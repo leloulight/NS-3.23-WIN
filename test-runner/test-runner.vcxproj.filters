@@ -92,11 +92,11 @@
     <Filter Include="tests\wave">
       <UniqueIdentifier>{7892ed0f-9dba-4cb9-af75-309cd68b20f7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="tests\visualizer">
-      <UniqueIdentifier>{a3858dc2-a2d1-42e9-9135-11f1a09d42c8}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\ns-3\utils\test-runner.cc">
+      <Filter>model</Filter>
+    </ClCompile>
     <ClCompile Include="..\ns-3\src\antenna\test\test-angles.cc">
       <Filter>tests\antenna</Filter>
     </ClCompile>
@@ -129,6 +129,18 @@
     </ClCompile>
     <ClCompile Include="..\ns-3\src\applications\test\udp-client-server-test.cc">
       <Filter>tests\applications</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\buildings\test\building-position-allocator-test.cc">
+      <Filter>tests\buildings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\buildings\test\buildings-helper-test.cc">
+      <Filter>tests\buildings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\buildings\test\buildings-pathloss-test.cc">
+      <Filter>tests\buildings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\buildings\test\buildings-shadowing-test.cc">
+      <Filter>tests\buildings</Filter>
     </ClCompile>
     <ClCompile Include="..\ns-3\src\core\test\attribute-test-suite.cc">
       <Filter>tests\core</Filter>
@@ -169,10 +181,19 @@
     <ClCompile Include="..\ns-3\src\core\test\ptr-test-suite.cc">
       <Filter>tests\core</Filter>
     </ClCompile>
+    <ClCompile Include="..\ns-3\src\core\test\random-variable-stream-test-suite.cc">
+      <Filter>tests\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\core\test\rng-test-suite.cc">
+      <Filter>tests\core</Filter>
+    </ClCompile>
     <ClCompile Include="..\ns-3\src\core\test\sample-test-suite.cc">
       <Filter>tests\core</Filter>
     </ClCompile>
     <ClCompile Include="..\ns-3\src\core\test\simulator-test-suite.cc">
+      <Filter>tests\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\core\test\threaded-test-suite.cc">
       <Filter>tests\core</Filter>
     </ClCompile>
     <ClCompile Include="..\ns-3\src\core\test\timer-test-suite.cc">
@@ -192,18 +213,6 @@
     </ClCompile>
     <ClCompile Include="..\ns-3\src\core\test\watchdog-test-suite.cc">
       <Filter>tests\core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\buildings\test\building-position-allocator-test.cc">
-      <Filter>tests\buildings</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\buildings\test\buildings-helper-test.cc">
-      <Filter>tests\buildings</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\buildings\test\buildings-pathloss-test.cc">
-      <Filter>tests\buildings</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\buildings\test\buildings-shadowing-test.cc">
-      <Filter>tests\buildings</Filter>
     </ClCompile>
     <ClCompile Include="..\ns-3\src\dsdv\test\dsdv-testcase.cc">
       <Filter>tests\dsdv</Filter>
@@ -316,8 +325,35 @@
     <ClCompile Include="..\ns-3\src\internet\test\tcp-timestamp-test.cc">
       <Filter>tests\internet</Filter>
     </ClCompile>
+    <ClCompile Include="..\ns-3\src\internet\test\tcp-wscaling-test.cc">
+      <Filter>tests\internet</Filter>
+    </ClCompile>
     <ClCompile Include="..\ns-3\src\internet\test\udp-test.cc">
       <Filter>tests\internet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\lr-wpan\test\lr-wpan-ack-test.cc">
+      <Filter>tests\lr-wpan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\lr-wpan\test\lr-wpan-cca-test.cc">
+      <Filter>tests\lr-wpan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\lr-wpan\test\lr-wpan-collision-test.cc">
+      <Filter>tests\lr-wpan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\lr-wpan\test\lr-wpan-ed-test.cc">
+      <Filter>tests\lr-wpan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\lr-wpan\test\lr-wpan-error-model-test.cc">
+      <Filter>tests\lr-wpan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\lr-wpan\test\lr-wpan-packet-test.cc">
+      <Filter>tests\lr-wpan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\lr-wpan\test\lr-wpan-pd-plme-sap-test.cc">
+      <Filter>tests\lr-wpan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\lr-wpan\test\lr-wpan-spectrum-value-helper-test.cc">
+      <Filter>tests\lr-wpan</Filter>
     </ClCompile>
     <ClCompile Include="..\ns-3\src\lte\test\epc-test-gtpu.cc">
       <Filter>tests\lte</Filter>
@@ -349,6 +385,9 @@
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-cqi-generation.cc">
       <Filter>tests\lte</Filter>
     </ClCompile>
+    <ClCompile Include="..\ns-3\src\lte\test\lte-test-deactivate-bearer.cc">
+      <Filter>tests\lte</Filter>
+    </ClCompile>
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-downlink-power-control.cc">
       <Filter>tests\lte</Filter>
     </ClCompile>
@@ -359,6 +398,9 @@
       <Filter>tests\lte</Filter>
     </ClCompile>
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-entities.cc">
+      <Filter>tests\lte</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\lte\test\lte-test-fading.cc">
       <Filter>tests\lte</Filter>
     </ClCompile>
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-fdbet-ff-mac-scheduler.cc">
@@ -415,9 +457,6 @@
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-rr-ff-mac-scheduler.cc">
       <Filter>tests\lte</Filter>
     </ClCompile>
-    <ClCompile Include="..\ns-3\src\lte\test\lte-test-sinr-chunk-processor.cc">
-      <Filter>tests\lte</Filter>
-    </ClCompile>
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-spectrum-value-helper.cc">
       <Filter>tests\lte</Filter>
     </ClCompile>
@@ -463,6 +502,9 @@
     <ClCompile Include="..\ns-3\src\lte\test\test-lte-handover-target.cc">
       <Filter>tests\lte</Filter>
     </ClCompile>
+    <ClCompile Include="..\ns-3\src\lte\test\test-lte-rlc-header.cc">
+      <Filter>tests\lte</Filter>
+    </ClCompile>
     <ClCompile Include="..\ns-3\src\lte\test\test-lte-rrc.cc">
       <Filter>tests\lte</Filter>
     </ClCompile>
@@ -471,6 +513,9 @@
     </ClCompile>
     <ClCompile Include="..\ns-3\src\lte\test\test-lte-x2-handover-measures.cc">
       <Filter>tests\lte</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\mesh\test\mesh-information-element-vector-test-suite.cc">
+      <Filter>tests\mesh</Filter>
     </ClCompile>
     <ClCompile Include="..\ns-3\src\mesh\test\dot11s\dot11s-test-suite.cc">
       <Filter>tests\mesh\dot11</Filter>
@@ -502,8 +547,8 @@
     <ClCompile Include="..\ns-3\src\mesh\test\flame\regression.cc">
       <Filter>tests\mesh\flame</Filter>
     </ClCompile>
-    <ClCompile Include="..\ns-3\src\mesh\test\mesh-information-element-vector-test-suite.cc">
-      <Filter>tests\mesh</Filter>
+    <ClCompile Include="..\ns-3\src\mobility\test\geo-to-cartesian-test.cc">
+      <Filter>tests\mobility</Filter>
     </ClCompile>
     <ClCompile Include="..\ns-3\src\mobility\test\mobility-test-suite.cc">
       <Filter>tests\mobility</Filter>
@@ -512,6 +557,9 @@
       <Filter>tests\mobility</Filter>
     </ClCompile>
     <ClCompile Include="..\ns-3\src\mobility\test\ns2-mobility-helper-test-suite.cc">
+      <Filter>tests\mobility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\mobility\test\rand-cart-around-geo-test.cc">
       <Filter>tests\mobility</Filter>
     </ClCompile>
     <ClCompile Include="..\ns-3\src\mobility\test\steady-state-random-waypoint-mobility-model-test.cc">
@@ -592,6 +640,18 @@
     <ClCompile Include="..\ns-3\src\propagation\test\propagation-loss-model-test-suite.cc">
       <Filter>tests\propagation</Filter>
     </ClCompile>
+    <ClCompile Include="..\ns-3\src\sixlowpan\test\error-channel-sixlow.cc">
+      <Filter>tests\sixlowpan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\sixlowpan\test\sixlowpan-fragmentation-test.cc">
+      <Filter>tests\sixlowpan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\sixlowpan\test\sixlowpan-hc1-test.cc">
+      <Filter>tests\sixlowpan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\sixlowpan\test\sixlowpan-iphc-test.cc">
+      <Filter>tests\sixlowpan</Filter>
+    </ClCompile>
     <ClCompile Include="..\ns-3\src\spectrum\test\spectrum-ideal-phy-test.cc">
       <Filter>tests\spectrum</Filter>
     </ClCompile>
@@ -599,6 +659,15 @@
       <Filter>tests\spectrum</Filter>
     </ClCompile>
     <ClCompile Include="..\ns-3\src\spectrum\test\spectrum-value-test.cc">
+      <Filter>tests\spectrum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\spectrum\test\spectrum-waveform-generator-test.cc">
+      <Filter>tests\spectrum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\spectrum\test\tv-helper-distribution-test.cc">
+      <Filter>tests\spectrum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\spectrum\test\tv-spectrum-transmitter-test.cc">
       <Filter>tests\spectrum</Filter>
     </ClCompile>
     <ClCompile Include="..\ns-3\src\stats\test\average-test-suite.cc">
@@ -616,13 +685,25 @@
     <ClCompile Include="..\ns-3\src\uan\test\uan-test.cc">
       <Filter>tests\uan</Filter>
     </ClCompile>
+    <ClCompile Include="..\ns-3\src\wave\test\mac-extension-test-suite.cc">
+      <Filter>tests\wave</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\wave\test\ocb-test-suite.cc">
+      <Filter>tests\wave</Filter>
+    </ClCompile>
     <ClCompile Include="..\ns-3\src\wifi\test\block-ack-test-suite.cc">
       <Filter>tests\wifi</Filter>
     </ClCompile>
     <ClCompile Include="..\ns-3\src\wifi\test\dcf-manager-test.cc">
       <Filter>tests\wifi</Filter>
     </ClCompile>
+    <ClCompile Include="..\ns-3\src\wifi\test\power-rate-adaptation-test.cc">
+      <Filter>tests\wifi</Filter>
+    </ClCompile>
     <ClCompile Include="..\ns-3\src\wifi\test\tx-duration-test.cc">
+      <Filter>tests\wifi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\wifi\test\wifi-aggregation-test.cc">
       <Filter>tests\wifi</Filter>
     </ClCompile>
     <ClCompile Include="..\ns-3\src\wifi\test\wifi-test.cc">
@@ -648,66 +729,6 @@
     </ClCompile>
     <ClCompile Include="..\ns-3\src\wimax\test\wimax-tlv-test.cc">
       <Filter>tests\wimax</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\utils\test-runner.cc">
-      <Filter>model</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\core\test\random-variable-stream-test-suite.cc">
-      <Filter>tests\core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\core\test\rng-test-suite.cc">
-      <Filter>tests\core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\wave\test\ocb-test-suite.cc">
-      <Filter>tests\wave</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\sixlowpan\test\error-channel-sixlow.cc">
-      <Filter>tests\sixlowpan</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\sixlowpan\test\sixlowpan-fragmentation-test.cc">
-      <Filter>tests\sixlowpan</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\sixlowpan\test\sixlowpan-hc1-test.cc">
-      <Filter>tests\sixlowpan</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\sixlowpan\test\sixlowpan-iphc-test.cc">
-      <Filter>tests\sixlowpan</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\lr-wpan\test\lr-wpan-ack-test.cc">
-      <Filter>tests\lr-wpan</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\lr-wpan\test\lr-wpan-cca-test.cc">
-      <Filter>tests\lr-wpan</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\lr-wpan\test\lr-wpan-collision-test.cc">
-      <Filter>tests\lr-wpan</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\lr-wpan\test\lr-wpan-ed-test.cc">
-      <Filter>tests\lr-wpan</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\lr-wpan\test\lr-wpan-error-model-test.cc">
-      <Filter>tests\lr-wpan</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\lr-wpan\test\lr-wpan-packet-test.cc">
-      <Filter>tests\lr-wpan</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\lr-wpan\test\lr-wpan-pd-plme-sap-test.cc">
-      <Filter>tests\lr-wpan</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\lr-wpan\test\lr-wpan-spectrum-value-helper-test.cc">
-      <Filter>tests\lr-wpan</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\lte\test\lte-test-deactivate-bearer.cc">
-      <Filter>tests\lte</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\spectrum\test\spectrum-waveform-generator-test.cc">
-      <Filter>tests\spectrum</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\wave\test\mac-extension-test-suite.cc">
-      <Filter>tests\wave</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\wifi\test\power-rate-adaptation-test.cc">
-      <Filter>tests\wifi</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -753,6 +774,9 @@
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-cqi-generation.h">
       <Filter>tests\lte</Filter>
     </ClInclude>
+    <ClInclude Include="..\ns-3\src\lte\test\lte-test-deactivate-bearer.h">
+      <Filter>tests\lte</Filter>
+    </ClInclude>
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-downlink-power-control.h">
       <Filter>tests\lte</Filter>
     </ClInclude>
@@ -760,6 +784,9 @@
       <Filter>tests\lte</Filter>
     </ClInclude>
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-entities.h">
+      <Filter>tests\lte</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\lte\test\lte-test-fading.h">
       <Filter>tests\lte</Filter>
     </ClInclude>
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-fdbet-ff-mac-scheduler.h">
@@ -816,9 +843,6 @@
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-rr-ff-mac-scheduler.h">
       <Filter>tests\lte</Filter>
     </ClInclude>
-    <ClInclude Include="..\ns-3\src\lte\test\lte-test-sinr-chunk-processor.h">
-      <Filter>tests\lte</Filter>
-    </ClInclude>
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-tdbet-ff-mac-scheduler.h">
       <Filter>tests\lte</Filter>
     </ClInclude>
@@ -870,14 +894,11 @@
     <ClInclude Include="..\ns-3\src\olsr\test\tc-regression-test.h">
       <Filter>tests\olsr</Filter>
     </ClInclude>
-    <ClInclude Include="..\ns-3\src\spectrum\test\spectrum-test.h">
-      <Filter>tests\spectrum</Filter>
-    </ClInclude>
     <ClInclude Include="..\ns-3\src\sixlowpan\test\error-channel-sixlow.h">
       <Filter>tests\sixlowpan</Filter>
     </ClInclude>
-    <ClInclude Include="..\ns-3\src\lte\test\lte-test-deactivate-bearer.h">
-      <Filter>tests\lte</Filter>
+    <ClInclude Include="..\ns-3\src\spectrum\test\spectrum-test.h">
+      <Filter>tests\spectrum</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -17,7 +17,6 @@
  *
  * Author: Benjamin Cizdziel <ben.cizdziel@gmail.com>
  */
-
 #define private public //to make private method testable
 
 #include <ns3/test.h>

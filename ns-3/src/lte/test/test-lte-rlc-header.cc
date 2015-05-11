@@ -41,28 +41,54 @@ public:
   // Function to convert packet contents in hex format
   static std::string sprintPacketContentsHex (Ptr<Packet> pkt)
   {
-    uint32_t psize = pkt->GetSize ();
-    uint8_t buffer[psize];
+	  uint32_t psize = pkt->GetSize();
+	  ///WINDOWS
+	  //uint8_t buffer[psize];
+#ifndef WIN32
+	  uint8_t buffer[psize];
+#else
+	  uint8_t* buffer = new uint8_t[psize];
+#endif
+	  ///WINDOWS
     std::ostringstream oss (std::ostringstream::out);
     pkt->CopyData (buffer, psize);
     for (uint32_t i = 0; i < psize; i++)
       {
         oss << std::setfill ('0') << std::setw (2) << std::hex << (uint32_t) buffer[i];
-      }
+	}
+	///WINDOWS
+	//释放内存。
+#ifdef WIN32
+	delete[] buffer;
+#endif
+	///WINDOWS
     return oss.str ();
   }
 
   // Function to convert packet contents in binary format
   static std::string sprintPacketContentsBin (Ptr<Packet> pkt)
   {
-    uint32_t psize = pkt->GetSize ();
-    uint8_t buffer[psize];
+	  uint32_t psize = pkt->GetSize();
+	  ///WINDOWS
+	  //uint8_t buffer[psize];
+#ifndef WIN32
+	  uint8_t buffer[psize];
+#else
+	  uint8_t* buffer = new uint8_t[psize];
+#endif
+	  ///WINDOWS
     std::ostringstream oss (std::ostringstream::out);
     pkt->CopyData (buffer, psize);
     for (uint32_t i = 0; i < psize; i++)
       {
         oss << (std::bitset<8> (buffer[i]));
-      }
+	}
+	///WINDOWS
+	//释放内存。
+#ifdef WIN32
+	delete[] buffer;
+#endif
+	///WINDOWS
     return std::string (oss.str () + "\n");
   }
 

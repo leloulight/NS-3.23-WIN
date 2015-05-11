@@ -43,6 +43,7 @@
     <ClCompile Include="..\ns-3\src\core\test\rng-test-suite.cc" />
     <ClCompile Include="..\ns-3\src\core\test\sample-test-suite.cc" />
     <ClCompile Include="..\ns-3\src\core\test\simulator-test-suite.cc" />
+    <ClCompile Include="..\ns-3\src\core\test\threaded-test-suite.cc" />
     <ClCompile Include="..\ns-3\src\core\test\time-test-suite.cc" />
     <ClCompile Include="..\ns-3\src\core\test\timer-test-suite.cc" />
     <ClCompile Include="..\ns-3\src\core\test\traced-callback-test-suite.cc" />
@@ -86,6 +87,7 @@
     <ClCompile Include="..\ns-3\src\internet\test\tcp-option-test.cc" />
     <ClCompile Include="..\ns-3\src\internet\test\tcp-test.cc" />
     <ClCompile Include="..\ns-3\src\internet\test\tcp-timestamp-test.cc" />
+    <ClCompile Include="..\ns-3\src\internet\test\tcp-wscaling-test.cc" />
     <ClCompile Include="..\ns-3\src\internet\test\udp-test.cc" />
     <ClCompile Include="..\ns-3\src\lr-wpan\test\lr-wpan-ack-test.cc" />
     <ClCompile Include="..\ns-3\src\lr-wpan\test\lr-wpan-cca-test.cc" />
@@ -110,6 +112,7 @@
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-downlink-sinr.cc" />
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-earfcn.cc" />
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-entities.cc" />
+    <ClCompile Include="..\ns-3\src\lte\test\lte-test-fading.cc" />
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-fdbet-ff-mac-scheduler.cc" />
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-fdmt-ff-mac-scheduler.cc" />
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-fdtbfq-ff-mac-scheduler.cc" />
@@ -128,7 +131,6 @@
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-rlc-um-e2e.cc" />
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-rlc-um-transmitter.cc" />
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-rr-ff-mac-scheduler.cc" />
-    <ClCompile Include="..\ns-3\src\lte\test\lte-test-sinr-chunk-processor.cc" />
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-spectrum-value-helper.cc" />
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-tdbet-ff-mac-scheduler.cc" />
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-tdmt-ff-mac-scheduler.cc" />
@@ -144,6 +146,7 @@
     <ClCompile Include="..\ns-3\src\lte\test\test-lte-epc-e2e-data.cc" />
     <ClCompile Include="..\ns-3\src\lte\test\test-lte-handover-delay.cc" />
     <ClCompile Include="..\ns-3\src\lte\test\test-lte-handover-target.cc" />
+    <ClCompile Include="..\ns-3\src\lte\test\test-lte-rlc-header.cc" />
     <ClCompile Include="..\ns-3\src\lte\test\test-lte-rrc.cc" />
     <ClCompile Include="..\ns-3\src\lte\test\test-lte-x2-handover-measures.cc" />
     <ClCompile Include="..\ns-3\src\lte\test\test-lte-x2-handover.cc" />
@@ -158,9 +161,11 @@
     <ClCompile Include="..\ns-3\src\mesh\test\flame\flame-test-suite.cc" />
     <ClCompile Include="..\ns-3\src\mesh\test\flame\regression.cc" />
     <ClCompile Include="..\ns-3\src\mesh\test\mesh-information-element-vector-test-suite.cc" />
+    <ClCompile Include="..\ns-3\src\mobility\test\geo-to-cartesian-test.cc" />
     <ClCompile Include="..\ns-3\src\mobility\test\mobility-test-suite.cc" />
     <ClCompile Include="..\ns-3\src\mobility\test\mobility-trace-test-suite.cc" />
     <ClCompile Include="..\ns-3\src\mobility\test\ns2-mobility-helper-test-suite.cc" />
+    <ClCompile Include="..\ns-3\src\mobility\test\rand-cart-around-geo-test.cc" />
     <ClCompile Include="..\ns-3\src\mobility\test\steady-state-random-waypoint-mobility-model-test.cc" />
     <ClCompile Include="..\ns-3\src\mobility\test\waypoint-mobility-model-test.cc" />
     <ClCompile Include="..\ns-3\src\netanim\test\netanim-test.cc" />
@@ -195,6 +200,8 @@
     <ClCompile Include="..\ns-3\src\spectrum\test\spectrum-interference-test.cc" />
     <ClCompile Include="..\ns-3\src\spectrum\test\spectrum-value-test.cc" />
     <ClCompile Include="..\ns-3\src\spectrum\test\spectrum-waveform-generator-test.cc" />
+    <ClCompile Include="..\ns-3\src\spectrum\test\tv-helper-distribution-test.cc" />
+    <ClCompile Include="..\ns-3\src\spectrum\test\tv-spectrum-transmitter-test.cc" />
     <ClCompile Include="..\ns-3\src\stats\test\average-test-suite.cc" />
     <ClCompile Include="..\ns-3\src\stats\test\basic-data-calculators-test-suite.cc" />
     <ClCompile Include="..\ns-3\src\stats\test\double-probe-test-suite.cc" />
@@ -206,6 +213,7 @@
     <ClCompile Include="..\ns-3\src\wifi\test\dcf-manager-test.cc" />
     <ClCompile Include="..\ns-3\src\wifi\test\power-rate-adaptation-test.cc" />
     <ClCompile Include="..\ns-3\src\wifi\test\tx-duration-test.cc" />
+    <ClCompile Include="..\ns-3\src\wifi\test\wifi-aggregation-test.cc" />
     <ClCompile Include="..\ns-3\src\wifi\test\wifi-test.cc" />
     <ClCompile Include="..\ns-3\src\wimax\test\mac-messages-test.cc" />
     <ClCompile Include="..\ns-3\src\wimax\test\phy-test.cc" />
@@ -235,6 +243,7 @@
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-downlink-power-control.h" />
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-downlink-sinr.h" />
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-entities.h" />
+    <ClInclude Include="..\ns-3\src\lte\test\lte-test-fading.h" />
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-fdbet-ff-mac-scheduler.h" />
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-fdmt-ff-mac-scheduler.h" />
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-fdtbfq-ff-mac-scheduler.h" />
@@ -253,7 +262,6 @@
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-rlc-um-e2e.h" />
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-rlc-um-transmitter.h" />
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-rr-ff-mac-scheduler.h" />
-    <ClInclude Include="..\ns-3\src\lte\test\lte-test-sinr-chunk-processor.h" />
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-tdbet-ff-mac-scheduler.h" />
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-tdmt-ff-mac-scheduler.h" />
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-tdtbfq-ff-mac-scheduler.h" />
@@ -315,7 +323,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_XKEYCHECK_H;WIN32;_DEBUG;_CONSOLE;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)headers;$(SolutionDir)others\x86\include;</AdditionalIncludeDirectories>
       <AdditionalOptions>/D "NS3_LOG_ENABLE" </AdditionalOptions>
       <BrowseInformation>true</BrowseInformation>
@@ -327,7 +335,7 @@
     </Link>
     <PreBuildEvent>
       <Command>
-</Command>
+      </Command>
     </PreBuildEvent>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
