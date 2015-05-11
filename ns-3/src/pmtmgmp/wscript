@@ -1,0 +1,82 @@
+## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
+
+def build(bld):
+    obj = bld.create_ns3_module('pmtmgmp', ['internet', 'wifi', 'applications'])
+
+    obj.source = [
+        'model/wmn-information-element-vector.cc',
+        'model/wmn-point-device.cc',
+        'model/wmn-l2-routing-protocol.cc',
+        'model/wmn-wifi-beacon.cc',
+        'model/wmn-wifi-interface-mac.cc',
+        'model/my11s/ie-my11s-beacon-timing.cc',
+        'model/my11s/ie-my11s-configuration.cc',
+        'model/my11s/ie-my11s-id.cc',
+        'model/my11s/ie-my11s-peer-management.cc',
+        'model/my11s/ie-my11s-preq.cc',
+        'model/my11s/ie-my11s-prep.cc',
+        'model/my11s/ie-my11s-perr.cc',
+        'model/my11s/ie-my11s-rann.cc',
+        'model/my11s/ie-my11s-peering-protocol.cc',
+        'model/my11s/ie-my11s-metric-report.cc',
+        'model/my11s/my11s-mac-header.cc',
+        'model/my11s/pmtmgmp-peer-link-frame.cc',
+        'model/my11s/pmtmgmp-peer-link.cc',
+        'model/my11s/pmtmgmp-peer-management-protocol-mac.cc',
+        'model/my11s/pmtmgmp-peer-management-protocol.cc',
+        'model/my11s/pmtmgmp-tag.cc',
+        'model/my11s/pmtmgmp-rtable.cc',
+        'model/my11s/pmtmgmp-protocol-mac.cc',
+        'model/my11s/pmtmgmp-protocol.cc',
+        'model/my11s/pmtmgmp-airtime-metric.cc',
+        'helper/wmn-helper.cc',
+        'helper/my11s/my11s-installer.cc',
+        ]
+
+    obj_test = bld.create_ns3_module_test_library('wmn')
+    obj_test.source = [
+        'test/wmn-information-element-vector-test-suite.cc',
+        'test/my11s/my11s-test-suite.cc',
+        'test/my11s/pmp-regression.cc',
+        'test/my11s/pmtmgmp-reactive-regression.cc',
+        'test/my11s/pmtmgmp-proactive-regression.cc',
+        'test/my11s/pmtmgmp-simplest-regression.cc',
+        'test/my11s/pmtmgmp-target-flags-regression.cc',
+        'test/my11s/regression.cc',
+        ]
+
+    headers = bld(features='ns3header')
+    headers.module = 'pmtmgmp'
+    headers.source = [
+        'model/wmn-information-element.h',
+        'model/wmn-information-element-vector.h',
+        'model/wmn-point-device.h',
+        'model/wmn-l2-routing-protocol.h',
+        'model/wmn-wifi-beacon.h',
+        'model/wmn-wifi-interface-mac.h',
+        'model/wmn-wifi-interface-mac-plugin.h',
+        'model/my11s/pmtmgmp-protocol.h',
+        'model/my11s/pmtmgmp-peer-management-protocol.h',
+        'model/my11s/ie-my11s-beacon-timing.h',
+        'model/my11s/ie-my11s-configuration.h',
+        'model/my11s/ie-my11s-peer-management.h',
+        'model/my11s/ie-my11s-id.h',
+        'model/my11s/pmtmgmp-peer-link.h',
+        'model/my11s/my11s-mac-header.h',
+        'model/my11s/pmtmgmp-peer-link-frame.h',
+        'model/my11s/pmtmgmp-rtable.h',
+        'model/my11s/ie-my11s-peering-protocol.h',
+        'model/my11s/ie-my11s-metric-report.h',
+        'model/my11s/ie-my11s-perr.h',
+        'model/my11s/ie-my11s-prep.h',
+        'model/my11s/ie-my11s-preq.h',
+        'model/my11s/ie-my11s-rann.h',
+        'helper/wmn-helper.h',
+        'helper/wmn-stack-installer.h',
+        'helper/my11s/my11s-installer.h',
+        ]
+
+    if bld.env['ENABLE_EXAMPLES']:
+        bld.recurse('examples')
+
+    bld.ns3_python_bindings()

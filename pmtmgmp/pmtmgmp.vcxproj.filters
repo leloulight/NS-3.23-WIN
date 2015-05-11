@@ -1,0 +1,190 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="..\others\ns3\pmtmgmp-module.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\helper\my11s\my11s-installer.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\helper\wmn-helper.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\helper\wmn-stack-installer.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-beacon-timing.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-configuration.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-id.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-metric-report.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-peer-management.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-peering-protocol.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-perr.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-prep.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-preq.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-rann.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\my11s-mac-header.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\my11s.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\pmtmgmp-airtime-metric.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\pmtmgmp-peer-link-frame.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\pmtmgmp-peer-link.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\pmtmgmp-peer-management-protocol-mac.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\pmtmgmp-peer-management-protocol.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\pmtmgmp-protocol-mac.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\pmtmgmp-protocol.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\pmtmgmp-rtable.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\pmtmgmp-tag.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\wmn-information-element-vector.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\wmn-information-element.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\wmn-l2-routing-protocol.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\wmn-point-device.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\wmn-wifi-beacon.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\wmn-wifi-interface-mac-plugin.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\wmn-wifi-interface-mac.h">
+      <Filter>model</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="helper">
+      <UniqueIdentifier>{bdb89393-35f8-40f1-ac2e-73262416974d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="model">
+      <UniqueIdentifier>{7e826354-0935-4bf4-847b-6952cc88c080}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\helper\my11s\my11s-installer.cc">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\helper\wmn-helper.cc">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-beacon-timing.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-configuration.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-id.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-metric-report.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-peer-management.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-peering-protocol.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-perr.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-prep.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-preq.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-rann.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\my11s-mac-header.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\pmtmgmp-airtime-metric.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\pmtmgmp-peer-link-frame.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\pmtmgmp-peer-link.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\pmtmgmp-peer-management-protocol-mac.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\pmtmgmp-peer-management-protocol.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\pmtmgmp-protocol-mac.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\pmtmgmp-protocol.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\pmtmgmp-rtable.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\pmtmgmp-tag.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\wmn-information-element-vector.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\wmn-l2-routing-protocol.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\wmn-point-device.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\wmn-wifi-beacon.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\wmn-wifi-interface-mac.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
