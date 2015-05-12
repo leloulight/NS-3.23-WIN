@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\ns-3\examples\tutorial\seventh.cc">
+    <ClCompile Include="..\ns-3\src\pmtmgmp\examples\wmn.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

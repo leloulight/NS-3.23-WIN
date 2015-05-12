@@ -234,7 +234,15 @@ WmnWifiInterfaceMac::ForwardDown (Ptr<const Packet> const_packet, Mac48Address f
   // Address 1 is unknwon here. Routing plugin is responsible to correctly set it.
   hdr.SetAddr1 (Mac48Address ());
   // Filter packet through all installed plugins
-  for (PluginList::const_iterator i = m_plugins.end () - 1; i != m_plugins.begin () - 1; i--)
+  ///WINDOWS
+  //for (PluginList::const_iterator i = m_plugins.end() - 1; i != m_plugins.begin() - 1; i--)
+  //²Î¿¼ns-3-win2.2014.11.30.
+#ifndef WIN32
+  for (PluginList::const_iterator i = m_plugins.end() - 1; i != m_plugins.begin() - 1; i--)
+#else
+  for (PluginList::const_reverse_iterator i = m_plugins.rbegin(); i != m_plugins.rend(); ++i)
+#endif
+	  ///WINDOWS
     {
       bool drop = !((*i)->UpdateOutcomingFrame (packet, hdr, from, to));
       if (drop)
@@ -277,8 +285,16 @@ void
 WmnWifiInterfaceMac::SendManagementFrame (Ptr<Packet> packet, const WifiMacHeader& hdr)
 {
   //Filter management frames:
-  WifiMacHeader header = hdr;
-  for (PluginList::const_iterator i = m_plugins.end () - 1; i != m_plugins.begin () - 1; i--)
+	WifiMacHeader header = hdr;
+	///WINDOWS
+	//for (PluginList::const_iterator i = m_plugins.end() - 1; i != m_plugins.begin() - 1; i--)
+	//²Î¿¼ns-3-win2.2014.11.30.
+#ifndef WIN32
+	for (PluginList::const_iterator i = m_plugins.end() - 1; i != m_plugins.begin() - 1; i--)
+#else
+	for (PluginList::const_reverse_iterator i = m_plugins.rbegin(); i != m_plugins.rend(); ++i)
+#endif
+		///WINDOWS
     {
       bool drop = !((*i)->UpdateOutcomingFrame (packet, header, Mac48Address (), Mac48Address ()));
       if (drop)

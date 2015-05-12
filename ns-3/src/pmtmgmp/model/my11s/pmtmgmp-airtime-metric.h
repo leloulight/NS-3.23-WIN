@@ -38,10 +38,10 @@ namespace my11s {
  *
  * Final result is expressed in units of 0.01 Time Unit = 10.24 us (as required by 802.11s draft)
  */
-class AirtimeLinkMetricCalculator : public Object
+class PmtmgmpAirtimeLinkMetricCalculator : public Object
 {
 public:
-  AirtimeLinkMetricCalculator ();
+  PmtmgmpAirtimeLinkMetricCalculator ();
   static TypeId GetTypeId ();
   uint32_t CalculateMetric (Mac48Address peerAddress, Ptr<WmnWifiInterfaceMac> mac);
   void SetTestLength (uint16_t testLength);

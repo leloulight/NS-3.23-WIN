@@ -720,8 +720,8 @@ PmtmgmpProtocol::Install (Ptr<WmnPointDevice> mp)
       m_interfaces[wifiNetDev->GetIfIndex ()] = pmtmgmpMac;
       mac->InstallPlugin (pmtmgmpMac);
       //Installing airtime link metric:
-      Ptr<AirtimeLinkMetricCalculator> metric = CreateObject <AirtimeLinkMetricCalculator> ();
-      mac->SetLinkMetricCallback (MakeCallback (&AirtimeLinkMetricCalculator::CalculateMetric, metric));
+      Ptr<PmtmgmpAirtimeLinkMetricCalculator> metric = CreateObject <PmtmgmpAirtimeLinkMetricCalculator> ();
+      mac->SetLinkMetricCallback (MakeCallback (&PmtmgmpAirtimeLinkMetricCalculator::CalculateMetric, metric));
     }
   mp->SetRoutingProtocol (this);
   // Wmn point aggregates all installed protocols

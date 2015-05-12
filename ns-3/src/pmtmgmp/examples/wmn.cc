@@ -49,7 +49,7 @@
 #include "ns3/network-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/wifi-module.h"
-#include "ns3/wmn-module.h"
+#include "ns3/pmtmgmp-module.h"
 #include "ns3/mobility-module.h"
 #include "ns3/wmn-helper.h"
 

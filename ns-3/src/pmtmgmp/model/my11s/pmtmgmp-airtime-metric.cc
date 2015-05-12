@@ -25,37 +25,37 @@
 
 namespace ns3 {
 namespace my11s {
-NS_OBJECT_ENSURE_REGISTERED (AirtimeLinkMetricCalculator);
+NS_OBJECT_ENSURE_REGISTERED (PmtmgmpAirtimeLinkMetricCalculator);
   
 TypeId
-AirtimeLinkMetricCalculator::GetTypeId ()
+PmtmgmpAirtimeLinkMetricCalculator::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::my11s::AirtimeLinkMetricCalculator")
+  static TypeId tid = TypeId ("ns3::my11s::PmtmgmpAirtimeLinkMetricCalculator")
     .SetParent<Object> ()
     .SetGroupName ("Wmn")
-    .AddConstructor<AirtimeLinkMetricCalculator> ()
+    .AddConstructor<PmtmgmpAirtimeLinkMetricCalculator> ()
     .AddAttribute ( "TestLength",
                     "Rate should be estimated using test length.",
                     UintegerValue (1024),
                     MakeUintegerAccessor (
-                      &AirtimeLinkMetricCalculator::SetTestLength),
+                      &PmtmgmpAirtimeLinkMetricCalculator::SetTestLength),
                     MakeUintegerChecker<uint16_t> (1)
                     )
     .AddAttribute ( "Dot11MetricTid",
                     "TID used to calculate metric (data rate)",
                     UintegerValue (0),
                     MakeUintegerAccessor (
-                      &AirtimeLinkMetricCalculator::SetHeaderTid),
+                      &PmtmgmpAirtimeLinkMetricCalculator::SetHeaderTid),
                     MakeUintegerChecker<uint8_t> (0)
                     )
   ;
   return tid;
 }
-AirtimeLinkMetricCalculator::AirtimeLinkMetricCalculator ()
+PmtmgmpAirtimeLinkMetricCalculator::PmtmgmpAirtimeLinkMetricCalculator ()
 {
 }
 void
-AirtimeLinkMetricCalculator::SetHeaderTid (uint8_t tid)
+PmtmgmpAirtimeLinkMetricCalculator::SetHeaderTid (uint8_t tid)
 {
   m_testHeader.SetDsFrom ();
   m_testHeader.SetDsTo ();
@@ -63,12 +63,12 @@ AirtimeLinkMetricCalculator::SetHeaderTid (uint8_t tid)
   m_testHeader.SetQosTid (tid);
 }
 void
-AirtimeLinkMetricCalculator::SetTestLength (uint16_t testLength)
+PmtmgmpAirtimeLinkMetricCalculator::SetTestLength (uint16_t testLength)
 {
   m_testFrame = Create<Packet> (testLength + 6 /*Wmn header*/ + 36 /*802.11 header*/);
 }
 uint32_t
-AirtimeLinkMetricCalculator::CalculateMetric (Mac48Address peerAddress, Ptr<WmnWifiInterfaceMac> mac)
+PmtmgmpAirtimeLinkMetricCalculator::CalculateMetric (Mac48Address peerAddress, Ptr<WmnWifiInterfaceMac> mac)
 {
   /* Airtime link metric is defined in 11B.10 of 802.11s Draft D3.0 as:
    *
