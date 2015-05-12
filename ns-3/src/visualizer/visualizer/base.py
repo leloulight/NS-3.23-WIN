@@ -4,6 +4,7 @@ import ns.wifi
 import ns.bridge
 import ns.internet
 import ns.mesh
+import ns.pmtmgmp
 import ns.wimax
 import ns.wimax
 import ns.lte
@@ -41,6 +42,7 @@ netdevice_traits = {
     ns.bridge.BridgeNetDevice: NetDeviceTraits(is_virtual=True),
     ns.internet.LoopbackNetDevice: NetDeviceTraits(is_virtual=True, is_wireless=False),
     ns.mesh.MeshPointDevice: NetDeviceTraits(is_virtual=True),
+    ns.pmtmgmp.PmtmgmpPointDevice: NetDeviceTraits(is_virtual=True),
     ns.wimax.SubscriberStationNetDevice: NetDeviceTraits(is_wireless=True),
     ns.wimax.BaseStationNetDevice: NetDeviceTraits(is_wireless=True),
     ns.lte.LteUeNetDevice: NetDeviceTraits(is_wireless=True),
