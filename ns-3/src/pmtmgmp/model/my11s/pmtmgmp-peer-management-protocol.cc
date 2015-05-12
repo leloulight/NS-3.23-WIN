@@ -35,7 +35,7 @@
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("PeerManagementProtocol");
+NS_LOG_COMPONENT_DEFINE ("PmtmgmpPeerManagementProtocol");
   
 namespace my11s {
   

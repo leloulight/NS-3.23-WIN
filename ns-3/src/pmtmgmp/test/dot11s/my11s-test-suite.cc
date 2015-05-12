@@ -206,7 +206,7 @@ PmtmgmpRtableTest::DoRun ()
 struct PeerLinkFrameStartTest : public TestCase
 {
   PeerLinkFrameStartTest () :
-    TestCase ("PeerLinkFrames (open, confirm, close) unit tests")
+    TestCase ("PmtmgmpPeerLinkFrames (open, confirm, close) unit tests")
   {
   }
   virtual void DoRun ();

@@ -186,19 +186,17 @@ LteEnbAntennaTestCase::DoRun (void)
   // this can only be done for not-too-bad SINR otherwise the measurement won't be available
   double expectedSinrDl = enbTxPowerDbm + m_antennaGainDb - noisePowerDbm + ueNoiseFigureDb;
   if (expectedSinrDl > 0)
-    {
-
-		///WINDOWS
-		//double calculatedSinrDbDl = -INFINITY;
-		//参考ns-3-win2源文件,calculatedSinrDbUl改为calculatedSinrDbUl。
+  {
+	  ///WINDOWS
+	  //double calculatedSinrDbDl = -INFINITY;
+	  //参考ns-3-win2源文件,calculatedSinrDbUl改为calculatedSinrDbUl。
 #ifndef WIN32
-      double calculatedSinrDbDl = -INFINITY;
+	  double calculatedSinrDbDl = -INFINITY;
 #else            
-		double calculatedSinrDbDl = -std::numeric_limits<double>::infinity();
+	  double calculatedSinrDbDl = -std::numeric_limits<double>::infinity();
 #endif
-		///WINDOWS
-
-      if (testDlSinr->GetSinr () != 0)
+	  ///WINDOWS
+      if (dlSinrCatcher.GetValue () != 0)
         {
           calculatedSinrDbDl = 10.0 * std::log10 (dlSinrCatcher.GetValue ()->operator[] (0));
         }      
@@ -208,19 +206,17 @@ LteEnbAntennaTestCase::DoRun (void)
     }
   double expectedSinrUl = ueTxPowerDbm + m_antennaGainDb - noisePowerDbm + enbNoiseFigureDb;
   if (expectedSinrUl > 0)
-    {      
-
-		///WINDOWS
-		//double calculatedSinrDbUl = -INFINITY;
-		//参考ns-3-win2源文件,calculatedSinrDbUl改为calculatedSinrDbUl。
+  {
+	  ///WINDOWS
+	  //double calculatedSinrDbUl = -INFINITY;
+	  //参考ns-3-win2源文件,calculatedSinrDbUl改为calculatedSinrDbUl。
 #ifndef WIN32
-      double calculatedSinrDbUl = -INFINITY;
+	  double calculatedSinrDbUl = -INFINITY;
 #else      
-		double calculatedSinrDbUl = -std::numeric_limits<double>::infinity();
+	  double calculatedSinrDbUl = -std::numeric_limits<double>::infinity();
 #endif
-		///WINDOWS
-
-      if (testUlSinr->GetSinr () != 0)
+	  ///WINDOWS
+      if (ulSinrCatcher.GetValue () != 0)
         {
           calculatedSinrDbUl = 10.0 * std::log10 (ulSinrCatcher.GetValue ()->operator[] (0));
         }  

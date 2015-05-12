@@ -193,9 +193,6 @@
     <ClCompile Include="..\ns-3\src\core\test\simulator-test-suite.cc">
       <Filter>tests\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\ns-3\src\core\test\threaded-test-suite.cc">
-      <Filter>tests\core</Filter>
-    </ClCompile>
     <ClCompile Include="..\ns-3\src\core\test\timer-test-suite.cc">
       <Filter>tests\core</Filter>
     </ClCompile>
@@ -213,9 +210,6 @@
     </ClCompile>
     <ClCompile Include="..\ns-3\src\core\test\watchdog-test-suite.cc">
       <Filter>tests\core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\dsdv\test\dsdv-testcase.cc">
-      <Filter>tests\dsdv</Filter>
     </ClCompile>
     <ClCompile Include="..\ns-3\src\dsr\test\dsr-test-suite.cc">
       <Filter>tests\dsr</Filter>
@@ -325,9 +319,6 @@
     <ClCompile Include="..\ns-3\src\internet\test\tcp-timestamp-test.cc">
       <Filter>tests\internet</Filter>
     </ClCompile>
-    <ClCompile Include="..\ns-3\src\internet\test\tcp-wscaling-test.cc">
-      <Filter>tests\internet</Filter>
-    </ClCompile>
     <ClCompile Include="..\ns-3\src\internet\test\udp-test.cc">
       <Filter>tests\internet</Filter>
     </ClCompile>
@@ -398,9 +389,6 @@
       <Filter>tests\lte</Filter>
     </ClCompile>
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-entities.cc">
-      <Filter>tests\lte</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\lte\test\lte-test-fading.cc">
       <Filter>tests\lte</Filter>
     </ClCompile>
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-fdbet-ff-mac-scheduler.cc">
@@ -664,12 +652,6 @@
     <ClCompile Include="..\ns-3\src\spectrum\test\spectrum-waveform-generator-test.cc">
       <Filter>tests\spectrum</Filter>
     </ClCompile>
-    <ClCompile Include="..\ns-3\src\spectrum\test\tv-helper-distribution-test.cc">
-      <Filter>tests\spectrum</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\spectrum\test\tv-spectrum-transmitter-test.cc">
-      <Filter>tests\spectrum</Filter>
-    </ClCompile>
     <ClCompile Include="..\ns-3\src\stats\test\average-test-suite.cc">
       <Filter>tests\stats</Filter>
     </ClCompile>
@@ -784,9 +766,6 @@
       <Filter>tests\lte</Filter>
     </ClInclude>
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-entities.h">
-      <Filter>tests\lte</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ns-3\src\lte\test\lte-test-fading.h">
       <Filter>tests\lte</Filter>
     </ClInclude>
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-fdbet-ff-mac-scheduler.h">

@@ -367,8 +367,14 @@ LteUplinkSrsSinrTestCase::DoRun (void)
   int numOfIntfSignals = 4;
   int numOfSignals = numOfDataSignals + numOfIntfSignals;
 
+  ///WINDOWS
+  //uint16_t pbCellId[numOfSignals];
+#ifndef WIN32
   uint16_t pbCellId[numOfSignals];
-  
+#else
+  uint16_t* pbCellId = new uint16_t[numOfSignals];
+#endif
+  ///WINDOWS
   
   
   /**
@@ -478,5 +484,11 @@ LteUplinkSrsSinrTestCase::DoRun (void)
   NS_TEST_ASSERT_MSG_SPECTRUM_VALUE_EQ_TOL (*m_actualSinr, *m_expectedSinr, 0.0000001, "Data Frame - Wrong SINR !");
   ulPhy->Dispose ();
   Simulator::Destroy ();
-  
+
+  ///WINDOWS
+  //ÊÍ·ÅÄÚ´æ¡£
+#ifdef WIN32
+  delete[] pbCellId;
+#endif
+  ///WINDOWS
 }

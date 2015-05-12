@@ -43,14 +43,12 @@
     <ClCompile Include="..\ns-3\src\core\test\rng-test-suite.cc" />
     <ClCompile Include="..\ns-3\src\core\test\sample-test-suite.cc" />
     <ClCompile Include="..\ns-3\src\core\test\simulator-test-suite.cc" />
-    <ClCompile Include="..\ns-3\src\core\test\threaded-test-suite.cc" />
     <ClCompile Include="..\ns-3\src\core\test\time-test-suite.cc" />
     <ClCompile Include="..\ns-3\src\core\test\timer-test-suite.cc" />
     <ClCompile Include="..\ns-3\src\core\test\traced-callback-test-suite.cc" />
     <ClCompile Include="..\ns-3\src\core\test\type-id-test-suite.cc" />
     <ClCompile Include="..\ns-3\src\core\test\type-traits-test-suite.cc" />
     <ClCompile Include="..\ns-3\src\core\test\watchdog-test-suite.cc" />
-    <ClCompile Include="..\ns-3\src\dsdv\test\dsdv-testcase.cc" />
     <ClCompile Include="..\ns-3\src\dsr\test\dsr-test-suite.cc" />
     <ClCompile Include="..\ns-3\src\energy\test\basic-energy-harvester-test.cc" />
     <ClCompile Include="..\ns-3\src\energy\test\basic-energy-model-test.cc" />
@@ -87,7 +85,6 @@
     <ClCompile Include="..\ns-3\src\internet\test\tcp-option-test.cc" />
     <ClCompile Include="..\ns-3\src\internet\test\tcp-test.cc" />
     <ClCompile Include="..\ns-3\src\internet\test\tcp-timestamp-test.cc" />
-    <ClCompile Include="..\ns-3\src\internet\test\tcp-wscaling-test.cc" />
     <ClCompile Include="..\ns-3\src\internet\test\udp-test.cc" />
     <ClCompile Include="..\ns-3\src\lr-wpan\test\lr-wpan-ack-test.cc" />
     <ClCompile Include="..\ns-3\src\lr-wpan\test\lr-wpan-cca-test.cc" />
@@ -112,7 +109,6 @@
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-downlink-sinr.cc" />
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-earfcn.cc" />
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-entities.cc" />
-    <ClCompile Include="..\ns-3\src\lte\test\lte-test-fading.cc" />
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-fdbet-ff-mac-scheduler.cc" />
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-fdmt-ff-mac-scheduler.cc" />
     <ClCompile Include="..\ns-3\src\lte\test\lte-test-fdtbfq-ff-mac-scheduler.cc" />
@@ -200,8 +196,6 @@
     <ClCompile Include="..\ns-3\src\spectrum\test\spectrum-interference-test.cc" />
     <ClCompile Include="..\ns-3\src\spectrum\test\spectrum-value-test.cc" />
     <ClCompile Include="..\ns-3\src\spectrum\test\spectrum-waveform-generator-test.cc" />
-    <ClCompile Include="..\ns-3\src\spectrum\test\tv-helper-distribution-test.cc" />
-    <ClCompile Include="..\ns-3\src\spectrum\test\tv-spectrum-transmitter-test.cc" />
     <ClCompile Include="..\ns-3\src\stats\test\average-test-suite.cc" />
     <ClCompile Include="..\ns-3\src\stats\test\basic-data-calculators-test-suite.cc" />
     <ClCompile Include="..\ns-3\src\stats\test\double-probe-test-suite.cc" />
@@ -243,7 +237,6 @@
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-downlink-power-control.h" />
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-downlink-sinr.h" />
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-entities.h" />
-    <ClInclude Include="..\ns-3\src\lte\test\lte-test-fading.h" />
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-fdbet-ff-mac-scheduler.h" />
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-fdmt-ff-mac-scheduler.h" />
     <ClInclude Include="..\ns-3\src\lte\test\lte-test-fdtbfq-ff-mac-scheduler.h" />
