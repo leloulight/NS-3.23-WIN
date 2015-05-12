@@ -19,7 +19,6 @@
     <None Include="..\ns-3\src\visualizer\visualizer\plugins\interface_statistics.py" />
     <None Include="..\ns-3\src\visualizer\visualizer\plugins\ipv4_routing_table.py" />
     <None Include="..\ns-3\src\visualizer\visualizer\plugins\olsr.py" />
-    <None Include="..\ns-3\src\visualizer\visualizer\plugins\pmtmgmp_information.py" />
     <None Include="..\ns-3\src\visualizer\visualizer\plugins\show_last_packets.py" />
     <None Include="..\ns-3\src\visualizer\visualizer\plugins\wifi_intrastructure_link.py" />
     <None Include="..\ns-3\src\visualizer\visualizer\svgitem.py" />

@@ -607,6 +607,9 @@ int MeshRouteClass::Run()
 	// 数据统计模块配置
 	void StatsDataSet();
 
+	//Ptr<WmnPointDevice> wpd = DynamicCast<WmnPointDevice>(l_Nodes.Get(0)->GetDevice(0));
+	//Ptr<my11s::PmtmgmpProtocol> pp = DynamicCast<my11s::PmtmgmpProtocol>(wpd->GetRoutingProtocol());
+
 	//流量监测
 	l_Monitor = l_Flowmon.InstallAll();
 

@@ -40,19 +40,22 @@ namespace ns3 {
 #define IE11S_PROXY_UPDATE                     ((WifiInformationElementId)137)
 #define IE11S_PROXY_UPDATE_CONFIRMATION        ((WifiInformationElementId)138)
 #define IE11S_ABBREVIATED_HANDSHAKE            ((WifiInformationElementId)39)
-/* begin of open80211s-compatible IDs */
+	/* begin of open80211s-compatible IDs */
 #define IE11S_WMN_CONFIGURATION               ((WifiInformationElementId)113)
 #define IE11S_WMN_ID                          ((WifiInformationElementId)114)
 #define IE11S_PMTMGMP_PEERING_MANAGEMENT               ((WifiInformationElementId)117)
-/* end of open80211s-compatible IDs */
+	/* end of open80211s-compatible IDs */
 #define IE11S_RANN                             ((WifiInformationElementId)126)
-/* begin of open80211s-compatible IDs */
+	/* begin of open80211s-compatible IDs */
 #define IE11S_PREQ                             ((WifiInformationElementId)130)
 #define IE11S_PREP                             ((WifiInformationElementId)131)
 #define IE11S_PERR                             ((WifiInformationElementId)132)
-/* end of open80211s-compatible IDs */
+	/* end of open80211s-compatible IDs */
 #define IE11S_WMN_PMTMGMP_PEERING_PROTOCOL_VERSION    ((WifiInformationElementId)74)
 
+#ifndef PMTMGMP_UNUSED_MY_CODE
+#define IE11S_SECREQ                             ((WifiInformationElementId)255)
+#endif
 }
 
 #endif /* WMN_INFORMATION_ELEMENT_H */
