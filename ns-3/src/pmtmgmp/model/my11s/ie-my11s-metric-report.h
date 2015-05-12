@@ -18,8 +18,8 @@
  * Author: Kirill Andreev <andreev@iitp.ru>
  */
 
-#ifndef METRIC_REPORT_H
-#define METRIC_REPORT_H
+#ifndef PMTMGMP_METRIC_REPORT_H
+#define PMTMGMP_METRIC_REPORT_H
 
 #include <stdint.h>
 #include "ns3/buffer.h"
@@ -59,4 +59,4 @@ bool operator<  (const IeLinkMetricReport & a, const IeLinkMetricReport & b);
 std::ostream &operator << (std::ostream &os, const IeLinkMetricReport &linkMetricReport);
 } // namespace my11s
 } // namespace ns3
-#endif /* METRIC_REPORT_H */
+#endif /* PMTMGMP_METRIC_REPORT_H */

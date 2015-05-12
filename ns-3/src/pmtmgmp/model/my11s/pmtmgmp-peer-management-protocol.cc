@@ -42,80 +42,80 @@ namespace my11s {
 /***************************************************
  * PeerManager
  ***************************************************/
-NS_OBJECT_ENSURE_REGISTERED (PeerManagementProtocol);
+NS_OBJECT_ENSURE_REGISTERED (PmtmgmpPeerManagementProtocol);
 
 TypeId
-PeerManagementProtocol::GetTypeId (void)
+PmtmgmpPeerManagementProtocol::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::my11s::PeerManagementProtocol")
+  static TypeId tid = TypeId ("ns3::my11s::PmtmgmpPeerManagementProtocol")
     .SetParent<Object> ()
     .SetGroupName ("Wmn")
-    .AddConstructor<PeerManagementProtocol> ()
+    .AddConstructor<PmtmgmpPeerManagementProtocol> ()
     // maximum number of peer links. Now we calculate the total
     // number of peer links on all interfaces
-    .AddAttribute ( "MaxNumberOfPeerLinks",
+    .AddAttribute ( "MaxNumberOfPmtmgmpPeerLinks",
                     "Maximum number of peer links",
                     UintegerValue (32),
                     MakeUintegerAccessor (
-                      &PeerManagementProtocol::m_maxNumberOfPeerLinks),
+                      &PmtmgmpPeerManagementProtocol::m_maxNumberOfPmtmgmpPeerLinks),
                     MakeUintegerChecker<uint8_t> ()
                     )
     .AddAttribute ( "MaxBeaconShiftValue",
                     "Maximum number of TUs for beacon shifting",
                     UintegerValue (15),
                     MakeUintegerAccessor (
-                      &PeerManagementProtocol::m_maxBeaconShift),
+                      &PmtmgmpPeerManagementProtocol::m_maxBeaconShift),
                     MakeUintegerChecker<uint16_t> ()
                     )
     .AddAttribute ( "EnableBeaconCollisionAvoidance",
                     "Enable/Disable Beacon collision avoidance.",
                     BooleanValue (true),
                     MakeBooleanAccessor (
-                      &PeerManagementProtocol::SetBeaconCollisionAvoidance, &PeerManagementProtocol::GetBeaconCollisionAvoidance),
+                      &PmtmgmpPeerManagementProtocol::SetBeaconCollisionAvoidance, &PmtmgmpPeerManagementProtocol::GetBeaconCollisionAvoidance),
                     MakeBooleanChecker ()
                     )
     .AddTraceSource ("LinkOpen",
                      "New peer link opened",
-                     MakeTraceSourceAccessor (&PeerManagementProtocol::m_linkOpenTraceSrc),
-                     "ns3::PeerManagementProtocol::LinkOpenCloseTracedCallback"
+                     MakeTraceSourceAccessor (&PmtmgmpPeerManagementProtocol::m_linkOpenTraceSrc),
+                     "ns3::PmtmgmpPeerManagementProtocol::LinkOpenCloseTracedCallback"
                      )
     .AddTraceSource ("LinkClose",
                      "New peer link closed",
-                     MakeTraceSourceAccessor (&PeerManagementProtocol::m_linkCloseTraceSrc),
-                     "ns3::PeerManagementProtocol::LinkOpenCloseTracedCallback"
+                     MakeTraceSourceAccessor (&PmtmgmpPeerManagementProtocol::m_linkCloseTraceSrc),
+                     "ns3::PmtmgmpPeerManagementProtocol::LinkOpenCloseTracedCallback"
                      )
 
   ;
   return tid;
 }
-PeerManagementProtocol::PeerManagementProtocol () :
+PmtmgmpPeerManagementProtocol::PmtmgmpPeerManagementProtocol () :
   m_lastAssocId (0), m_lastLocalLinkId (1), m_enableBca (true), m_maxBeaconShift (15)
 {
   m_beaconShift = CreateObject<UniformRandomVariable> ();
 }
-PeerManagementProtocol::~PeerManagementProtocol ()
+PmtmgmpPeerManagementProtocol::~PmtmgmpPeerManagementProtocol ()
 {
   m_wmnId = 0;
 }
 void
-PeerManagementProtocol::DoDispose ()
+PmtmgmpPeerManagementProtocol::DoDispose ()
 {
   //cancel cleanup event and go through the map of peer links,
   //deleting each
-  for (PeerLinksMap::iterator j = m_peerLinks.begin (); j != m_peerLinks.end (); j++)
+  for (PmtmgmpPeerLinksMap::iterator j = m_PmtmgmpPeerLinks.begin (); j != m_PmtmgmpPeerLinks.end (); j++)
     {
-      for (PeerLinksOnInterface::iterator i = j->second.begin (); i != j->second.end (); i++)
+      for (PmtmgmpPeerLinksOnInterface::iterator i = j->second.begin (); i != j->second.end (); i++)
         {
           (*i) = 0;
         }
       j->second.clear ();
     }
-  m_peerLinks.clear ();
+  m_PmtmgmpPeerLinks.clear ();
   m_plugins.clear ();
 }
 
 bool
-PeerManagementProtocol::Install (Ptr<WmnPointDevice> mp)
+PmtmgmpPeerManagementProtocol::Install (Ptr<WmnPointDevice> mp)
 {
   std::vector<Ptr<NetDevice> > interfaces = mp->GetInterfaces ();
   for (std::vector<Ptr<NetDevice> >::iterator i = interfaces.begin (); i != interfaces.end (); i++)
@@ -130,11 +130,11 @@ PeerManagementProtocol::Install (Ptr<WmnPointDevice> mp)
         {
           return false;
         }
-      Ptr<PeerManagementProtocolMac> plugin = Create<PeerManagementProtocolMac> ((*i)->GetIfIndex (), this);
+      Ptr<PmtmgmpPeerManagementProtocolMac> plugin = Create<PmtmgmpPeerManagementProtocolMac> ((*i)->GetIfIndex (), this);
       mac->InstallPlugin (plugin);
       m_plugins[(*i)->GetIfIndex ()] = plugin;
-      PeerLinksOnInterface newmap;
-      m_peerLinks[(*i)->GetIfIndex ()] = newmap;
+      PmtmgmpPeerLinksOnInterface newmap;
+      m_PmtmgmpPeerLinks[(*i)->GetIfIndex ()] = newmap;
     }
   // Wmn point aggregates all installed protocols
   m_address = Mac48Address::ConvertFrom (mp->GetAddress ());
@@ -143,16 +143,16 @@ PeerManagementProtocol::Install (Ptr<WmnPointDevice> mp)
 }
 
 Ptr<IeBeaconTiming>
-PeerManagementProtocol::GetBeaconTimingElement (uint32_t interface)
+PmtmgmpPeerManagementProtocol::GetBeaconTimingElement (uint32_t interface)
 {
   if (!GetBeaconCollisionAvoidance ())
     {
       return 0;
     }
   Ptr<IeBeaconTiming> retval = Create<IeBeaconTiming> ();
-  PeerLinksMap::iterator iface = m_peerLinks.find (interface);
-  NS_ASSERT (iface != m_peerLinks.end ());
-  for (PeerLinksOnInterface::iterator i = iface->second.begin (); i != iface->second.end (); i++)
+  PmtmgmpPeerLinksMap::iterator iface = m_PmtmgmpPeerLinks.find (interface);
+  NS_ASSERT (iface != m_PmtmgmpPeerLinks.end ());
+  for (PmtmgmpPeerLinksOnInterface::iterator i = iface->second.begin (); i != iface->second.end (); i++)
     {
       //If we do not know peer Assoc Id, we shall not add any info
       //to a beacon timing element
@@ -167,137 +167,137 @@ PeerManagementProtocol::GetBeaconTimingElement (uint32_t interface)
   return retval;
 }
 void
-PeerManagementProtocol::ReceiveBeacon (uint32_t interface, Mac48Address peerAddress, Time beaconInterval, Ptr<IeBeaconTiming> timingElement)
+PmtmgmpPeerManagementProtocol::ReceiveBeacon (uint32_t interface, Mac48Address peerAddress, Time beaconInterval, Ptr<IeBeaconTiming> timingElement)
 {
   //PM STATE Machine
   //Check that a given beacon is not from our interface
-  for (PeerManagementProtocolMacMap::const_iterator i = m_plugins.begin (); i != m_plugins.end (); i++)
+  for (PmtmgmpPeerManagementProtocolMacMap::const_iterator i = m_plugins.begin (); i != m_plugins.end (); i++)
     {
       if (i->second->GetAddress () == peerAddress)
         {
           return;
         }
     }
-  Ptr<PeerLink> peerLink = FindPeerLink (interface, peerAddress);
-  if (peerLink == 0)
+  Ptr<PmtmgmpPeerLink> PmtmgmpPeerLink = FindPmtmgmpPeerLink (interface, peerAddress);
+  if (PmtmgmpPeerLink == 0)
     {
       if (ShouldSendOpen (interface, peerAddress))
         {
-          peerLink = InitiateLink (interface, peerAddress, Mac48Address::GetBroadcast ());
-          peerLink->MLMEActivePeerLinkOpen ();
+          PmtmgmpPeerLink = InitiateLink (interface, peerAddress, Mac48Address::GetBroadcast ());
+          PmtmgmpPeerLink->MLMEActivePmtmgmpPeerLinkOpen ();
         }
       else
         {
           return;
         }
     }
-  peerLink->SetBeaconInformation (Simulator::Now (), beaconInterval);
+  PmtmgmpPeerLink->SetBeaconInformation (Simulator::Now (), beaconInterval);
   if (GetBeaconCollisionAvoidance ())
     {
-      peerLink->SetBeaconTimingElement (*PeekPointer (timingElement));
+      PmtmgmpPeerLink->SetBeaconTimingElement (*PeekPointer (timingElement));
     }
 }
 
 void
-PeerManagementProtocol::ReceivePeerLinkFrame (uint32_t interface, Mac48Address peerAddress,
+PmtmgmpPeerManagementProtocol::ReceivePmtmgmpPeerLinkFrame (uint32_t interface, Mac48Address peerAddress,
                                               Mac48Address peerWmnPointAddress, uint16_t aid, IePeerManagement peerManagementElement,
                                               IeConfiguration wmnConfig)
 {
-  Ptr<PeerLink> peerLink = FindPeerLink (interface, peerAddress);
+  Ptr<PmtmgmpPeerLink> PmtmgmpPeerLink = FindPmtmgmpPeerLink (interface, peerAddress);
   if (peerManagementElement.SubtypeIsOpen ())
     {
       PmpReasonCode reasonCode (REASON11S_RESERVED);
       bool reject = !(ShouldAcceptOpen (interface, peerAddress, reasonCode));
-      if (peerLink == 0)
+      if (PmtmgmpPeerLink == 0)
         {
-          peerLink = InitiateLink (interface, peerAddress, peerWmnPointAddress);
+          PmtmgmpPeerLink = InitiateLink (interface, peerAddress, peerWmnPointAddress);
         }
       if (!reject)
         {
-          peerLink->OpenAccept (peerManagementElement.GetLocalLinkId (), wmnConfig, peerWmnPointAddress);
+          PmtmgmpPeerLink->OpenAccept (peerManagementElement.GetLocalLinkId (), wmnConfig, peerWmnPointAddress);
         }
       else
         {
-          peerLink->OpenReject (peerManagementElement.GetLocalLinkId (), wmnConfig, peerWmnPointAddress,
+          PmtmgmpPeerLink->OpenReject (peerManagementElement.GetLocalLinkId (), wmnConfig, peerWmnPointAddress,
                                 reasonCode);
         }
     }
-  if (peerLink == 0)
+  if (PmtmgmpPeerLink == 0)
     {
       return;
     }
   if (peerManagementElement.SubtypeIsConfirm ())
     {
-      peerLink->ConfirmAccept (peerManagementElement.GetLocalLinkId (),
-                               peerManagementElement.GetPeerLinkId (), aid, wmnConfig, peerWmnPointAddress);
+      PmtmgmpPeerLink->ConfirmAccept (peerManagementElement.GetLocalLinkId (),
+                               peerManagementElement.GetPmtmgmpPeerLinkId (), aid, wmnConfig, peerWmnPointAddress);
     }
   if (peerManagementElement.SubtypeIsClose ())
     {
-      peerLink->Close (peerManagementElement.GetLocalLinkId (), peerManagementElement.GetPeerLinkId (),
+      PmtmgmpPeerLink->Close (peerManagementElement.GetLocalLinkId (), peerManagementElement.GetPmtmgmpPeerLinkId (),
                        peerManagementElement.GetReasonCode ());
     }
 }
 void
-PeerManagementProtocol::ConfigurationMismatch (uint32_t interface, Mac48Address peerAddress)
+PmtmgmpPeerManagementProtocol::ConfigurationMismatch (uint32_t interface, Mac48Address peerAddress)
 {
-  Ptr<PeerLink> peerLink = FindPeerLink (interface, peerAddress);
-  if (peerLink != 0)
+  Ptr<PmtmgmpPeerLink> PmtmgmpPeerLink = FindPmtmgmpPeerLink (interface, peerAddress);
+  if (PmtmgmpPeerLink != 0)
     {
-      peerLink->MLMECancelPeerLink (REASON11S_WMN_CAPABILITY_POLICY_VIOLATION);
+      PmtmgmpPeerLink->MLMECancelPmtmgmpPeerLink (REASON11S_WMN_CAPABILITY_POLICY_VIOLATION);
     }
 }
 void
-PeerManagementProtocol::TransmissionFailure (uint32_t interface, Mac48Address peerAddress)
+PmtmgmpPeerManagementProtocol::TransmissionFailure (uint32_t interface, Mac48Address peerAddress)
 {
   NS_LOG_DEBUG ("transmission failed between "<<GetAddress () << " and " << peerAddress << " failed, link will be closed");
-  Ptr<PeerLink> peerLink = FindPeerLink (interface, peerAddress);
-  if (peerLink != 0)
+  Ptr<PmtmgmpPeerLink> PmtmgmpPeerLink = FindPmtmgmpPeerLink (interface, peerAddress);
+  if (PmtmgmpPeerLink != 0)
     {
-      peerLink->TransmissionFailure ();
+      PmtmgmpPeerLink->TransmissionFailure ();
     }
 }
 void
-PeerManagementProtocol::TransmissionSuccess (uint32_t interface, Mac48Address peerAddress)
+PmtmgmpPeerManagementProtocol::TransmissionSuccess (uint32_t interface, Mac48Address peerAddress)
 {
   NS_LOG_DEBUG ("transmission success "<< GetAddress () << " and " << peerAddress);
-  Ptr<PeerLink> peerLink = FindPeerLink (interface, peerAddress);
-  if (peerLink != 0)
+  Ptr<PmtmgmpPeerLink> PmtmgmpPeerLink = FindPmtmgmpPeerLink (interface, peerAddress);
+  if (PmtmgmpPeerLink != 0)
     {
-      peerLink->TransmissionSuccess ();
+      PmtmgmpPeerLink->TransmissionSuccess ();
     }
 }
-Ptr<PeerLink>
-PeerManagementProtocol::InitiateLink (uint32_t interface, Mac48Address peerAddress,
+Ptr<PmtmgmpPeerLink>
+PmtmgmpPeerManagementProtocol::InitiateLink (uint32_t interface, Mac48Address peerAddress,
                                       Mac48Address peerWmnPointAddress)
 {
-  Ptr<PeerLink> new_link = CreateObject<PeerLink> ();
+  Ptr<PmtmgmpPeerLink> new_link = CreateObject<PmtmgmpPeerLink> ();
   //find a peer link  - it must not exist
-  if (FindPeerLink (interface, peerAddress) != 0)
+  if (FindPmtmgmpPeerLink (interface, peerAddress) != 0)
     {
       NS_FATAL_ERROR ("Peer link must not exist.");
     }
   // Plugin must exist
-  PeerManagementProtocolMacMap::iterator plugin = m_plugins.find (interface);
+  PmtmgmpPeerManagementProtocolMacMap::iterator plugin = m_plugins.find (interface);
   NS_ASSERT (plugin != m_plugins.end ());
-  PeerLinksMap::iterator iface = m_peerLinks.find (interface);
-  NS_ASSERT (iface != m_peerLinks.end ());
+  PmtmgmpPeerLinksMap::iterator iface = m_PmtmgmpPeerLinks.find (interface);
+  NS_ASSERT (iface != m_PmtmgmpPeerLinks.end ());
   new_link->SetLocalAid (m_lastAssocId++);
   new_link->SetInterface (interface);
   new_link->SetLocalLinkId (m_lastLocalLinkId++);
   new_link->SetPeerAddress (peerAddress);
   new_link->SetPeerWmnPointAddress (peerWmnPointAddress);
   new_link->SetMacPlugin (plugin->second);
-  new_link->MLMESetSignalStatusCallback (MakeCallback (&PeerManagementProtocol::PeerLinkStatus, this));
+  new_link->MLMESetSignalStatusCallback (MakeCallback (&PmtmgmpPeerManagementProtocol::PmtmgmpPeerLinkStatus, this));
   iface->second.push_back (new_link);
   return new_link;
 }
 
-Ptr<PeerLink>
-PeerManagementProtocol::FindPeerLink (uint32_t interface, Mac48Address peerAddress)
+Ptr<PmtmgmpPeerLink>
+PmtmgmpPeerManagementProtocol::FindPmtmgmpPeerLink (uint32_t interface, Mac48Address peerAddress)
 {
-  PeerLinksMap::iterator iface = m_peerLinks.find (interface);
-  NS_ASSERT (iface != m_peerLinks.end ());
-  for (PeerLinksOnInterface::iterator i = iface->second.begin (); i != iface->second.end (); i++)
+  PmtmgmpPeerLinksMap::iterator iface = m_PmtmgmpPeerLinks.find (interface);
+  NS_ASSERT (iface != m_PmtmgmpPeerLinks.end ());
+  for (PmtmgmpPeerLinksOnInterface::iterator i = iface->second.begin (); i != iface->second.end (); i++)
     {
       if ((*i)->GetPeerAddress () == peerAddress)
         {
@@ -316,19 +316,19 @@ PeerManagementProtocol::FindPeerLink (uint32_t interface, Mac48Address peerAddre
   return 0;
 }
 void
-PeerManagementProtocol::SetPeerLinkStatusCallback (
+PmtmgmpPeerManagementProtocol::SetPmtmgmpPeerLinkStatusCallback (
   Callback<void, Mac48Address, Mac48Address, uint32_t, bool> cb)
 {
   m_peerStatusCallback = cb;
 }
 
 std::vector<Mac48Address>
-PeerManagementProtocol::GetPeers (uint32_t interface) const
+PmtmgmpPeerManagementProtocol::GetPeers (uint32_t interface) const
 {
   std::vector<Mac48Address> retval;
-  PeerLinksMap::const_iterator iface = m_peerLinks.find (interface);
-  NS_ASSERT (iface != m_peerLinks.end ());
-  for (PeerLinksOnInterface::const_iterator i = iface->second.begin (); i != iface->second.end (); i++)
+  PmtmgmpPeerLinksMap::const_iterator iface = m_PmtmgmpPeerLinks.find (interface);
+  NS_ASSERT (iface != m_PmtmgmpPeerLinks.end ());
+  for (PmtmgmpPeerLinksOnInterface::const_iterator i = iface->second.begin (); i != iface->second.end (); i++)
     {
       if ((*i)->LinkIsEstab ())
         {
@@ -338,14 +338,14 @@ PeerManagementProtocol::GetPeers (uint32_t interface) const
   return retval;
 }
 
-std::vector< Ptr<PeerLink> >
-PeerManagementProtocol::GetPeerLinks () const
+std::vector< Ptr<PmtmgmpPeerLink> >
+PmtmgmpPeerManagementProtocol::GetPmtmgmpPeerLinks () const
 {
-  std::vector< Ptr<PeerLink> > links;
+  std::vector< Ptr<PmtmgmpPeerLink> > links;
 
-  for (PeerLinksMap::const_iterator iface = m_peerLinks.begin (); iface != m_peerLinks.end (); ++iface)
+  for (PmtmgmpPeerLinksMap::const_iterator iface = m_PmtmgmpPeerLinks.begin (); iface != m_PmtmgmpPeerLinks.end (); ++iface)
     {
-      for (PeerLinksOnInterface::const_iterator i = iface->second.begin ();
+      for (PmtmgmpPeerLinksOnInterface::const_iterator i = iface->second.begin ();
            i != iface->second.end (); i++)
         if ((*i)->LinkIsEstab ())
           links.push_back (*i);
@@ -353,26 +353,26 @@ PeerManagementProtocol::GetPeerLinks () const
   return links;
 }
 bool
-PeerManagementProtocol::IsActiveLink (uint32_t interface, Mac48Address peerAddress)
+PmtmgmpPeerManagementProtocol::IsActiveLink (uint32_t interface, Mac48Address peerAddress)
 {
-  Ptr<PeerLink> peerLink = FindPeerLink (interface, peerAddress);
-  if (peerLink != 0)
+  Ptr<PmtmgmpPeerLink> PmtmgmpPeerLink = FindPmtmgmpPeerLink (interface, peerAddress);
+  if (PmtmgmpPeerLink != 0)
     {
-      return (peerLink->LinkIsEstab ());
+      return (PmtmgmpPeerLink->LinkIsEstab ());
     }
   return false;
 }
 bool
-PeerManagementProtocol::ShouldSendOpen (uint32_t interface, Mac48Address peerAddress)
+PmtmgmpPeerManagementProtocol::ShouldSendOpen (uint32_t interface, Mac48Address peerAddress)
 {
-  return (m_stats.linksTotal <= m_maxNumberOfPeerLinks);
+  return (m_stats.linksTotal <= m_maxNumberOfPmtmgmpPeerLinks);
 }
 
 bool
-PeerManagementProtocol::ShouldAcceptOpen (uint32_t interface, Mac48Address peerAddress,
+PmtmgmpPeerManagementProtocol::ShouldAcceptOpen (uint32_t interface, Mac48Address peerAddress,
                                           PmpReasonCode & reasonCode)
 {
-  if (m_stats.linksTotal > m_maxNumberOfPeerLinks)
+  if (m_stats.linksTotal > m_maxNumberOfPmtmgmpPeerLinks)
     {
       reasonCode = REASON11S_WMN_MAX_PMTMGMP_PEERS;
       return false;
@@ -381,14 +381,14 @@ PeerManagementProtocol::ShouldAcceptOpen (uint32_t interface, Mac48Address peerA
 }
 
 void
-PeerManagementProtocol::CheckBeaconCollisions (uint32_t interface)
+PmtmgmpPeerManagementProtocol::CheckBeaconCollisions (uint32_t interface)
 {
   if (!GetBeaconCollisionAvoidance ())
     {
       return;
     }
-  PeerLinksMap::iterator iface = m_peerLinks.find (interface);
-  NS_ASSERT (iface != m_peerLinks.end ());
+  PmtmgmpPeerLinksMap::iterator iface = m_PmtmgmpPeerLinks.find (interface);
+  NS_ASSERT (iface != m_PmtmgmpPeerLinks.end ());
   NS_ASSERT (m_plugins.find (interface) != m_plugins.end ());
 
   std::map<uint32_t, Time>::const_iterator lastBeacon = m_lastBeacon.find (interface);
@@ -410,7 +410,7 @@ PeerManagementProtocol::CheckBeaconCollisions (uint32_t interface)
     }
   //check whether all my peers receive my beacon and I'am not in collision with other beacons
 
-  for (PeerLinksOnInterface::iterator i = iface->second.begin (); i != iface->second.end (); i++)
+  for (PmtmgmpPeerLinksOnInterface::iterator i = iface->second.begin (); i != iface->second.end (); i++)
     {
       bool myBeaconExists = false;
       IeBeaconTiming::NeighboursTimingUnitsList neighbors = (*i)->GetBeaconTimingElement ().GetNeighboursTimingElementsList ();
@@ -441,7 +441,7 @@ PeerManagementProtocol::CheckBeaconCollisions (uint32_t interface)
 }
 
 void
-PeerManagementProtocol::ShiftOwnBeacon (uint32_t interface)
+PmtmgmpPeerManagementProtocol::ShiftOwnBeacon (uint32_t interface)
 {
   int shift = 0;
   do
@@ -450,24 +450,24 @@ PeerManagementProtocol::ShiftOwnBeacon (uint32_t interface)
     }
   while (shift == 0);
   // Apply beacon shift parameters:
-  PeerManagementProtocolMacMap::iterator plugin = m_plugins.find (interface);
+  PmtmgmpPeerManagementProtocolMacMap::iterator plugin = m_plugins.find (interface);
   NS_ASSERT (plugin != m_plugins.end ());
   plugin->second->SetBeaconShift (TuToTime (shift));
 }
 
 Time
-PeerManagementProtocol::TuToTime (int x)
+PmtmgmpPeerManagementProtocol::TuToTime (int x)
 {
   return MicroSeconds (x * 1024);
 }
 int
-PeerManagementProtocol::TimeToTu (Time x)
+PmtmgmpPeerManagementProtocol::TimeToTu (Time x)
 {
   return (int)(x.GetMicroSeconds () / 1024);
 }
 
 void
-PeerManagementProtocol::NotifyLinkOpen (Mac48Address peerMp, Mac48Address peerIface, Mac48Address myIface, uint32_t interface)
+PmtmgmpPeerManagementProtocol::NotifyLinkOpen (Mac48Address peerMp, Mac48Address peerIface, Mac48Address myIface, uint32_t interface)
 {
   NS_LOG_LOGIC ("link_open " << myIface << " " << peerIface);
   m_stats.linksOpened++;
@@ -480,7 +480,7 @@ PeerManagementProtocol::NotifyLinkOpen (Mac48Address peerMp, Mac48Address peerIf
 }
 
 void
-PeerManagementProtocol::NotifyLinkClose (Mac48Address peerMp, Mac48Address peerIface, Mac48Address myIface, uint32_t interface)
+PmtmgmpPeerManagementProtocol::NotifyLinkClose (Mac48Address peerMp, Mac48Address peerIface, Mac48Address myIface, uint32_t interface)
 {
   NS_LOG_LOGIC ("link_close " << myIface << " " << peerIface);
   m_stats.linksClosed++;
@@ -493,62 +493,62 @@ PeerManagementProtocol::NotifyLinkClose (Mac48Address peerMp, Mac48Address peerI
 }
 
 void
-PeerManagementProtocol::PeerLinkStatus (uint32_t interface, Mac48Address peerAddress,
-                                        Mac48Address peerWmnPointAddress, PeerLink::PeerState ostate, PeerLink::PeerState nstate)
+PmtmgmpPeerManagementProtocol::PmtmgmpPeerLinkStatus (uint32_t interface, Mac48Address peerAddress,
+                                        Mac48Address peerWmnPointAddress, PmtmgmpPeerLink::PeerState ostate, PmtmgmpPeerLink::PeerState nstate)
 {
-  PeerManagementProtocolMacMap::iterator plugin = m_plugins.find (interface);
+  PmtmgmpPeerManagementProtocolMacMap::iterator plugin = m_plugins.find (interface);
   NS_ASSERT (plugin != m_plugins.end ());
   NS_LOG_DEBUG ("Link between me:" << m_address << " my interface:" << plugin->second->GetAddress ()
                                    << " and peer wmn point:" << peerWmnPointAddress << " and its interface:" << peerAddress
                                    << ", at my interface ID:" << interface << ". State movement:" << ostate << " -> " << nstate);
-  if ((nstate == PeerLink::ESTAB) && (ostate != PeerLink::ESTAB))
+  if ((nstate == PmtmgmpPeerLink::ESTAB) && (ostate != PmtmgmpPeerLink::ESTAB))
     {
       NotifyLinkOpen (peerWmnPointAddress, peerAddress, plugin->second->GetAddress (), interface);
     }
-  if ((ostate == PeerLink::ESTAB) && (nstate != PeerLink::ESTAB))
+  if ((ostate == PmtmgmpPeerLink::ESTAB) && (nstate != PmtmgmpPeerLink::ESTAB))
     {
       NotifyLinkClose (peerWmnPointAddress, peerAddress, plugin->second->GetAddress (), interface);
     }
-  if (nstate == PeerLink::IDLE)
+  if (nstate == PmtmgmpPeerLink::IDLE)
     {
-      Ptr<PeerLink> link = FindPeerLink (interface, peerAddress);
+      Ptr<PmtmgmpPeerLink> link = FindPmtmgmpPeerLink (interface, peerAddress);
       NS_ASSERT (link == 0);
     }
 }
 uint8_t
-PeerManagementProtocol::GetNumberOfLinks ()
+PmtmgmpPeerManagementProtocol::GetNumberOfLinks ()
 {
   return m_stats.linksTotal;
 }
 Ptr<IeWmnId>
-PeerManagementProtocol::GetWmnId () const
+PmtmgmpPeerManagementProtocol::GetWmnId () const
 {
   NS_ASSERT (m_wmnId != 0);
   return m_wmnId;
 }
 void
-PeerManagementProtocol::SetWmnId (std::string s)
+PmtmgmpPeerManagementProtocol::SetWmnId (std::string s)
 {
   m_wmnId = Create<IeWmnId> (s);
 }
 Mac48Address
-PeerManagementProtocol::GetAddress ()
+PmtmgmpPeerManagementProtocol::GetAddress ()
 {
   return m_address;
 }
 void
-PeerManagementProtocol::NotifyBeaconSent (uint32_t interface, Time beaconInterval)
+PmtmgmpPeerManagementProtocol::NotifyBeaconSent (uint32_t interface, Time beaconInterval)
 {
   m_lastBeacon[interface] = Simulator::Now ();
-  Simulator::Schedule (beaconInterval - TuToTime (m_maxBeaconShift + 1), &PeerManagementProtocol::CheckBeaconCollisions,this, interface);
+  Simulator::Schedule (beaconInterval - TuToTime (m_maxBeaconShift + 1), &PmtmgmpPeerManagementProtocol::CheckBeaconCollisions,this, interface);
   m_beaconInterval[interface] = beaconInterval;
 }
-PeerManagementProtocol::Statistics::Statistics (uint16_t t) :
+PmtmgmpPeerManagementProtocol::Statistics::Statistics (uint16_t t) :
   linksTotal (t), linksOpened (0), linksClosed (0)
 {
 }
 void
-PeerManagementProtocol::Statistics::Print (std::ostream & os) const
+PmtmgmpPeerManagementProtocol::Statistics::Print (std::ostream & os) const
 {
   os << "<Statistics "
   "linksTotal=\"" << linksTotal << "\" "
@@ -556,36 +556,36 @@ PeerManagementProtocol::Statistics::Print (std::ostream & os) const
   "linksClosed=\"" << linksClosed << "\"/>" << std::endl;
 }
 void
-PeerManagementProtocol::Report (std::ostream & os) const
+PmtmgmpPeerManagementProtocol::Report (std::ostream & os) const
 {
-  os << "<PeerManagementProtocol>" << std::endl;
+  os << "<PmtmgmpPeerManagementProtocol>" << std::endl;
   m_stats.Print (os);
-  for (PeerManagementProtocolMacMap::const_iterator plugins = m_plugins.begin (); plugins != m_plugins.end (); plugins++)
+  for (PmtmgmpPeerManagementProtocolMacMap::const_iterator plugins = m_plugins.begin (); plugins != m_plugins.end (); plugins++)
     {
       //Take statistics from plugin:
       plugins->second->Report (os);
       //Print all active peer links:
-      PeerLinksMap::const_iterator iface = m_peerLinks.find (plugins->second->m_ifIndex);
-      NS_ASSERT (iface != m_peerLinks.end ());
-      for (PeerLinksOnInterface::const_iterator i = iface->second.begin (); i != iface->second.end (); i++)
+      PmtmgmpPeerLinksMap::const_iterator iface = m_PmtmgmpPeerLinks.find (plugins->second->m_ifIndex);
+      NS_ASSERT (iface != m_PmtmgmpPeerLinks.end ());
+      for (PmtmgmpPeerLinksOnInterface::const_iterator i = iface->second.begin (); i != iface->second.end (); i++)
         {
           (*i)->Report (os);
         }
     }
-  os << "</PeerManagementProtocol>" << std::endl;
+  os << "</PmtmgmpPeerManagementProtocol>" << std::endl;
 }
 void
-PeerManagementProtocol::ResetStats ()
+PmtmgmpPeerManagementProtocol::ResetStats ()
 {
   m_stats = Statistics (m_stats.linksTotal); // don't reset number of links
-  for (PeerManagementProtocolMacMap::const_iterator plugins = m_plugins.begin (); plugins != m_plugins.end (); plugins++)
+  for (PmtmgmpPeerManagementProtocolMacMap::const_iterator plugins = m_plugins.begin (); plugins != m_plugins.end (); plugins++)
     {
       plugins->second->ResetStats ();
     }
 }
 
 int64_t
-PeerManagementProtocol::AssignStreams (int64_t stream)
+PmtmgmpPeerManagementProtocol::AssignStreams (int64_t stream)
 {
   NS_LOG_FUNCTION (this << stream);
   m_beaconShift->SetStream (stream);
@@ -593,7 +593,7 @@ PeerManagementProtocol::AssignStreams (int64_t stream)
 }
 
 void
-PeerManagementProtocol::DoInitialize ()
+PmtmgmpPeerManagementProtocol::DoInitialize ()
 {
   // If beacon interval is equal to the neighbor's one and one o more beacons received
   // by my neighbor coincide with my beacon - apply random uniformly distributed shift from
@@ -603,12 +603,12 @@ PeerManagementProtocol::DoInitialize ()
 }
 
 void
-PeerManagementProtocol::SetBeaconCollisionAvoidance (bool enable)
+PmtmgmpPeerManagementProtocol::SetBeaconCollisionAvoidance (bool enable)
 {
   m_enableBca = enable;
 }
 bool
-PeerManagementProtocol::GetBeaconCollisionAvoidance () const
+PmtmgmpPeerManagementProtocol::GetBeaconCollisionAvoidance () const
 {
   return m_enableBca;
 }

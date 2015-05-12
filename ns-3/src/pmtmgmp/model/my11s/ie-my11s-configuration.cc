@@ -25,7 +25,7 @@ namespace ns3 {
 namespace my11s {
 
 My11sWmnCapability::My11sWmnCapability () :
-  acceptPeerLinks (true), MCCASupported (false), MCCAEnabled (false), forwarding (true), beaconTimingReport (
+  acceptPmtmgmpPeerLinks (true), MCCASupported (false), MCCAEnabled (false), forwarding (true), beaconTimingReport (
     true), TBTTAdjustment (true), powerSaveLevel (false)
 {
 }
@@ -38,7 +38,7 @@ uint8_t
 My11sWmnCapability::GetUint8 () const  //IEEE 802.11-2012 8.4.2.100.8 Wmn Capability 
 {
   uint8_t result = 0;  
-  if (acceptPeerLinks)
+  if (acceptPmtmgmpPeerLinks)
     {
       result |= 1 << 0; //The Accepting Additional Wmn Peerings subfield is set to 1 if the wmn STA is willing to establish additional wmn peerings   with other wmn STAs and set to 0 otherwise
     }
@@ -78,7 +78,7 @@ Buffer::Iterator
 My11sWmnCapability::Deserialize (Buffer::Iterator i)
 {
   uint8_t cap = i.ReadU8 ();
-  acceptPeerLinks = Is (cap, 0);
+  acceptPmtmgmpPeerLinks = Is (cap, 0);
   MCCASupported = Is (cap, 1);
   MCCAEnabled = Is (cap, 2);
   forwarding = Is (cap, 3);
@@ -199,7 +199,7 @@ IeConfiguration::WmnCapability ()
 bool
 operator== (const My11sWmnCapability & a, const My11sWmnCapability & b)
 {
-  return ((a.acceptPeerLinks == b.acceptPeerLinks) && (a.MCCASupported == b.MCCASupported) && (a.MCCAEnabled
+  return ((a.acceptPmtmgmpPeerLinks == b.acceptPmtmgmpPeerLinks) && (a.MCCASupported == b.MCCASupported) && (a.MCCAEnabled
                                                                                                == b.MCCAEnabled) && (a.forwarding == b.forwarding) && (a.beaconTimingReport == b.beaconTimingReport)
           && (a.TBTTAdjustment == b.TBTTAdjustment) && (a.powerSaveLevel == b.powerSaveLevel));
 }

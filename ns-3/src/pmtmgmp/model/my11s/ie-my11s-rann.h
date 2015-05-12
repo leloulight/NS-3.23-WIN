@@ -18,8 +18,8 @@
  * Author: Kirill Andreev <andreev@iitp.ru>
  */
 
-#ifndef RANN_INFORMATION_ELEMENT_H
-#define RANN_INFORMATION_ELEMENT_H
+#ifndef PMTMGMP_RANN_INFORMATION_ELEMENT_H
+#define PMTMGMP_RANN_INFORMATION_ELEMENT_H
 
 #include "ns3/mac48-address.h"
 #include "ns3/wmn-information-element-vector.h"

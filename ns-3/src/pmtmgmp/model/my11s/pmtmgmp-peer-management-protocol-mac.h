@@ -26,10 +26,10 @@
 namespace ns3 {
 class WmnWifiInterfaceMac;
 namespace my11s {
-class PeerManagementProtocol;
+class PmtmgmpPeerManagementProtocol;
 class IeConfiguration;
 class IePeerManagement;
-class PeerManagementProtocol;
+class PmtmgmpPeerManagementProtocol;
 /**
  * \ingroup my11s
  *
@@ -39,11 +39,11 @@ class PeerManagementProtocol;
  * element and wmn configuration element and passes it to main part
  * of protocol
  */
-class PeerManagementProtocolMac : public WmnWifiInterfaceMacPlugin
+class PmtmgmpPeerManagementProtocolMac : public WmnWifiInterfaceMacPlugin
 {
 public:
-  PeerManagementProtocolMac (uint32_t interface, Ptr<PeerManagementProtocol> protocol);
-  ~PeerManagementProtocolMac ();
+  PmtmgmpPeerManagementProtocolMac (uint32_t interface, Ptr<PmtmgmpPeerManagementProtocol> protocol);
+  ~PmtmgmpPeerManagementProtocolMac ();
   
   // Inherited from plugin abstract class
   void SetParent (Ptr<WmnWifiInterfaceMac> parent);
@@ -59,11 +59,11 @@ public:
   // \}
 
 private:
-  PeerManagementProtocolMac& operator= (const PeerManagementProtocolMac &);
-  PeerManagementProtocolMac (const PeerManagementProtocolMac &);
+  PmtmgmpPeerManagementProtocolMac& operator= (const PmtmgmpPeerManagementProtocolMac &);
+  PmtmgmpPeerManagementProtocolMac (const PmtmgmpPeerManagementProtocolMac &);
 
-  friend class PeerManagementProtocol;
-  friend class PeerLink;
+  friend class PmtmgmpPeerManagementProtocol;
+  friend class PmtmgmpPeerLink;
   ///\name Create peer link management frames
   // \{
   /**
@@ -77,9 +77,9 @@ private:
     SupportedRates rates;
     uint16_t qos;
   };
-  Ptr<Packet> CreatePeerLinkOpenFrame ();
-  Ptr<Packet> CreatePeerLinkConfirmFrame ();
-  Ptr<Packet> CreatePeerLinkCloseFrame ();
+  Ptr<Packet> CreatePmtmgmpPeerLinkOpenFrame ();
+  Ptr<Packet> CreatePmtmgmpPeerLinkConfirmFrame ();
+  Ptr<Packet> CreatePmtmgmpPeerLinkCloseFrame ();
   /// Parses the start of the frame, where no WifiInformationElements exist
   PlinkFrameStart ParsePlinkFrame (Ptr<const Packet> packet);
   // \}
@@ -88,8 +88,8 @@ private:
   void TxOk (WifiMacHeader const &hdr);
   /// BCA functionality
   void SetBeaconShift (Time shift);
-  void SetPeerManagerProtcol (Ptr<PeerManagementProtocol> protocol);
-  void SendPeerLinkManagementFrame (
+  void SetPeerManagerProtcol (Ptr<PmtmgmpPeerManagementProtocol> protocol);
+  void SendPmtmgmpPeerLinkManagementFrame (
     Mac48Address peerAddress,
     Mac48Address peerMpAddress,
     uint16_t aid,
@@ -127,7 +127,7 @@ private:
   // \{
   Ptr<WmnWifiInterfaceMac> m_parent;
   uint32_t m_ifIndex;
-  Ptr<PeerManagementProtocol> m_protocol;
+  Ptr<PmtmgmpPeerManagementProtocol> m_protocol;
   // \}
 };
 

@@ -34,21 +34,21 @@
 namespace ns3 {
 namespace my11s {
 
-class PeerManagementProtocolMac;
+class PmtmgmpPeerManagementProtocolMac;
 /**
  * \ingroup my11s
  *
  * \brief Peer link model for 802.11s Peer Management protocol
  */
-class PeerLink : public Object
+class PmtmgmpPeerLink : public Object
 {
 public:
-  friend class PeerManagementProtocol;
+  friend class PmtmgmpPeerManagementProtocol;
   /// Support object system
   static TypeId GetTypeId ();
   /// C-tor create empty link
-  PeerLink ();
-  ~PeerLink ();
+  PmtmgmpPeerLink ();
+  ~PmtmgmpPeerLink ();
   void DoDispose ();
   /// Peer Link state:
   enum  PeerState {
@@ -84,21 +84,21 @@ public:
   Time GetLastBeacon () const;
   Time GetBeaconInterval () const;
   IeBeaconTiming GetBeaconTimingElement () const;
-  //IePeerManagement GetPeerLinkDescriptorElement ()const;
+  //IePeerManagement GetPmtmgmpPeerLinkDescriptorElement ()const;
   //\}
 
   /**
    * \name MLME
    * \{
    */
-  /// MLME-CancelPeerLink.request
-  void MLMECancelPeerLink (PmpReasonCode reason);
-  /// MLME-ActivePeerLinkOpen.request
-  void MLMEActivePeerLinkOpen ();
+  /// MLME-CancelPmtmgmpPeerLink.request
+  void MLMECancelPmtmgmpPeerLink (PmpReasonCode reason);
+  /// MLME-ActivePmtmgmpPeerLinkOpen.request
+  void MLMEActivePmtmgmpPeerLinkOpen ();
   /// MLME-PeeringRequestReject
   void MLMEPeeringRequestReject ();
-  /// Callback type for MLME-SignalPeerLinkStatus event
-  typedef Callback<void, uint32_t, Mac48Address, Mac48Address, PeerLink::PeerState, PeerLink::PeerState> SignalStatusCallback;
+  /// Callback type for MLME-SignalPmtmgmpPeerLinkStatus event
+  typedef Callback<void, uint32_t, Mac48Address, Mac48Address, PmtmgmpPeerLink::PeerState, PmtmgmpPeerLink::PeerState> SignalStatusCallback;
   /// Set callback
   void MLMESetSignalStatusCallback (SignalStatusCallback);
   /// Reports about transmission success/failure
@@ -113,12 +113,12 @@ private:
   {
     CNCL,       ///< Cancel peer link
     ACTOPN,     ///< Active peer link open
-    CLS_ACPT,   ///< PeerLinkClose_Accept
-    OPN_ACPT,   ///< PeerLinkOpen_Accept
-    OPN_RJCT,   ///< PeerLinkOpen_Reject
-    REQ_RJCT,   ///< PeerLinkOpenReject by internal reason
-    CNF_ACPT,   ///< PeerLinkConfirm_Accept
-    CNF_RJCT,   ///< PeerLinkConfirm_Reject
+    CLS_ACPT,   ///< PmtmgmpPeerLinkClose_Accept
+    OPN_ACPT,   ///< PmtmgmpPeerLinkOpen_Accept
+    OPN_RJCT,   ///< PmtmgmpPeerLinkOpen_Reject
+    REQ_RJCT,   ///< PmtmgmpPeerLinkOpenReject by internal reason
+    CNF_ACPT,   ///< PmtmgmpPeerLinkConfirm_Accept
+    CNF_RJCT,   ///< PmtmgmpPeerLinkConfirm_Reject
     TOR1,       ///< Timeout of retry timer
     TOR2,       ///< also timeout of retry timer
     TOC,        ///< Timeout of confirm timer
@@ -130,12 +130,12 @@ private:
    * \name Link response to received management frames
    *
    * \attention In all this methods {local/peer}LinkID correspond to _peer_ station, as written in
-   * received frame, e.g. I am peerLinkID and peer link is localLinkID .
+   * received frame, e.g. I am PmtmgmpPeerLinkID and peer link is localLinkID .
    *
    * \{
    */
   /// Close link
-  void Close (uint16_t localLinkID, uint16_t peerLinkID, PmpReasonCode reason);
+  void Close (uint16_t localLinkID, uint16_t PmtmgmpPeerLinkID, PmpReasonCode reason);
   /// Accept open link
   void OpenAccept (uint16_t localLinkId, IeConfiguration conf, Mac48Address peerMp);
   /// Reject open link
@@ -143,7 +143,7 @@ private:
   /// Confirm accept
   void ConfirmAccept (
     uint16_t localLinkId,
-    uint16_t peerLinkId,
+    uint16_t PmtmgmpPeerLinkId,
     uint16_t peerAid,
     IeConfiguration conf,
     Mac48Address peerMp
@@ -151,7 +151,7 @@ private:
   /// Confirm reject
   void  ConfirmReject (
     uint16_t localLinkId,
-    uint16_t peerLinkId,
+    uint16_t PmtmgmpPeerLinkId,
     IeConfiguration  conf,
     Mac48Address peerMp,
     PmpReasonCode reason
@@ -165,7 +165,7 @@ private:
    * Set pointer to MAC-plugin, which is responsible for sending peer
    * link management frames
    */
-  void SetMacPlugin (Ptr<PeerManagementProtocolMac> plugin);
+  void SetMacPlugin (Ptr<PmtmgmpPeerManagementProtocolMac> plugin);
   /**
    * \name Event handlers
    * \{
@@ -182,9 +182,9 @@ private:
    * \name Work with management frames
    * \{
    */
-  void SendPeerLinkClose (PmpReasonCode reasoncode);
-  void SendPeerLinkOpen ();
-  void SendPeerLinkConfirm ();
+  void SendPmtmgmpPeerLinkClose (PmpReasonCode reasoncode);
+  void SendPmtmgmpPeerLinkOpen ();
+  void SendPmtmgmpPeerLinkConfirm ();
   //\}
 
   /**
@@ -199,13 +199,13 @@ private:
   void BeaconLoss ();
 private:
 
-  PeerLink& operator= (const PeerLink &);
-  PeerLink (const PeerLink &);
+  PmtmgmpPeerLink& operator= (const PmtmgmpPeerLink &);
+  PmtmgmpPeerLink (const PmtmgmpPeerLink &);
 
   /// The number of interface I am associated with
   uint32_t m_interface;
   /// pointer to MAC plugin, which is responsible for peer management
-  Ptr<PeerManagementProtocolMac> m_macPlugin;
+  Ptr<PmtmgmpPeerManagementProtocolMac> m_macPlugin;
   /// Peer address
   Mac48Address m_peerAddress;
   /// Wmn point address, equal to peer address in case of single
@@ -214,7 +214,7 @@ private:
   /// My ID of this link
   uint16_t m_localLinkId;
   /// Peer ID of this link
-  uint16_t m_peerLinkId;
+  uint16_t m_PmtmgmpPeerLinkId;
   /// My association ID
   uint16_t m_assocId;
   /// Assoc Id assigned to me by peer

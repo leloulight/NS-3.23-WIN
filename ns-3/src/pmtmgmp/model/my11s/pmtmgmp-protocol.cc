@@ -65,59 +65,59 @@ PmtmgmpProtocol::GetTypeId ()
                       &PmtmgmpProtocol::m_maxQueueSize),
                     MakeUintegerChecker<uint16_t> (1)
                     )
-    .AddAttribute ( "Dot11WmnPMTMGMPmaxPREQretries",
+    .AddAttribute ( "My11WmnPMTMGMPmaxPREQretries",
                     "Maximum number of retries before we suppose the destination to be unreachable",
                     UintegerValue (3),
                     MakeUintegerAccessor (
-                      &PmtmgmpProtocol::m_dot11WmnPMTMGMPmaxPREQretries),
+                      &PmtmgmpProtocol::m_My11WmnPMTMGMPmaxPREQretries),
                     MakeUintegerChecker<uint8_t> (1)
                     )
-    .AddAttribute ( "Dot11WmnPMTMGMPnetDiameterTraversalTime",
+    .AddAttribute ( "My11WmnPMTMGMPnetDiameterTraversalTime",
                     "Time we suppose the packet to go from one edge of the network to another",
                     TimeValue (MicroSeconds (1024*100)),
                     MakeTimeAccessor (
-                      &PmtmgmpProtocol::m_dot11WmnPMTMGMPnetDiameterTraversalTime),
+                      &PmtmgmpProtocol::m_My11WmnPMTMGMPnetDiameterTraversalTime),
                     MakeTimeChecker ()
                     )
-    .AddAttribute ( "Dot11WmnPMTMGMPpreqMinInterval",
+    .AddAttribute ( "My11WmnPMTMGMPpreqMinInterval",
                     "Minimal interval between to successive PREQs",
                     TimeValue (MicroSeconds (1024*100)),
                     MakeTimeAccessor (
-                      &PmtmgmpProtocol::m_dot11WmnPMTMGMPpreqMinInterval),
+                      &PmtmgmpProtocol::m_My11WmnPMTMGMPpreqMinInterval),
                     MakeTimeChecker ()
                     )
-    .AddAttribute ( "Dot11WmnPMTMGMPperrMinInterval",
+    .AddAttribute ( "My11WmnPMTMGMPperrMinInterval",
                     "Minimal interval between to successive PREQs",
                     TimeValue (MicroSeconds (1024*100)),
-                    MakeTimeAccessor (&PmtmgmpProtocol::m_dot11WmnPMTMGMPperrMinInterval),
+                    MakeTimeAccessor (&PmtmgmpProtocol::m_My11WmnPMTMGMPperrMinInterval),
                     MakeTimeChecker ()
                     )
-    .AddAttribute ( "Dot11WmnPMTMGMPactiveRootTimeout",
+    .AddAttribute ( "My11WmnPMTMGMPactiveRootTimeout",
                     "Lifetime of poractive routing information",
                     TimeValue (MicroSeconds (1024*5000)),
                     MakeTimeAccessor (
-                      &PmtmgmpProtocol::m_dot11WmnPMTMGMPactiveRootTimeout),
+                      &PmtmgmpProtocol::m_My11WmnPMTMGMPactiveRootTimeout),
                     MakeTimeChecker ()
                     )
-    .AddAttribute ( "Dot11WmnPMTMGMPactivePathTimeout",
+    .AddAttribute ( "My11WmnPMTMGMPactivePathTimeout",
                     "Lifetime of reactive routing information",
                     TimeValue (MicroSeconds (1024*5000)),
                     MakeTimeAccessor (
-                      &PmtmgmpProtocol::m_dot11WmnPMTMGMPactivePathTimeout),
+                      &PmtmgmpProtocol::m_My11WmnPMTMGMPactivePathTimeout),
                     MakeTimeChecker ()
                     )
-    .AddAttribute ( "Dot11WmnPMTMGMPpathToRootInterval",
+    .AddAttribute ( "My11WmnPMTMGMPpathToRootInterval",
                     "Interval between two successive proactive PREQs",
                     TimeValue (MicroSeconds (1024*2000)),
                     MakeTimeAccessor (
-                      &PmtmgmpProtocol::m_dot11WmnPMTMGMPpathToRootInterval),
+                      &PmtmgmpProtocol::m_My11WmnPMTMGMPpathToRootInterval),
                     MakeTimeChecker ()
                     )
-    .AddAttribute ( "Dot11WmnPMTMGMPrannInterval",
+    .AddAttribute ( "My11WmnPMTMGMPrannInterval",
                     "Lifetime of poractive routing information",
                     TimeValue (MicroSeconds (1024*5000)),
                     MakeTimeAccessor (
-                      &PmtmgmpProtocol::m_dot11WmnPMTMGMPrannInterval),
+                      &PmtmgmpProtocol::m_My11WmnPMTMGMPrannInterval),
                     MakeTimeChecker ()
                     )
     .AddAttribute ( "MaxTtl",
@@ -179,14 +179,14 @@ PmtmgmpProtocol::PmtmgmpProtocol () :
   m_rtable (CreateObject<PmtmgmpRtable> ()),
   m_randomStart (Seconds (0.1)),
   m_maxQueueSize (255),
-  m_dot11WmnPMTMGMPmaxPREQretries (3),
-  m_dot11WmnPMTMGMPnetDiameterTraversalTime (MicroSeconds (1024*100)),
-  m_dot11WmnPMTMGMPpreqMinInterval (MicroSeconds (1024*100)),
-  m_dot11WmnPMTMGMPperrMinInterval (MicroSeconds (1024*100)),
-  m_dot11WmnPMTMGMPactiveRootTimeout (MicroSeconds (1024*5000)),
-  m_dot11WmnPMTMGMPactivePathTimeout (MicroSeconds (1024*5000)),
-  m_dot11WmnPMTMGMPpathToRootInterval (MicroSeconds (1024*2000)),
-  m_dot11WmnPMTMGMPrannInterval (MicroSeconds (1024*5000)),
+  m_My11WmnPMTMGMPmaxPREQretries (3),
+  m_My11WmnPMTMGMPnetDiameterTraversalTime (MicroSeconds (1024*100)),
+  m_My11WmnPMTMGMPpreqMinInterval (MicroSeconds (1024*100)),
+  m_My11WmnPMTMGMPperrMinInterval (MicroSeconds (1024*100)),
+  m_My11WmnPMTMGMPactiveRootTimeout (MicroSeconds (1024*5000)),
+  m_My11WmnPMTMGMPactivePathTimeout (MicroSeconds (1024*5000)),
+  m_My11WmnPMTMGMPpathToRootInterval (MicroSeconds (1024*2000)),
+  m_My11WmnPMTMGMPrannInterval (MicroSeconds (1024*5000)),
   m_isRoot (false),
   m_maxTtl (32),
   m_unicastPerrThreshold (32),
@@ -730,7 +730,7 @@ PmtmgmpProtocol::Install (Ptr<WmnPointDevice> mp)
   return true;
 }
 void
-PmtmgmpProtocol::PeerLinkStatus (Mac48Address wmnPointAddress, Mac48Address peerAddress, uint32_t interface, bool status)
+PmtmgmpProtocol::PmtmgmpPeerLinkStatus (Mac48Address wmnPointAddress, Mac48Address peerAddress, uint32_t interface, bool status)
 {
   if (status)
     {
@@ -975,7 +975,7 @@ PmtmgmpProtocol::ShouldSendPreq (Mac48Address dst)
   if (i == m_preqTimeouts.end ())
     {
       m_preqTimeouts[dst].preqTimeout = Simulator::Schedule (
-          Time (m_dot11WmnPMTMGMPnetDiameterTraversalTime * 2),
+          Time (m_My11WmnPMTMGMPnetDiameterTraversalTime * 2),
           &PmtmgmpProtocol::RetryPathDiscovery, this, dst, 1);
       m_preqTimeouts[dst].whenScheduled = Simulator::Now ();
       return true;
@@ -997,7 +997,7 @@ PmtmgmpProtocol::RetryPathDiscovery (Mac48Address dst, uint8_t numOfRetry)
       m_preqTimeouts.erase (i);
       return;
     }
-  if (numOfRetry > m_dot11WmnPMTMGMPmaxPREQretries)
+  if (numOfRetry > m_My11WmnPMTMGMPmaxPREQretries)
     {
       QueuedPacket packet = DequeueFirstPacketByDst (dst);
       //purge queue and delete entry from retryDatabase
@@ -1021,7 +1021,7 @@ PmtmgmpProtocol::RetryPathDiscovery (Mac48Address dst, uint8_t numOfRetry)
       i->second->RequestDestination (dst, originator_seqno, dst_seqno);
     }
   m_preqTimeouts[dst].preqTimeout = Simulator::Schedule (
-      Time ((2 * (numOfRetry + 1)) *  m_dot11WmnPMTMGMPnetDiameterTraversalTime),
+      Time ((2 * (numOfRetry + 1)) *  m_My11WmnPMTMGMPnetDiameterTraversalTime),
       &PmtmgmpProtocol::RetryPathDiscovery, this, dst, numOfRetry);
 }
 //Proactive PREQ routines:
@@ -1043,7 +1043,7 @@ PmtmgmpProtocol::SendProactivePreq ()
   //By default: must answer
   preq.SetHopcount (0);
   preq.SetTTL (m_maxTtl);
-  preq.SetLifetime (m_dot11WmnPMTMGMPactiveRootTimeout.GetMicroSeconds () /1024);
+  preq.SetLifetime (m_My11WmnPMTMGMPactiveRootTimeout.GetMicroSeconds () /1024);
   //\attention: do not forget to set originator address, sequence
   //number and preq ID in PMTMGMP-MAC plugin
   preq.AddDestinationAddressElement (true, true, Mac48Address::GetBroadcast (), 0);
@@ -1054,7 +1054,7 @@ PmtmgmpProtocol::SendProactivePreq ()
     {
       i->second->SendPreq (preq);
     }
-  m_proactivePreqTimer = Simulator::Schedule (m_dot11WmnPMTMGMPpathToRootInterval, &PmtmgmpProtocol::SendProactivePreq, this);
+  m_proactivePreqTimer = Simulator::Schedule (m_My11WmnPMTMGMPpathToRootInterval, &PmtmgmpProtocol::SendProactivePreq, this);
 }
 bool
 PmtmgmpProtocol::GetDoFlag ()
@@ -1069,12 +1069,12 @@ PmtmgmpProtocol::GetRfFlag ()
 Time
 PmtmgmpProtocol::GetPreqMinInterval ()
 {
-  return m_dot11WmnPMTMGMPpreqMinInterval;
+  return m_My11WmnPMTMGMPpreqMinInterval;
 }
 Time
 PmtmgmpProtocol::GetPerrMinInterval ()
 {
-  return m_dot11WmnPMTMGMPperrMinInterval;
+  return m_My11WmnPMTMGMPperrMinInterval;
 }
 uint8_t
 PmtmgmpProtocol::GetMaxTtl ()
@@ -1096,7 +1096,7 @@ PmtmgmpProtocol::GetNextPmtmgmpSeqno ()
 uint32_t
 PmtmgmpProtocol::GetActivePathLifetime ()
 {
-  return m_dot11WmnPMTMGMPactivePathTimeout.GetMicroSeconds () / 1024;
+  return m_My11WmnPMTMGMPactivePathTimeout.GetMicroSeconds () / 1024;
 }
 uint8_t
 PmtmgmpProtocol::GetUnicastPerrThreshold ()
@@ -1140,14 +1140,14 @@ PmtmgmpProtocol::Report (std::ostream & os) const
   os << "<Pmtmgmp "
   "address=\"" << m_address << "\"" << std::endl <<
   "maxQueueSize=\"" << m_maxQueueSize << "\"" << std::endl <<
-  "Dot11WmnPMTMGMPmaxPREQretries=\"" << (uint16_t)m_dot11WmnPMTMGMPmaxPREQretries << "\"" << std::endl <<
-  "Dot11WmnPMTMGMPnetDiameterTraversalTime=\"" << m_dot11WmnPMTMGMPnetDiameterTraversalTime.GetSeconds () << "\"" << std::endl <<
-  "Dot11WmnPMTMGMPpreqMinInterval=\"" << m_dot11WmnPMTMGMPpreqMinInterval.GetSeconds () << "\"" << std::endl <<
-  "Dot11WmnPMTMGMPperrMinInterval=\"" << m_dot11WmnPMTMGMPperrMinInterval.GetSeconds () << "\"" << std::endl <<
-  "Dot11WmnPMTMGMPactiveRootTimeout=\"" << m_dot11WmnPMTMGMPactiveRootTimeout.GetSeconds () << "\"" << std::endl <<
-  "Dot11WmnPMTMGMPactivePathTimeout=\"" << m_dot11WmnPMTMGMPactivePathTimeout.GetSeconds () << "\"" << std::endl <<
-  "Dot11WmnPMTMGMPpathToRootInterval=\"" << m_dot11WmnPMTMGMPpathToRootInterval.GetSeconds () << "\"" << std::endl <<
-  "Dot11WmnPMTMGMPrannInterval=\"" << m_dot11WmnPMTMGMPrannInterval.GetSeconds () << "\"" << std::endl <<
+  "My11WmnPMTMGMPmaxPREQretries=\"" << (uint16_t)m_My11WmnPMTMGMPmaxPREQretries << "\"" << std::endl <<
+  "My11WmnPMTMGMPnetDiameterTraversalTime=\"" << m_My11WmnPMTMGMPnetDiameterTraversalTime.GetSeconds () << "\"" << std::endl <<
+  "My11WmnPMTMGMPpreqMinInterval=\"" << m_My11WmnPMTMGMPpreqMinInterval.GetSeconds () << "\"" << std::endl <<
+  "My11WmnPMTMGMPperrMinInterval=\"" << m_My11WmnPMTMGMPperrMinInterval.GetSeconds () << "\"" << std::endl <<
+  "My11WmnPMTMGMPactiveRootTimeout=\"" << m_My11WmnPMTMGMPactiveRootTimeout.GetSeconds () << "\"" << std::endl <<
+  "My11WmnPMTMGMPactivePathTimeout=\"" << m_My11WmnPMTMGMPactivePathTimeout.GetSeconds () << "\"" << std::endl <<
+  "My11WmnPMTMGMPpathToRootInterval=\"" << m_My11WmnPMTMGMPpathToRootInterval.GetSeconds () << "\"" << std::endl <<
+  "My11WmnPMTMGMPrannInterval=\"" << m_My11WmnPMTMGMPrannInterval.GetSeconds () << "\"" << std::endl <<
   "isRoot=\"" << m_isRoot << "\"" << std::endl <<
   "maxTtl=\"" << (uint16_t)m_maxTtl << "\"" << std::endl <<
   "unicastPerrThreshold=\"" << (uint16_t)m_unicastPerrThreshold << "\"" << std::endl <<

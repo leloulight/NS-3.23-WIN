@@ -42,10 +42,10 @@ namespace my11s
  * - Supported rates
  * - Wmn ID of wmn
  */
-class PeerLinkFrameStart : public Header
+class PmtmgmpPeerLinkFrameStart : public Header
 {
 public:
-  PeerLinkFrameStart ();
+  PmtmgmpPeerLinkFrameStart ();
   ///\brief fields:
   struct PlinkFrameStartFields
   {
@@ -82,13 +82,13 @@ private:
   IeConfiguration m_config;
   uint16_t m_reasonCode;
 
-  friend bool operator== (const PeerLinkFrameStart & a, const PeerLinkFrameStart & b);
+  friend bool operator== (const PmtmgmpPeerLinkFrameStart & a, const PmtmgmpPeerLinkFrameStart & b);
 
-  PeerLinkFrameStart& operator= (const PeerLinkFrameStart &);
-  PeerLinkFrameStart (const PeerLinkFrameStart &);
+  PmtmgmpPeerLinkFrameStart& operator= (const PmtmgmpPeerLinkFrameStart &);
+  PmtmgmpPeerLinkFrameStart (const PmtmgmpPeerLinkFrameStart &);
 
 };
-bool operator== (const PeerLinkFrameStart & a, const PeerLinkFrameStart & b);
+bool operator== (const PmtmgmpPeerLinkFrameStart & a, const PmtmgmpPeerLinkFrameStart & b);
 } // namespace my11s
 } // namespace ns3
 #endif

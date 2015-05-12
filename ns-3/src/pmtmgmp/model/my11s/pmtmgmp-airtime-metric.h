@@ -18,8 +18,8 @@
  * Authors: Kirill Andreev <andreev@iitp.ru>
  */
 
-#ifndef AIRTIME_METRIC_H
-#define AIRTIME_METRIC_H
+#ifndef PMTMGMP_AIRTIME_METRIC_H
+#define PMTMGMP_AIRTIME_METRIC_H
 #include "ns3/wmn-wifi-interface-mac.h"
 namespace ns3 {
 namespace my11s {

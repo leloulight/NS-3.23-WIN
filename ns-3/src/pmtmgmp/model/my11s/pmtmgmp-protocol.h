@@ -74,7 +74,7 @@ public:
    * via WmnPointDevice::GetObject<my11s::PmtmgmpProtocol>();
    */
   bool Install (Ptr<WmnPointDevice>);
-  void PeerLinkStatus (Mac48Address wmnPontAddress, Mac48Address peerAddress, uint32_t interface,bool status);
+  void PmtmgmpPeerLinkStatus (Mac48Address wmnPontAddress, Mac48Address peerAddress, uint32_t interface,bool status);
   ///\brief This callback is used to obtain active neighbours on a given interface
   ///\param cb is a callback, which returns a list of addresses on given interface (uint32_t)
   void SetNeighboursCallback (Callback<std::vector<Mac48Address>, uint32_t> cb);
@@ -266,14 +266,14 @@ private:
   /// These are all Aattributes
   /// \{
   uint16_t m_maxQueueSize;
-  uint8_t m_dot11WmnPMTMGMPmaxPREQretries;
-  Time m_dot11WmnPMTMGMPnetDiameterTraversalTime;
-  Time m_dot11WmnPMTMGMPpreqMinInterval;
-  Time m_dot11WmnPMTMGMPperrMinInterval;
-  Time m_dot11WmnPMTMGMPactiveRootTimeout;
-  Time m_dot11WmnPMTMGMPactivePathTimeout;
-  Time m_dot11WmnPMTMGMPpathToRootInterval;
-  Time m_dot11WmnPMTMGMPrannInterval;
+  uint8_t m_My11WmnPMTMGMPmaxPREQretries;
+  Time m_My11WmnPMTMGMPnetDiameterTraversalTime;
+  Time m_My11WmnPMTMGMPpreqMinInterval;
+  Time m_My11WmnPMTMGMPperrMinInterval;
+  Time m_My11WmnPMTMGMPactiveRootTimeout;
+  Time m_My11WmnPMTMGMPactivePathTimeout;
+  Time m_My11WmnPMTMGMPpathToRootInterval;
+  Time m_My11WmnPMTMGMPrannInterval;
   bool m_isRoot;
   uint8_t m_maxTtl;
   uint8_t m_unicastPerrThreshold;

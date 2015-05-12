@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\ns-3\src\pmtmgmp\examples\wmn.cc">
+    <ClCompile Include="..\ns-3\scratch\MeshRouteTest.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

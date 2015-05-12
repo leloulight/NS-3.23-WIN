@@ -28,59 +28,59 @@
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("My11sPeerManagementProtocol");
+NS_LOG_COMPONENT_DEFINE ("My11sPmtmgmpPeerManagementProtocol");
   
 namespace my11s {
 
-NS_OBJECT_ENSURE_REGISTERED ( PeerLink);
+NS_OBJECT_ENSURE_REGISTERED ( PmtmgmpPeerLink);
 
 TypeId
-PeerLink::GetTypeId ()
+PmtmgmpPeerLink::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::my11s::PeerLink")
+  static TypeId tid = TypeId ("ns3::my11s::PmtmgmpPeerLink")
     .SetParent<Object> ()
     .SetGroupName ("Wmn")
-    .AddConstructor<PeerLink> ()
+    .AddConstructor<PmtmgmpPeerLink> ()
     .AddAttribute ( "RetryTimeout",
                     "Retry timeout",
                     TimeValue (TimeValue (MicroSeconds (40 * 1024))),
                     MakeTimeAccessor (
-                      &PeerLink::m_dot11WmnRetryTimeout),
+                      &PmtmgmpPeerLink::m_dot11WmnRetryTimeout),
                     MakeTimeChecker ()
                     )
     .AddAttribute ( "HoldingTimeout",
                     "Holding timeout",
                     TimeValue (TimeValue (MicroSeconds (40 * 1024))),
                     MakeTimeAccessor (
-                      &PeerLink::m_dot11WmnHoldingTimeout),
+                      &PmtmgmpPeerLink::m_dot11WmnHoldingTimeout),
                     MakeTimeChecker ()
                     )
     .AddAttribute ( "ConfirmTimeout",
                     "Confirm timeout",
                     TimeValue (TimeValue (MicroSeconds (40 * 1024))),
                     MakeTimeAccessor (
-                      &PeerLink::m_dot11WmnConfirmTimeout),
+                      &PmtmgmpPeerLink::m_dot11WmnConfirmTimeout),
                     MakeTimeChecker ()
                     )
     .AddAttribute ( "MaxRetries",
                     "Maximum number of retries",
                     UintegerValue (4),
                     MakeUintegerAccessor (
-                      &PeerLink::m_dot11WmnMaxRetries),
+                      &PmtmgmpPeerLink::m_dot11WmnMaxRetries),
                     MakeUintegerChecker<uint16_t> ()
                     )
     .AddAttribute ( "MaxBeaconLoss",
                     "Maximum number of lost beacons before link will be closed",
                     UintegerValue (2),
                     MakeUintegerAccessor (
-                      &PeerLink::m_maxBeaconLoss),
+                      &PmtmgmpPeerLink::m_maxBeaconLoss),
                     MakeUintegerChecker<uint16_t> (1)
                     )
     .AddAttribute ( "MaxPacketFailure",
                     "Maximum number of failed packets before link will be closed",
                     UintegerValue (2),
                     MakeUintegerAccessor (
-                      &PeerLink::m_maxPacketFail),
+                      &PmtmgmpPeerLink::m_maxPacketFail),
                     MakeUintegerChecker<uint16_t> (1)
                     )
   ;
@@ -89,13 +89,13 @@ PeerLink::GetTypeId ()
 
 
 //-----------------------------------------------------------------------------
-// PeerLink public interface
+// PmtmgmpPeerLink public interface
 //-----------------------------------------------------------------------------
-PeerLink::PeerLink () :
+PmtmgmpPeerLink::PmtmgmpPeerLink () :
   m_peerAddress (Mac48Address::GetBroadcast ()),
   m_peerWmnPointAddress (Mac48Address::GetBroadcast ()),
   m_localLinkId (0),
-  m_peerLinkId (0),
+  m_PmtmgmpPeerLinkId (0),
   m_assocId (0),
   m_peerAssocId (0),
   m_lastBeacon (Seconds (0)),
@@ -106,11 +106,11 @@ PeerLink::PeerLink () :
   m_maxPacketFail (3)
 {
 }
-PeerLink::~PeerLink ()
+PmtmgmpPeerLink::~PmtmgmpPeerLink ()
 {
 }
 void
-PeerLink::DoDispose ()
+PmtmgmpPeerLink::DoDispose ()
 {
   m_retryTimer.Cancel ();
   m_holdingTimer.Cancel ();
@@ -119,57 +119,57 @@ PeerLink::DoDispose ()
   m_beaconTiming.ClearTimingElement ();
 }
 void
-PeerLink::SetPeerAddress (Mac48Address macaddr)
+PmtmgmpPeerLink::SetPeerAddress (Mac48Address macaddr)
 {
   m_peerAddress = macaddr;
 }
 void
-PeerLink::SetPeerWmnPointAddress (Mac48Address macaddr)
+PmtmgmpPeerLink::SetPeerWmnPointAddress (Mac48Address macaddr)
 {
   m_peerWmnPointAddress = macaddr;
 }
 void
-PeerLink::SetInterface (uint32_t interface)
+PmtmgmpPeerLink::SetInterface (uint32_t interface)
 {
   m_interface = interface;
 }
 void
-PeerLink::SetLocalLinkId (uint16_t id)
+PmtmgmpPeerLink::SetLocalLinkId (uint16_t id)
 {
   m_localLinkId = id;
 }
 void
-PeerLink::SetLocalAid (uint16_t aid)
+PmtmgmpPeerLink::SetLocalAid (uint16_t aid)
 {
   m_assocId = aid;
 }
 void
-PeerLink::SetBeaconInformation (Time lastBeacon, Time beaconInterval)
+PmtmgmpPeerLink::SetBeaconInformation (Time lastBeacon, Time beaconInterval)
 {
   m_lastBeacon = lastBeacon;
   m_beaconInterval = beaconInterval;
   m_beaconLossTimer.Cancel ();
   Time delay = Seconds (beaconInterval.GetSeconds () * m_maxBeaconLoss);
   NS_ASSERT (delay.GetMicroSeconds () != 0);
-  m_beaconLossTimer = Simulator::Schedule (delay, &PeerLink::BeaconLoss, this);
+  m_beaconLossTimer = Simulator::Schedule (delay, &PmtmgmpPeerLink::BeaconLoss, this);
 }
 void
-PeerLink::MLMESetSignalStatusCallback (PeerLink::SignalStatusCallback cb)
+PmtmgmpPeerLink::MLMESetSignalStatusCallback (PmtmgmpPeerLink::SignalStatusCallback cb)
 {
   m_linkStatusCallback = cb;
 }
 void
-PeerLink::BeaconLoss ()
+PmtmgmpPeerLink::BeaconLoss ()
 {
   StateMachine (CNCL);
 }
 void
-PeerLink::TransmissionSuccess ()
+PmtmgmpPeerLink::TransmissionSuccess ()
 {
   m_packetFail = 0;
 }
 void
-PeerLink::TransmissionFailure ()
+PmtmgmpPeerLink::TransmissionFailure ()
 {
   m_packetFail++;
   if (m_packetFail == m_maxPacketFail)
@@ -180,70 +180,70 @@ PeerLink::TransmissionFailure ()
 }
 
 void
-PeerLink::SetBeaconTimingElement (IeBeaconTiming beaconTiming)
+PmtmgmpPeerLink::SetBeaconTimingElement (IeBeaconTiming beaconTiming)
 {
   m_beaconTiming = beaconTiming;
 }
 Mac48Address
-PeerLink::GetPeerAddress () const
+PmtmgmpPeerLink::GetPeerAddress () const
 {
   return m_peerAddress;
 }
 uint16_t
-PeerLink::GetLocalAid () const
+PmtmgmpPeerLink::GetLocalAid () const
 {
   return m_assocId;
 }
 uint16_t
-PeerLink::GetPeerAid () const
+PmtmgmpPeerLink::GetPeerAid () const
 {
   return m_peerAssocId;
 }
 
 Time
-PeerLink::GetLastBeacon () const
+PmtmgmpPeerLink::GetLastBeacon () const
 {
   return m_lastBeacon;
 }
 Time
-PeerLink::GetBeaconInterval () const
+PmtmgmpPeerLink::GetBeaconInterval () const
 {
   return m_beaconInterval;
 }
 IeBeaconTiming
-PeerLink::GetBeaconTimingElement () const
+PmtmgmpPeerLink::GetBeaconTimingElement () const
 {
   return m_beaconTiming;
 }
 void
-PeerLink::MLMECancelPeerLink (PmpReasonCode reason)
+PmtmgmpPeerLink::MLMECancelPmtmgmpPeerLink (PmpReasonCode reason)
 {
   StateMachine (CNCL, reason);
 }
 void
-PeerLink::MLMEActivePeerLinkOpen ()
+PmtmgmpPeerLink::MLMEActivePmtmgmpPeerLinkOpen ()
 {
   StateMachine (ACTOPN);
 }
 void
-PeerLink::MLMEPeeringRequestReject ()
+PmtmgmpPeerLink::MLMEPeeringRequestReject ()
 {
   StateMachine (REQ_RJCT, REASON11S_PMTMGMP_PEERING_CANCELLED);
 }
 void
-PeerLink::Close (uint16_t localLinkId, uint16_t peerLinkId, PmpReasonCode reason)
+PmtmgmpPeerLink::Close (uint16_t localLinkId, uint16_t PmtmgmpPeerLinkId, PmpReasonCode reason)
 {
-  if (peerLinkId != 0 && m_localLinkId != peerLinkId)
+  if (PmtmgmpPeerLinkId != 0 && m_localLinkId != PmtmgmpPeerLinkId)
     {
       return;
     }
-  if (m_peerLinkId == 0)
+  if (m_PmtmgmpPeerLinkId == 0)
     {
-      m_peerLinkId = localLinkId;
+      m_PmtmgmpPeerLinkId = localLinkId;
     }
   else
     {
-      if (m_peerLinkId != localLinkId)
+      if (m_PmtmgmpPeerLinkId != localLinkId)
         {
           return;
         }
@@ -251,9 +251,9 @@ PeerLink::Close (uint16_t localLinkId, uint16_t peerLinkId, PmpReasonCode reason
   StateMachine (CLS_ACPT, reason);
 }
 void
-PeerLink::OpenAccept (uint16_t localLinkId, IeConfiguration conf, Mac48Address peerMp)
+PmtmgmpPeerLink::OpenAccept (uint16_t localLinkId, IeConfiguration conf, Mac48Address peerMp)
 {
-  m_peerLinkId = localLinkId;
+  m_PmtmgmpPeerLinkId = localLinkId;
   m_configuration = conf;
   if (m_peerWmnPointAddress != Mac48Address::GetBroadcast ())
     {
@@ -266,11 +266,11 @@ PeerLink::OpenAccept (uint16_t localLinkId, IeConfiguration conf, Mac48Address p
   StateMachine (OPN_ACPT);
 }
 void
-PeerLink::OpenReject (uint16_t localLinkId, IeConfiguration conf, Mac48Address peerMp, PmpReasonCode reason)
+PmtmgmpPeerLink::OpenReject (uint16_t localLinkId, IeConfiguration conf, Mac48Address peerMp, PmpReasonCode reason)
 {
-  if (m_peerLinkId == 0)
+  if (m_PmtmgmpPeerLinkId == 0)
     {
-      m_peerLinkId = localLinkId;
+      m_PmtmgmpPeerLinkId = localLinkId;
     }
   m_configuration = conf;
   if (m_peerWmnPointAddress != Mac48Address::GetBroadcast ())
@@ -284,20 +284,20 @@ PeerLink::OpenReject (uint16_t localLinkId, IeConfiguration conf, Mac48Address p
   StateMachine (OPN_RJCT, reason);
 }
 void
-PeerLink::ConfirmAccept (uint16_t localLinkId, uint16_t peerLinkId, uint16_t peerAid, IeConfiguration conf,
+PmtmgmpPeerLink::ConfirmAccept (uint16_t localLinkId, uint16_t PmtmgmpPeerLinkId, uint16_t peerAid, IeConfiguration conf,
                          Mac48Address peerMp)
 {
-  if (m_localLinkId != peerLinkId)
+  if (m_localLinkId != PmtmgmpPeerLinkId)
     {
       return;
     }
-  if (m_peerLinkId == 0)
+  if (m_PmtmgmpPeerLinkId == 0)
     {
-      m_peerLinkId = localLinkId;
+      m_PmtmgmpPeerLinkId = localLinkId;
     }
   else
     {
-      if (m_peerLinkId != localLinkId)
+      if (m_PmtmgmpPeerLinkId != localLinkId)
         {
           return;
         }
@@ -315,20 +315,20 @@ PeerLink::ConfirmAccept (uint16_t localLinkId, uint16_t peerLinkId, uint16_t pee
   StateMachine (CNF_ACPT);
 }
 void
-PeerLink::ConfirmReject (uint16_t localLinkId, uint16_t peerLinkId, IeConfiguration conf,
+PmtmgmpPeerLink::ConfirmReject (uint16_t localLinkId, uint16_t PmtmgmpPeerLinkId, IeConfiguration conf,
                          Mac48Address peerMp, PmpReasonCode reason)
 {
-  if (m_localLinkId != peerLinkId)
+  if (m_localLinkId != PmtmgmpPeerLinkId)
     {
       return;
     }
-  if (m_peerLinkId == 0)
+  if (m_PmtmgmpPeerLinkId == 0)
     {
-      m_peerLinkId = localLinkId;
+      m_PmtmgmpPeerLinkId = localLinkId;
     }
   else
     {
-      if (m_peerLinkId != localLinkId)
+      if (m_PmtmgmpPeerLinkId != localLinkId)
         {
           return;
         }
@@ -342,17 +342,17 @@ PeerLink::ConfirmReject (uint16_t localLinkId, uint16_t peerLinkId, IeConfigurat
   StateMachine (CNF_RJCT, reason);
 }
 bool
-PeerLink::LinkIsEstab () const
+PmtmgmpPeerLink::LinkIsEstab () const
 {
   return (m_state == ESTAB);
 }
 bool
-PeerLink::LinkIsIdle () const
+PmtmgmpPeerLink::LinkIsIdle () const
 {
   return (m_state == IDLE);
 }
 void
-PeerLink::SetMacPlugin (Ptr<PeerManagementProtocolMac> plugin)
+PmtmgmpPeerLink::SetMacPlugin (Ptr<PmtmgmpPeerManagementProtocolMac> plugin)
 {
   m_macPlugin = plugin;
 }
@@ -360,7 +360,7 @@ PeerLink::SetMacPlugin (Ptr<PeerManagementProtocolMac> plugin)
 // Private
 //-----------------------------------------------------------------------------
 void
-PeerLink::StateMachine (PeerEvent event, PmpReasonCode reasoncode)
+PmtmgmpPeerLink::StateMachine (PeerEvent event, PmpReasonCode reasoncode)
 {
   switch (m_state)
     {
@@ -373,19 +373,19 @@ PeerLink::StateMachine (PeerEvent event, PmpReasonCode reasoncode)
           m_linkStatusCallback (m_interface, m_peerAddress, m_peerWmnPointAddress, IDLE, IDLE);
           break;
         case REQ_RJCT:
-          SendPeerLinkClose (reasoncode);
+          SendPmtmgmpPeerLinkClose (reasoncode);
           break;
         case ACTOPN:
           m_state = OPN_SNT;
           m_linkStatusCallback (m_interface, m_peerAddress, m_peerWmnPointAddress, IDLE, OPN_SNT);
-          SendPeerLinkOpen ();
+          SendPmtmgmpPeerLinkOpen ();
           SetRetryTimer ();
           break;
         case OPN_ACPT:
           m_state = OPN_RCVD;
           m_linkStatusCallback (m_interface, m_peerAddress, m_peerWmnPointAddress, IDLE, OPN_RCVD);
-          SendPeerLinkConfirm ();
-          SendPeerLinkOpen ();
+          SendPmtmgmpPeerLinkConfirm ();
+          SendPmtmgmpPeerLinkOpen ();
           SetRetryTimer ();
           break;
         default:
@@ -398,7 +398,7 @@ PeerLink::StateMachine (PeerEvent event, PmpReasonCode reasoncode)
       switch (event)
         {
         case TOR1:
-          SendPeerLinkOpen ();
+          SendPmtmgmpPeerLinkOpen ();
           m_retryCounter++;
           SetRetryTimer ();
           break;
@@ -411,13 +411,13 @@ PeerLink::StateMachine (PeerEvent event, PmpReasonCode reasoncode)
         case OPN_ACPT:
           m_state = OPN_RCVD;
           m_linkStatusCallback (m_interface, m_peerAddress, m_peerWmnPointAddress, OPN_SNT, OPN_RCVD);
-          SendPeerLinkConfirm ();
+          SendPmtmgmpPeerLinkConfirm ();
           break;
         case CLS_ACPT:
           m_state = HOLDING;
           m_linkStatusCallback (m_interface, m_peerAddress, m_peerWmnPointAddress, OPN_SNT, HOLDING);
           ClearRetryTimer ();
-          SendPeerLinkClose (REASON11S_WMN_CLOSE_RCVD);
+          SendPmtmgmpPeerLinkClose (REASON11S_WMN_CLOSE_RCVD);
           SetHoldingTimer ();
           break;
         case OPN_RJCT:
@@ -425,21 +425,21 @@ PeerLink::StateMachine (PeerEvent event, PmpReasonCode reasoncode)
           m_state = HOLDING;
           m_linkStatusCallback (m_interface, m_peerAddress, m_peerWmnPointAddress, OPN_SNT, HOLDING);
           ClearRetryTimer ();
-          SendPeerLinkClose (reasoncode);
+          SendPmtmgmpPeerLinkClose (reasoncode);
           SetHoldingTimer ();
           break;
         case TOR2:
           m_state = HOLDING;
           m_linkStatusCallback (m_interface, m_peerAddress, m_peerWmnPointAddress, OPN_SNT, HOLDING);
           ClearRetryTimer ();
-          SendPeerLinkClose (REASON11S_WMN_MAX_RETRIES);
+          SendPmtmgmpPeerLinkClose (REASON11S_WMN_MAX_RETRIES);
           SetHoldingTimer ();
           break;
         case CNCL:
           m_state = HOLDING;
           m_linkStatusCallback (m_interface, m_peerAddress, m_peerWmnPointAddress, OPN_SNT, HOLDING);
           ClearRetryTimer ();
-          SendPeerLinkClose (REASON11S_PMTMGMP_PEERING_CANCELLED);
+          SendPmtmgmpPeerLinkClose (REASON11S_PMTMGMP_PEERING_CANCELLED);
           SetHoldingTimer ();
           break;
         default:
@@ -457,14 +457,14 @@ PeerLink::StateMachine (PeerEvent event, PmpReasonCode reasoncode)
           m_state = ESTAB;
           m_linkStatusCallback (m_interface, m_peerAddress, m_peerWmnPointAddress, CNF_RCVD, ESTAB);
           ClearConfirmTimer ();
-          SendPeerLinkConfirm ();
+          SendPmtmgmpPeerLinkConfirm ();
           NS_ASSERT (m_peerWmnPointAddress != Mac48Address::GetBroadcast ());
           break;
         case CLS_ACPT:
           m_state = HOLDING;
           m_linkStatusCallback (m_interface, m_peerAddress, m_peerWmnPointAddress, CNF_RCVD, HOLDING);
           ClearConfirmTimer ();
-          SendPeerLinkClose (REASON11S_WMN_CLOSE_RCVD);
+          SendPmtmgmpPeerLinkClose (REASON11S_WMN_CLOSE_RCVD);
           SetHoldingTimer ();
           break;
         case CNF_RJCT:
@@ -472,20 +472,20 @@ PeerLink::StateMachine (PeerEvent event, PmpReasonCode reasoncode)
           m_state = HOLDING;
           m_linkStatusCallback (m_interface, m_peerAddress, m_peerWmnPointAddress, CNF_RCVD, HOLDING);
           ClearConfirmTimer ();
-          SendPeerLinkClose (reasoncode);
+          SendPmtmgmpPeerLinkClose (reasoncode);
           SetHoldingTimer ();
           break;
         case CNCL:
           m_state = HOLDING;
           m_linkStatusCallback (m_interface, m_peerAddress, m_peerWmnPointAddress, CNF_RCVD, HOLDING);
           ClearConfirmTimer ();
-          SendPeerLinkClose (REASON11S_PMTMGMP_PEERING_CANCELLED);
+          SendPmtmgmpPeerLinkClose (REASON11S_PMTMGMP_PEERING_CANCELLED);
           SetHoldingTimer ();
           break;
         case TOC:
           m_state = HOLDING;
           m_linkStatusCallback (m_interface, m_peerAddress, m_peerWmnPointAddress, CNF_RCVD, HOLDING);
-          SendPeerLinkClose (REASON11S_WMN_CONFIRM_TIMEOUT);
+          SendPmtmgmpPeerLinkClose (REASON11S_WMN_CONFIRM_TIMEOUT);
           SetHoldingTimer ();
           break;
         default:
@@ -498,7 +498,7 @@ PeerLink::StateMachine (PeerEvent event, PmpReasonCode reasoncode)
       switch (event)
         {
         case TOR1:
-          SendPeerLinkOpen ();
+          SendPmtmgmpPeerLinkOpen ();
           m_retryCounter++;
           SetRetryTimer ();
           break;
@@ -512,7 +512,7 @@ PeerLink::StateMachine (PeerEvent event, PmpReasonCode reasoncode)
           m_state = HOLDING;
           m_linkStatusCallback (m_interface, m_peerAddress, m_peerWmnPointAddress, OPN_RCVD, HOLDING);
           ClearRetryTimer ();
-          SendPeerLinkClose (REASON11S_WMN_CLOSE_RCVD);
+          SendPmtmgmpPeerLinkClose (REASON11S_WMN_CLOSE_RCVD);
           SetHoldingTimer ();
           break;
         case OPN_RJCT:
@@ -520,21 +520,21 @@ PeerLink::StateMachine (PeerEvent event, PmpReasonCode reasoncode)
           m_state = HOLDING;
           m_linkStatusCallback (m_interface, m_peerAddress, m_peerWmnPointAddress, OPN_RCVD, HOLDING);
           ClearRetryTimer ();
-          SendPeerLinkClose (reasoncode);
+          SendPmtmgmpPeerLinkClose (reasoncode);
           SetHoldingTimer ();
           break;
         case TOR2:
           m_state = HOLDING;
           m_linkStatusCallback (m_interface, m_peerAddress, m_peerWmnPointAddress, OPN_RCVD, HOLDING);
           ClearRetryTimer ();
-          SendPeerLinkClose (REASON11S_WMN_MAX_RETRIES);
+          SendPmtmgmpPeerLinkClose (REASON11S_WMN_MAX_RETRIES);
           SetHoldingTimer ();
           break;
         case CNCL:
           m_state = HOLDING;
           m_linkStatusCallback (m_interface, m_peerAddress, m_peerWmnPointAddress, OPN_RCVD, HOLDING);
           ClearRetryTimer ();
-          SendPeerLinkClose (REASON11S_PMTMGMP_PEERING_CANCELLED);
+          SendPmtmgmpPeerLinkClose (REASON11S_PMTMGMP_PEERING_CANCELLED);
           SetHoldingTimer ();
           break;
         default:
@@ -547,12 +547,12 @@ PeerLink::StateMachine (PeerEvent event, PmpReasonCode reasoncode)
       switch (event)
         {
         case OPN_ACPT:
-          SendPeerLinkConfirm ();
+          SendPmtmgmpPeerLinkConfirm ();
           break;
         case CLS_ACPT:
           m_state = HOLDING;
           m_linkStatusCallback (m_interface, m_peerAddress, m_peerWmnPointAddress, ESTAB, HOLDING);
-          SendPeerLinkClose (REASON11S_WMN_CLOSE_RCVD);
+          SendPmtmgmpPeerLinkClose (REASON11S_WMN_CLOSE_RCVD);
           SetHoldingTimer ();
           break;
         case OPN_RJCT:
@@ -560,13 +560,13 @@ PeerLink::StateMachine (PeerEvent event, PmpReasonCode reasoncode)
           m_state = HOLDING;
           m_linkStatusCallback (m_interface, m_peerAddress, m_peerWmnPointAddress, ESTAB, HOLDING);
           ClearRetryTimer ();
-          SendPeerLinkClose (reasoncode);
+          SendPmtmgmpPeerLinkClose (reasoncode);
           SetHoldingTimer ();
           break;
         case CNCL:
           m_state = HOLDING;
           m_linkStatusCallback (m_interface, m_peerAddress, m_peerWmnPointAddress, ESTAB, HOLDING);
-          SendPeerLinkClose (REASON11S_PMTMGMP_PEERING_CANCELLED);
+          SendPmtmgmpPeerLinkClose (REASON11S_PMTMGMP_PEERING_CANCELLED);
           SetHoldingTimer ();
           break;
         default:
@@ -590,13 +590,13 @@ PeerLink::StateMachine (PeerEvent event, PmpReasonCode reasoncode)
           m_state = HOLDING;
           m_linkStatusCallback (m_interface, m_peerAddress, m_peerWmnPointAddress, HOLDING, HOLDING);
           // reason not spec in D2.0
-          SendPeerLinkClose (REASON11S_PMTMGMP_PEERING_CANCELLED);
+          SendPmtmgmpPeerLinkClose (REASON11S_PMTMGMP_PEERING_CANCELLED);
           break;
         case OPN_RJCT:
         case CNF_RJCT:
           m_state = HOLDING;
           m_linkStatusCallback (m_interface, m_peerAddress, m_peerWmnPointAddress, HOLDING, HOLDING);
-          SendPeerLinkClose (reasoncode);
+          SendPmtmgmpPeerLinkClose (reasoncode);
           break;
         default:
           //11B.5.3.9 of 802.11s Draft D3.0
@@ -607,64 +607,64 @@ PeerLink::StateMachine (PeerEvent event, PmpReasonCode reasoncode)
     }
 }
 void
-PeerLink::ClearRetryTimer ()
+PmtmgmpPeerLink::ClearRetryTimer ()
 {
   m_retryTimer.Cancel ();
 }
 void
-PeerLink::ClearConfirmTimer ()
+PmtmgmpPeerLink::ClearConfirmTimer ()
 {
   m_confirmTimer.Cancel ();
 }
 void
-PeerLink::ClearHoldingTimer ()
+PmtmgmpPeerLink::ClearHoldingTimer ()
 {
   m_holdingTimer.Cancel ();
 }
 void
-PeerLink::SendPeerLinkClose (PmpReasonCode reasoncode)
+PmtmgmpPeerLink::SendPmtmgmpPeerLinkClose (PmpReasonCode reasoncode)
 {
   IePeerManagement peerElement;
-  peerElement.SetPeerClose (m_localLinkId, m_peerLinkId, reasoncode);
-  m_macPlugin->SendPeerLinkManagementFrame (m_peerAddress, m_peerWmnPointAddress, m_assocId, peerElement,
+  peerElement.SetPeerClose (m_localLinkId, m_PmtmgmpPeerLinkId, reasoncode);
+  m_macPlugin->SendPmtmgmpPeerLinkManagementFrame (m_peerAddress, m_peerWmnPointAddress, m_assocId, peerElement,
                                             m_configuration);
 }
 void
-PeerLink::SendPeerLinkOpen ()
+PmtmgmpPeerLink::SendPmtmgmpPeerLinkOpen ()
 {
   IePeerManagement peerElement;
   peerElement.SetPeerOpen (m_localLinkId);
   NS_ASSERT (m_macPlugin != 0);
-  m_macPlugin->SendPeerLinkManagementFrame (m_peerAddress, m_peerWmnPointAddress, m_assocId, peerElement,
+  m_macPlugin->SendPmtmgmpPeerLinkManagementFrame (m_peerAddress, m_peerWmnPointAddress, m_assocId, peerElement,
                                             m_configuration);
 }
 void
-PeerLink::SendPeerLinkConfirm ()
+PmtmgmpPeerLink::SendPmtmgmpPeerLinkConfirm ()
 {
   IePeerManagement peerElement;
-  peerElement.SetPeerConfirm (m_localLinkId, m_peerLinkId);
-  m_macPlugin->SendPeerLinkManagementFrame (m_peerAddress, m_peerWmnPointAddress, m_assocId, peerElement,
+  peerElement.SetPeerConfirm (m_localLinkId, m_PmtmgmpPeerLinkId);
+  m_macPlugin->SendPmtmgmpPeerLinkManagementFrame (m_peerAddress, m_peerWmnPointAddress, m_assocId, peerElement,
                                             m_configuration);
 }
 void
-PeerLink::SetHoldingTimer ()
+PmtmgmpPeerLink::SetHoldingTimer ()
 {
   NS_ASSERT (m_dot11WmnHoldingTimeout.GetMicroSeconds () != 0);
-  m_holdingTimer = Simulator::Schedule (m_dot11WmnHoldingTimeout, &PeerLink::HoldingTimeout, this);
+  m_holdingTimer = Simulator::Schedule (m_dot11WmnHoldingTimeout, &PmtmgmpPeerLink::HoldingTimeout, this);
 }
 void
-PeerLink::HoldingTimeout ()
+PmtmgmpPeerLink::HoldingTimeout ()
 {
   StateMachine (TOH);
 }
 void
-PeerLink::SetRetryTimer ()
+PmtmgmpPeerLink::SetRetryTimer ()
 {
   NS_ASSERT (m_dot11WmnRetryTimeout.GetMicroSeconds () != 0);
-  m_retryTimer = Simulator::Schedule (m_dot11WmnRetryTimeout, &PeerLink::RetryTimeout, this);
+  m_retryTimer = Simulator::Schedule (m_dot11WmnRetryTimeout, &PmtmgmpPeerLink::RetryTimeout, this);
 }
 void
-PeerLink::RetryTimeout ()
+PmtmgmpPeerLink::RetryTimeout ()
 {
   if (m_retryCounter < m_dot11WmnMaxRetries)
     {
@@ -676,31 +676,31 @@ PeerLink::RetryTimeout ()
     }
 }
 void
-PeerLink::SetConfirmTimer ()
+PmtmgmpPeerLink::SetConfirmTimer ()
 {
   NS_ASSERT (m_dot11WmnConfirmTimeout.GetMicroSeconds () != 0);
-  m_confirmTimer = Simulator::Schedule (m_dot11WmnConfirmTimeout, &PeerLink::ConfirmTimeout, this);
+  m_confirmTimer = Simulator::Schedule (m_dot11WmnConfirmTimeout, &PmtmgmpPeerLink::ConfirmTimeout, this);
 }
 void
-PeerLink::ConfirmTimeout ()
+PmtmgmpPeerLink::ConfirmTimeout ()
 {
   StateMachine (TOC);
 }
 void
-PeerLink::Report (std::ostream & os) const
+PmtmgmpPeerLink::Report (std::ostream & os) const
 {
   if (m_state != ESTAB)
     {
       return;
     }
-  os << "<PeerLink" << std::endl <<
+  os << "<PmtmgmpPeerLink" << std::endl <<
   "localAddress=\"" << m_macPlugin->GetAddress () << "\"" << std::endl <<
   "peerInterfaceAddress=\"" << m_peerAddress << "\"" << std::endl <<
   "peerWmnPointAddress=\"" << m_peerWmnPointAddress << "\"" << std::endl <<
   "metric=\"" << m_macPlugin->GetLinkMetric (m_peerAddress) << "\"" << std::endl <<
   "lastBeacon=\"" << m_lastBeacon.GetSeconds () << "\"" << std::endl <<
   "localLinkId=\"" << m_localLinkId << "\"" << std::endl <<
-  "peerLinkId=\"" << m_peerLinkId << "\"" << std::endl <<
+  "PmtmgmpPeerLinkId=\"" << m_PmtmgmpPeerLinkId << "\"" << std::endl <<
   "assocId=\"" << m_assocId << "\"" << std::endl <<
   "/>" << std::endl;
 }

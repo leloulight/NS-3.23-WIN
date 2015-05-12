@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\ns-3\src\pmtmgmp\examples\wmn.cc" />
+    <ClCompile Include="..\ns-3\scratch\MeshRouteTest.cc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E295EBA9-1ACD-4583-B9C8-16C7FDD1E35A}</ProjectGuid>

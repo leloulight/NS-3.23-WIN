@@ -26,20 +26,20 @@
 
 namespace ns3 {
 namespace my11s {
-NS_OBJECT_ENSURE_REGISTERED (PeerLinkFrameStart);
+NS_OBJECT_ENSURE_REGISTERED (PmtmgmpPeerLinkFrameStart);
 
-PeerLinkFrameStart::PeerLinkFrameStart () :
+PmtmgmpPeerLinkFrameStart::PmtmgmpPeerLinkFrameStart () :
   m_subtype (255), m_capability (0), m_aid (0), m_rates (SupportedRates ()), m_wmnId (),
   m_config (IeConfiguration ())
 {
 }
 void
-PeerLinkFrameStart::SetPlinkFrameSubtype (uint8_t subtype)
+PmtmgmpPeerLinkFrameStart::SetPlinkFrameSubtype (uint8_t subtype)
 {
   m_subtype = subtype;
 }
 void
-PeerLinkFrameStart::SetPlinkFrameStart (PeerLinkFrameStart::PlinkFrameStartFields fields)
+PmtmgmpPeerLinkFrameStart::SetPlinkFrameStart (PmtmgmpPeerLinkFrameStart::PlinkFrameStartFields fields)
 {
   m_subtype = fields.subtype;
   
@@ -68,8 +68,8 @@ PeerLinkFrameStart::SetPlinkFrameStart (PeerLinkFrameStart::PlinkFrameStartField
       //reasonCode not used here
     }
 }
-PeerLinkFrameStart::PlinkFrameStartFields
-PeerLinkFrameStart::GetFields () const
+PmtmgmpPeerLinkFrameStart::PlinkFrameStartFields
+PmtmgmpPeerLinkFrameStart::GetFields () const
 {
   PlinkFrameStartFields retval;
   /// \todo protocol version:
@@ -83,22 +83,22 @@ PeerLinkFrameStart::GetFields () const
   return retval;
 }
 TypeId
-PeerLinkFrameStart::GetTypeId ()
+PmtmgmpPeerLinkFrameStart::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::my11s::PeerLinkFrameStart")
+  static TypeId tid = TypeId ("ns3::my11s::PmtmgmpPeerLinkFrameStart")
     .SetParent<Header> ()
     .SetGroupName ("Wmn")
-    .AddConstructor<PeerLinkFrameStart> ()
+    .AddConstructor<PmtmgmpPeerLinkFrameStart> ()
   ;
   return tid;
 }
 TypeId
-PeerLinkFrameStart::GetInstanceTypeId () const
+PmtmgmpPeerLinkFrameStart::GetInstanceTypeId () const
 {
   return GetTypeId ();
 }
 void
-PeerLinkFrameStart::Print (std::ostream &os) const
+PmtmgmpPeerLinkFrameStart::Print (std::ostream &os) const
 {
   os << "subtype = " << (uint16_t) m_subtype << std::endl << "capability = " << m_capability << std::endl << "laid = "
      << (uint16_t) m_aid << std::endl << "rates = " << m_rates << std::endl << "wmnId = ";
@@ -108,7 +108,7 @@ PeerLinkFrameStart::Print (std::ostream &os) const
   os << std::endl << "reason code = " << m_reasonCode;
 }
 uint32_t
-PeerLinkFrameStart::GetSerializedSize () const
+PmtmgmpPeerLinkFrameStart::GetSerializedSize () const
 {
   uint32_t size =0; //Peering protocol
   NS_ASSERT (m_subtype < 4);
@@ -140,7 +140,7 @@ PeerLinkFrameStart::GetSerializedSize () const
   return size;
 }
 void
-PeerLinkFrameStart::Serialize (Buffer::Iterator start) const
+PmtmgmpPeerLinkFrameStart::Serialize (Buffer::Iterator start) const
 {
   Buffer::Iterator i = start;
   NS_ASSERT (m_subtype < 4);
@@ -172,7 +172,7 @@ PeerLinkFrameStart::Serialize (Buffer::Iterator start) const
     }
 }
 uint32_t
-PeerLinkFrameStart::Deserialize (Buffer::Iterator start)
+PmtmgmpPeerLinkFrameStart::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
   NS_ASSERT (m_subtype < 4);
@@ -219,7 +219,7 @@ PeerLinkFrameStart::Deserialize (Buffer::Iterator start)
   return i.GetDistanceFrom (start);
 }
 bool
-operator== (const PeerLinkFrameStart & a, const PeerLinkFrameStart & b)
+operator== (const PmtmgmpPeerLinkFrameStart & a, const PmtmgmpPeerLinkFrameStart & b)
 {
   return ((a.m_subtype == b.m_subtype) && (a.m_capability == b.m_capability) && (a.m_aid == b.m_aid)
           && (a.m_wmnId.IsEqual (b.m_wmnId)) && (a.m_config == b.m_config));

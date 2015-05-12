@@ -75,7 +75,7 @@ public:
   Buffer::Iterator Serialize (Buffer::Iterator i) const;
   Buffer::Iterator Deserialize (Buffer::Iterator i);
   uint8_t GetUint8 () const;  
-  bool acceptPeerLinks;
+  bool acceptPmtmgmpPeerLinks;
   bool MCCASupported;
   bool MCCAEnabled;
   bool forwarding;

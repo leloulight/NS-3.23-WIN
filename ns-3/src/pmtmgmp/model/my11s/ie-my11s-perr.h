@@ -18,8 +18,8 @@
  * Author: Kirill Andreev <andreev@iitp.ru>
  */
 
-#ifndef PERR_INFORMATION_ELEMENT_H
-#define PERR_INFORMATION_ELEMENT_H
+#ifndef PMTMGMP_PERR_INFORMATION_ELEMENT_H
+#define PMTMGMP_PERR_INFORMATION_ELEMENT_H
 
 #include "ns3/mac48-address.h"
 #include "ns3/wmn-information-element-vector.h"

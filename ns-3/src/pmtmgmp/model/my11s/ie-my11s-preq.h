@@ -18,8 +18,8 @@
  * Author: Kirill Andreev <andreev@iitp.ru>
  */
 
-#ifndef WIFI_PREQ_INFORMATION_ELEMENT_H
-#define WIFI_PREQ_INFORMATION_ELEMENT_H
+#ifndef PMTMGMP_WIFI_PREQ_INFORMATION_ELEMENT_H
+#define PMTMGMP_WIFI_PREQ_INFORMATION_ELEMENT_H
 
 #include <vector>
 

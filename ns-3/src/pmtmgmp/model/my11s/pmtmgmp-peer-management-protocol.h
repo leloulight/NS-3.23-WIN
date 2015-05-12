@@ -36,8 +36,8 @@ namespace ns3 {
 class WmnPointDevice;
 class UniformRandomVariable;
 namespace my11s {
-class PeerManagementProtocolMac;
-class PeerLink;
+class PmtmgmpPeerManagementProtocolMac;
+class PmtmgmpPeerLink;
 class IeWmnId;
 class IePeerManagement;
 class IeConfiguration;
@@ -46,11 +46,11 @@ class IeConfiguration;
  *
  * \brief 802.11s Peer Management Protocol model
  */
-class PeerManagementProtocol : public Object
+class PmtmgmpPeerManagementProtocol : public Object
 {
 public:
-  PeerManagementProtocol ();
-  ~PeerManagementProtocol ();
+  PmtmgmpPeerManagementProtocol ();
+  ~PmtmgmpPeerManagementProtocol ();
   static TypeId GetTypeId ();
   void DoDispose ();
   /**
@@ -59,7 +59,7 @@ public:
    * Installing protocol cause installing its interface MAC plugins.
    *
    * Also MP aggregates all installed protocols, PMP protocol can be accessed
-   * via WmnPointDevice::GetObject<PeerManagementProtocol>();
+   * via WmnPointDevice::GetObject<PmtmgmpPeerManagementProtocol>();
    */
   bool Install (Ptr<WmnPointDevice>);
   /**
@@ -101,7 +101,7 @@ public:
    * \param wmnConfig is wmn configuration element taken from the peer
    * management frame
    */
-  void ReceivePeerLinkFrame (
+  void ReceivePmtmgmpPeerLinkFrame (
     uint32_t interface,
     Mac48Address peerAddress,
     Mac48Address peerWmnPointAddress,
@@ -130,11 +130,11 @@ public:
   ///\name Interface to other protocols (MLME)
   // \{
   /// Set peer link status change callback
-  void SetPeerLinkStatusCallback (Callback<void, Mac48Address, Mac48Address, uint32_t, bool> cb);
+  void SetPmtmgmpPeerLinkStatusCallback (Callback<void, Mac48Address, Mac48Address, uint32_t, bool> cb);
   /// Find active peer link by my interface and peer interface MAC
-  Ptr<PeerLink> FindPeerLink (uint32_t interface, Mac48Address peerAddress);
+  Ptr<PmtmgmpPeerLink> FindPmtmgmpPeerLink (uint32_t interface, Mac48Address peerAddress);
   /// Get list of all active peer links
-  std::vector < Ptr<PeerLink> > GetPeerLinks () const;
+  std::vector < Ptr<PmtmgmpPeerLink> > GetPmtmgmpPeerLinks () const;
   /// Get list of active peers of my given interface
   std::vector<Mac48Address> GetPeers (uint32_t interface) const;
   /// Get wmn point address.
@@ -184,23 +184,23 @@ private:
     Time referenceTbtt; //When one of my station's beacons was put into a beacon queue;
     Time beaconInterval; //Beacon interval of my station;
   };
-  /// We keep a vector of pointers to PeerLink class. This vector
+  /// We keep a vector of pointers to PmtmgmpPeerLink class. This vector
   /// keeps all peer links at a given interface.
-  typedef std::vector<Ptr<PeerLink> > PeerLinksOnInterface;
+  typedef std::vector<Ptr<PmtmgmpPeerLink> > PmtmgmpPeerLinksOnInterface;
   /// This map keeps all peer links.
-  typedef std::map<uint32_t, PeerLinksOnInterface>  PeerLinksMap;
+  typedef std::map<uint32_t, PmtmgmpPeerLinksOnInterface>  PmtmgmpPeerLinksMap;
   /// This map keeps relationship between peer address and its beacon information
   typedef std::map<Mac48Address, BeaconInfo>  BeaconsOnInterface;
   ///\brief This map keeps beacon information on all interfaces
   typedef std::map<uint32_t, BeaconsOnInterface> BeaconInfoMap;
   ///\brief this vector keeps pointers to MAC-plugins
-  typedef std::map<uint32_t, Ptr<PeerManagementProtocolMac> > PeerManagementProtocolMacMap;
+  typedef std::map<uint32_t, Ptr<PmtmgmpPeerManagementProtocolMac> > PmtmgmpPeerManagementProtocolMacMap;
 
 private:
-  PeerManagementProtocol& operator= (const PeerManagementProtocol &);
-  PeerManagementProtocol (const PeerManagementProtocol &);
+  PmtmgmpPeerManagementProtocol& operator= (const PmtmgmpPeerManagementProtocol &);
+  PmtmgmpPeerManagementProtocol (const PmtmgmpPeerManagementProtocol &);
 
-  Ptr<PeerLink> InitiateLink (
+  Ptr<PmtmgmpPeerLink> InitiateLink (
     uint32_t interface,
     Mac48Address peerAddress,
     Mac48Address peerWmnPointAddress
@@ -215,7 +215,7 @@ private:
    * \}
    * \brief Indicates changes in peer links
    */
-  void PeerLinkStatus (uint32_t interface, Mac48Address peerAddress, Mac48Address peerWmnPointAddres, PeerLink::PeerState ostate, PeerLink::PeerState nstate);
+  void PmtmgmpPeerLinkStatus (uint32_t interface, Mac48Address peerAddress, Mac48Address peerWmnPointAddres, PmtmgmpPeerLink::PeerState ostate, PmtmgmpPeerLink::PeerState nstate);
   ///\brief BCA
   void CheckBeaconCollisions (uint32_t interface);
   void ShiftOwnBeacon (uint32_t interface);
@@ -232,13 +232,13 @@ private:
   /// Aux. method to register closed links
   void NotifyLinkClose (Mac48Address peerMp, Mac48Address peerIface, Mac48Address myIface, uint32_t interface);
 private:
-  PeerManagementProtocolMacMap m_plugins;
+  PmtmgmpPeerManagementProtocolMacMap m_plugins;
   Mac48Address m_address;
   Ptr<IeWmnId> m_wmnId;
 
   uint16_t m_lastAssocId;
   uint16_t m_lastLocalLinkId;
-  uint8_t m_maxNumberOfPeerLinks;
+  uint8_t m_maxNumberOfPmtmgmpPeerLinks;
   /// Flag which enables BCA
   bool m_enableBca;
   /// Beacon can be shifted at [-m_maxBeaconShift; +m_maxBeaconShift] TUs
@@ -252,7 +252,7 @@ private:
    * \name Peer Links
    * \{
    */
-  PeerLinksMap m_peerLinks;
+  PmtmgmpPeerLinksMap m_PmtmgmpPeerLinks;
   /**
    * \}
    */

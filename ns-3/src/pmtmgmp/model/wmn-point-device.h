@@ -19,8 +19,8 @@
  *          Pavel Boyko <boyko@iitp.ru>
  */
 
-#ifndef L2ROUTING_NET_DEVICE_H
-#define L2ROUTING_NET_DEVICE_H
+#ifndef PMTMGMP_L2ROUTING_NET_DEVICE_H
+#define PMTMGMP_L2ROUTING_NET_DEVICE_H
 
 #include "ns3/net-device.h"
 #include "ns3/mac48-address.h"

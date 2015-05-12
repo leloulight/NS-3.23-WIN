@@ -55,7 +55,7 @@ bool
 My11sStack::InstallStack (Ptr<WmnPointDevice> mp)
 {
   //Install Peer management protocol:
-  Ptr<PeerManagementProtocol> pmp = CreateObject<PeerManagementProtocol> ();
+  Ptr<PmtmgmpPeerManagementProtocol> pmp = CreateObject<PmtmgmpPeerManagementProtocol> ();
   pmp->SetWmnId ("wmn");
   bool install_ok = pmp->Install (mp);
   if (!install_ok)
@@ -75,8 +75,8 @@ My11sStack::InstallStack (Ptr<WmnPointDevice> mp)
     }
   //Install interaction between PMTMGMP and Peer management protocol:
   //PeekPointer()'s to avoid circular Ptr references
-  pmp->SetPeerLinkStatusCallback (MakeCallback (&PmtmgmpProtocol::PeerLinkStatus, PeekPointer (pmtmgmp)));
-  pmtmgmp->SetNeighboursCallback (MakeCallback (&PeerManagementProtocol::GetPeers, PeekPointer (pmp)));
+  pmp->SetPmtmgmpPeerLinkStatusCallback (MakeCallback (&PmtmgmpProtocol::PmtmgmpPeerLinkStatus, PeekPointer (pmtmgmp)));
+  pmtmgmp->SetNeighboursCallback (MakeCallback (&PmtmgmpPeerManagementProtocol::GetPeers, PeekPointer (pmp)));
   return true;
 }
 void
@@ -97,7 +97,7 @@ My11sStack::Report (const Ptr<WmnPointDevice> mp, std::ostream& os)
   NS_ASSERT (pmtmgmp != 0);
   pmtmgmp->Report (os);
 
-  Ptr<PeerManagementProtocol> pmp = mp->GetObject<PeerManagementProtocol> ();
+  Ptr<PmtmgmpPeerManagementProtocol> pmp = mp->GetObject<PmtmgmpPeerManagementProtocol> ();
   NS_ASSERT (pmp != 0);
   pmp->Report (os);
 }
@@ -119,7 +119,7 @@ My11sStack::ResetStats (const Ptr<WmnPointDevice> mp)
   NS_ASSERT (pmtmgmp != 0);
   pmtmgmp->ResetStats ();
 
-  Ptr<PeerManagementProtocol> pmp = mp->GetObject<PeerManagementProtocol> ();
+  Ptr<PmtmgmpPeerManagementProtocol> pmp = mp->GetObject<PmtmgmpPeerManagementProtocol> ();
   NS_ASSERT (pmp != 0);
   pmp->ResetStats ();
 }

@@ -27,7 +27,7 @@ namespace ns3 {
 namespace my11s {
 
 IePeerManagement::IePeerManagement () :
-  m_length (3), m_subtype (PMTMGMP_PEER_OPEN), m_localLinkId (0), m_peerLinkId (0), m_reasonCode (REASON11S_RESERVED)
+  m_length (3), m_subtype (PMTMGMP_PEER_OPEN), m_localLinkId (0), m_PmtmgmpPeerLinkId (0), m_reasonCode (REASON11S_RESERVED)
 {
 }
 WifiInformationElementId
@@ -43,22 +43,22 @@ IePeerManagement::SetPeerOpen (uint16_t localLinkId)
   m_localLinkId = localLinkId;
 }
 void
-IePeerManagement::SetPeerClose (uint16_t localLinkId, uint16_t peerLinkId, PmpReasonCode reasonCode)
+IePeerManagement::SetPeerClose (uint16_t localLinkId, uint16_t PmtmgmpPeerLinkId, PmpReasonCode reasonCode)
 {
   m_length = 7;
   m_subtype = PMTMGMP_PEER_CLOSE;
   m_localLinkId = localLinkId;
-  m_peerLinkId = peerLinkId;
+  m_PmtmgmpPeerLinkId = PmtmgmpPeerLinkId;
   m_reasonCode = reasonCode;
 }
 
 void
-IePeerManagement::SetPeerConfirm (uint16_t localLinkId, uint16_t peerLinkId)
+IePeerManagement::SetPeerConfirm (uint16_t localLinkId, uint16_t PmtmgmpPeerLinkId)
 {
   m_length = 5;
   m_subtype = PMTMGMP_PEER_CONFIRM;
   m_localLinkId = localLinkId;
-  m_peerLinkId = peerLinkId;
+  m_PmtmgmpPeerLinkId = PmtmgmpPeerLinkId;
 }
 
 PmpReasonCode
@@ -74,9 +74,9 @@ IePeerManagement::GetLocalLinkId () const
 }
 
 uint16_t
-IePeerManagement::GetPeerLinkId () const
+IePeerManagement::GetPmtmgmpPeerLinkId () const
 {
-  return m_peerLinkId;
+  return m_PmtmgmpPeerLinkId;
 }
 
 uint8_t
@@ -112,7 +112,7 @@ IePeerManagement::SerializeInformationField (Buffer::Iterator i) const
   i.WriteHtolsbU16 (m_localLinkId);
   if (m_length > 3)
     {
-      i.WriteHtolsbU16 (m_peerLinkId);
+      i.WriteHtolsbU16 (m_PmtmgmpPeerLinkId);
     }
   if (m_length > 5)
     {
@@ -140,7 +140,7 @@ IePeerManagement::DeserializeInformationField (Buffer::Iterator start, uint8_t l
   m_localLinkId = i.ReadLsbtohU16 ();
   if (m_length > 3)
     {
-      m_peerLinkId = i.ReadLsbtohU16 ();
+      m_PmtmgmpPeerLinkId = i.ReadLsbtohU16 ();
     }
   if (m_length > 5)
     {
@@ -155,7 +155,7 @@ IePeerManagement::Print (std::ostream& os) const
   os << " Subtype:      = " << (uint16_t) m_subtype << std::endl;
   os << " Length:       = " << (uint16_t) m_length << std::endl;
   os << " LocalLinkId:  = " << m_localLinkId << std::endl;
-  os << " PeerLinkId:   = " << m_peerLinkId << std::endl;
+  os << " PmtmgmpPeerLinkId:   = " << m_PmtmgmpPeerLinkId << std::endl;
   os << " ReasonCode:   = " << m_reasonCode << std::endl;
   os << "</information_element>" << std::endl;
 }
@@ -163,7 +163,7 @@ bool
 operator== (const IePeerManagement & a, const IePeerManagement & b)
 {
   return ((a.m_length == b.m_length) && (a.m_subtype == b.m_subtype) && (a.m_localLinkId == b.m_localLinkId)
-          && (a.m_peerLinkId == b.m_peerLinkId) && (a.m_reasonCode == b.m_reasonCode));
+          && (a.m_PmtmgmpPeerLinkId == b.m_PmtmgmpPeerLinkId) && (a.m_reasonCode == b.m_reasonCode));
 }
 std::ostream &
 operator << (std::ostream &os, const IePeerManagement &a)

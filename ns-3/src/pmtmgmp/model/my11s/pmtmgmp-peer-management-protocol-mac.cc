@@ -31,36 +31,36 @@
 #include "ns3/log.h"
 namespace ns3 {
 namespace my11s {
-PeerManagementProtocolMac::PeerManagementProtocolMac (uint32_t interface,
-                                                      Ptr<PeerManagementProtocol> protocol)
+PmtmgmpPeerManagementProtocolMac::PmtmgmpPeerManagementProtocolMac (uint32_t interface,
+                                                      Ptr<PmtmgmpPeerManagementProtocol> protocol)
 {
   m_ifIndex = interface;
   m_protocol = protocol;
 }
 
-PeerManagementProtocolMac::~PeerManagementProtocolMac ()
+PmtmgmpPeerManagementProtocolMac::~PmtmgmpPeerManagementProtocolMac ()
 {
 }
 
 void
-PeerManagementProtocolMac::SetParent (Ptr<WmnWifiInterfaceMac> parent)
+PmtmgmpPeerManagementProtocolMac::SetParent (Ptr<WmnWifiInterfaceMac> parent)
 {
   m_parent = parent;
-  m_parent->TraceConnectWithoutContext ("TxErrHeader", MakeCallback (&PeerManagementProtocolMac::TxError, this));
-  m_parent->TraceConnectWithoutContext ("TxOkHeader",  MakeCallback (&PeerManagementProtocolMac::TxOk,    this));
+  m_parent->TraceConnectWithoutContext ("TxErrHeader", MakeCallback (&PmtmgmpPeerManagementProtocolMac::TxError, this));
+  m_parent->TraceConnectWithoutContext ("TxOkHeader",  MakeCallback (&PmtmgmpPeerManagementProtocolMac::TxOk,    this));
 }
 void
-PeerManagementProtocolMac::TxError (WifiMacHeader const &hdr)
+PmtmgmpPeerManagementProtocolMac::TxError (WifiMacHeader const &hdr)
 {
   m_protocol->TransmissionFailure (m_ifIndex, hdr.GetAddr1 ());
 }
 void
-PeerManagementProtocolMac::TxOk (WifiMacHeader const &hdr)
+PmtmgmpPeerManagementProtocolMac::TxOk (WifiMacHeader const &hdr)
 {
   m_protocol->TransmissionSuccess (m_ifIndex, hdr.GetAddr1 ());
 }
 bool
-PeerManagementProtocolMac::Receive (Ptr<Packet> const_packet, const WifiMacHeader & header)
+PmtmgmpPeerManagementProtocolMac::Receive (Ptr<Packet> const_packet, const WifiMacHeader & header)
 {
   // First of all we copy a packet, because we need to remove some
   //headers
@@ -96,9 +96,9 @@ PeerManagementProtocolMac::Receive (Ptr<Packet> const_packet, const WifiMacHeade
       m_stats.rxMgtBytes += packet->GetSize ();
       Mac48Address peerAddress = header.GetAddr2 ();
       Mac48Address peerMpAddress = header.GetAddr3 ();
-      PeerLinkFrameStart::PlinkFrameStartFields fields;
+      PmtmgmpPeerLinkFrameStart::PlinkFrameStartFields fields;
       {
-        PeerLinkFrameStart peerFrame;
+        PmtmgmpPeerLinkFrameStart peerFrame;
         peerFrame.SetPlinkFrameSubtype ((uint8_t) actionValue.selfProtectedAction);
         packet->RemoveHeader (peerFrame);
         fields = peerFrame.GetFields ();
@@ -143,7 +143,7 @@ PeerManagementProtocolMac::Receive (Ptr<Packet> const_packet, const WifiMacHeade
            NS_ASSERT (actionValue.selfProtectedAction == WifiActionHeader::PEER_LINK_CLOSE); 
         }
       //Deliver Peer link management frame to protocol:
-      m_protocol->ReceivePeerLinkFrame (m_ifIndex, peerAddress, peerMpAddress, fields.aid, *peerElement,
+      m_protocol->ReceivePmtmgmpPeerLinkFrame (m_ifIndex, peerAddress, peerMpAddress, fields.aid, *peerElement,
                                         fields.config);
       // if we can handle a frame - drop it
       return false;
@@ -151,7 +151,7 @@ PeerManagementProtocolMac::Receive (Ptr<Packet> const_packet, const WifiMacHeade
   return m_protocol->IsActiveLink (m_ifIndex, header.GetAddr2 ());
 }
 bool
-PeerManagementProtocolMac::UpdateOutcomingFrame (Ptr<Packet> packet, WifiMacHeader & header,
+PmtmgmpPeerManagementProtocolMac::UpdateOutcomingFrame (Ptr<Packet> packet, WifiMacHeader & header,
                                                  Mac48Address from, Mac48Address to)
 {
   if (header.IsAction ())
@@ -181,7 +181,7 @@ PeerManagementProtocolMac::UpdateOutcomingFrame (Ptr<Packet> packet, WifiMacHead
     }
 }
 void
-PeerManagementProtocolMac::UpdateBeacon (WmnWifiBeacon & beacon) const
+PmtmgmpPeerManagementProtocolMac::UpdateBeacon (WmnWifiBeacon & beacon) const
 {
   if (m_protocol->GetBeaconCollisionAvoidance ())
     {
@@ -193,7 +193,7 @@ PeerManagementProtocolMac::UpdateBeacon (WmnWifiBeacon & beacon) const
 }
 
 void
-PeerManagementProtocolMac::SendPeerLinkManagementFrame (Mac48Address peerAddress, Mac48Address peerMpAddress,
+PmtmgmpPeerManagementProtocolMac::SendPmtmgmpPeerLinkManagementFrame (Mac48Address peerAddress, Mac48Address peerMpAddress,
                                                         uint16_t aid, IePeerManagement peerElement, IeConfiguration wmnConfig)
 {
   //Create a packet:
@@ -202,12 +202,12 @@ PeerManagementProtocolMac::SendPeerLinkManagementFrame (Mac48Address peerAddress
   WmnInformationElementVector elements;
   elements.AddInformationElement (Ptr<IePeerManagement> (&peerElement));
   packet->AddHeader (elements);
-  PeerLinkFrameStart::PlinkFrameStartFields fields;
+  PmtmgmpPeerLinkFrameStart::PlinkFrameStartFields fields;
   fields.rates = m_parent->GetSupportedRates ();
   fields.capability = 0;
   fields.wmnId = *(m_protocol->GetWmnId ());
   fields.config = wmnConfig;
-  PeerLinkFrameStart plinkFrame;
+  PmtmgmpPeerLinkFrameStart plinkFrame;
   //Create an 802.11 frame header:
   //Send management frame to MAC:
   WifiActionHeader actionHdr;
@@ -255,7 +255,7 @@ PeerManagementProtocolMac::SendPeerLinkManagementFrame (Mac48Address peerAddress
 }
 
 Mac48Address
-PeerManagementProtocolMac::GetAddress () const
+PmtmgmpPeerManagementProtocolMac::GetAddress () const
 {
   if (m_parent != 0)
     {
@@ -267,7 +267,7 @@ PeerManagementProtocolMac::GetAddress () const
     }
 }
 void
-PeerManagementProtocolMac::SetBeaconShift (Time shift)
+PmtmgmpPeerManagementProtocolMac::SetBeaconShift (Time shift)
 {
   if (shift != Seconds (0))
     {
@@ -275,13 +275,13 @@ PeerManagementProtocolMac::SetBeaconShift (Time shift)
     }
   m_parent->ShiftTbtt (shift);
 }
-PeerManagementProtocolMac::Statistics::Statistics () :
+PmtmgmpPeerManagementProtocolMac::Statistics::Statistics () :
   txOpen (0), txConfirm (0), txClose (0), rxOpen (0), rxConfirm (0), rxClose (0), dropped (0), brokenMgt (0),
   txMgt (0), txMgtBytes (0), rxMgt (0), rxMgtBytes (0), beaconShift (0)
 {
 }
 void
-PeerManagementProtocolMac::Statistics::Print (std::ostream & os) const
+PmtmgmpPeerManagementProtocolMac::Statistics::Print (std::ostream & os) const
 {
   os << "<Statistics "
   "txOpen=\"" << txOpen << "\"" << std::endl <<
@@ -299,25 +299,25 @@ PeerManagementProtocolMac::Statistics::Print (std::ostream & os) const
   "beaconShift=\"" << beaconShift << "\"/>" << std::endl;
 }
 void
-PeerManagementProtocolMac::Report (std::ostream & os) const
+PmtmgmpPeerManagementProtocolMac::Report (std::ostream & os) const
 {
-  os << "<PeerManagementProtocolMac "
+  os << "<PmtmgmpPeerManagementProtocolMac "
   "address=\"" << m_parent->GetAddress () << "\">" << std::endl;
   m_stats.Print (os);
-  os << "</PeerManagementProtocolMac>" << std::endl;
+  os << "</PmtmgmpPeerManagementProtocolMac>" << std::endl;
 }
 void
-PeerManagementProtocolMac::ResetStats ()
+PmtmgmpPeerManagementProtocolMac::ResetStats ()
 {
   m_stats = Statistics ();
 }
 uint32_t
-PeerManagementProtocolMac::GetLinkMetric (Mac48Address peerAddress)
+PmtmgmpPeerManagementProtocolMac::GetLinkMetric (Mac48Address peerAddress)
 {
   return m_parent->GetLinkMetric (peerAddress);
 }
 int64_t
-PeerManagementProtocolMac::AssignStreams (int64_t stream)
+PmtmgmpPeerManagementProtocolMac::AssignStreams (int64_t stream)
 { 
   return m_protocol->AssignStreams (stream);
 }

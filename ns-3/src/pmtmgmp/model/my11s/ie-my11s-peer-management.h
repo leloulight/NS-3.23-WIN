@@ -59,12 +59,12 @@ public:
     PMTMGMP_PEER_CLOSE = 3,
   };
   void   SetPeerOpen (uint16_t localLinkId);
-  void   SetPeerClose (uint16_t localLinkID, uint16_t peerLinkId, PmpReasonCode reasonCode);
-  void   SetPeerConfirm (uint16_t localLinkID, uint16_t peerLinkId);
+  void   SetPeerClose (uint16_t localLinkID, uint16_t PmtmgmpPeerLinkId, PmpReasonCode reasonCode);
+  void   SetPeerConfirm (uint16_t localLinkID, uint16_t PmtmgmpPeerLinkId);
 
   PmpReasonCode GetReasonCode () const;
   uint16_t  GetLocalLinkId () const;
-  uint16_t  GetPeerLinkId () const;
+  uint16_t  GetPmtmgmpPeerLinkId () const;
   bool   SubtypeIsOpen () const;
   bool   SubtypeIsClose () const;
   bool   SubtypeIsConfirm () const;
@@ -84,7 +84,7 @@ private:
   /**
    * Present within confirm and may be present in close
    */
-  uint16_t m_peerLinkId;
+  uint16_t m_PmtmgmpPeerLinkId;
   /**
    * Present only within close frame
    */
