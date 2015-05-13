@@ -38,9 +38,17 @@ namespace ns3 {
 		{
 			m_originatorAddress = originator_address;
 		}
+		void IeSecreq::SetAffiliatedMTERPnum(uint8_t mTERP_number)
+		{
+			m_affiliatedMTERPnum = mTERP_number;
+		}
 		Mac48Address IeSecreq::GetOriginatorAddress() const
 		{
 			return m_originatorAddress;
+		}
+		uint8_t IeSecreq::GetAffiliatedMTERPnum() const
+		{
+			return m_affiliatedMTERPnum;
 		}
 		WifiInformationElementId IeSecreq::ElementId() const
 		{
@@ -50,6 +58,7 @@ namespace ns3 {
 		{
 			os << std::endl << "<information_element id=" << ElementId() << ">" << std::endl;
 			os << " originator address  = " << m_originatorAddress << std::endl;
+			os << " belong MTERP number  = " << m_originatorAddress << std::endl;
 			os << "</information_element>" << std::endl;
 		}
 		void IeSecreq::SerializeInformationField(Buffer::Iterator i) const

@@ -24,6 +24,7 @@
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-prep.h" />
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-preq.h" />
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-rann.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-secreq.h" />
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\my11s-mac-header.h" />
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\my11s.h" />
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\pmtmgmp-airtime-metric.h" />
@@ -57,6 +58,7 @@
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-prep.cc" />
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-preq.cc" />
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-rann.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-secreq.cc" />
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\my11s-mac-header.cc" />
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\pmtmgmp-airtime-metric.cc" />
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\pmtmgmp-peer-link-frame.cc" />

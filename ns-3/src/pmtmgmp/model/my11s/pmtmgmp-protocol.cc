@@ -36,6 +36,10 @@
 #include "ns3/trace-source-accessor.h"
 #include "ie-my11s-perr.h"
 
+#ifndef PMTMGMP_UNUSED_MY_CODE
+#include "ns3/ie-my11s-secreq.h"
+#endif
+
 namespace ns3 {
 
 	NS_LOG_COMPONENT_DEFINE("PmtmgmpProtocol");
@@ -1198,6 +1202,75 @@ namespace ns3 {
 			Time randomStart = Seconds(m_coefficient->GetValue());
 			m_sECREQTimer = Simulator::Schedule(randomStart, &PmtmgmpProtocol::SendProactivePreq, this);
 			NS_LOG_DEBUG("Send SECREQ");
+		}
+		////发送SECREQ
+		void PmtmgmpProtocol::SendSecreq()
+		{
+			IeSecreq secreq;
+			secreq.SetOriginatorAddress(GetAddress());
+			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
+			{
+				i->second->SendSecreq(secreq);
+			}
+		}
+		////列出SECREQ的发送地址
+		std::vector<Mac48Address> PmtmgmpProtocol::GetSecreqReceivers(uint32_t interface)
+		{
+			std::vector<Mac48Address> retval;
+			if (!m_neighboursCallback.IsNull())
+			{
+				retval = m_neighboursCallback(interface);
+			}
+			if ((retval.size() >= m_unicastSecreqThreshold) || (retval.size() == 0))
+			{
+				retval.clear();
+				retval.push_back(Mac48Address::GetBroadcast());
+			}
+			return retval;
+		}
+		////接收SECREQ
+		void PmtmgmpProtocol::ReceiveSecreq(IeSecreq secreq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
+		{
+			int i = 0;
+		}
+		////设置和获取当前节点类型
+		void PmtmgmpProtocol::SetNodeType(NodeType nodeType)
+		{
+			NS_LOG_FUNCTION(this << nodeType);
+			m_nodeType = nodeType;
+		}
+		PmtmgmpProtocol::NodeType PmtmgmpProtocol::GetNodeType()
+		{
+			NS_LOG_FUNCTION(this);
+			return m_nodeType;
+		}
+		////添加所属MTERP的MAC地址
+		void PmtmgmpProtocol::AddAffiliatedMTERPAddress(Mac48Address mTERPAddress)
+		{
+			m_AffiliatedMTERPaddress.push_back(mTERPAddress);
+		}
+		////删除所属MTERP的MAC地址
+		void PmtmgmpProtocol::RemoveAffiliatedMTERPAddress(Mac48Address mTERPAddress)
+		{
+			std::vector<Mac48Address>::iterator iter = std::find(m_AffiliatedMTERPaddress.begin(), m_AffiliatedMTERPaddress.end(), mTERPAddress);
+			if (iter != m_AffiliatedMTERPaddress.end())
+			{
+				m_AffiliatedMTERPaddress.erase(iter);
+			}
+			else
+			{
+				NS_FATAL_ERROR("Removed MAC is not exist.");
+			}
+		}
+		////获取所属MTERP的数量
+		uint8_t PmtmgmpProtocol::GetAffiliatedMTERPAddressNum()
+		{
+			return m_AffiliatedMTERPaddress.size();
+		}
+		////测试是否为参地址的辅助节点
+		bool PmtmgmpProtocol::CheckAffiliatedMTERPAddress(Mac48Address mTERPAddress){
+			std::vector<Mac48Address>::iterator iter = std::find(m_AffiliatedMTERPaddress.begin(), m_AffiliatedMTERPaddress.end(), mTERPAddress);
+			return iter != m_AffiliatedMTERPaddress.end();
 		}
 #endif
 	} // namespace my11s

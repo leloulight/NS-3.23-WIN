@@ -39,6 +39,9 @@ namespace ns3 {
 		class IePerr;
 		class IePreq;
 		class IePrep;
+#ifndef PMTMGMP_UNUSED_MY_CODE
+		class IeSecreq;
+#endif
 		/**
 		 * \ingroup my11s
 		 *
@@ -219,6 +222,33 @@ namespace ns3 {
 			uint32_t GetActivePathLifetime();
 			uint8_t GetUnicastPerrThreshold();
 			///\}
+#ifndef PMTMGMP_UNUSED_MY_CODE
+			////发送SECREQ
+			void SendSecreq();
+			////列出SECREQ的发送地址
+			std::vector<Mac48Address> GetSecreqReceivers(uint32_t interface);
+			////接收SECREQ
+			void ReceiveSecreq(IeSecreq secreq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
+			////PMTMGMP协议中节点的类型枚举
+			enum NodeType
+			{
+				Mesh_STA,
+				Mesh_Access_Point,
+				Mesh_Portal,
+				Mesh_Secondary_Point,
+			};
+			////设置和获取当前节点类型
+			void SetNodeType(NodeType nodeType);
+			NodeType GetNodeType();
+			////添加所属MTERP的MAC地址
+			void AddAffiliatedMTERPAddress(Mac48Address mTERPAddress);
+			////删除所属MTERP的MAC地址
+			void RemoveAffiliatedMTERPAddress(Mac48Address mTERPAddress);
+			////获取所属MTERP的数量
+			uint8_t GetAffiliatedMTERPAddressNum();
+			////测试是否为参地址的辅助节点
+			bool CheckAffiliatedMTERPAddress(Mac48Address mTERPAddress);
+#endif
 		private:
 			///\name Statistics:
 			///\{
@@ -295,6 +325,10 @@ namespace ns3 {
 			Callback <std::vector<Mac48Address>, uint32_t> m_neighboursCallback;
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			EventId m_sECREQTimer;
+			uint8_t m_unicastSecreqThreshold;
+			////节点类型属性
+			NodeType m_nodeType;
+			std::vector<Mac48Address> m_AffiliatedMTERPaddress;
 #endif
 		};
 	} // namespace my11s
