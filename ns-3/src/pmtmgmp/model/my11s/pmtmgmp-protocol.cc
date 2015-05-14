@@ -38,6 +38,7 @@
 
 #ifndef PMTMGMP_UNUSED_MY_CODE
 #include "ns3/ie-my11s-secreq.h"
+#include "ns3/ie-my11s-secrep.h"
 #endif
 
 namespace ns3 {
@@ -127,7 +128,7 @@ namespace ns3 {
 #ifndef PMTMGMP_UNUSED_MY_CODE
 				.AddAttribute("My11PmtmgmpPMTMGMPsecSetTime",
 				"Interval between two times of sending SECREQ",
-				TimeValue(MicroSeconds(1024 * 100)),
+				TimeValue(MicroSeconds(1024 * 2000)),
 				MakeTimeAccessor(
 				&PmtmgmpProtocol::m_my11PmtmgmpPMTMGMPsecSetTime),
 				MakeTimeChecker()
@@ -210,7 +211,7 @@ namespace ns3 {
 			m_My11WmnPMTMGMPpathToRootInterval(MicroSeconds(1024 * 2000)),
 			m_My11WmnPMTMGMPrannInterval(MicroSeconds(1024 * 5000)),
 #ifndef PMTMGMP_UNUSED_MY_CODE
-			m_my11PmtmgmpPMTMGMPsecSetTime(MicroSeconds(1024 * 100)),
+			m_my11PmtmgmpPMTMGMPsecSetTime(MicroSeconds(1024 * 2000)),
 #endif
 			m_isRoot(false),
 			m_maxTtl(32),
@@ -245,7 +246,7 @@ namespace ns3 {
 				m_proactivePreqTimer = Simulator::Schedule(randomStart, &PmtmgmpProtocol::SendProactivePreq, this);
 			}
 #ifndef PMTMGMP_UNUSED_MY_CODE
-			if ((GetNodeType() & (Mesh_Access_Point | Mesh_Portal)) != 0)
+			if (IsMTERP())
 			{
 				MSECPSearch();
 			}
@@ -1247,7 +1248,6 @@ namespace ns3 {
 		{
 			IeSecreq secreq;
 			secreq.SetOriginatorAddress(GetAddress());
-			secreq.SetAffiliatedMTERPnum(GetAffiliatedMTERPAddressNum());
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
 				i->second->SendSecreq(secreq);
@@ -1271,7 +1271,28 @@ namespace ns3 {
 		////接收SECREQ
 		void PmtmgmpProtocol::ReceiveSecreq(IeSecreq secreq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
-			int i = secreq.GetAffiliatedMTERPnum();
+			////终端节点不会作为其他的终端节点的辅助节点
+			if (! IsMTERP())
+			{
+				SendSecrep(secreq.GetOriginatorAddress());
+
+			}
+		}
+		////发送SECREP
+		void PmtmgmpProtocol::SendSecrep(Mac48Address receiver)
+		{
+			IeSecrep secrep;
+			secrep.SetOriginatorAddress(GetAddress());
+			secrep.SetAffiliatedMTERPnum(GetAffiliatedMTERPAddressNum());
+			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
+			{
+				i->second->SendSecrep(secrep, receiver);
+			}
+		}
+		////接收SECREP
+		void PmtmgmpProtocol::ReceiveSecrep(IeSecrep secrep, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
+		{
+			int i = secrep.GetAffiliatedMTERPnum();
 		}
 		////设置和获取当前节点类型
 		void PmtmgmpProtocol::SetNodeType(NodeType nodeType)
@@ -1311,6 +1332,11 @@ namespace ns3 {
 		bool PmtmgmpProtocol::CheckAffiliatedMTERPAddress(Mac48Address mTERPAddress){
 			std::vector<Mac48Address>::iterator iter = std::find(m_AffiliatedMTERPaddress.begin(), m_AffiliatedMTERPaddress.end(), mTERPAddress);
 			return iter != m_AffiliatedMTERPaddress.end();
+		}
+		////验证协议所属结点是否为终端节点MTERP
+		bool PmtmgmpProtocol::IsMTERP()
+		{
+			return (m_nodeType & (Mesh_Access_Point | Mesh_Portal)) != 0;
 		}
 #endif
 	} // namespace my11s

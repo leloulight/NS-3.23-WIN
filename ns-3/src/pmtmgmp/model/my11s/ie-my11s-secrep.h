@@ -19,25 +19,27 @@
 */
 
 #ifndef PMTMGMP_UNUSED_MY_CODE
-#ifndef PMTMGMP_WIFI_SECREQ_INFORMATION_ELEMENT_H
-#define PMTMGMP_WIFI_SECREQ_INFORMATION_ELEMENT_H
+#ifndef PMTMGMP_WIFI_SECREP_INFORMATION_ELEMENT_H
+#define PMTMGMP_WIFI_SECREP_INFORMATION_ELEMENT_H
 
 #include "ns3/mac48-address.h"
 #include "ns3/wmn-information-element-vector.h"
 
 namespace ns3 {
 	namespace my11s {
-		class IeSecreq : public WifiInformationElement
+		class IeSecrep : public WifiInformationElement
 		{
 		public:
-			IeSecreq();
-			~IeSecreq();
+			IeSecrep();
+			~IeSecrep();
 
 			// Setters for fields:
 			void SetOriginatorAddress(Mac48Address originator_address);
+			void SetAffiliatedMTERPnum(uint8_t mTERP_number);
 
 			// Getters for fields:
 			Mac48Address GetOriginatorAddress() const;
+			uint8_t GetAffiliatedMTERPnum() const;
 
 			// Inherited from WifiInformationElement
 			virtual WifiInformationElementId ElementId() const;
@@ -53,11 +55,12 @@ namespace ns3 {
 			uint8_t m_maxSize;
 
 			Mac48Address m_originatorAddress;
-			friend bool operator== (const IeSecreq & a, const IeSecreq & b);
+			uint8_t m_affiliatedMTERPnum;
+			friend bool operator== (const IeSecrep & a, const IeSecrep & b);
 
 		};
-		bool operator== (const IeSecreq & a, const IeSecreq & b);
-		std::ostream &operator << (std::ostream &os, const IeSecreq &secreq);
+		bool operator== (const IeSecrep & a, const IeSecrep & b);
+		std::ostream &operator << (std::ostream &os, const IeSecrep &secreq);
 	}
 }
 #endif

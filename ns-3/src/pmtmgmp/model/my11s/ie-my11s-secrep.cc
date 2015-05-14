@@ -19,7 +19,7 @@
 */
 
 #ifndef PMTMGMP_UNUSED_MY_CODE
-#include "ie-my11s-secreq.h"
+#include "ie-my11s-secrep.h"
 #include "ns3/address-utils.h"
 #include "ns3/assert.h"
 #include "ns3/packet.h"
@@ -27,52 +27,60 @@
 
 namespace ns3 {
 	namespace my11s {
-		IeSecreq::~IeSecreq()
+		IeSecrep::~IeSecrep()
 		{
 		}
-		IeSecreq::IeSecreq()
+		IeSecrep::IeSecrep()
 		{
 
 		}
-		void IeSecreq::SetOriginatorAddress(Mac48Address originator_address)
+		void IeSecrep::SetOriginatorAddress(Mac48Address originator_address)
 		{
 			m_originatorAddress = originator_address;
 		}
-		Mac48Address IeSecreq::GetOriginatorAddress() const
+		void IeSecrep::SetAffiliatedMTERPnum(uint8_t mTERP_number)
 		{
-			return m_originatorAddress;
+			m_affiliatedMTERPnum = mTERP_number;
 		}
-		WifiInformationElementId IeSecreq::ElementId() const
+		WifiInformationElementId IeSecrep::ElementId() const
 		{
-			return IE11S_SECREQ;
+			return IE11S_SECREP;
 		}
-		void IeSecreq::Print(std::ostream &os) const
+		uint8_t IeSecrep::GetAffiliatedMTERPnum() const
+		{
+			return m_affiliatedMTERPnum;
+		}
+		void IeSecrep::Print(std::ostream &os) const
 		{
 			os << std::endl << "<information_element id=" << ElementId() << ">" << std::endl;
 			os << " originator address  = " << m_originatorAddress << std::endl;
+			os << " belong MTERP number  = " << m_affiliatedMTERPnum << std::endl;
 			os << "</information_element>" << std::endl;
 		}
-		void IeSecreq::SerializeInformationField(Buffer::Iterator i) const
+		void IeSecrep::SerializeInformationField(Buffer::Iterator i) const
 		{
 			WriteTo(i, m_originatorAddress);
+			i.WriteU8(m_affiliatedMTERPnum);
 		}
-		uint8_t IeSecreq::DeserializeInformationField(Buffer::Iterator start, uint8_t length)
+		uint8_t IeSecrep::DeserializeInformationField(Buffer::Iterator start, uint8_t length)
 		{
 			Buffer::Iterator i = start;
 			ReadFrom(i, m_originatorAddress);
+			m_affiliatedMTERPnum = i.ReadU8();
 			return i.GetDistanceFrom(start);
 		}
-		uint8_t IeSecreq::GetInformationFieldSize() const
+		uint8_t IeSecrep::GetInformationFieldSize() const
 		{
-			uint8_t retval = 6; //Source address (originator)
+			uint8_t retval = 6 //Source address (originator)
+			+ 1; //Affiliated MTERP number
 			return retval;
 		}
-		bool operator== (const IeSecreq & a, const IeSecreq & b)
+		bool operator== (const IeSecrep & a, const IeSecrep & b)
 		{
 			return true;
 		}
 		std::ostream &
-			operator << (std::ostream &os, const IeSecreq &secreq)
+			operator << (std::ostream &os, const IeSecrep &secreq)
 		{
 			secreq.Print(os);
 			return os;

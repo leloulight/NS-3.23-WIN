@@ -34,6 +34,7 @@
 
 #ifndef PMTMGMP_UNUSED_MY_CODE
 #include "ie-my11s-secreq.h"
+#include "ie-my11s-secrep.h"
 #endif
 
 namespace ns3 {
@@ -165,6 +166,13 @@ namespace ns3 {
 					NS_ASSERT(secreq != 0);
 					m_stats.rxPreq++;
 					m_protocol->ReceiveSecreq(*secreq, header.GetAddr2(), m_ifIndex, header.GetAddr3(), m_parent->GetLinkMetric(header.GetAddr2()));
+				}
+				if ((*i)->ElementId() == IE11S_SECREP)
+				{
+					Ptr<IeSecrep> secrep = DynamicCast<IeSecrep>(*i);
+					NS_ASSERT(secrep != 0);
+					m_stats.rxPrep++;
+					m_protocol->ReceiveSecrep(*secrep, header.GetAddr2(), m_ifIndex, header.GetAddr3(), m_parent->GetLinkMetric(header.GetAddr2()));
 				}
 #endif
 			}
@@ -533,6 +541,38 @@ namespace ns3 {
 				m_stats.txMgtBytes += packet->GetSize();
 				m_parent->SendManagementFrame(packet, hdr);
 			}
+		}
+		////·¢ËÍSECREP
+		void PmtmgmpProtocolMac::SendSecrep(IeSecrep secrep, Mac48Address receiver)
+		{
+			NS_LOG_FUNCTION_NOARGS();
+			std::vector<IeSecrep> secrep_vector;
+			secrep_vector.push_back(secrep);
+			SendSecrep(secrep_vector, receiver);
+		}
+		void PmtmgmpProtocolMac::SendSecrep(std::vector<IeSecrep> secrep, Mac48Address receiver)
+		{
+			Ptr<Packet> packet = Create<Packet>();
+			WmnInformationElementVector elements;
+			for (std::vector<IeSecrep>::iterator i = secrep.begin(); i != secrep.end(); i++)
+			{
+				elements.AddInformationElement(Ptr<IeSecrep>(&(*i)));
+			}
+			packet->AddHeader(elements);
+			packet->AddHeader(GetWifiActionHeader());
+			//create 802.11 header:
+			WifiMacHeader hdr;
+			hdr.SetAction();
+			hdr.SetDsNotFrom();
+			hdr.SetDsNotTo();
+			hdr.SetAddr2(m_parent->GetAddress());
+			hdr.SetAddr3(m_protocol->GetAddress());
+			//Send Management frame
+			hdr.SetAddr1(receiver);
+			m_stats.txSecreq++;
+			m_stats.txMgt++;
+			m_stats.txMgtBytes += packet->GetSize();
+			m_parent->SendManagementFrame(packet, hdr);
 		}
 #endif
 	} // namespace my11s

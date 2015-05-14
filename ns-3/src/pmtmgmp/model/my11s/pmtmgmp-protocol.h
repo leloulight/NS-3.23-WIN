@@ -41,6 +41,7 @@ namespace ns3 {
 		class IePrep;
 #ifndef PMTMGMP_UNUSED_MY_CODE
 		class IeSecreq;
+		class IeSecrep;
 #endif
 		/**
 		 * \ingroup my11s
@@ -240,6 +241,10 @@ namespace ns3 {
 			std::vector<Mac48Address> GetSecreqReceivers(uint32_t interface);
 			////接收SECREQ
 			void ReceiveSecreq(IeSecreq secreq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
+			////发送SECREP
+			void SendSecrep(Mac48Address receiver);
+			////接收SECREP
+			void ReceiveSecrep(IeSecrep secrep, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
 			////添加所属MTERP的MAC地址
 			void AddAffiliatedMTERPAddress(Mac48Address mTERPAddress);
 			////删除所属MTERP的MAC地址
@@ -248,6 +253,8 @@ namespace ns3 {
 			uint8_t GetAffiliatedMTERPAddressNum();
 			////测试是否为参地址的辅助节点
 			bool CheckAffiliatedMTERPAddress(Mac48Address mTERPAddress);
+			////验证协议所属结点是否为终端节点MTERP
+			bool IsMTERP();
 #endif
 		private:
 			///\name Statistics:
@@ -328,6 +335,7 @@ namespace ns3 {
 			uint8_t m_unicastSecreqThreshold;
 			////节点类型属性
 			NodeType m_nodeType;
+			////所属MTERP列表
 			std::vector<Mac48Address> m_AffiliatedMTERPaddress;
 			////SECREQ发送周期
 			Time m_my11PmtmgmpPMTMGMPsecSetTime;
