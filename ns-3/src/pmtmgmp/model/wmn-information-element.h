@@ -51,11 +51,10 @@ namespace ns3 {
 #define IE11S_PREP                             ((WifiInformationElementId)131)
 #define IE11S_PERR                             ((WifiInformationElementId)132)
 	/* end of open80211s-compatible IDs */
-#define IE11S_WMN_PMTMGMP_PEERING_PROTOCOL_VERSION    ((WifiInformationElementId)74)
-
 #ifndef PMTMGMP_UNUSED_MY_CODE
 #define IE11S_SECREQ                             ((WifiInformationElementId)255)
 #endif
+#define IE11S_WMN_PMTMGMP_PEERING_PROTOCOL_VERSION    ((WifiInformationElementId)74)
 }
 
 #endif /* WMN_INFORMATION_ELEMENT_H */

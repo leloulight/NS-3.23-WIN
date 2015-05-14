@@ -34,62 +34,71 @@
 #include "ns3/ie-my11s-preq.h"
 #include "ns3/ie-my11s-rann.h"
 
+#ifndef PMTMGMP_UNUSED_MY_CODE
+#include "ns3/ie-my11s-secreq.h"
+#endif
+
 namespace ns3 {
 
-uint32_t
-WmnInformationElementVector::DeserializeSingleIe (Buffer::Iterator start)
-{
-  Buffer::Iterator i = start;
-  uint8_t id = i.ReadU8 ();
-  uint8_t length = i.ReadU8 ();
-  Ptr<WifiInformationElement> newElement;
-  switch (id)
-    {
-    case IE11S_WMN_CONFIGURATION:
-      newElement = Create<my11s::IeConfiguration> ();
-      break;
-    case IE11S_WMN_ID:
-      newElement = Create<my11s::IeWmnId> ();
-      break;
-    case IE11S_LINK_METRIC_REPORT:
-      newElement = Create<my11s::IeLinkMetricReport> ();
-      break;
-    case IE11S_PMTMGMP_PEERING_MANAGEMENT:
-      newElement = Create<my11s::IePeerManagement> ();
-      break;
-    case IE11S_BEACON_TIMING:
-      newElement = Create<my11s::IeBeaconTiming> ();
-      break;
-    case IE11S_RANN:
-      newElement = Create<my11s::IeRann> ();
-      break;
-    case IE11S_PREQ:
-      newElement = Create<my11s::IePreq> ();
-      break;
-    case IE11S_PREP:
-      newElement = Create<my11s::IePrep> ();
-      break;
-    case IE11S_PERR:
-      newElement = Create<my11s::IePerr> ();
-      break;
-    case IE11S_WMN_PMTMGMP_PEERING_PROTOCOL_VERSION:
-      newElement = Create<my11s::IePeeringProtocol> ();
-      break;
-    default:
-      // We peeked at the ID and length, so we need to back up the
-      // pointer before deferring to our parent.
-      i.Prev (2);
-      return WifiInformationElementVector::DeserializeSingleIe (i);
-    }
-  if (GetSize () + length > m_maxSize)
-    {
-      NS_FATAL_ERROR ("Check max size for information element!");
-    }
-  newElement->DeserializeInformationField (i, length);
-  i.Next (length);
-  m_elements.push_back (newElement);
-  return i.GetDistanceFrom (start);
-}
+	uint32_t
+		WmnInformationElementVector::DeserializeSingleIe(Buffer::Iterator start)
+	{
+		Buffer::Iterator i = start;
+		uint8_t id = i.ReadU8();
+		uint8_t length = i.ReadU8();
+		Ptr<WifiInformationElement> newElement;
+		switch (id)
+		{
+		case IE11S_WMN_CONFIGURATION:
+			newElement = Create<my11s::IeConfiguration>();
+			break;
+		case IE11S_WMN_ID:
+			newElement = Create<my11s::IeWmnId>();
+			break;
+		case IE11S_LINK_METRIC_REPORT:
+			newElement = Create<my11s::IeLinkMetricReport>();
+			break;
+		case IE11S_PMTMGMP_PEERING_MANAGEMENT:
+			newElement = Create<my11s::IePeerManagement>();
+			break;
+		case IE11S_BEACON_TIMING:
+			newElement = Create<my11s::IeBeaconTiming>();
+			break;
+		case IE11S_RANN:
+			newElement = Create<my11s::IeRann>();
+			break;
+		case IE11S_PREQ:
+			newElement = Create<my11s::IePreq>();
+			break;
+		case IE11S_PREP:
+			newElement = Create<my11s::IePrep>();
+			break;
+		case IE11S_PERR:
+			newElement = Create<my11s::IePerr>();
+			break;
+#ifndef PMTMGMP_UNUSED_MY_CODE
+		case IE11S_SECREQ:
+			newElement = Create<my11s::IeSecreq>();
+			break;
+#endif
+		case IE11S_WMN_PMTMGMP_PEERING_PROTOCOL_VERSION:
+			newElement = Create<my11s::IePeeringProtocol>();
+			break;
+		default:
+			// We peeked at the ID and length, so we need to back up the
+			// pointer before deferring to our parent.
+			i.Prev(2);
+			return WifiInformationElementVector::DeserializeSingleIe(i);
+		}
+		if (GetSize() + length > m_maxSize)
+		{
+			NS_FATAL_ERROR("Check max size for information element!");
+		}
+		newElement->DeserializeInformationField(i, length);
+		i.Next(length);
+		m_elements.push_back(newElement);
+		return i.GetDistanceFrom(start);
+	}
 
 
 } // namespace ns3

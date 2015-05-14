@@ -104,6 +104,17 @@ namespace ns3 {
 			PmtmgmpRtable GetPmtmgmpRtable();
 			////终端节点发动 
 			void MSECPSearch();
+			////PMTMGMP协议中节点的类型枚举
+			enum NodeType
+			{
+				Mesh_STA = 1,
+				Mesh_Access_Point = 2,
+				Mesh_Portal = 4,
+				Mesh_Secondary_Point = 8,
+			};
+			////设置和获取当前节点类型
+			void SetNodeType(NodeType nodeType);
+			NodeType GetNodeType();
 #endif
 
 		private:
@@ -229,17 +240,6 @@ namespace ns3 {
 			std::vector<Mac48Address> GetSecreqReceivers(uint32_t interface);
 			////接收SECREQ
 			void ReceiveSecreq(IeSecreq secreq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
-			////PMTMGMP协议中节点的类型枚举
-			enum NodeType
-			{
-				Mesh_STA,
-				Mesh_Access_Point,
-				Mesh_Portal,
-				Mesh_Secondary_Point,
-			};
-			////设置和获取当前节点类型
-			void SetNodeType(NodeType nodeType);
-			NodeType GetNodeType();
 			////添加所属MTERP的MAC地址
 			void AddAffiliatedMTERPAddress(Mac48Address mTERPAddress);
 			////删除所属MTERP的MAC地址
@@ -329,6 +329,8 @@ namespace ns3 {
 			////节点类型属性
 			NodeType m_nodeType;
 			std::vector<Mac48Address> m_AffiliatedMTERPaddress;
+			////SECREQ发送周期
+			Time m_my11PmtmgmpPMTMGMPsecSetTime;
 #endif
 		};
 	} // namespace my11s

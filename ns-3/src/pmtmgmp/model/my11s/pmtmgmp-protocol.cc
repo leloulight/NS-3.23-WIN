@@ -124,6 +124,15 @@ namespace ns3 {
 				&PmtmgmpProtocol::m_My11WmnPMTMGMPrannInterval),
 				MakeTimeChecker()
 				)
+#ifndef PMTMGMP_UNUSED_MY_CODE
+				.AddAttribute("My11PmtmgmpPMTMGMPsecSetTime",
+				"Interval between two times of sending SECREQ",
+				TimeValue(MicroSeconds(1024 * 100)),
+				MakeTimeAccessor(
+				&PmtmgmpProtocol::m_my11PmtmgmpPMTMGMPsecSetTime),
+				MakeTimeChecker()
+				)
+#endif
 				.AddAttribute("MaxTtl",
 				"Initial value of Time To Live field",
 				UintegerValue(32),
@@ -145,6 +154,15 @@ namespace ns3 {
 				&PmtmgmpProtocol::m_unicastPreqThreshold),
 				MakeUintegerChecker<uint8_t>(1)
 				)
+#ifndef PMTMGMP_UNUSED_MY_CODE
+				.AddAttribute("UnicastSecreqThreshold",
+				"Maximum number of SecREQ receivers, when we send a SECREQ as a chain of unicasts",
+				UintegerValue(10),
+				MakeUintegerAccessor(
+				&PmtmgmpProtocol::m_unicastSecreqThreshold),
+				MakeUintegerChecker<uint8_t>(1)
+				)
+#endif
 				.AddAttribute("UnicastDataThreshold",
 				"Maximum number ofbroadcast receivers, when we send a broadcast as a chain of unicasts",
 				UintegerValue(1),
@@ -191,13 +209,22 @@ namespace ns3 {
 			m_My11WmnPMTMGMPactivePathTimeout(MicroSeconds(1024 * 5000)),
 			m_My11WmnPMTMGMPpathToRootInterval(MicroSeconds(1024 * 2000)),
 			m_My11WmnPMTMGMPrannInterval(MicroSeconds(1024 * 5000)),
+#ifndef PMTMGMP_UNUSED_MY_CODE
+			m_my11PmtmgmpPMTMGMPsecSetTime(MicroSeconds(1024 * 100)),
+#endif
 			m_isRoot(false),
 			m_maxTtl(32),
 			m_unicastPerrThreshold(32),
 			m_unicastPreqThreshold(1),
+#ifndef PMTMGMP_UNUSED_MY_CODE
+			m_unicastSecreqThreshold(10),
+#endif
 			m_unicastDataThreshold(1),
 			m_doFlag(false),
-			m_rfFlag(false)
+			m_rfFlag(false),
+#ifndef PMTMGMP_UNUSED_MY_CODE
+			m_nodeType(Mesh_STA)
+#endif
 		{
 			NS_LOG_FUNCTION_NOARGS();
 			m_coefficient = CreateObject<UniformRandomVariable>();
@@ -217,6 +244,12 @@ namespace ns3 {
 				Time randomStart = Seconds(m_coefficient->GetValue());
 				m_proactivePreqTimer = Simulator::Schedule(randomStart, &PmtmgmpProtocol::SendProactivePreq, this);
 			}
+#ifndef PMTMGMP_UNUSED_MY_CODE
+			if ((GetNodeType() & (Mesh_Access_Point | Mesh_Portal)) != 0)
+			{
+				MSECPSearch();
+			}
+#endif
 		}
 
 		void
@@ -1152,11 +1185,17 @@ namespace ns3 {
 				"My11WmnPMTMGMPactivePathTimeout=\"" << m_My11WmnPMTMGMPactivePathTimeout.GetSeconds() << "\"" << std::endl <<
 				"My11WmnPMTMGMPpathToRootInterval=\"" << m_My11WmnPMTMGMPpathToRootInterval.GetSeconds() << "\"" << std::endl <<
 				"My11WmnPMTMGMPrannInterval=\"" << m_My11WmnPMTMGMPrannInterval.GetSeconds() << "\"" << std::endl <<
+#ifndef PMTMGMP_UNUSED_MY_CODE
+				"My11PmtmgmpPMTMGMPsecSetTime=\"" << m_my11PmtmgmpPMTMGMPsecSetTime.GetSeconds() << "\"" << std::endl <<
+#endif
 				"isRoot=\"" << m_isRoot << "\"" << std::endl <<
 				"maxTtl=\"" << (uint16_t)m_maxTtl << "\"" << std::endl <<
 				"unicastPerrThreshold=\"" << (uint16_t)m_unicastPerrThreshold << "\"" << std::endl <<
 				"unicastPreqThreshold=\"" << (uint16_t)m_unicastPreqThreshold << "\"" << std::endl <<
 				"unicastDataThreshold=\"" << (uint16_t)m_unicastDataThreshold << "\"" << std::endl <<
+#ifndef PMTMGMP_UNUSED_MY_CODE
+				"unicastSecreqThreshold=\"" << (uint16_t)m_unicastSecreqThreshold << "\"" << std::endl <<
+#endif
 				"doFlag=\"" << m_doFlag << "\"" << std::endl <<
 				"rfFlag=\"" << m_rfFlag << "\">" << std::endl;
 			m_stats.Print(os);
@@ -1200,7 +1239,7 @@ namespace ns3 {
 		void PmtmgmpProtocol::MSECPSearch()
 		{
 			Time randomStart = Seconds(m_coefficient->GetValue());
-			m_sECREQTimer = Simulator::Schedule(randomStart, &PmtmgmpProtocol::SendProactivePreq, this);
+			m_sECREQTimer = Simulator::Schedule(randomStart, &PmtmgmpProtocol::SendSecreq, this);
 			NS_LOG_DEBUG("Send SECREQ");
 		}
 		////发送SECREQ
@@ -1208,6 +1247,7 @@ namespace ns3 {
 		{
 			IeSecreq secreq;
 			secreq.SetOriginatorAddress(GetAddress());
+			secreq.SetAffiliatedMTERPnum(GetAffiliatedMTERPAddressNum());
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
 				i->second->SendSecreq(secreq);
@@ -1231,7 +1271,7 @@ namespace ns3 {
 		////接收SECREQ
 		void PmtmgmpProtocol::ReceiveSecreq(IeSecreq secreq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
-			int i = 0;
+			int i = secreq.GetAffiliatedMTERPnum();
 		}
 		////设置和获取当前节点类型
 		void PmtmgmpProtocol::SetNodeType(NodeType nodeType)

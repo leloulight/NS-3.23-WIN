@@ -18,6 +18,28 @@ This release is not yet available.
 
 Supported platforms
 -------------------
+
+New user-visible features
+-------------------------
+
+Bugs fixed
+----------
+
+Known issues
+------------
+In general, known issues are tracked on the project tracker available
+at http://www.nsnam.org/bugzilla/
+
+Release 3.23
+============
+
+Availability
+------------
+This release is available from:
+http://www.nsnam.org/release/ns-allinone-3.23.tar.bz2
+
+Supported platforms
+-------------------
 This release has been tested on the following platforms:
 - Ubuntu 15.04 (64 bit) with g++-4.9.2
 - Fedora Core 21 (64 bit) with g++-4.9.2

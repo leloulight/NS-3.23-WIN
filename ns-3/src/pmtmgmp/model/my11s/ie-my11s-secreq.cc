@@ -58,22 +58,25 @@ namespace ns3 {
 		{
 			os << std::endl << "<information_element id=" << ElementId() << ">" << std::endl;
 			os << " originator address  = " << m_originatorAddress << std::endl;
-			os << " belong MTERP number  = " << m_originatorAddress << std::endl;
+			os << " belong MTERP number  = " << m_affiliatedMTERPnum << std::endl;
 			os << "</information_element>" << std::endl;
 		}
 		void IeSecreq::SerializeInformationField(Buffer::Iterator i) const
 		{
 			WriteTo(i, m_originatorAddress);
+			i.WriteU8(m_affiliatedMTERPnum);
 		}
 		uint8_t IeSecreq::DeserializeInformationField(Buffer::Iterator start, uint8_t length)
 		{
 			Buffer::Iterator i = start;
-			ReadFrom(i, m_originatorAddress); 
+			ReadFrom(i, m_originatorAddress);
+			m_affiliatedMTERPnum = i.ReadU8();
 			return i.GetDistanceFrom(start);
 		}
 		uint8_t IeSecreq::GetInformationFieldSize() const
 		{
-			uint8_t retval = 6;   //Source address (originator)
+			uint8_t retval = 6 //Source address (originator)
+				+1; //Affiliated MTERP number
 			return retval;
 		}
 		bool operator== (const IeSecreq & a, const IeSecreq & b)

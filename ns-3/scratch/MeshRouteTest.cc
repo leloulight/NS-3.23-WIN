@@ -134,7 +134,7 @@ m_Size(2),
 m_RandomStart(0.1),
 m_NumIface(1),
 m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
-m_Step(170),
+m_Step(100),
 m_ApplicationNum(0),
 m_MaxBytes(0),
 m_SourceNum(0),
@@ -390,11 +390,11 @@ void MeshRouteClass::InstallApplicationRandom()
 		sinkApps.Start(Seconds(0.0));
 		sinkApps.Stop(Seconds(m_TotalTime));
 
-		/*if (m_ProtocolType == MY11S_PMTMGMP)
+		if (m_ProtocolType == MY11S_PMTMGMP)
 		{
-			l_Pmtmgmp.SetNodeTypeOfMeshPoint(l_Nodes.Get(m_SourceNum), PmtmgmpPointDevice::Mesh_Access_Point);
-			l_Pmtmgmp.SetNodeTypeOfMeshPoint(l_Nodes.Get(m_DestinationNum), PmtmgmpPointDevice::Mesh_Portal);
-		}*/
+			DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(m_SourceNum)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Access_Point);
+			DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(m_DestinationNum)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Portal);
+		}
 		return;
 	}
 
@@ -466,11 +466,11 @@ void MeshRouteClass::InstallApplicationRandom()
 		PacketSinkHelper sinkAPP("ns3::UdpSocketFactory", InetSocketAddress(l_Interfaces.GetAddress(destinationNUM), 49001));
 		apps = sinkAPP.Install(l_Nodes.Get(destinationNUM));
 		apps.Start(Seconds(1.0));
-		/*if (m_ProtocolType == MY11S_PMTMGMP)
+		if (m_ProtocolType == MY11S_PMTMGMP)
 		{
-			l_Pmtmgmp.SetNodeTypeOfMeshPoint(l_Nodes.Get(sourceNum), PmtmgmpPointDevice::Mesh_Access_Point);
-			l_Pmtmgmp.SetNodeTypeOfMeshPoint(l_Nodes.Get(destinationNUM), PmtmgmpPointDevice::Mesh_Portal);
-		}*/
+			DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(sourceNum)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Access_Point);
+			DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(destinationNUM)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Portal);
+		}
 	}
 }
 
