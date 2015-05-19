@@ -235,6 +235,32 @@ namespace ns3 {
 			uint8_t GetUnicastPerrThreshold();
 			///\}
 #ifndef PMTMGMP_UNUSED_MY_CODE
+			////SECREP信息记录
+			struct SECREPInformation
+			{
+				////升序
+				bool operator < (const SECREPInformation si) const
+				{
+					return metric * (affiliatedNumber + 1) < si.metric * (si.affiliatedNumber + 1);
+				}
+				////降序
+				//bool operator > (const SECREPInformation si) const
+				//{
+				//	return metric * (affiliatedNumber + 1) > si.metric * (si.affiliatedNumber + 1);
+				//}
+				Mac48Address address;
+				uint32_t metric;
+				uint8_t affiliatedNumber;
+			};
+			struct finder_t
+			{
+				finder_t(Mac48Address address) :address(address){};
+				bool operator()(SECREPInformation p)
+				{
+					return address == p.address;
+				}
+				Mac48Address address;
+			};
 			////发送SECREQ
 			void SendSecreq();
 			////列出SECREQ的发送地址
@@ -242,19 +268,13 @@ namespace ns3 {
 			////接收SECREQ
 			void ReceiveSecreq(IeSecreq secreq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
 			////发送SECREP
-			void SendSecrep(Mac48Address receiver);
+			void SendSecrep(Mac48Address receiver, uint32_t index);
 			////接收SECREP
 			void ReceiveSecrep(IeSecrep secrep, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
-			////添加所属MTERP的MAC地址
-			void AddAffiliatedMTERPAddress(Mac48Address mTERPAddress);
-			////删除所属MTERP的MAC地址
-			void RemoveAffiliatedMTERPAddress(Mac48Address mTERPAddress);
-			////获取所属MTERP的数量
-			uint8_t GetAffiliatedMTERPAddressNum();
-			////测试是否为参地址的辅助节点
-			bool CheckAffiliatedMTERPAddress(Mac48Address mTERPAddress);
 			////验证协议所属结点是否为终端节点MTERP
 			bool IsMTERP();
+			////延迟整理SECREP信息，选取可接受的MSECP
+			void SelectMSECP();
 #endif
 		private:
 			///\name Statistics:
@@ -331,14 +351,21 @@ namespace ns3 {
 			Ptr<UniformRandomVariable> m_coefficient;
 			Callback <std::vector<Mac48Address>, uint32_t> m_neighboursCallback;
 #ifndef PMTMGMP_UNUSED_MY_CODE
-			EventId m_sECREQTimer;
-			uint8_t m_unicastSecreqThreshold;
+			EventId m_SECREQTimer;
+			EventId m_MSECPSetTimer;
+			uint8_t m_UnicastSecreqThreshold;
 			////节点类型属性
-			NodeType m_nodeType;
+			NodeType m_NodeType;
 			////所属MTERP列表
-			std::vector<Mac48Address> m_AffiliatedMTERPaddress;
-			////SECREQ发送周期
-			Time m_my11PmtmgmpPMTMGMPsecSetTime;
+			std::vector<SECREPInformation> m_AffiliatedAddress;
+			////SECREQ设置延迟
+			Time m_My11WmnPMTMGMPsecSetTime;
+			////SECREP接收信息记录
+			std::vector<SECREPInformation> m_SECREPInformation;
+			////MSECP选择序号（从零开始，奇数开启，偶数关闭。）
+			uint32_t m_MSECPSelectIndex;
+			////每个MTERP可有的SECREP的最大数量
+			uint8_t m_MSECPnumForMTERP;
 #endif
 		};
 	} // namespace my11s

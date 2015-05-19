@@ -37,6 +37,9 @@
 #include "ie-my11s-perr.h"
 
 #ifndef PMTMGMP_UNUSED_MY_CODE
+////find_if
+#include <algorithm>
+
 #include "ns3/ie-my11s-secreq.h"
 #include "ns3/ie-my11s-secrep.h"
 #endif
@@ -126,11 +129,11 @@ namespace ns3 {
 				MakeTimeChecker()
 				)
 #ifndef PMTMGMP_UNUSED_MY_CODE
-				.AddAttribute("My11PmtmgmpPMTMGMPsecSetTime",
-				"Interval between two times of sending SECREQ",
+				.AddAttribute("My11WmnPMTMGMPsecSetTime",
+				"Delay time of waiting for accept SECREP",
 				TimeValue(MicroSeconds(1024 * 2000)),
 				MakeTimeAccessor(
-				&PmtmgmpProtocol::m_my11PmtmgmpPMTMGMPsecSetTime),
+				&PmtmgmpProtocol::m_My11WmnPMTMGMPsecSetTime),
 				MakeTimeChecker()
 				)
 #endif
@@ -160,7 +163,7 @@ namespace ns3 {
 				"Maximum number of SecREQ receivers, when we send a SECREQ as a chain of unicasts",
 				UintegerValue(10),
 				MakeUintegerAccessor(
-				&PmtmgmpProtocol::m_unicastSecreqThreshold),
+				&PmtmgmpProtocol::m_UnicastSecreqThreshold),
 				MakeUintegerChecker<uint8_t>(1)
 				)
 #endif
@@ -191,6 +194,15 @@ namespace ns3 {
 				&PmtmgmpProtocol::m_routeDiscoveryTimeCallback),
 				"ns3::Time::TracedCallback"
 				)
+#ifndef PMTMGMP_UNUSED_MY_CODE
+				.AddAttribute("MSECPnumForMTERP",
+				"The number of MESCP that each MTERP can have.",
+				UintegerValue(2),
+				MakeUintegerAccessor(
+				&PmtmgmpProtocol::m_MSECPnumForMTERP),
+				MakeUintegerChecker<uint8_t>(1)
+				)
+#endif
 				;
 			return tid;
 		}
@@ -211,24 +223,31 @@ namespace ns3 {
 			m_My11WmnPMTMGMPpathToRootInterval(MicroSeconds(1024 * 2000)),
 			m_My11WmnPMTMGMPrannInterval(MicroSeconds(1024 * 5000)),
 #ifndef PMTMGMP_UNUSED_MY_CODE
-			m_my11PmtmgmpPMTMGMPsecSetTime(MicroSeconds(1024 * 2000)),
+			//m_My11WmnPMTMGMPsecSetTime(MicroSeconds(1024 * 2000)),
 #endif
 			m_isRoot(false),
 			m_maxTtl(32),
 			m_unicastPerrThreshold(32),
 			m_unicastPreqThreshold(1),
 #ifndef PMTMGMP_UNUSED_MY_CODE
-			m_unicastSecreqThreshold(10),
+			//m_UnicastSecreqThreshold(10),
 #endif
 			m_unicastDataThreshold(1),
 			m_doFlag(false),
 			m_rfFlag(false),
 #ifndef PMTMGMP_UNUSED_MY_CODE
-			m_nodeType(Mesh_STA)
+			m_NodeType(Mesh_STA),
+			m_MSECPSelectIndex(0),
+			m_MSECPnumForMTERP(2)
 #endif
 		{
 			NS_LOG_FUNCTION_NOARGS();
 			m_coefficient = CreateObject<UniformRandomVariable>();
+#ifndef PMTMGMP_UNUSED_MY_CODE
+			//默认初值设置方式编译出错
+			m_My11WmnPMTMGMPsecSetTime = MicroSeconds(1024 * 2000);
+			m_UnicastSecreqThreshold = 10;
+#endif
 		}
 
 		PmtmgmpProtocol::~PmtmgmpProtocol()
@@ -1187,7 +1206,7 @@ namespace ns3 {
 				"My11WmnPMTMGMPpathToRootInterval=\"" << m_My11WmnPMTMGMPpathToRootInterval.GetSeconds() << "\"" << std::endl <<
 				"My11WmnPMTMGMPrannInterval=\"" << m_My11WmnPMTMGMPrannInterval.GetSeconds() << "\"" << std::endl <<
 #ifndef PMTMGMP_UNUSED_MY_CODE
-				"My11PmtmgmpPMTMGMPsecSetTime=\"" << m_my11PmtmgmpPMTMGMPsecSetTime.GetSeconds() << "\"" << std::endl <<
+				"My11PmtmgmpPMTMGMPsecSetTime=\"" << m_My11WmnPMTMGMPsecSetTime.GetSeconds() << "\"" << std::endl <<
 #endif
 				"isRoot=\"" << m_isRoot << "\"" << std::endl <<
 				"maxTtl=\"" << (uint16_t)m_maxTtl << "\"" << std::endl <<
@@ -1195,7 +1214,7 @@ namespace ns3 {
 				"unicastPreqThreshold=\"" << (uint16_t)m_unicastPreqThreshold << "\"" << std::endl <<
 				"unicastDataThreshold=\"" << (uint16_t)m_unicastDataThreshold << "\"" << std::endl <<
 #ifndef PMTMGMP_UNUSED_MY_CODE
-				"unicastSecreqThreshold=\"" << (uint16_t)m_unicastSecreqThreshold << "\"" << std::endl <<
+				"unicastSecreqThreshold=\"" << (uint16_t)m_UnicastSecreqThreshold << "\"" << std::endl <<
 #endif
 				"doFlag=\"" << m_doFlag << "\"" << std::endl <<
 				"rfFlag=\"" << m_rfFlag << "\">" << std::endl;
@@ -1239,19 +1258,25 @@ namespace ns3 {
 		////终端节点发动 
 		void PmtmgmpProtocol::MSECPSearch()
 		{
+			NS_LOG_DEBUG("MSECP Search start");
 			Time randomStart = Seconds(m_coefficient->GetValue());
-			m_sECREQTimer = Simulator::Schedule(randomStart, &PmtmgmpProtocol::SendSecreq, this);
-			NS_LOG_DEBUG("Send SECREQ");
+			m_MSECPSelectIndex += 1;
+			m_SECREPInformation.clear();
+			m_SECREQTimer = Simulator::Schedule(randomStart, &PmtmgmpProtocol::SendSecreq, this);
 		}
 		////发送SECREQ
 		void PmtmgmpProtocol::SendSecreq()
 		{
+			NS_LOG_DEBUG("Send SECREP");
 			IeSecreq secreq;
 			secreq.SetOriginatorAddress(GetAddress());
+			secreq.SetMSECPSelectIndex(m_MSECPSelectIndex);
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
 				i->second->SendSecreq(secreq);
 			}
+			////延迟等待处理选择MSECP
+			m_MSECPSetTimer = Simulator::Schedule(m_My11WmnPMTMGMPsecSetTime, &PmtmgmpProtocol::SelectMSECP, this);
 		}
 		////列出SECREQ的发送地址
 		std::vector<Mac48Address> PmtmgmpProtocol::GetSecreqReceivers(uint32_t interface)
@@ -1261,7 +1286,7 @@ namespace ns3 {
 			{
 				retval = m_neighboursCallback(interface);
 			}
-			if ((retval.size() >= m_unicastSecreqThreshold) || (retval.size() == 0))
+			if ((retval.size() >= m_UnicastSecreqThreshold) || (retval.size() == 0))
 			{
 				retval.clear();
 				retval.push_back(Mac48Address::GetBroadcast());
@@ -1271,19 +1296,22 @@ namespace ns3 {
 		////接收SECREQ
 		void PmtmgmpProtocol::ReceiveSecreq(IeSecreq secreq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
+			NS_LOG_DEBUG("Receive SECREQ from " << from << " at interface " << interface << " while metric is " << metric);
 			////终端节点不会作为其他的终端节点的辅助节点
 			if (! IsMTERP())
 			{
-				SendSecrep(secreq.GetOriginatorAddress());
-
+				SendSecrep(secreq.GetOriginatorAddress(), secreq.GetMSECPSelectIndex());
 			}
 		}
 		////发送SECREP
-		void PmtmgmpProtocol::SendSecrep(Mac48Address receiver)
+		void PmtmgmpProtocol::SendSecrep(Mac48Address receiver, uint32_t index)
 		{
+			NS_LOG_DEBUG("Send SECREP to " << receiver);
 			IeSecrep secrep;
-			secrep.SetOriginatorAddress(GetAddress());
-			secrep.SetAffiliatedMTERPnum(GetAffiliatedMTERPAddressNum());
+			secrep.SetOriginatorAddress(receiver);
+			secrep.SetCandidateMSECPaddress(GetAddress());
+			secrep.SetAffiliatedMTERPnum(m_AffiliatedAddress.size());
+			secrep.SetMSECPSelectIndex(index);
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
 				i->second->SendSecrep(secrep, receiver);
@@ -1292,51 +1320,57 @@ namespace ns3 {
 		////接收SECREP
 		void PmtmgmpProtocol::ReceiveSecrep(IeSecrep secrep, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
-			int i = secrep.GetAffiliatedMTERPnum();
+			NS_LOG_DEBUG("Receive SECREP from " << from << " at interface " << interface << " while metric is " << metric);
+			if ((secrep.GetMSECPSelectIndex() != m_MSECPSelectIndex) || (secrep.GetOriginatorAddress() != m_address)) 
+				return;////过期SECREP将会被丢弃
+			SECREPInformation newInformation;
+			newInformation.address = secrep.GetCandidateMSECPaddress();
+			newInformation.metric = metric;
+			newInformation.affiliatedNumber = secrep.GetAffiliatedMTERPnum();
+			m_SECREPInformation.push_back(newInformation);
 		}
 		////设置和获取当前节点类型
 		void PmtmgmpProtocol::SetNodeType(NodeType nodeType)
 		{
-			NS_LOG_FUNCTION(this << nodeType);
-			m_nodeType = nodeType;
+			NS_LOG_DEBUG(this << nodeType);
+			m_NodeType = nodeType;
 		}
 		PmtmgmpProtocol::NodeType PmtmgmpProtocol::GetNodeType()
 		{
-			NS_LOG_FUNCTION(this);
-			return m_nodeType;
-		}
-		////添加所属MTERP的MAC地址
-		void PmtmgmpProtocol::AddAffiliatedMTERPAddress(Mac48Address mTERPAddress)
-		{
-			m_AffiliatedMTERPaddress.push_back(mTERPAddress);
-		}
-		////删除所属MTERP的MAC地址
-		void PmtmgmpProtocol::RemoveAffiliatedMTERPAddress(Mac48Address mTERPAddress)
-		{
-			std::vector<Mac48Address>::iterator iter = std::find(m_AffiliatedMTERPaddress.begin(), m_AffiliatedMTERPaddress.end(), mTERPAddress);
-			if (iter != m_AffiliatedMTERPaddress.end())
-			{
-				m_AffiliatedMTERPaddress.erase(iter);
-			}
-			else
-			{
-				NS_FATAL_ERROR("Removed MAC is not exist.");
-			}
-		}
-		////获取所属MTERP的数量
-		uint8_t PmtmgmpProtocol::GetAffiliatedMTERPAddressNum()
-		{
-			return m_AffiliatedMTERPaddress.size();
-		}
-		////测试是否为参地址的辅助节点
-		bool PmtmgmpProtocol::CheckAffiliatedMTERPAddress(Mac48Address mTERPAddress){
-			std::vector<Mac48Address>::iterator iter = std::find(m_AffiliatedMTERPaddress.begin(), m_AffiliatedMTERPaddress.end(), mTERPAddress);
-			return iter != m_AffiliatedMTERPaddress.end();
+			return m_NodeType;
 		}
 		////验证协议所属结点是否为终端节点MTERP
 		bool PmtmgmpProtocol::IsMTERP()
 		{
-			return (m_nodeType & (Mesh_Access_Point | Mesh_Portal)) != 0;
+			return (m_NodeType & (Mesh_Access_Point | Mesh_Portal)) != 0;
+		}
+		////延迟整理SECREP信息，选取可接受的MSECP
+		void PmtmgmpProtocol::SelectMSECP()
+		{
+			NS_LOG_DEBUG("Receive SECREP:" << m_SECREPInformation.size());
+			m_MSECPSelectIndex += 1;
+			////for (std::vector<SECREPInformation>::iterator selectIter = m_SECREPInformation.begin(); selectIter != m_SECREPInformation.end(); selectIter++)
+			////{
+			////	std::vector<SECREPInformation>::iterator iter = std::find_if(m_AffiliatedAddress.begin(), m_AffiliatedAddress.end(), finder_t(iter->address));
+			////	if (iter == m_AffiliatedAddress.end())
+			////	{
+			////		m_AffiliatedAddress.push_back(*selectIter);
+			////	}
+			////	else
+			////	{
+			////		iter = selectIter;
+			////	}
+			////}
+			////std::sort(m_AffiliatedAddress.begin(), m_AffiliatedAddress.end());
+			////
+			////////丢弃Metric过大的结果。
+			////if (m_AffiliatedAddress.size() > m_MSECPnumForMTERP)
+			////{
+			////	for (std::vector<SECREPInformation>::iterator iter = m_AffiliatedAddress.begin() + m_MSECPnumForMTERP; iter != m_AffiliatedAddress.end(); iter++)
+			////	{
+			////		m_AffiliatedAddress.erase(iter);
+			////	}
+			////}
 		}
 #endif
 	} // namespace my11s

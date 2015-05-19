@@ -38,9 +38,17 @@ namespace ns3 {
 		{
 			m_originatorAddress = originator_address;
 		}
+		void IeSecreq::SetMSECPSelectIndex(uint32_t index)
+		{
+			m_MSECPSelectIndex = index;
+		}
 		Mac48Address IeSecreq::GetOriginatorAddress() const
 		{
 			return m_originatorAddress;
+		}
+		uint32_t IeSecreq::GetMSECPSelectIndex() const
+		{
+			return m_MSECPSelectIndex;
 		}
 		WifiInformationElementId IeSecreq::ElementId() const
 		{
@@ -50,21 +58,25 @@ namespace ns3 {
 		{
 			os << std::endl << "<information_element id=" << ElementId() << ">" << std::endl;
 			os << " originator address  = " << m_originatorAddress << std::endl;
+			os << " MSECP Select Index  = " << m_originatorAddress << std::endl;
 			os << "</information_element>" << std::endl;
 		}
 		void IeSecreq::SerializeInformationField(Buffer::Iterator i) const
 		{
 			WriteTo(i, m_originatorAddress);
+			i.WriteHtolsbU32(m_MSECPSelectIndex);
 		}
 		uint8_t IeSecreq::DeserializeInformationField(Buffer::Iterator start, uint8_t length)
 		{
 			Buffer::Iterator i = start;
 			ReadFrom(i, m_originatorAddress);
+			m_MSECPSelectIndex = i.ReadLsbtohU32();
 			return i.GetDistanceFrom(start);
 		}
 		uint8_t IeSecreq::GetInformationFieldSize() const
 		{
-			uint8_t retval = 6; //Source address (originator)
+			uint8_t retval = 6	//Source address (originator)
+				+ 4;			//MSECP Select Index
 			return retval;
 		}
 		bool operator== (const IeSecreq & a, const IeSecreq & b)

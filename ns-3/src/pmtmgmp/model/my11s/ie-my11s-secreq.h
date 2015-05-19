@@ -35,9 +35,11 @@ namespace ns3 {
 
 			// Setters for fields:
 			void SetOriginatorAddress(Mac48Address originator_address);
+			void SetMSECPSelectIndex(uint32_t index);
 
 			// Getters for fields:
 			Mac48Address GetOriginatorAddress() const;
+			uint32_t GetMSECPSelectIndex() const;
 
 			// Inherited from WifiInformationElement
 			virtual WifiInformationElementId ElementId() const;
@@ -53,6 +55,7 @@ namespace ns3 {
 			uint8_t m_maxSize;
 
 			Mac48Address m_originatorAddress;
+			uint32_t m_MSECPSelectIndex;
 			friend bool operator== (const IeSecreq & a, const IeSecreq & b);
 
 		};

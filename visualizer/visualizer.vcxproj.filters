@@ -45,5 +45,8 @@
     <None Include="..\ns-3\src\visualizer\visualizer\plugins\wifi_intrastructure_link.py">
       <Filter>pyviz\plugins</Filter>
     </None>
+    <None Include="..\ns-3\src\visualizer\visualizer\plugins\pmtmgmp_information.py">
+      <Filter>pyviz\plugins</Filter>
+    </None>
   </ItemGroup>
 </Project>

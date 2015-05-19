@@ -130,7 +130,7 @@ private:
 MeshRouteClass::MeshRouteClass() :
 m_ProtocolType(MY11S_PMTMGMP),
 m_AreaType(SQUARE),
-m_Size(2),
+m_Size(4),
 m_RandomStart(0.1),
 m_NumIface(1),
 m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
@@ -142,7 +142,7 @@ m_DestinationNum(0),
 m_PacketSize(1024),
 m_DataRate("150kbps"),
 m_TotalTime(50),
-m_Root("00:00:00:00:00:01"),
+m_Root("00:00:00:00:00:06"),
 m_Pcap(false)
 {
 	// 链路层及网络层协议设置
@@ -378,6 +378,8 @@ void MeshRouteClass::InstallApplicationRandom()
 	{
 		if (m_SourceNum < 0 || m_SourceNum >= l_NodeNum) m_SourceNum = 0;
 		if (m_DestinationNum < 0 || m_DestinationNum >= l_NodeNum || m_DestinationNum == m_SourceNum) m_DestinationNum = l_NodeNum - 1;
+		m_SourceNum = m_Size + 1;
+		m_DestinationNum = m_Size * (m_Size - 1) - 2;
 
 		BulkSendHelper source("ns3::TcpSocketFactory", InetSocketAddress(l_Interfaces.GetAddress(m_DestinationNum), 49002));
 		source.SetAttribute("MaxBytes", UintegerValue(m_MaxBytes));
@@ -671,16 +673,17 @@ int main(int argc, char *argv[])
 {
 	//LogComponentEnableAll((LogLevel)(LOG_LEVEL_INFO | LOG_PREFIX_ALL));
 
-	LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
-	LogComponentEnable("WmnPointDevice", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
-	LogComponentEnable("PmtmgmpRtable", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
-	LogComponentEnable("WmnWifiInterfaceMac", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("WmnPointDevice", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("PmtmgmpRtable", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("WmnWifiInterfaceMac", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	LogComponentEnable("PmtmgmpProtocolMac", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	LogComponentEnable("PmtmgmpPeerManagementProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	LogComponentEnable("PmtmgmpPeerLinkFrameStart", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("HwmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("MeshPointDevice", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 
-	LogComponentEnable("BulkSendApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("BulkSendApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 
 	//LogComponentEnable("MeshRouteTest", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 

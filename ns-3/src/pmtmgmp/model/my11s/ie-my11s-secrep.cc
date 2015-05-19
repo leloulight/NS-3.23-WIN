@@ -38,41 +38,69 @@ namespace ns3 {
 		{
 			m_originatorAddress = originator_address;
 		}
+		void IeSecrep::SetCandidateMSECPaddress(Mac48Address candidateMSECP_address)
+		{
+			m_candidateMSECPaddress = candidateMSECP_address;
+		}
 		void IeSecrep::SetAffiliatedMTERPnum(uint8_t mTERP_number)
 		{
 			m_affiliatedMTERPnum = mTERP_number;
 		}
-		WifiInformationElementId IeSecrep::ElementId() const
+		void IeSecrep::SetMSECPSelectIndex(uint32_t index)
 		{
-			return IE11S_SECREP;
+			m_MSECPSelectIndex = index;
+		}
+		Mac48Address IeSecrep::GetOriginatorAddress() const
+		{
+			return m_originatorAddress;
+		}
+		Mac48Address IeSecrep::GetCandidateMSECPaddress() const
+		{
+			return m_candidateMSECPaddress;
 		}
 		uint8_t IeSecrep::GetAffiliatedMTERPnum() const
 		{
 			return m_affiliatedMTERPnum;
 		}
+		uint32_t IeSecrep::GetMSECPSelectIndex() const
+		{
+			return m_MSECPSelectIndex;
+		}
+		WifiInformationElementId IeSecrep::ElementId() const
+		{
+			return IE11S_SECREP;
+		}
 		void IeSecrep::Print(std::ostream &os) const
 		{
 			os << std::endl << "<information_element id=" << ElementId() << ">" << std::endl;
 			os << " originator address  = " << m_originatorAddress << std::endl;
+			os << " candidate MSECP address  = " << m_candidateMSECPaddress << std::endl;
 			os << " belong MTERP number  = " << m_affiliatedMTERPnum << std::endl;
+			os << " MSECP Select Index  = " << m_originatorAddress << std::endl;
 			os << "</information_element>" << std::endl;
 		}
 		void IeSecrep::SerializeInformationField(Buffer::Iterator i) const
 		{
 			WriteTo(i, m_originatorAddress);
+			WriteTo(i, m_candidateMSECPaddress);
 			i.WriteU8(m_affiliatedMTERPnum);
+			i.WriteHtolsbU32(m_MSECPSelectIndex);
 		}
 		uint8_t IeSecrep::DeserializeInformationField(Buffer::Iterator start, uint8_t length)
 		{
 			Buffer::Iterator i = start;
 			ReadFrom(i, m_originatorAddress);
+			ReadFrom(i, m_candidateMSECPaddress);
 			m_affiliatedMTERPnum = i.ReadU8();
+			m_MSECPSelectIndex = i.ReadLsbtohU32();
 			return i.GetDistanceFrom(start);
 		}
 		uint8_t IeSecrep::GetInformationFieldSize() const
 		{
-			uint8_t retval = 6 //Source address (originator)
-			+ 1; //Affiliated MTERP number
+			uint8_t retval = 6	//Source address (originator)
+				+ 6				//Candidate MSECP address
+				+ 1				//Affiliated MTERP number
+				+ 4;			//MSECP Select Index
 			return retval;
 		}
 		bool operator== (const IeSecrep & a, const IeSecrep & b)
