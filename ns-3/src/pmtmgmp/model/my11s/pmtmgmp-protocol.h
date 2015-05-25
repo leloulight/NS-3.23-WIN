@@ -358,6 +358,8 @@ namespace ns3 {
 			NodeType m_NodeType;
 			////所属MTERP列表
 			std::vector<SECREPInformation> m_AffiliatedAddress;
+			////MSECP搜索初始延迟
+			Time m_My11WmnPMTMGMPsecStartDelayTime;
 			////SECREQ设置延迟
 			Time m_My11WmnPMTMGMPsecSetTime;
 			////SECREP接收信息记录

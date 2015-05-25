@@ -34,6 +34,8 @@
 #include <fstream>
 #include <ctime>
 
+//#define OUT_TO_FILE 
+
 //角度转换
 #define DEGREES_TO_RADIANS(__ANGLE__) ((__ANGLE__) * 0.01745329252f) // PI / 180
 #define MIN_APPLICATION_TIME 50 // 仿真前路由生成时间
@@ -189,7 +191,7 @@ void MeshRouteClass::Configure(int argc, char ** argv)
 void MeshRouteClass::SimulatorSetting()
 {
 	//仿真总时间
-	if (m_ApplicationNum != 0)m_TotalTime += MIN_APPLICATION_TIME + END_APPLICATION_TIME;
+	m_TotalTime += MIN_APPLICATION_TIME + END_APPLICATION_TIME;
 
 	// 配置路径
 	string l_AttributePath_PeerLink;// Peer Link
@@ -384,13 +386,13 @@ void MeshRouteClass::InstallApplicationRandom()
 		BulkSendHelper source("ns3::TcpSocketFactory", InetSocketAddress(l_Interfaces.GetAddress(m_DestinationNum), 49002));
 		source.SetAttribute("MaxBytes", UintegerValue(m_MaxBytes));
 		ApplicationContainer sourceApps = source.Install(l_Nodes.Get(m_SourceNum));
-		sourceApps.Start(Seconds(0.0));
-		sourceApps.Stop(Seconds(m_TotalTime));
+		sourceApps.Start(Seconds(MIN_APPLICATION_TIME));
+		sourceApps.Stop(Seconds(m_TotalTime - END_APPLICATION_TIME));
 
 		PacketSinkHelper sink("ns3::TcpSocketFactory", InetSocketAddress(l_Interfaces.GetAddress(m_DestinationNum), 49002));
 		ApplicationContainer sinkApps = sink.Install(l_Nodes.Get(m_DestinationNum));
-		sinkApps.Start(Seconds(0.0));
-		sinkApps.Stop(Seconds(m_TotalTime));
+		sinkApps.Start(Seconds(MIN_APPLICATION_TIME));
+		sinkApps.Stop(Seconds(m_TotalTime - END_APPLICATION_TIME));
 
 		if (m_ProtocolType == MY11S_PMTMGMP)
 		{
@@ -668,24 +670,27 @@ void MeshRouteClass::Report()
 	}
 	n = 0;
 }
-
 int main(int argc, char *argv[])
 {
+#ifdef OUT_TO_FILE
+	ofstream logfile("E:\\Ns-3.23-log.log");
+	std::clog.rdbuf(logfile.rdbuf());
+#endif
+
 	//LogComponentEnableAll((LogLevel)(LOG_LEVEL_INFO | LOG_PREFIX_ALL));
 
 	//LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("WmnPointDevice", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpRtable", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("WmnWifiInterfaceMac", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
-	LogComponentEnable("PmtmgmpProtocolMac", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
-	LogComponentEnable("PmtmgmpPeerManagementProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
-	LogComponentEnable("PmtmgmpPeerLinkFrameStart", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("PmtmgmpProtocolMac", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("PmtmgmpPeerManagementProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("HwmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("MeshPointDevice", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 
 	//LogComponentEnable("BulkSendApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 
-	//LogComponentEnable("MeshRouteTest", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	LogComponentEnable("MeshRouteTest", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 
 	PacketMetadata::Enable();
 	MeshRouteClass t;

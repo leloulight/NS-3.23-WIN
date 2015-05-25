@@ -129,6 +129,13 @@ namespace ns3 {
 				MakeTimeChecker()
 				)
 #ifndef PMTMGMP_UNUSED_MY_CODE
+				.AddAttribute("My11WmnPMTMGMPsecStartDelayTime",
+				"Delay time of start MSECP search",
+				TimeValue(MicroSeconds(1024 * 50000)),
+				MakeTimeAccessor(
+				&PmtmgmpProtocol::m_My11WmnPMTMGMPsecStartDelayTime),
+				MakeTimeChecker()
+				)
 				.AddAttribute("My11WmnPMTMGMPsecSetTime",
 				"Delay time of waiting for accept SECREP",
 				TimeValue(MicroSeconds(1024 * 2000)),
@@ -245,6 +252,7 @@ namespace ns3 {
 			m_coefficient = CreateObject<UniformRandomVariable>();
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			//默认初值设置方式编译出错
+			m_My11WmnPMTMGMPsecStartDelayTime = MicroSeconds(1024 * 50000);
 			m_My11WmnPMTMGMPsecSetTime = MicroSeconds(1024 * 2000);
 			m_UnicastSecreqThreshold = 10;
 #endif
@@ -1259,10 +1267,9 @@ namespace ns3 {
 		void PmtmgmpProtocol::MSECPSearch()
 		{
 			NS_LOG_DEBUG("MSECP Search start");
-			Time randomStart = Seconds(m_coefficient->GetValue());
 			m_MSECPSelectIndex += 1;
 			m_SECREPInformation.clear();
-			m_SECREQTimer = Simulator::Schedule(randomStart, &PmtmgmpProtocol::SendSecreq, this);
+			m_SECREQTimer = Simulator::Schedule(m_My11WmnPMTMGMPsecStartDelayTime, &PmtmgmpProtocol::SendSecreq, this);
 		}
 		////发送SECREQ
 		void PmtmgmpProtocol::SendSecreq()
@@ -1349,28 +1356,28 @@ namespace ns3 {
 		{
 			NS_LOG_DEBUG("Receive SECREP:" << m_SECREPInformation.size());
 			m_MSECPSelectIndex += 1;
-			////for (std::vector<SECREPInformation>::iterator selectIter = m_SECREPInformation.begin(); selectIter != m_SECREPInformation.end(); selectIter++)
-			////{
-			////	std::vector<SECREPInformation>::iterator iter = std::find_if(m_AffiliatedAddress.begin(), m_AffiliatedAddress.end(), finder_t(iter->address));
-			////	if (iter == m_AffiliatedAddress.end())
-			////	{
-			////		m_AffiliatedAddress.push_back(*selectIter);
-			////	}
-			////	else
-			////	{
-			////		iter = selectIter;
-			////	}
-			////}
-			////std::sort(m_AffiliatedAddress.begin(), m_AffiliatedAddress.end());
-			////
-			////////丢弃Metric过大的结果。
-			////if (m_AffiliatedAddress.size() > m_MSECPnumForMTERP)
-			////{
-			////	for (std::vector<SECREPInformation>::iterator iter = m_AffiliatedAddress.begin() + m_MSECPnumForMTERP; iter != m_AffiliatedAddress.end(); iter++)
-			////	{
-			////		m_AffiliatedAddress.erase(iter);
-			////	}
-			////}
+			for (std::vector<SECREPInformation>::iterator selectIter = m_SECREPInformation.begin(); selectIter != m_SECREPInformation.end(); selectIter++)
+			{
+				std::vector<SECREPInformation>::iterator iter = std::find_if(m_AffiliatedAddress.begin(), m_AffiliatedAddress.end(), finder_t(selectIter->address));
+				if (iter == m_AffiliatedAddress.end())
+				{
+					m_AffiliatedAddress.push_back(*selectIter);
+				}
+				else
+				{
+					iter = selectIter;
+				}
+			}
+			std::sort(m_AffiliatedAddress.begin(), m_AffiliatedAddress.end());
+			
+			////丢弃Metric过大的结果。
+			if (m_AffiliatedAddress.size() > m_MSECPnumForMTERP)
+			{
+				for (int i = m_AffiliatedAddress.size() - m_MSECPnumForMTERP; i > 0; i--)
+				{
+					m_AffiliatedAddress.pop_back();
+				}
+			}
 		}
 #endif
 	} // namespace my11s

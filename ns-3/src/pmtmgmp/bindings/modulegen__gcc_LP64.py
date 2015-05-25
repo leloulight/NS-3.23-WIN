@@ -14,7 +14,7 @@ pybindgen.settings.error_handler = ErrorHandler()
 import sys
 
 def module_init():
-    root_module = Module('ns.wmn', cpp_namespace='::ns3')
+    root_module = Module('ns.pmtmgmp', cpp_namespace='::ns3')
     return root_module
 
 def register_types(module):
@@ -33,7 +33,7 @@ def register_types(module):
     ## qos-utils.h (module 'wifi'): ns3::AcIndex [enumeration]
     module.add_enum('AcIndex', ['AC_BE', 'AC_BK', 'AC_VI', 'AC_VO', 'AC_BE_NQOS', 'AC_UNDEF'], import_from_module='ns.wifi')
     ## edca-txop-n.h (module 'wifi'): ns3::TypeOfStation [enumeration]
-    module.add_enum('TypeOfStation', ['STA', 'AP', 'ADHOC_STA', 'WMN', 'HT_STA', 'HT_AP', 'HT_ADHOC_STA', 'OCB'], import_from_module='ns.wifi')
+    module.add_enum('TypeOfStation', ['STA', 'AP', 'ADHOC_STA', 'MESH', 'HT_STA', 'HT_AP', 'HT_ADHOC_STA', 'OCB'], import_from_module='ns.wifi')
     ## ctrl-headers.h (module 'wifi'): ns3::BlockAckType [enumeration]
     module.add_enum('BlockAckType', ['BASIC_BLOCK_ACK', 'COMPRESSED_BLOCK_ACK', 'MULTI_TID_BLOCK_ACK'], import_from_module='ns.wifi')
     ## address.h (module 'network'): ns3::Address [class]
@@ -92,12 +92,6 @@ def register_types(module):
     module.add_class('Mac48Address', import_from_module='ns.network')
     ## mac48-address.h (module 'network'): ns3::Mac48Address [class]
     root_module['ns3::Mac48Address'].implicitly_converts_to(root_module['ns3::Address'])
-    ## wmn-helper.h (module 'wmn'): ns3::WmnHelper [class]
-    module.add_class('WmnHelper')
-    ## wmn-helper.h (module 'wmn'): ns3::WmnHelper::ChannelPolicy [enumeration]
-    module.add_enum('ChannelPolicy', ['SPREAD_CHANNELS', 'ZERO_CHANNEL'], outer_class=root_module['ns3::WmnHelper'])
-    ## wmn-wifi-beacon.h (module 'wmn'): ns3::WmnWifiBeacon [class]
-    module.add_class('WmnWifiBeacon')
     ## net-device-container.h (module 'network'): ns3::NetDeviceContainer [class]
     module.add_class('NetDeviceContainer', import_from_module='ns.network')
     ## node-container.h (module 'network'): ns3::NodeContainer [class]
@@ -180,6 +174,12 @@ def register_types(module):
     module.add_enum('', ['BRAND_NEW', 'DISASSOC', 'WAIT_ASSOC_TX_OK', 'GOT_ASSOC_TX_OK'], outer_class=root_module['ns3::WifiRemoteStationState'], import_from_module='ns.wifi')
     ## wifi-tx-vector.h (module 'wifi'): ns3::WifiTxVector [class]
     module.add_class('WifiTxVector', import_from_module='ns.wifi')
+    ## wmn-helper.h (module 'pmtmgmp'): ns3::WmnHelper [class]
+    module.add_class('WmnHelper')
+    ## wmn-helper.h (module 'pmtmgmp'): ns3::WmnHelper::ChannelPolicy [enumeration]
+    module.add_enum('ChannelPolicy', ['SPREAD_CHANNELS', 'ZERO_CHANNEL'], outer_class=root_module['ns3::WmnHelper'])
+    ## wmn-wifi-beacon.h (module 'pmtmgmp'): ns3::WmnWifiBeacon [class]
+    module.add_class('WmnWifiBeacon')
     ## empty.h (module 'core'): ns3::empty [class]
     module.add_class('empty', import_from_module='ns.core')
     ## int64x64-double.h (module 'core'): ns3::int64x64_t [class]
@@ -222,8 +222,6 @@ def register_types(module):
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::EventImpl', 'ns3::empty', 'ns3::DefaultDeleter<ns3::EventImpl>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::Hash::Implementation, ns3::empty, ns3::DefaultDeleter<ns3::Hash::Implementation> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::Hash::Implementation', 'ns3::empty', 'ns3::DefaultDeleter<ns3::Hash::Implementation>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
-    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::WmnWifiInterfaceMacPlugin, ns3::empty, ns3::DefaultDeleter<ns3::WmnWifiInterfaceMacPlugin> > [class]
-    module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::WmnWifiInterfaceMacPlugin', 'ns3::empty', 'ns3::DefaultDeleter<ns3::WmnWifiInterfaceMacPlugin>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::NixVector, ns3::empty, ns3::DefaultDeleter<ns3::NixVector> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::NixVector', 'ns3::empty', 'ns3::DefaultDeleter<ns3::NixVector>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::OutputStreamWrapper, ns3::empty, ns3::DefaultDeleter<ns3::OutputStreamWrapper> > [class]
@@ -234,6 +232,8 @@ def register_types(module):
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::TraceSourceAccessor', 'ns3::empty', 'ns3::DefaultDeleter<ns3::TraceSourceAccessor>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::WifiInformationElement, ns3::empty, ns3::DefaultDeleter<ns3::WifiInformationElement> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::WifiInformationElement', 'ns3::empty', 'ns3::DefaultDeleter<ns3::WifiInformationElement>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::WmnWifiInterfaceMacPlugin, ns3::empty, ns3::DefaultDeleter<ns3::WmnWifiInterfaceMacPlugin> > [class]
+    module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::WmnWifiInterfaceMacPlugin', 'ns3::empty', 'ns3::DefaultDeleter<ns3::WmnWifiInterfaceMacPlugin>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::my11s::DestinationAddressUnit, ns3::empty, ns3::DefaultDeleter<ns3::my11s::DestinationAddressUnit> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::my11s::DestinationAddressUnit', 'ns3::empty', 'ns3::DefaultDeleter<ns3::my11s::DestinationAddressUnit>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::my11s::IeBeaconTimingUnit, ns3::empty, ns3::DefaultDeleter<ns3::my11s::IeBeaconTimingUnit> > [class]
@@ -251,13 +251,13 @@ def register_types(module):
     ## mgt-headers.h (module 'wifi'): ns3::WifiActionHeader [class]
     module.add_class('WifiActionHeader', import_from_module='ns.wifi', parent=root_module['ns3::Header'])
     ## mgt-headers.h (module 'wifi'): ns3::WifiActionHeader::CategoryValue [enumeration]
-    module.add_enum('CategoryValue', ['BLOCK_ACK', 'WMN', 'MULTIHOP', 'SELF_PROTECTED', 'VENDOR_SPECIFIC_ACTION'], outer_class=root_module['ns3::WifiActionHeader'], import_from_module='ns.wifi')
+    module.add_enum('CategoryValue', ['BLOCK_ACK', 'MESH', 'MULTIHOP', 'SELF_PROTECTED', 'VENDOR_SPECIFIC_ACTION'], outer_class=root_module['ns3::WifiActionHeader'], import_from_module='ns.wifi')
     ## mgt-headers.h (module 'wifi'): ns3::WifiActionHeader::SelfProtectedActionValue [enumeration]
-    module.add_enum('SelfProtectedActionValue', ['PMTMGMP_PEER_LINK_OPEN', 'PMTMGMP_PEER_LINK_CONFIRM', 'PMTMGMP_PEER_LINK_CLOSE', 'GROUP_KEY_INFORM', 'GROUP_KEY_ACK'], outer_class=root_module['ns3::WifiActionHeader'], import_from_module='ns.wifi')
+    module.add_enum('SelfProtectedActionValue', ['PEER_LINK_OPEN', 'PEER_LINK_CONFIRM', 'PEER_LINK_CLOSE', 'GROUP_KEY_INFORM', 'GROUP_KEY_ACK'], outer_class=root_module['ns3::WifiActionHeader'], import_from_module='ns.wifi')
     ## mgt-headers.h (module 'wifi'): ns3::WifiActionHeader::MultihopActionValue [enumeration]
     module.add_enum('MultihopActionValue', ['PROXY_UPDATE', 'PROXY_UPDATE_CONFIRMATION'], outer_class=root_module['ns3::WifiActionHeader'], import_from_module='ns.wifi')
-    ## mgt-headers.h (module 'wifi'): ns3::WifiActionHeader::WmnActionValue [enumeration]
-    module.add_enum('WmnActionValue', ['LINK_METRIC_REPORT', 'PATH_SELECTION', 'PORTAL_ANNOUNCEMENT', 'CONGESTION_CONTROL_NOTIFICATION', 'MDA_SETUP_REQUEST', 'MDA_SETUP_REPLY', 'MDAOP_ADVERTISMENT_REQUEST', 'MDAOP_ADVERTISMENTS', 'MDAOP_SET_TEARDOWN', 'TBTT_ADJUSTMENT_REQUEST', 'TBTT_ADJUSTMENT_RESPONSE'], outer_class=root_module['ns3::WifiActionHeader'], import_from_module='ns.wifi')
+    ## mgt-headers.h (module 'wifi'): ns3::WifiActionHeader::MeshActionValue [enumeration]
+    module.add_enum('MeshActionValue', ['LINK_METRIC_REPORT', 'PATH_SELECTION', 'PORTAL_ANNOUNCEMENT', 'CONGESTION_CONTROL_NOTIFICATION', 'MDA_SETUP_REQUEST', 'MDA_SETUP_REPLY', 'MDAOP_ADVERTISMENT_REQUEST', 'MDAOP_ADVERTISMENTS', 'MDAOP_SET_TEARDOWN', 'TBTT_ADJUSTMENT_REQUEST', 'TBTT_ADJUSTMENT_RESPONSE'], outer_class=root_module['ns3::WifiActionHeader'], import_from_module='ns.wifi')
     ## mgt-headers.h (module 'wifi'): ns3::WifiActionHeader::BlockAckActionValue [enumeration]
     module.add_enum('BlockAckActionValue', ['BLOCK_ACK_ADDBA_REQUEST', 'BLOCK_ACK_ADDBA_RESPONSE', 'BLOCK_ACK_DELBA'], outer_class=root_module['ns3::WifiActionHeader'], import_from_module='ns.wifi')
     ## mgt-headers.h (module 'wifi'): ns3::WifiActionHeader::ActionValue [union]
@@ -280,6 +280,14 @@ def register_types(module):
     module.add_enum('State', ['IDLE', 'CCA_BUSY', 'TX', 'RX', 'SWITCHING', 'SLEEP'], outer_class=root_module['ns3::WifiPhy'], import_from_module='ns.wifi')
     ## wifi-remote-station-manager.h (module 'wifi'): ns3::WifiRemoteStationManager [class]
     module.add_class('WifiRemoteStationManager', import_from_module='ns.wifi', parent=root_module['ns3::Object'])
+    ## wmn-information-element-vector.h (module 'pmtmgmp'): ns3::WmnInformationElementVector [class]
+    module.add_class('WmnInformationElementVector', parent=root_module['ns3::WifiInformationElementVector'])
+    ## wmn-l2-routing-protocol.h (module 'pmtmgmp'): ns3::WmnL2RoutingProtocol [class]
+    module.add_class('WmnL2RoutingProtocol', parent=root_module['ns3::Object'])
+    ## wmn-stack-installer.h (module 'pmtmgmp'): ns3::WmnStack [class]
+    module.add_class('WmnStack', parent=root_module['ns3::Object'])
+    ## wmn-wifi-interface-mac-plugin.h (module 'pmtmgmp'): ns3::WmnWifiInterfaceMacPlugin [class]
+    module.add_class('WmnWifiInterfaceMacPlugin', parent=root_module['ns3::SimpleRefCount< ns3::WmnWifiInterfaceMacPlugin, ns3::empty, ns3::DefaultDeleter<ns3::WmnWifiInterfaceMacPlugin> >'])
     ## attribute.h (module 'core'): ns3::AttributeAccessor [class]
     module.add_class('AttributeAccessor', import_from_module='ns.core', parent=root_module['ns3::SimpleRefCount< ns3::AttributeAccessor, ns3::empty, ns3::DefaultDeleter<ns3::AttributeAccessor> >'])
     ## attribute.h (module 'core'): ns3::AttributeChecker [class]
@@ -346,16 +354,10 @@ def register_types(module):
     module.add_class('Mac48AddressChecker', import_from_module='ns.network', parent=root_module['ns3::AttributeChecker'])
     ## mac48-address.h (module 'network'): ns3::Mac48AddressValue [class]
     module.add_class('Mac48AddressValue', import_from_module='ns.network', parent=root_module['ns3::AttributeValue'])
-    ## wmn-information-element-vector.h (module 'wmn'): ns3::WmnInformationElementVector [class]
-    module.add_class('WmnInformationElementVector', parent=root_module['ns3::WifiInformationElementVector'])
-    ## wmn-l2-routing-protocol.h (module 'wmn'): ns3::WmnL2RoutingProtocol [class]
-    module.add_class('WmnL2RoutingProtocol', parent=root_module['ns3::Object'])
-    ## wmn-stack-installer.h (module 'wmn'): ns3::WmnStack [class]
-    module.add_class('WmnStack', parent=root_module['ns3::Object'])
-    ## wmn-wifi-interface-mac-plugin.h (module 'wmn'): ns3::WmnWifiInterfaceMacPlugin [class]
-    module.add_class('WmnWifiInterfaceMacPlugin', parent=root_module['ns3::SimpleRefCount< ns3::WmnWifiInterfaceMacPlugin, ns3::empty, ns3::DefaultDeleter<ns3::WmnWifiInterfaceMacPlugin> >'])
     ## mgt-headers.h (module 'wifi'): ns3::MgtBeaconHeader [class]
     module.add_class('MgtBeaconHeader', import_from_module='ns.wifi', parent=root_module['ns3::MgtProbeResponseHeader'])
+    ## my11s-installer.h (module 'pmtmgmp'): ns3::My11sStack [class]
+    module.add_class('My11sStack', parent=root_module['ns3::WmnStack'])
     ## net-device.h (module 'network'): ns3::NetDevice [class]
     module.add_class('NetDevice', import_from_module='ns.network', parent=root_module['ns3::Object'])
     ## net-device.h (module 'network'): ns3::NetDevice::PacketType [enumeration]
@@ -394,6 +396,10 @@ def register_types(module):
     module.add_class('WifiModeChecker', import_from_module='ns.wifi', parent=root_module['ns3::AttributeChecker'])
     ## wifi-mode.h (module 'wifi'): ns3::WifiModeValue [class]
     module.add_class('WifiModeValue', import_from_module='ns.wifi', parent=root_module['ns3::AttributeValue'])
+    ## wmn-point-device.h (module 'pmtmgmp'): ns3::WmnPointDevice [class]
+    module.add_class('WmnPointDevice', parent=root_module['ns3::NetDevice'])
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): ns3::WmnWifiInterfaceMac [class]
+    module.add_class('WmnWifiInterfaceMac', parent=root_module['ns3::RegularWifiMac'])
     ## address.h (module 'network'): ns3::AddressChecker [class]
     module.add_class('AddressChecker', import_from_module='ns.network', parent=root_module['ns3::AttributeChecker'])
     ## address.h (module 'network'): ns3::AddressValue [class]
@@ -402,14 +408,6 @@ def register_types(module):
     module.add_class('BridgeChannel', import_from_module='ns.bridge', parent=root_module['ns3::Channel'])
     ## dca-txop.h (module 'wifi'): ns3::DcaTxop [class]
     module.add_class('DcaTxop', import_from_module='ns.wifi', parent=root_module['ns3::Dcf'])
-    ## my11s-installer.h (module 'wmn'): ns3::My11sStack [class]
-    module.add_class('My11sStack', parent=root_module['ns3::WmnStack'])
-    ## flame-installer.h (module 'wmn'): ns3::FlameStack [class]
-    module.add_class('FlameStack', parent=root_module['ns3::WmnStack'])
-    ## wmn-point-device.h (module 'wmn'): ns3::WmnPointDevice [class]
-    module.add_class('WmnPointDevice', parent=root_module['ns3::NetDevice'])
-    ## wmn-wifi-interface-mac.h (module 'wmn'): ns3::WmnWifiInterfaceMac [class]
-    module.add_class('WmnWifiInterfaceMac', parent=root_module['ns3::RegularWifiMac'])
     module.add_container('ns3::WifiModeList', 'ns3::WifiMode', container_type=u'vector')
     module.add_container('ns3::WifiMcsList', 'unsigned char', container_type=u'vector')
     module.add_container('std::vector< ns3::Ptr< ns3::NetDevice > >', 'ns3::Ptr< ns3::NetDevice >', container_type=u'vector')
@@ -441,22 +439,16 @@ def register_types(module):
     register_types_ns3_Hash(nested_module)
     
     
-    ## Register a nested module for the namespace my11s
-    
-    nested_module = module.add_cpp_namespace('my11s')
-    register_types_ns3_my11s(nested_module)
-    
-    
-    ## Register a nested module for the namespace flame
-    
-    nested_module = module.add_cpp_namespace('flame')
-    register_types_ns3_flame(nested_module)
-    
-    
     ## Register a nested module for the namespace internal
     
     nested_module = module.add_cpp_namespace('internal')
     register_types_ns3_internal(nested_module)
+    
+    
+    ## Register a nested module for the namespace my11s
+    
+    nested_module = module.add_cpp_namespace('my11s')
+    register_types_ns3_my11s(nested_module)
     
 
 def register_types_ns3_FatalImpl(module):
@@ -493,99 +485,89 @@ def register_types_ns3_Hash_Function(module):
     ## hash-murmur3.h (module 'core'): ns3::Hash::Function::Murmur3 [class]
     module.add_class('Murmur3', import_from_module='ns.core', parent=root_module['ns3::Hash::Implementation'])
 
-def register_types_ns3_my11s(module):
-    root_module = module.get_root()
-    
-    ## ie-my11s-configuration.h (module 'wmn'): ns3::my11s::my11sSynchronizationProtocolIdentifier [enumeration]
-    module.add_enum('my11sSynchronizationProtocolIdentifier', ['SYNC_NEIGHBOUR_OFFSET', 'SYNC_NULL'])
-    ## ie-my11s-configuration.h (module 'wmn'): ns3::my11s::my11sCongestionControlMode [enumeration]
-    module.add_enum('my11sCongestionControlMode', ['CONGESTION_SIGNALING', 'CONGESTION_NULL'])
-    ## ie-my11s-configuration.h (module 'wmn'): ns3::my11s::my11sAuthenticationProtocol [enumeration]
-    module.add_enum('my11sAuthenticationProtocol', ['AUTH_NULL', 'AUTH_SAE', 'AUTH_IEEE'])
-    ## ie-my11s-configuration.h (module 'wmn'): ns3::my11s::my11sPathSelectionMetric [enumeration]
-    module.add_enum('my11sPathSelectionMetric', ['METRIC_AIRTIME'])
-    ## ie-my11s-peer-management.h (module 'wmn'): ns3::my11s::PmpReasonCode [enumeration]
-    module.add_enum('PmpReasonCode', ['REASON11S_PMTMGMP_PEERING_CANCELLED', 'REASON11S_WMN_MAX_PMTMGMP_PEERS', 'REASON11S_WMN_CAPABILITY_POLICY_VIOLATION', 'REASON11S_WMN_CLOSE_RCVD', 'REASON11S_WMN_MAX_RETRIES', 'REASON11S_WMN_CONFIRM_TIMEOUT', 'REASON11S_WMN_INVALID_GTK', 'REASON11S_WMN_INCONSISTENT_PARAMETERS', 'REASON11S_WMN_INVALID_SECURITY_CAPABILITY', 'REASON11S_RESERVED'])
-    ## ie-my11s-configuration.h (module 'wmn'): ns3::my11s::my11sPathSelectionProtocol [enumeration]
-    module.add_enum('my11sPathSelectionProtocol', ['PROTOCOL_PMTMGMP'])
-    ## ie-my11s-preq.h (module 'wmn'): ns3::my11s::DestinationAddressUnit [class]
-    module.add_class('DestinationAddressUnit', parent=root_module['ns3::SimpleRefCount< ns3::my11s::DestinationAddressUnit, ns3::empty, ns3::DefaultDeleter<ns3::my11s::DestinationAddressUnit> >'])
-    ## ie-my11s-configuration.h (module 'wmn'): ns3::my11s::My11sWmnCapability [class]
-    module.add_class('My11sWmnCapability')
-    ## pmtmgmp-protocol.h (module 'wmn'): ns3::my11s::PmtmgmpProtocol [class]
-    module.add_class('PmtmgmpProtocol', parent=root_module['ns3::WmnL2RoutingProtocol'])
-    ## pmtmgmp-protocol.h (module 'wmn'): ns3::my11s::PmtmgmpProtocol::FailedDestination [struct]
-    module.add_class('FailedDestination', outer_class=root_module['ns3::my11s::PmtmgmpProtocol'])
-    ## pmtmgmp-rtable.h (module 'wmn'): ns3::my11s::PmtmgmpRtable [class]
-    module.add_class('PmtmgmpRtable', parent=root_module['ns3::Object'])
-    ## pmtmgmp-rtable.h (module 'wmn'): ns3::my11s::PmtmgmpRtable::LookupResult [struct]
-    module.add_class('LookupResult', outer_class=root_module['ns3::my11s::PmtmgmpRtable'])
-    ## ie-my11s-beacon-timing.h (module 'wmn'): ns3::my11s::IeBeaconTiming [class]
-    module.add_class('IeBeaconTiming', parent=root_module['ns3::WifiInformationElement'])
-    ## ie-my11s-beacon-timing.h (module 'wmn'): ns3::my11s::IeBeaconTimingUnit [class]
-    module.add_class('IeBeaconTimingUnit', parent=root_module['ns3::SimpleRefCount< ns3::my11s::IeBeaconTimingUnit, ns3::empty, ns3::DefaultDeleter<ns3::my11s::IeBeaconTimingUnit> >'])
-    ## ie-my11s-configuration.h (module 'wmn'): ns3::my11s::IeConfiguration [class]
-    module.add_class('IeConfiguration', parent=root_module['ns3::WifiInformationElement'])
-    ## ie-my11s-metric-report.h (module 'wmn'): ns3::my11s::IeLinkMetricReport [class]
-    module.add_class('IeLinkMetricReport', parent=root_module['ns3::WifiInformationElement'])
-    ## ie-my11s-id.h (module 'wmn'): ns3::my11s::IeWmnId [class]
-    module.add_class('IeWmnId', parent=root_module['ns3::WifiInformationElement'])
-    ## ie-my11s-id.h (module 'wmn'): ns3::my11s::IeWmnIdChecker [class]
-    module.add_class('IeWmnIdChecker', parent=root_module['ns3::AttributeChecker'])
-    ## ie-my11s-id.h (module 'wmn'): ns3::my11s::IeWmnIdValue [class]
-    module.add_class('IeWmnIdValue', parent=root_module['ns3::AttributeValue'])
-    ## ie-my11s-peer-management.h (module 'wmn'): ns3::my11s::IePeerManagement [class]
-    module.add_class('IePeerManagement', parent=root_module['ns3::WifiInformationElement'])
-    ## ie-my11s-peer-management.h (module 'wmn'): ns3::my11s::IePeerManagement::Subtype [enumeration]
-    module.add_enum('Subtype', ['PMTMGMP_PEER_OPEN', 'PMTMGMP_PEER_CONFIRM', 'PMTMGMP_PEER_CLOSE'], outer_class=root_module['ns3::my11s::IePeerManagement'])
-    ## ie-my11s-peering-protocol.h (module 'wmn'): ns3::my11s::IePeeringProtocol [class]
-    module.add_class('IePeeringProtocol', parent=root_module['ns3::WifiInformationElement'])
-    ## ie-my11s-perr.h (module 'wmn'): ns3::my11s::IePerr [class]
-    module.add_class('IePerr', parent=root_module['ns3::WifiInformationElement'])
-    ## ie-my11s-prep.h (module 'wmn'): ns3::my11s::IePrep [class]
-    module.add_class('IePrep', parent=root_module['ns3::WifiInformationElement'])
-    ## ie-my11s-preq.h (module 'wmn'): ns3::my11s::IePreq [class]
-    module.add_class('IePreq', parent=root_module['ns3::WifiInformationElement'])
-    ## ie-my11s-rann.h (module 'wmn'): ns3::my11s::IeRann [class]
-    module.add_class('IeRann', parent=root_module['ns3::WifiInformationElement'])
-    ## my11s-mac-header.h (module 'wmn'): ns3::my11s::WmnHeader [class]
-    module.add_class('WmnHeader', parent=root_module['ns3::Header'])
-    ## pmtmgmp-peer-link.h (module 'wmn'): ns3::my11s::PeerLink [class]
-    module.add_class('PeerLink', parent=root_module['ns3::Object'])
-    ## pmtmgmp-peer-link.h (module 'wmn'): ns3::my11s::PeerLink::PeerState [enumeration]
-    module.add_enum('PeerState', ['IDLE', 'OPN_SNT', 'CNF_RCVD', 'OPN_RCVD', 'ESTAB', 'HOLDING'], outer_class=root_module['ns3::my11s::PeerLink'])
-    ## pmtmgmp-peer-link-frame.h (module 'wmn'): ns3::my11s::PeerLinkFrameStart [class]
-    module.add_class('PeerLinkFrameStart', parent=root_module['ns3::Header'])
-    ## pmtmgmp-peer-link-frame.h (module 'wmn'): ns3::my11s::PeerLinkFrameStart::PlinkFrameStartFields [struct]
-    module.add_class('PlinkFrameStartFields', outer_class=root_module['ns3::my11s::PeerLinkFrameStart'])
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): ns3::my11s::PeerManagementProtocol [class]
-    module.add_class('PeerManagementProtocol', parent=root_module['ns3::Object'])
-    module.add_container('std::vector< std::pair< unsigned int, ns3::Mac48Address > >', 'std::pair< unsigned int, ns3::Mac48Address >', container_type=u'vector')
-    module.add_container('std::vector< ns3::my11s::PmtmgmpProtocol::FailedDestination >', 'ns3::my11s::PmtmgmpProtocol::FailedDestination', container_type=u'vector')
-    module.add_container('std::vector< ns3::Ptr< ns3::my11s::IeBeaconTimingUnit > >', 'ns3::Ptr< ns3::my11s::IeBeaconTimingUnit >', container_type=u'vector')
-    module.add_container('std::vector< ns3::Ptr< ns3::my11s::DestinationAddressUnit > >', 'ns3::Ptr< ns3::my11s::DestinationAddressUnit >', container_type=u'vector')
-    module.add_container('std::vector< ns3::Ptr< ns3::my11s::PeerLink > >', 'ns3::Ptr< ns3::my11s::PeerLink >', container_type=u'vector')
-    module.add_container('std::vector< ns3::Mac48Address >', 'ns3::Mac48Address', container_type=u'vector')
-
-def register_types_ns3_flame(module):
-    root_module = module.get_root()
-    
-    ## flame-header.h (module 'wmn'): ns3::flame::FlameHeader [class]
-    module.add_class('FlameHeader', parent=root_module['ns3::Header'])
-    ## flame-protocol.h (module 'wmn'): ns3::flame::FlameProtocol [class]
-    module.add_class('FlameProtocol', parent=root_module['ns3::WmnL2RoutingProtocol'])
-    ## flame-protocol-mac.h (module 'wmn'): ns3::flame::FlameProtocolMac [class]
-    module.add_class('FlameProtocolMac', parent=root_module['ns3::WmnWifiInterfaceMacPlugin'])
-    ## flame-rtable.h (module 'wmn'): ns3::flame::FlameRtable [class]
-    module.add_class('FlameRtable', parent=root_module['ns3::Object'])
-    ## flame-rtable.h (module 'wmn'): ns3::flame::FlameRtable::LookupResult [struct]
-    module.add_class('LookupResult', outer_class=root_module['ns3::flame::FlameRtable'])
-    ## flame-protocol.h (module 'wmn'): ns3::flame::FlameTag [class]
-    module.add_class('FlameTag', parent=root_module['ns3::Tag'])
-
 def register_types_ns3_internal(module):
     root_module = module.get_root()
     
+
+def register_types_ns3_my11s(module):
+    root_module = module.get_root()
+    
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): ns3::my11s::my11sSynchronizationProtocolIdentifier [enumeration]
+    module.add_enum('my11sSynchronizationProtocolIdentifier', ['SYNC_NEIGHBOUR_OFFSET', 'SYNC_NULL'])
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): ns3::my11s::my11sCongestionControlMode [enumeration]
+    module.add_enum('my11sCongestionControlMode', ['CONGESTION_SIGNALING', 'CONGESTION_NULL'])
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): ns3::my11s::my11sPathSelectionProtocol [enumeration]
+    module.add_enum('my11sPathSelectionProtocol', ['PROTOCOL_PMTMGMP'])
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): ns3::my11s::my11sPathSelectionMetric [enumeration]
+    module.add_enum('my11sPathSelectionMetric', ['METRIC_AIRTIME'])
+    ## ie-my11s-peer-management.h (module 'pmtmgmp'): ns3::my11s::PmpReasonCode [enumeration]
+    module.add_enum('PmpReasonCode', ['REASON11S_PMTMGMP_PEERING_CANCELLED', 'REASON11S_WMN_MAX_PMTMGMP_PEERS', 'REASON11S_WMN_CAPABILITY_POLICY_VIOLATION', 'REASON11S_WMN_CLOSE_RCVD', 'REASON11S_WMN_MAX_RETRIES', 'REASON11S_WMN_CONFIRM_TIMEOUT', 'REASON11S_WMN_INVALID_GTK', 'REASON11S_WMN_INCONSISTENT_PARAMETERS', 'REASON11S_WMN_INVALID_SECURITY_CAPABILITY', 'REASON11S_RESERVED'])
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): ns3::my11s::my11sAuthenticationProtocol [enumeration]
+    module.add_enum('my11sAuthenticationProtocol', ['AUTH_NULL', 'AUTH_SAE', 'AUTH_IEEE'])
+    ## ie-my11s-preq.h (module 'pmtmgmp'): ns3::my11s::DestinationAddressUnit [class]
+    module.add_class('DestinationAddressUnit', parent=root_module['ns3::SimpleRefCount< ns3::my11s::DestinationAddressUnit, ns3::empty, ns3::DefaultDeleter<ns3::my11s::DestinationAddressUnit> >'])
+    ## ie-my11s-beacon-timing.h (module 'pmtmgmp'): ns3::my11s::IeBeaconTiming [class]
+    module.add_class('IeBeaconTiming', parent=root_module['ns3::WifiInformationElement'])
+    ## ie-my11s-beacon-timing.h (module 'pmtmgmp'): ns3::my11s::IeBeaconTimingUnit [class]
+    module.add_class('IeBeaconTimingUnit', parent=root_module['ns3::SimpleRefCount< ns3::my11s::IeBeaconTimingUnit, ns3::empty, ns3::DefaultDeleter<ns3::my11s::IeBeaconTimingUnit> >'])
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): ns3::my11s::IeConfiguration [class]
+    module.add_class('IeConfiguration', parent=root_module['ns3::WifiInformationElement'])
+    ## ie-my11s-metric-report.h (module 'pmtmgmp'): ns3::my11s::IeLinkMetricReport [class]
+    module.add_class('IeLinkMetricReport', parent=root_module['ns3::WifiInformationElement'])
+    ## ie-my11s-peer-management.h (module 'pmtmgmp'): ns3::my11s::IePeerManagement [class]
+    module.add_class('IePeerManagement', parent=root_module['ns3::WifiInformationElement'])
+    ## ie-my11s-peer-management.h (module 'pmtmgmp'): ns3::my11s::IePeerManagement::Subtype [enumeration]
+    module.add_enum('Subtype', ['PMTMGMP_PEER_OPEN', 'PMTMGMP_PEER_CONFIRM', 'PMTMGMP_PEER_CLOSE'], outer_class=root_module['ns3::my11s::IePeerManagement'])
+    ## ie-my11s-peering-protocol.h (module 'pmtmgmp'): ns3::my11s::IePeeringProtocol [class]
+    module.add_class('IePeeringProtocol', parent=root_module['ns3::WifiInformationElement'])
+    ## ie-my11s-perr.h (module 'pmtmgmp'): ns3::my11s::IePerr [class]
+    module.add_class('IePerr', parent=root_module['ns3::WifiInformationElement'])
+    ## ie-my11s-prep.h (module 'pmtmgmp'): ns3::my11s::IePrep [class]
+    module.add_class('IePrep', parent=root_module['ns3::WifiInformationElement'])
+    ## ie-my11s-preq.h (module 'pmtmgmp'): ns3::my11s::IePreq [class]
+    module.add_class('IePreq', parent=root_module['ns3::WifiInformationElement'])
+    ## ie-my11s-rann.h (module 'pmtmgmp'): ns3::my11s::IeRann [class]
+    module.add_class('IeRann', parent=root_module['ns3::WifiInformationElement'])
+    ## ie-my11s-secrep.h (module 'pmtmgmp'): ns3::my11s::IeSecrep [class]
+    module.add_class('IeSecrep', parent=root_module['ns3::WifiInformationElement'])
+    ## ie-my11s-secreq.h (module 'pmtmgmp'): ns3::my11s::IeSecreq [class]
+    module.add_class('IeSecreq', parent=root_module['ns3::WifiInformationElement'])
+    ## ie-my11s-id.h (module 'pmtmgmp'): ns3::my11s::IeWmnId [class]
+    module.add_class('IeWmnId', parent=root_module['ns3::WifiInformationElement'])
+    ## ie-my11s-id.h (module 'pmtmgmp'): ns3::my11s::IeWmnIdChecker [class]
+    module.add_class('IeWmnIdChecker', parent=root_module['ns3::AttributeChecker'])
+    ## ie-my11s-id.h (module 'pmtmgmp'): ns3::my11s::IeWmnIdValue [class]
+    module.add_class('IeWmnIdValue', parent=root_module['ns3::AttributeValue'])
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): ns3::my11s::My11sWmnCapability [class]
+    module.add_class('My11sWmnCapability')
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpPeerLink [class]
+    module.add_class('PmtmgmpPeerLink', parent=root_module['ns3::Object'])
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpPeerLink::PeerState [enumeration]
+    module.add_enum('PeerState', ['IDLE', 'OPN_SNT', 'CNF_RCVD', 'OPN_RCVD', 'ESTAB', 'HOLDING'], outer_class=root_module['ns3::my11s::PmtmgmpPeerLink'])
+    ## pmtmgmp-peer-link-frame.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpPeerLinkFrameStart [class]
+    module.add_class('PmtmgmpPeerLinkFrameStart', parent=root_module['ns3::Header'])
+    ## pmtmgmp-peer-link-frame.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpPeerLinkFrameStart::PlinkFrameStartFields [struct]
+    module.add_class('PlinkFrameStartFields', outer_class=root_module['ns3::my11s::PmtmgmpPeerLinkFrameStart'])
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpPeerManagementProtocol [class]
+    module.add_class('PmtmgmpPeerManagementProtocol', parent=root_module['ns3::Object'])
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpProtocol [class]
+    module.add_class('PmtmgmpProtocol', parent=root_module['ns3::WmnL2RoutingProtocol'])
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpProtocol::NodeType [enumeration]
+    module.add_enum('NodeType', ['Mesh_STA', 'Mesh_Access_Point', 'Mesh_Portal', 'Mesh_Secondary_Point'], outer_class=root_module['ns3::my11s::PmtmgmpProtocol'])
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpProtocol::FailedDestination [struct]
+    module.add_class('FailedDestination', outer_class=root_module['ns3::my11s::PmtmgmpProtocol'])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRtable [class]
+    module.add_class('PmtmgmpRtable', parent=root_module['ns3::Object'])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRtable::LookupResult [struct]
+    module.add_class('LookupResult', outer_class=root_module['ns3::my11s::PmtmgmpRtable'])
+    ## my11s-mac-header.h (module 'pmtmgmp'): ns3::my11s::WmnHeader [class]
+    module.add_class('WmnHeader', parent=root_module['ns3::Header'])
+    module.add_container('std::vector< ns3::Ptr< ns3::my11s::IeBeaconTimingUnit > >', 'ns3::Ptr< ns3::my11s::IeBeaconTimingUnit >', container_type=u'vector')
+    module.add_container('std::vector< ns3::my11s::PmtmgmpProtocol::FailedDestination >', 'ns3::my11s::PmtmgmpProtocol::FailedDestination', container_type=u'vector')
+    module.add_container('std::vector< ns3::Ptr< ns3::my11s::DestinationAddressUnit > >', 'ns3::Ptr< ns3::my11s::DestinationAddressUnit >', container_type=u'vector')
+    module.add_container('std::vector< ns3::Ptr< ns3::my11s::PmtmgmpPeerLink > >', 'ns3::Ptr< ns3::my11s::PmtmgmpPeerLink >', container_type=u'vector')
+    module.add_container('std::vector< ns3::Mac48Address >', 'ns3::Mac48Address', container_type=u'vector')
+    module.add_container('std::vector< std::pair< unsigned int, ns3::Mac48Address > >', 'std::pair< unsigned int, ns3::Mac48Address >', container_type=u'vector')
 
 def register_methods(root_module):
     register_Ns3Address_methods(root_module, root_module['ns3::Address'])
@@ -612,8 +594,6 @@ def register_methods(root_module):
     register_Ns3Ipv6Address_methods(root_module, root_module['ns3::Ipv6Address'])
     register_Ns3Ipv6Prefix_methods(root_module, root_module['ns3::Ipv6Prefix'])
     register_Ns3Mac48Address_methods(root_module, root_module['ns3::Mac48Address'])
-    register_Ns3WmnHelper_methods(root_module, root_module['ns3::WmnHelper'])
-    register_Ns3WmnWifiBeacon_methods(root_module, root_module['ns3::WmnWifiBeacon'])
     register_Ns3NetDeviceContainer_methods(root_module, root_module['ns3::NetDeviceContainer'])
     register_Ns3NodeContainer_methods(root_module, root_module['ns3::NodeContainer'])
     register_Ns3ObjectBase_methods(root_module, root_module['ns3::ObjectBase'])
@@ -649,6 +629,8 @@ def register_methods(root_module):
     register_Ns3WifiRemoteStationInfo_methods(root_module, root_module['ns3::WifiRemoteStationInfo'])
     register_Ns3WifiRemoteStationState_methods(root_module, root_module['ns3::WifiRemoteStationState'])
     register_Ns3WifiTxVector_methods(root_module, root_module['ns3::WifiTxVector'])
+    register_Ns3WmnHelper_methods(root_module, root_module['ns3::WmnHelper'])
+    register_Ns3WmnWifiBeacon_methods(root_module, root_module['ns3::WmnWifiBeacon'])
     register_Ns3Empty_methods(root_module, root_module['ns3::empty'])
     register_Ns3Int64x64_t_methods(root_module, root_module['ns3::int64x64_t'])
     register_Ns3Chunk_methods(root_module, root_module['ns3::Chunk'])
@@ -669,12 +651,12 @@ def register_methods(root_module):
     register_Ns3SimpleRefCount__Ns3CallbackImplBase_Ns3Empty_Ns3DefaultDeleter__lt__ns3CallbackImplBase__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CallbackImplBase, ns3::empty, ns3::DefaultDeleter<ns3::CallbackImplBase> >'])
     register_Ns3SimpleRefCount__Ns3EventImpl_Ns3Empty_Ns3DefaultDeleter__lt__ns3EventImpl__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::EventImpl, ns3::empty, ns3::DefaultDeleter<ns3::EventImpl> >'])
     register_Ns3SimpleRefCount__Ns3HashImplementation_Ns3Empty_Ns3DefaultDeleter__lt__ns3HashImplementation__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::Hash::Implementation, ns3::empty, ns3::DefaultDeleter<ns3::Hash::Implementation> >'])
-    register_Ns3SimpleRefCount__Ns3WmnWifiInterfaceMacPlugin_Ns3Empty_Ns3DefaultDeleter__lt__ns3WmnWifiInterfaceMacPlugin__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::WmnWifiInterfaceMacPlugin, ns3::empty, ns3::DefaultDeleter<ns3::WmnWifiInterfaceMacPlugin> >'])
     register_Ns3SimpleRefCount__Ns3NixVector_Ns3Empty_Ns3DefaultDeleter__lt__ns3NixVector__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::NixVector, ns3::empty, ns3::DefaultDeleter<ns3::NixVector> >'])
     register_Ns3SimpleRefCount__Ns3OutputStreamWrapper_Ns3Empty_Ns3DefaultDeleter__lt__ns3OutputStreamWrapper__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::OutputStreamWrapper, ns3::empty, ns3::DefaultDeleter<ns3::OutputStreamWrapper> >'])
     register_Ns3SimpleRefCount__Ns3Packet_Ns3Empty_Ns3DefaultDeleter__lt__ns3Packet__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::Packet, ns3::empty, ns3::DefaultDeleter<ns3::Packet> >'])
     register_Ns3SimpleRefCount__Ns3TraceSourceAccessor_Ns3Empty_Ns3DefaultDeleter__lt__ns3TraceSourceAccessor__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::TraceSourceAccessor, ns3::empty, ns3::DefaultDeleter<ns3::TraceSourceAccessor> >'])
     register_Ns3SimpleRefCount__Ns3WifiInformationElement_Ns3Empty_Ns3DefaultDeleter__lt__ns3WifiInformationElement__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::WifiInformationElement, ns3::empty, ns3::DefaultDeleter<ns3::WifiInformationElement> >'])
+    register_Ns3SimpleRefCount__Ns3WmnWifiInterfaceMacPlugin_Ns3Empty_Ns3DefaultDeleter__lt__ns3WmnWifiInterfaceMacPlugin__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::WmnWifiInterfaceMacPlugin, ns3::empty, ns3::DefaultDeleter<ns3::WmnWifiInterfaceMacPlugin> >'])
     register_Ns3SimpleRefCount__Ns3My11sDestinationAddressUnit_Ns3Empty_Ns3DefaultDeleter__lt__ns3My11sDestinationAddressUnit__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::my11s::DestinationAddressUnit, ns3::empty, ns3::DefaultDeleter<ns3::my11s::DestinationAddressUnit> >'])
     register_Ns3SimpleRefCount__Ns3My11sIeBeaconTimingUnit_Ns3Empty_Ns3DefaultDeleter__lt__ns3My11sIeBeaconTimingUnit__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::my11s::IeBeaconTimingUnit, ns3::empty, ns3::DefaultDeleter<ns3::my11s::IeBeaconTimingUnit> >'])
     register_Ns3Time_methods(root_module, root_module['ns3::Time'])
@@ -688,6 +670,10 @@ def register_methods(root_module):
     register_Ns3WifiMacHeader_methods(root_module, root_module['ns3::WifiMacHeader'])
     register_Ns3WifiPhy_methods(root_module, root_module['ns3::WifiPhy'])
     register_Ns3WifiRemoteStationManager_methods(root_module, root_module['ns3::WifiRemoteStationManager'])
+    register_Ns3WmnInformationElementVector_methods(root_module, root_module['ns3::WmnInformationElementVector'])
+    register_Ns3WmnL2RoutingProtocol_methods(root_module, root_module['ns3::WmnL2RoutingProtocol'])
+    register_Ns3WmnStack_methods(root_module, root_module['ns3::WmnStack'])
+    register_Ns3WmnWifiInterfaceMacPlugin_methods(root_module, root_module['ns3::WmnWifiInterfaceMacPlugin'])
     register_Ns3AttributeAccessor_methods(root_module, root_module['ns3::AttributeAccessor'])
     register_Ns3AttributeChecker_methods(root_module, root_module['ns3::AttributeChecker'])
     register_Ns3AttributeValue_methods(root_module, root_module['ns3::AttributeValue'])
@@ -721,11 +707,8 @@ def register_methods(root_module):
     register_Ns3Ipv6PrefixValue_methods(root_module, root_module['ns3::Ipv6PrefixValue'])
     register_Ns3Mac48AddressChecker_methods(root_module, root_module['ns3::Mac48AddressChecker'])
     register_Ns3Mac48AddressValue_methods(root_module, root_module['ns3::Mac48AddressValue'])
-    register_Ns3WmnInformationElementVector_methods(root_module, root_module['ns3::WmnInformationElementVector'])
-    register_Ns3WmnL2RoutingProtocol_methods(root_module, root_module['ns3::WmnL2RoutingProtocol'])
-    register_Ns3WmnStack_methods(root_module, root_module['ns3::WmnStack'])
-    register_Ns3WmnWifiInterfaceMacPlugin_methods(root_module, root_module['ns3::WmnWifiInterfaceMacPlugin'])
     register_Ns3MgtBeaconHeader_methods(root_module, root_module['ns3::MgtBeaconHeader'])
+    register_Ns3My11sStack_methods(root_module, root_module['ns3::My11sStack'])
     register_Ns3NetDevice_methods(root_module, root_module['ns3::NetDevice'])
     register_Ns3NixVector_methods(root_module, root_module['ns3::NixVector'])
     register_Ns3Node_methods(root_module, root_module['ns3::Node'])
@@ -744,49 +727,43 @@ def register_methods(root_module):
     register_Ns3UintegerValue_methods(root_module, root_module['ns3::UintegerValue'])
     register_Ns3WifiModeChecker_methods(root_module, root_module['ns3::WifiModeChecker'])
     register_Ns3WifiModeValue_methods(root_module, root_module['ns3::WifiModeValue'])
+    register_Ns3WmnPointDevice_methods(root_module, root_module['ns3::WmnPointDevice'])
+    register_Ns3WmnWifiInterfaceMac_methods(root_module, root_module['ns3::WmnWifiInterfaceMac'])
     register_Ns3AddressChecker_methods(root_module, root_module['ns3::AddressChecker'])
     register_Ns3AddressValue_methods(root_module, root_module['ns3::AddressValue'])
     register_Ns3BridgeChannel_methods(root_module, root_module['ns3::BridgeChannel'])
     register_Ns3DcaTxop_methods(root_module, root_module['ns3::DcaTxop'])
-    register_Ns3My11sStack_methods(root_module, root_module['ns3::My11sStack'])
-    register_Ns3FlameStack_methods(root_module, root_module['ns3::FlameStack'])
-    register_Ns3WmnPointDevice_methods(root_module, root_module['ns3::WmnPointDevice'])
-    register_Ns3WmnWifiInterfaceMac_methods(root_module, root_module['ns3::WmnWifiInterfaceMac'])
     register_Ns3HashImplementation_methods(root_module, root_module['ns3::Hash::Implementation'])
     register_Ns3HashFunctionFnv1a_methods(root_module, root_module['ns3::Hash::Function::Fnv1a'])
     register_Ns3HashFunctionHash32_methods(root_module, root_module['ns3::Hash::Function::Hash32'])
     register_Ns3HashFunctionHash64_methods(root_module, root_module['ns3::Hash::Function::Hash64'])
     register_Ns3HashFunctionMurmur3_methods(root_module, root_module['ns3::Hash::Function::Murmur3'])
     register_Ns3My11sDestinationAddressUnit_methods(root_module, root_module['ns3::my11s::DestinationAddressUnit'])
-    register_Ns3My11sMy11sWmnCapability_methods(root_module, root_module['ns3::my11s::My11sWmnCapability'])
-    register_Ns3My11sPmtmgmpProtocol_methods(root_module, root_module['ns3::my11s::PmtmgmpProtocol'])
-    register_Ns3My11sPmtmgmpProtocolFailedDestination_methods(root_module, root_module['ns3::my11s::PmtmgmpProtocol::FailedDestination'])
-    register_Ns3My11sPmtmgmpRtable_methods(root_module, root_module['ns3::my11s::PmtmgmpRtable'])
-    register_Ns3My11sPmtmgmpRtableLookupResult_methods(root_module, root_module['ns3::my11s::PmtmgmpRtable::LookupResult'])
     register_Ns3My11sIeBeaconTiming_methods(root_module, root_module['ns3::my11s::IeBeaconTiming'])
     register_Ns3My11sIeBeaconTimingUnit_methods(root_module, root_module['ns3::my11s::IeBeaconTimingUnit'])
     register_Ns3My11sIeConfiguration_methods(root_module, root_module['ns3::my11s::IeConfiguration'])
     register_Ns3My11sIeLinkMetricReport_methods(root_module, root_module['ns3::my11s::IeLinkMetricReport'])
-    register_Ns3My11sIeWmnId_methods(root_module, root_module['ns3::my11s::IeWmnId'])
-    register_Ns3My11sIeWmnIdChecker_methods(root_module, root_module['ns3::my11s::IeWmnIdChecker'])
-    register_Ns3My11sIeWmnIdValue_methods(root_module, root_module['ns3::my11s::IeWmnIdValue'])
     register_Ns3My11sIePeerManagement_methods(root_module, root_module['ns3::my11s::IePeerManagement'])
     register_Ns3My11sIePeeringProtocol_methods(root_module, root_module['ns3::my11s::IePeeringProtocol'])
     register_Ns3My11sIePerr_methods(root_module, root_module['ns3::my11s::IePerr'])
     register_Ns3My11sIePrep_methods(root_module, root_module['ns3::my11s::IePrep'])
     register_Ns3My11sIePreq_methods(root_module, root_module['ns3::my11s::IePreq'])
     register_Ns3My11sIeRann_methods(root_module, root_module['ns3::my11s::IeRann'])
+    register_Ns3My11sIeSecrep_methods(root_module, root_module['ns3::my11s::IeSecrep'])
+    register_Ns3My11sIeSecreq_methods(root_module, root_module['ns3::my11s::IeSecreq'])
+    register_Ns3My11sIeWmnId_methods(root_module, root_module['ns3::my11s::IeWmnId'])
+    register_Ns3My11sIeWmnIdChecker_methods(root_module, root_module['ns3::my11s::IeWmnIdChecker'])
+    register_Ns3My11sIeWmnIdValue_methods(root_module, root_module['ns3::my11s::IeWmnIdValue'])
+    register_Ns3My11sMy11sWmnCapability_methods(root_module, root_module['ns3::my11s::My11sWmnCapability'])
+    register_Ns3My11sPmtmgmpPeerLink_methods(root_module, root_module['ns3::my11s::PmtmgmpPeerLink'])
+    register_Ns3My11sPmtmgmpPeerLinkFrameStart_methods(root_module, root_module['ns3::my11s::PmtmgmpPeerLinkFrameStart'])
+    register_Ns3My11sPmtmgmpPeerLinkFrameStartPlinkFrameStartFields_methods(root_module, root_module['ns3::my11s::PmtmgmpPeerLinkFrameStart::PlinkFrameStartFields'])
+    register_Ns3My11sPmtmgmpPeerManagementProtocol_methods(root_module, root_module['ns3::my11s::PmtmgmpPeerManagementProtocol'])
+    register_Ns3My11sPmtmgmpProtocol_methods(root_module, root_module['ns3::my11s::PmtmgmpProtocol'])
+    register_Ns3My11sPmtmgmpProtocolFailedDestination_methods(root_module, root_module['ns3::my11s::PmtmgmpProtocol::FailedDestination'])
+    register_Ns3My11sPmtmgmpRtable_methods(root_module, root_module['ns3::my11s::PmtmgmpRtable'])
+    register_Ns3My11sPmtmgmpRtableLookupResult_methods(root_module, root_module['ns3::my11s::PmtmgmpRtable::LookupResult'])
     register_Ns3My11sWmnHeader_methods(root_module, root_module['ns3::my11s::WmnHeader'])
-    register_Ns3My11sPeerLink_methods(root_module, root_module['ns3::my11s::PeerLink'])
-    register_Ns3My11sPeerLinkFrameStart_methods(root_module, root_module['ns3::my11s::PeerLinkFrameStart'])
-    register_Ns3My11sPeerLinkFrameStartPlinkFrameStartFields_methods(root_module, root_module['ns3::my11s::PeerLinkFrameStart::PlinkFrameStartFields'])
-    register_Ns3My11sPeerManagementProtocol_methods(root_module, root_module['ns3::my11s::PeerManagementProtocol'])
-    register_Ns3FlameFlameHeader_methods(root_module, root_module['ns3::flame::FlameHeader'])
-    register_Ns3FlameFlameProtocol_methods(root_module, root_module['ns3::flame::FlameProtocol'])
-    register_Ns3FlameFlameProtocolMac_methods(root_module, root_module['ns3::flame::FlameProtocolMac'])
-    register_Ns3FlameFlameRtable_methods(root_module, root_module['ns3::flame::FlameRtable'])
-    register_Ns3FlameFlameRtableLookupResult_methods(root_module, root_module['ns3::flame::FlameRtable::LookupResult'])
-    register_Ns3FlameFlameTag_methods(root_module, root_module['ns3::flame::FlameTag'])
     return
 
 def register_Ns3Address_methods(root_module, cls):
@@ -2272,88 +2249,6 @@ def register_Ns3Mac48Address_methods(root_module, cls):
                    is_static=True)
     return
 
-def register_Ns3WmnHelper_methods(root_module, cls):
-    ## wmn-helper.h (module 'wmn'): ns3::WmnHelper::WmnHelper(ns3::WmnHelper const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::WmnHelper const &', 'arg0')])
-    ## wmn-helper.h (module 'wmn'): ns3::WmnHelper::WmnHelper() [constructor]
-    cls.add_constructor([])
-    ## wmn-helper.h (module 'wmn'): int64_t ns3::WmnHelper::AssignStreams(ns3::NetDeviceContainer c, int64_t stream) [member function]
-    cls.add_method('AssignStreams', 
-                   'int64_t', 
-                   [param('ns3::NetDeviceContainer', 'c'), param('int64_t', 'stream')])
-    ## wmn-helper.h (module 'wmn'): static ns3::WmnHelper ns3::WmnHelper::Default() [member function]
-    cls.add_method('Default', 
-                   'ns3::WmnHelper', 
-                   [], 
-                   is_static=True)
-    ## wmn-helper.h (module 'wmn'): ns3::NetDeviceContainer ns3::WmnHelper::Install(ns3::WifiPhyHelper const & phyHelper, ns3::NodeContainer c) const [member function]
-    cls.add_method('Install', 
-                   'ns3::NetDeviceContainer', 
-                   [param('ns3::WifiPhyHelper const &', 'phyHelper'), param('ns3::NodeContainer', 'c')], 
-                   is_const=True)
-    ## wmn-helper.h (module 'wmn'): void ns3::WmnHelper::Report(ns3::Ptr<ns3::NetDevice> const & arg0, std::ostream & arg1) [member function]
-    cls.add_method('Report', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::NetDevice > const &', 'arg0'), param('std::ostream &', 'arg1')])
-    ## wmn-helper.h (module 'wmn'): void ns3::WmnHelper::ResetStats(ns3::Ptr<ns3::NetDevice> const & arg0) [member function]
-    cls.add_method('ResetStats', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::NetDevice > const &', 'arg0')])
-    ## wmn-helper.h (module 'wmn'): void ns3::WmnHelper::SetMacType(std::string n0="", ns3::AttributeValue const & v0=ns3::EmptyAttributeValue(), std::string n1="", ns3::AttributeValue const & v1=ns3::EmptyAttributeValue(), std::string n2="", ns3::AttributeValue const & v2=ns3::EmptyAttributeValue(), std::string n3="", ns3::AttributeValue const & v3=ns3::EmptyAttributeValue(), std::string n4="", ns3::AttributeValue const & v4=ns3::EmptyAttributeValue(), std::string n5="", ns3::AttributeValue const & v5=ns3::EmptyAttributeValue(), std::string n6="", ns3::AttributeValue const & v6=ns3::EmptyAttributeValue(), std::string n7="", ns3::AttributeValue const & v7=ns3::EmptyAttributeValue()) [member function]
-    cls.add_method('SetMacType', 
-                   'void', 
-                   [param('std::string', 'n0', default_value='""'), param('ns3::AttributeValue const &', 'v0', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n1', default_value='""'), param('ns3::AttributeValue const &', 'v1', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n2', default_value='""'), param('ns3::AttributeValue const &', 'v2', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n3', default_value='""'), param('ns3::AttributeValue const &', 'v3', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n4', default_value='""'), param('ns3::AttributeValue const &', 'v4', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n5', default_value='""'), param('ns3::AttributeValue const &', 'v5', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n6', default_value='""'), param('ns3::AttributeValue const &', 'v6', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n7', default_value='""'), param('ns3::AttributeValue const &', 'v7', default_value='ns3::EmptyAttributeValue()')])
-    ## wmn-helper.h (module 'wmn'): void ns3::WmnHelper::SetNumberOfInterfaces(uint32_t nInterfaces) [member function]
-    cls.add_method('SetNumberOfInterfaces', 
-                   'void', 
-                   [param('uint32_t', 'nInterfaces')])
-    ## wmn-helper.h (module 'wmn'): void ns3::WmnHelper::SetRemoteStationManager(std::string type, std::string n0="", ns3::AttributeValue const & v0=ns3::EmptyAttributeValue(), std::string n1="", ns3::AttributeValue const & v1=ns3::EmptyAttributeValue(), std::string n2="", ns3::AttributeValue const & v2=ns3::EmptyAttributeValue(), std::string n3="", ns3::AttributeValue const & v3=ns3::EmptyAttributeValue(), std::string n4="", ns3::AttributeValue const & v4=ns3::EmptyAttributeValue(), std::string n5="", ns3::AttributeValue const & v5=ns3::EmptyAttributeValue(), std::string n6="", ns3::AttributeValue const & v6=ns3::EmptyAttributeValue(), std::string n7="", ns3::AttributeValue const & v7=ns3::EmptyAttributeValue()) [member function]
-    cls.add_method('SetRemoteStationManager', 
-                   'void', 
-                   [param('std::string', 'type'), param('std::string', 'n0', default_value='""'), param('ns3::AttributeValue const &', 'v0', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n1', default_value='""'), param('ns3::AttributeValue const &', 'v1', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n2', default_value='""'), param('ns3::AttributeValue const &', 'v2', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n3', default_value='""'), param('ns3::AttributeValue const &', 'v3', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n4', default_value='""'), param('ns3::AttributeValue const &', 'v4', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n5', default_value='""'), param('ns3::AttributeValue const &', 'v5', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n6', default_value='""'), param('ns3::AttributeValue const &', 'v6', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n7', default_value='""'), param('ns3::AttributeValue const &', 'v7', default_value='ns3::EmptyAttributeValue()')])
-    ## wmn-helper.h (module 'wmn'): void ns3::WmnHelper::SetSpreadInterfaceChannels(ns3::WmnHelper::ChannelPolicy arg0) [member function]
-    cls.add_method('SetSpreadInterfaceChannels', 
-                   'void', 
-                   [param('ns3::WmnHelper::ChannelPolicy', 'arg0')])
-    ## wmn-helper.h (module 'wmn'): void ns3::WmnHelper::SetStackInstaller(std::string type, std::string n0="", ns3::AttributeValue const & v0=ns3::EmptyAttributeValue(), std::string n1="", ns3::AttributeValue const & v1=ns3::EmptyAttributeValue(), std::string n2="", ns3::AttributeValue const & v2=ns3::EmptyAttributeValue(), std::string n3="", ns3::AttributeValue const & v3=ns3::EmptyAttributeValue(), std::string n4="", ns3::AttributeValue const & v4=ns3::EmptyAttributeValue(), std::string n5="", ns3::AttributeValue const & v5=ns3::EmptyAttributeValue(), std::string n6="", ns3::AttributeValue const & v6=ns3::EmptyAttributeValue(), std::string n7="", ns3::AttributeValue const & v7=ns3::EmptyAttributeValue()) [member function]
-    cls.add_method('SetStackInstaller', 
-                   'void', 
-                   [param('std::string', 'type'), param('std::string', 'n0', default_value='""'), param('ns3::AttributeValue const &', 'v0', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n1', default_value='""'), param('ns3::AttributeValue const &', 'v1', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n2', default_value='""'), param('ns3::AttributeValue const &', 'v2', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n3', default_value='""'), param('ns3::AttributeValue const &', 'v3', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n4', default_value='""'), param('ns3::AttributeValue const &', 'v4', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n5', default_value='""'), param('ns3::AttributeValue const &', 'v5', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n6', default_value='""'), param('ns3::AttributeValue const &', 'v6', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n7', default_value='""'), param('ns3::AttributeValue const &', 'v7', default_value='ns3::EmptyAttributeValue()')])
-    ## wmn-helper.h (module 'wmn'): void ns3::WmnHelper::SetStandard(ns3::WifiPhyStandard standard) [member function]
-    cls.add_method('SetStandard', 
-                   'void', 
-                   [param('ns3::WifiPhyStandard', 'standard')])
-    return
-
-def register_Ns3WmnWifiBeacon_methods(root_module, cls):
-    ## wmn-wifi-beacon.h (module 'wmn'): ns3::WmnWifiBeacon::WmnWifiBeacon(ns3::WmnWifiBeacon const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::WmnWifiBeacon const &', 'arg0')])
-    ## wmn-wifi-beacon.h (module 'wmn'): ns3::WmnWifiBeacon::WmnWifiBeacon(ns3::Ssid ssid, ns3::SupportedRates rates, uint64_t us) [constructor]
-    cls.add_constructor([param('ns3::Ssid', 'ssid'), param('ns3::SupportedRates', 'rates'), param('uint64_t', 'us')])
-    ## wmn-wifi-beacon.h (module 'wmn'): void ns3::WmnWifiBeacon::AddInformationElement(ns3::Ptr<ns3::WifiInformationElement> ie) [member function]
-    cls.add_method('AddInformationElement', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::WifiInformationElement >', 'ie')])
-    ## wmn-wifi-beacon.h (module 'wmn'): ns3::MgtBeaconHeader ns3::WmnWifiBeacon::BeaconHeader() const [member function]
-    cls.add_method('BeaconHeader', 
-                   'ns3::MgtBeaconHeader', 
-                   [], 
-                   is_const=True)
-    ## wmn-wifi-beacon.h (module 'wmn'): ns3::WifiMacHeader ns3::WmnWifiBeacon::CreateHeader(ns3::Mac48Address address, ns3::Mac48Address mpAddress) [member function]
-    cls.add_method('CreateHeader', 
-                   'ns3::WifiMacHeader', 
-                   [param('ns3::Mac48Address', 'address'), param('ns3::Mac48Address', 'mpAddress')])
-    ## wmn-wifi-beacon.h (module 'wmn'): ns3::Ptr<ns3::Packet> ns3::WmnWifiBeacon::CreatePacket() [member function]
-    cls.add_method('CreatePacket', 
-                   'ns3::Ptr< ns3::Packet >', 
-                   [])
-    ## wmn-wifi-beacon.h (module 'wmn'): ns3::Time ns3::WmnWifiBeacon::GetBeaconInterval() const [member function]
-    cls.add_method('GetBeaconInterval', 
-                   'ns3::Time', 
-                   [], 
-                   is_const=True)
-    return
-
 def register_Ns3NetDeviceContainer_methods(root_module, cls):
     ## net-device-container.h (module 'network'): ns3::NetDeviceContainer::NetDeviceContainer(ns3::NetDeviceContainer const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::NetDeviceContainer const &', 'arg0')])
@@ -3704,6 +3599,88 @@ def register_Ns3WifiTxVector_methods(root_module, cls):
                    [param('uint8_t', 'powerlevel')])
     return
 
+def register_Ns3WmnHelper_methods(root_module, cls):
+    ## wmn-helper.h (module 'pmtmgmp'): ns3::WmnHelper::WmnHelper(ns3::WmnHelper const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::WmnHelper const &', 'arg0')])
+    ## wmn-helper.h (module 'pmtmgmp'): ns3::WmnHelper::WmnHelper() [constructor]
+    cls.add_constructor([])
+    ## wmn-helper.h (module 'pmtmgmp'): int64_t ns3::WmnHelper::AssignStreams(ns3::NetDeviceContainer c, int64_t stream) [member function]
+    cls.add_method('AssignStreams', 
+                   'int64_t', 
+                   [param('ns3::NetDeviceContainer', 'c'), param('int64_t', 'stream')])
+    ## wmn-helper.h (module 'pmtmgmp'): static ns3::WmnHelper ns3::WmnHelper::Default() [member function]
+    cls.add_method('Default', 
+                   'ns3::WmnHelper', 
+                   [], 
+                   is_static=True)
+    ## wmn-helper.h (module 'pmtmgmp'): ns3::NetDeviceContainer ns3::WmnHelper::Install(ns3::WifiPhyHelper const & phyHelper, ns3::NodeContainer c) const [member function]
+    cls.add_method('Install', 
+                   'ns3::NetDeviceContainer', 
+                   [param('ns3::WifiPhyHelper const &', 'phyHelper'), param('ns3::NodeContainer', 'c')], 
+                   is_const=True)
+    ## wmn-helper.h (module 'pmtmgmp'): void ns3::WmnHelper::Report(ns3::Ptr<ns3::NetDevice> const & arg0, std::ostream & arg1) [member function]
+    cls.add_method('Report', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::NetDevice > const &', 'arg0'), param('std::ostream &', 'arg1')])
+    ## wmn-helper.h (module 'pmtmgmp'): void ns3::WmnHelper::ResetStats(ns3::Ptr<ns3::NetDevice> const & arg0) [member function]
+    cls.add_method('ResetStats', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::NetDevice > const &', 'arg0')])
+    ## wmn-helper.h (module 'pmtmgmp'): void ns3::WmnHelper::SetMacType(std::string n0="", ns3::AttributeValue const & v0=ns3::EmptyAttributeValue(), std::string n1="", ns3::AttributeValue const & v1=ns3::EmptyAttributeValue(), std::string n2="", ns3::AttributeValue const & v2=ns3::EmptyAttributeValue(), std::string n3="", ns3::AttributeValue const & v3=ns3::EmptyAttributeValue(), std::string n4="", ns3::AttributeValue const & v4=ns3::EmptyAttributeValue(), std::string n5="", ns3::AttributeValue const & v5=ns3::EmptyAttributeValue(), std::string n6="", ns3::AttributeValue const & v6=ns3::EmptyAttributeValue(), std::string n7="", ns3::AttributeValue const & v7=ns3::EmptyAttributeValue()) [member function]
+    cls.add_method('SetMacType', 
+                   'void', 
+                   [param('std::string', 'n0', default_value='""'), param('ns3::AttributeValue const &', 'v0', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n1', default_value='""'), param('ns3::AttributeValue const &', 'v1', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n2', default_value='""'), param('ns3::AttributeValue const &', 'v2', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n3', default_value='""'), param('ns3::AttributeValue const &', 'v3', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n4', default_value='""'), param('ns3::AttributeValue const &', 'v4', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n5', default_value='""'), param('ns3::AttributeValue const &', 'v5', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n6', default_value='""'), param('ns3::AttributeValue const &', 'v6', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n7', default_value='""'), param('ns3::AttributeValue const &', 'v7', default_value='ns3::EmptyAttributeValue()')])
+    ## wmn-helper.h (module 'pmtmgmp'): void ns3::WmnHelper::SetNumberOfInterfaces(uint32_t nInterfaces) [member function]
+    cls.add_method('SetNumberOfInterfaces', 
+                   'void', 
+                   [param('uint32_t', 'nInterfaces')])
+    ## wmn-helper.h (module 'pmtmgmp'): void ns3::WmnHelper::SetRemoteStationManager(std::string type, std::string n0="", ns3::AttributeValue const & v0=ns3::EmptyAttributeValue(), std::string n1="", ns3::AttributeValue const & v1=ns3::EmptyAttributeValue(), std::string n2="", ns3::AttributeValue const & v2=ns3::EmptyAttributeValue(), std::string n3="", ns3::AttributeValue const & v3=ns3::EmptyAttributeValue(), std::string n4="", ns3::AttributeValue const & v4=ns3::EmptyAttributeValue(), std::string n5="", ns3::AttributeValue const & v5=ns3::EmptyAttributeValue(), std::string n6="", ns3::AttributeValue const & v6=ns3::EmptyAttributeValue(), std::string n7="", ns3::AttributeValue const & v7=ns3::EmptyAttributeValue()) [member function]
+    cls.add_method('SetRemoteStationManager', 
+                   'void', 
+                   [param('std::string', 'type'), param('std::string', 'n0', default_value='""'), param('ns3::AttributeValue const &', 'v0', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n1', default_value='""'), param('ns3::AttributeValue const &', 'v1', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n2', default_value='""'), param('ns3::AttributeValue const &', 'v2', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n3', default_value='""'), param('ns3::AttributeValue const &', 'v3', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n4', default_value='""'), param('ns3::AttributeValue const &', 'v4', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n5', default_value='""'), param('ns3::AttributeValue const &', 'v5', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n6', default_value='""'), param('ns3::AttributeValue const &', 'v6', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n7', default_value='""'), param('ns3::AttributeValue const &', 'v7', default_value='ns3::EmptyAttributeValue()')])
+    ## wmn-helper.h (module 'pmtmgmp'): void ns3::WmnHelper::SetSpreadInterfaceChannels(ns3::WmnHelper::ChannelPolicy arg0) [member function]
+    cls.add_method('SetSpreadInterfaceChannels', 
+                   'void', 
+                   [param('ns3::WmnHelper::ChannelPolicy', 'arg0')])
+    ## wmn-helper.h (module 'pmtmgmp'): void ns3::WmnHelper::SetStackInstaller(std::string type, std::string n0="", ns3::AttributeValue const & v0=ns3::EmptyAttributeValue(), std::string n1="", ns3::AttributeValue const & v1=ns3::EmptyAttributeValue(), std::string n2="", ns3::AttributeValue const & v2=ns3::EmptyAttributeValue(), std::string n3="", ns3::AttributeValue const & v3=ns3::EmptyAttributeValue(), std::string n4="", ns3::AttributeValue const & v4=ns3::EmptyAttributeValue(), std::string n5="", ns3::AttributeValue const & v5=ns3::EmptyAttributeValue(), std::string n6="", ns3::AttributeValue const & v6=ns3::EmptyAttributeValue(), std::string n7="", ns3::AttributeValue const & v7=ns3::EmptyAttributeValue()) [member function]
+    cls.add_method('SetStackInstaller', 
+                   'void', 
+                   [param('std::string', 'type'), param('std::string', 'n0', default_value='""'), param('ns3::AttributeValue const &', 'v0', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n1', default_value='""'), param('ns3::AttributeValue const &', 'v1', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n2', default_value='""'), param('ns3::AttributeValue const &', 'v2', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n3', default_value='""'), param('ns3::AttributeValue const &', 'v3', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n4', default_value='""'), param('ns3::AttributeValue const &', 'v4', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n5', default_value='""'), param('ns3::AttributeValue const &', 'v5', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n6', default_value='""'), param('ns3::AttributeValue const &', 'v6', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n7', default_value='""'), param('ns3::AttributeValue const &', 'v7', default_value='ns3::EmptyAttributeValue()')])
+    ## wmn-helper.h (module 'pmtmgmp'): void ns3::WmnHelper::SetStandard(ns3::WifiPhyStandard standard) [member function]
+    cls.add_method('SetStandard', 
+                   'void', 
+                   [param('ns3::WifiPhyStandard', 'standard')])
+    return
+
+def register_Ns3WmnWifiBeacon_methods(root_module, cls):
+    ## wmn-wifi-beacon.h (module 'pmtmgmp'): ns3::WmnWifiBeacon::WmnWifiBeacon(ns3::WmnWifiBeacon const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::WmnWifiBeacon const &', 'arg0')])
+    ## wmn-wifi-beacon.h (module 'pmtmgmp'): ns3::WmnWifiBeacon::WmnWifiBeacon(ns3::Ssid ssid, ns3::SupportedRates rates, uint64_t us) [constructor]
+    cls.add_constructor([param('ns3::Ssid', 'ssid'), param('ns3::SupportedRates', 'rates'), param('uint64_t', 'us')])
+    ## wmn-wifi-beacon.h (module 'pmtmgmp'): void ns3::WmnWifiBeacon::AddInformationElement(ns3::Ptr<ns3::WifiInformationElement> ie) [member function]
+    cls.add_method('AddInformationElement', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::WifiInformationElement >', 'ie')])
+    ## wmn-wifi-beacon.h (module 'pmtmgmp'): ns3::MgtBeaconHeader ns3::WmnWifiBeacon::BeaconHeader() const [member function]
+    cls.add_method('BeaconHeader', 
+                   'ns3::MgtBeaconHeader', 
+                   [], 
+                   is_const=True)
+    ## wmn-wifi-beacon.h (module 'pmtmgmp'): ns3::WifiMacHeader ns3::WmnWifiBeacon::CreateHeader(ns3::Mac48Address address, ns3::Mac48Address mpAddress) [member function]
+    cls.add_method('CreateHeader', 
+                   'ns3::WifiMacHeader', 
+                   [param('ns3::Mac48Address', 'address'), param('ns3::Mac48Address', 'mpAddress')])
+    ## wmn-wifi-beacon.h (module 'pmtmgmp'): ns3::Ptr<ns3::Packet> ns3::WmnWifiBeacon::CreatePacket() [member function]
+    cls.add_method('CreatePacket', 
+                   'ns3::Ptr< ns3::Packet >', 
+                   [])
+    ## wmn-wifi-beacon.h (module 'pmtmgmp'): ns3::Time ns3::WmnWifiBeacon::GetBeaconInterval() const [member function]
+    cls.add_method('GetBeaconInterval', 
+                   'ns3::Time', 
+                   [], 
+                   is_const=True)
+    return
+
 def register_Ns3Empty_methods(root_module, cls):
     ## empty.h (module 'core'): ns3::empty::empty() [constructor]
     cls.add_constructor([])
@@ -3712,10 +3689,10 @@ def register_Ns3Empty_methods(root_module, cls):
     return
 
 def register_Ns3Int64x64_t_methods(root_module, cls):
-    cls.add_binary_comparison_operator('<=')
     cls.add_binary_comparison_operator('!=')
-    cls.add_binary_numeric_operator('*', root_module['ns3::int64x64_t'], root_module['ns3::int64x64_t'], param('ns3::int64x64_t const &', u'right'))
+    cls.add_binary_comparison_operator('<=')
     cls.add_inplace_numeric_operator('+=', param('ns3::int64x64_t const &', u'right'))
+    cls.add_binary_numeric_operator('*', root_module['ns3::int64x64_t'], root_module['ns3::int64x64_t'], param('ns3::int64x64_t const &', u'right'))
     cls.add_binary_numeric_operator('+', root_module['ns3::int64x64_t'], root_module['ns3::int64x64_t'], param('ns3::int64x64_t const &', u'right'))
     cls.add_binary_numeric_operator('-', root_module['ns3::int64x64_t'], root_module['ns3::int64x64_t'], param('ns3::int64x64_t const &', u'right'))
     cls.add_unary_numeric_operator('-')
@@ -4572,18 +4549,6 @@ def register_Ns3SimpleRefCount__Ns3HashImplementation_Ns3Empty_Ns3DefaultDeleter
                    is_static=True)
     return
 
-def register_Ns3SimpleRefCount__Ns3WmnWifiInterfaceMacPlugin_Ns3Empty_Ns3DefaultDeleter__lt__ns3WmnWifiInterfaceMacPlugin__gt___methods(root_module, cls):
-    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::WmnWifiInterfaceMacPlugin, ns3::empty, ns3::DefaultDeleter<ns3::WmnWifiInterfaceMacPlugin> >::SimpleRefCount() [constructor]
-    cls.add_constructor([])
-    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::WmnWifiInterfaceMacPlugin, ns3::empty, ns3::DefaultDeleter<ns3::WmnWifiInterfaceMacPlugin> >::SimpleRefCount(ns3::SimpleRefCount<ns3::WmnWifiInterfaceMacPlugin, ns3::empty, ns3::DefaultDeleter<ns3::WmnWifiInterfaceMacPlugin> > const & o) [copy constructor]
-    cls.add_constructor([param('ns3::SimpleRefCount< ns3::WmnWifiInterfaceMacPlugin, ns3::empty, ns3::DefaultDeleter< ns3::WmnWifiInterfaceMacPlugin > > const &', 'o')])
-    ## simple-ref-count.h (module 'core'): static void ns3::SimpleRefCount<ns3::WmnWifiInterfaceMacPlugin, ns3::empty, ns3::DefaultDeleter<ns3::WmnWifiInterfaceMacPlugin> >::Cleanup() [member function]
-    cls.add_method('Cleanup', 
-                   'void', 
-                   [], 
-                   is_static=True)
-    return
-
 def register_Ns3SimpleRefCount__Ns3NixVector_Ns3Empty_Ns3DefaultDeleter__lt__ns3NixVector__gt___methods(root_module, cls):
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::NixVector, ns3::empty, ns3::DefaultDeleter<ns3::NixVector> >::SimpleRefCount() [constructor]
     cls.add_constructor([])
@@ -4644,6 +4609,18 @@ def register_Ns3SimpleRefCount__Ns3WifiInformationElement_Ns3Empty_Ns3DefaultDel
                    is_static=True)
     return
 
+def register_Ns3SimpleRefCount__Ns3WmnWifiInterfaceMacPlugin_Ns3Empty_Ns3DefaultDeleter__lt__ns3WmnWifiInterfaceMacPlugin__gt___methods(root_module, cls):
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::WmnWifiInterfaceMacPlugin, ns3::empty, ns3::DefaultDeleter<ns3::WmnWifiInterfaceMacPlugin> >::SimpleRefCount() [constructor]
+    cls.add_constructor([])
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::WmnWifiInterfaceMacPlugin, ns3::empty, ns3::DefaultDeleter<ns3::WmnWifiInterfaceMacPlugin> >::SimpleRefCount(ns3::SimpleRefCount<ns3::WmnWifiInterfaceMacPlugin, ns3::empty, ns3::DefaultDeleter<ns3::WmnWifiInterfaceMacPlugin> > const & o) [copy constructor]
+    cls.add_constructor([param('ns3::SimpleRefCount< ns3::WmnWifiInterfaceMacPlugin, ns3::empty, ns3::DefaultDeleter< ns3::WmnWifiInterfaceMacPlugin > > const &', 'o')])
+    ## simple-ref-count.h (module 'core'): static void ns3::SimpleRefCount<ns3::WmnWifiInterfaceMacPlugin, ns3::empty, ns3::DefaultDeleter<ns3::WmnWifiInterfaceMacPlugin> >::Cleanup() [member function]
+    cls.add_method('Cleanup', 
+                   'void', 
+                   [], 
+                   is_static=True)
+    return
+
 def register_Ns3SimpleRefCount__Ns3My11sDestinationAddressUnit_Ns3Empty_Ns3DefaultDeleter__lt__ns3My11sDestinationAddressUnit__gt___methods(root_module, cls):
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::my11s::DestinationAddressUnit, ns3::empty, ns3::DefaultDeleter<ns3::my11s::DestinationAddressUnit> >::SimpleRefCount() [constructor]
     cls.add_constructor([])
@@ -4669,10 +4646,10 @@ def register_Ns3SimpleRefCount__Ns3My11sIeBeaconTimingUnit_Ns3Empty_Ns3DefaultDe
     return
 
 def register_Ns3Time_methods(root_module, cls):
-    cls.add_binary_comparison_operator('<=')
     cls.add_binary_comparison_operator('!=')
-    cls.add_binary_numeric_operator('*', root_module['ns3::Time'], root_module['ns3::Time'], param('int64_t const &', u'right'))
+    cls.add_binary_comparison_operator('<=')
     cls.add_inplace_numeric_operator('+=', param('ns3::Time const &', u'right'))
+    cls.add_binary_numeric_operator('*', root_module['ns3::Time'], root_module['ns3::Time'], param('int64_t const &', u'right'))
     cls.add_binary_numeric_operator('+', root_module['ns3::Time'], root_module['ns3::Time'], param('ns3::Time const &', u'right'))
     cls.add_binary_numeric_operator('-', root_module['ns3::Time'], root_module['ns3::Time'], param('ns3::Time const &', u'right'))
     cls.add_binary_numeric_operator('/', root_module['ns3::Time'], root_module['ns3::Time'], param('int64_t const &', u'right'))
@@ -4982,8 +4959,8 @@ def register_Ns3WifiActionHeaderActionValue_methods(root_module, cls):
     cls.add_constructor([param('ns3::WifiActionHeader::ActionValue const &', 'arg0')])
     ## mgt-headers.h (module 'wifi'): ns3::WifiActionHeader::ActionValue::blockAck [variable]
     cls.add_instance_attribute('blockAck', 'ns3::WifiActionHeader::BlockAckActionValue', is_const=False)
-    ## mgt-headers.h (module 'wifi'): ns3::WifiActionHeader::ActionValue::wmnAction [variable]
-    cls.add_instance_attribute('wmnAction', 'ns3::WifiActionHeader::WmnActionValue', is_const=False)
+    ## mgt-headers.h (module 'wifi'): ns3::WifiActionHeader::ActionValue::meshAction [variable]
+    cls.add_instance_attribute('meshAction', 'ns3::WifiActionHeader::MeshActionValue', is_const=False)
     ## mgt-headers.h (module 'wifi'): ns3::WifiActionHeader::ActionValue::multihopAction [variable]
     cls.add_instance_attribute('multihopAction', 'ns3::WifiActionHeader::MultihopActionValue', is_const=False)
     ## mgt-headers.h (module 'wifi'): ns3::WifiActionHeader::ActionValue::selfProtectedAction [variable]
@@ -6968,6 +6945,103 @@ def register_Ns3WifiRemoteStationManager_methods(root_module, cls):
                    is_pure_virtual=True, is_const=True, visibility='private', is_virtual=True)
     return
 
+def register_Ns3WmnInformationElementVector_methods(root_module, cls):
+    ## wmn-information-element-vector.h (module 'pmtmgmp'): ns3::WmnInformationElementVector::WmnInformationElementVector() [constructor]
+    cls.add_constructor([])
+    ## wmn-information-element-vector.h (module 'pmtmgmp'): ns3::WmnInformationElementVector::WmnInformationElementVector(ns3::WmnInformationElementVector const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::WmnInformationElementVector const &', 'arg0')])
+    ## wmn-information-element-vector.h (module 'pmtmgmp'): uint32_t ns3::WmnInformationElementVector::DeserializeSingleIe(ns3::Buffer::Iterator start) [member function]
+    cls.add_method('DeserializeSingleIe', 
+                   'uint32_t', 
+                   [param('ns3::Buffer::Iterator', 'start')], 
+                   is_virtual=True)
+    return
+
+def register_Ns3WmnL2RoutingProtocol_methods(root_module, cls):
+    ## wmn-l2-routing-protocol.h (module 'pmtmgmp'): ns3::WmnL2RoutingProtocol::WmnL2RoutingProtocol() [constructor]
+    cls.add_constructor([])
+    ## wmn-l2-routing-protocol.h (module 'pmtmgmp'): ns3::WmnL2RoutingProtocol::WmnL2RoutingProtocol(ns3::WmnL2RoutingProtocol const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::WmnL2RoutingProtocol const &', 'arg0')])
+    ## wmn-l2-routing-protocol.h (module 'pmtmgmp'): static ns3::TypeId ns3::WmnL2RoutingProtocol::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_static=True)
+    ## wmn-l2-routing-protocol.h (module 'pmtmgmp'): ns3::Ptr<ns3::WmnPointDevice> ns3::WmnL2RoutingProtocol::GetWmnPoint() const [member function]
+    cls.add_method('GetWmnPoint', 
+                   'ns3::Ptr< ns3::WmnPointDevice >', 
+                   [], 
+                   is_const=True)
+    ## wmn-l2-routing-protocol.h (module 'pmtmgmp'): bool ns3::WmnL2RoutingProtocol::RemoveRoutingStuff(uint32_t fromIface, ns3::Mac48Address const source, ns3::Mac48Address const destination, ns3::Ptr<ns3::Packet> packet, uint16_t & protocolType) [member function]
+    cls.add_method('RemoveRoutingStuff', 
+                   'bool', 
+                   [param('uint32_t', 'fromIface'), param('ns3::Mac48Address const', 'source'), param('ns3::Mac48Address const', 'destination'), param('ns3::Ptr< ns3::Packet >', 'packet'), param('uint16_t &', 'protocolType')], 
+                   is_pure_virtual=True, is_virtual=True)
+    ## wmn-l2-routing-protocol.h (module 'pmtmgmp'): bool ns3::WmnL2RoutingProtocol::RequestRoute(uint32_t sourceIface, ns3::Mac48Address const source, ns3::Mac48Address const destination, ns3::Ptr<ns3::Packet const> packet, uint16_t protocolType, ns3::Callback<void, bool, ns3::Ptr<ns3::Packet>, ns3::Mac48Address, ns3::Mac48Address, unsigned short, unsigned int, ns3::empty, ns3::empty, ns3::empty> routeReply) [member function]
+    cls.add_method('RequestRoute', 
+                   'bool', 
+                   [param('uint32_t', 'sourceIface'), param('ns3::Mac48Address const', 'source'), param('ns3::Mac48Address const', 'destination'), param('ns3::Ptr< ns3::Packet const >', 'packet'), param('uint16_t', 'protocolType'), param('ns3::Callback< void, bool, ns3::Ptr< ns3::Packet >, ns3::Mac48Address, ns3::Mac48Address, unsigned short, unsigned int, ns3::empty, ns3::empty, ns3::empty >', 'routeReply')], 
+                   is_pure_virtual=True, is_virtual=True)
+    ## wmn-l2-routing-protocol.h (module 'pmtmgmp'): void ns3::WmnL2RoutingProtocol::SetWmnPoint(ns3::Ptr<ns3::WmnPointDevice> mp) [member function]
+    cls.add_method('SetWmnPoint', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::WmnPointDevice >', 'mp')])
+    return
+
+def register_Ns3WmnStack_methods(root_module, cls):
+    ## wmn-stack-installer.h (module 'pmtmgmp'): ns3::WmnStack::WmnStack() [constructor]
+    cls.add_constructor([])
+    ## wmn-stack-installer.h (module 'pmtmgmp'): ns3::WmnStack::WmnStack(ns3::WmnStack const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::WmnStack const &', 'arg0')])
+    ## wmn-stack-installer.h (module 'pmtmgmp'): bool ns3::WmnStack::InstallStack(ns3::Ptr<ns3::WmnPointDevice> mp) [member function]
+    cls.add_method('InstallStack', 
+                   'bool', 
+                   [param('ns3::Ptr< ns3::WmnPointDevice >', 'mp')], 
+                   is_pure_virtual=True, is_virtual=True)
+    ## wmn-stack-installer.h (module 'pmtmgmp'): void ns3::WmnStack::Report(ns3::Ptr<ns3::WmnPointDevice> const mp, std::ostream & arg1) [member function]
+    cls.add_method('Report', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::WmnPointDevice > const', 'mp'), param('std::ostream &', 'arg1')], 
+                   is_pure_virtual=True, is_virtual=True)
+    ## wmn-stack-installer.h (module 'pmtmgmp'): void ns3::WmnStack::ResetStats(ns3::Ptr<ns3::WmnPointDevice> const mp) [member function]
+    cls.add_method('ResetStats', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::WmnPointDevice > const', 'mp')], 
+                   is_pure_virtual=True, is_virtual=True)
+    return
+
+def register_Ns3WmnWifiInterfaceMacPlugin_methods(root_module, cls):
+    ## wmn-wifi-interface-mac-plugin.h (module 'pmtmgmp'): ns3::WmnWifiInterfaceMacPlugin::WmnWifiInterfaceMacPlugin() [constructor]
+    cls.add_constructor([])
+    ## wmn-wifi-interface-mac-plugin.h (module 'pmtmgmp'): ns3::WmnWifiInterfaceMacPlugin::WmnWifiInterfaceMacPlugin(ns3::WmnWifiInterfaceMacPlugin const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::WmnWifiInterfaceMacPlugin const &', 'arg0')])
+    ## wmn-wifi-interface-mac-plugin.h (module 'pmtmgmp'): int64_t ns3::WmnWifiInterfaceMacPlugin::AssignStreams(int64_t stream) [member function]
+    cls.add_method('AssignStreams', 
+                   'int64_t', 
+                   [param('int64_t', 'stream')], 
+                   is_pure_virtual=True, is_virtual=True)
+    ## wmn-wifi-interface-mac-plugin.h (module 'pmtmgmp'): bool ns3::WmnWifiInterfaceMacPlugin::Receive(ns3::Ptr<ns3::Packet> packet, ns3::WifiMacHeader const & header) [member function]
+    cls.add_method('Receive', 
+                   'bool', 
+                   [param('ns3::Ptr< ns3::Packet >', 'packet'), param('ns3::WifiMacHeader const &', 'header')], 
+                   is_pure_virtual=True, is_virtual=True)
+    ## wmn-wifi-interface-mac-plugin.h (module 'pmtmgmp'): void ns3::WmnWifiInterfaceMacPlugin::SetParent(ns3::Ptr<ns3::WmnWifiInterfaceMac> parent) [member function]
+    cls.add_method('SetParent', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::WmnWifiInterfaceMac >', 'parent')], 
+                   is_pure_virtual=True, is_virtual=True)
+    ## wmn-wifi-interface-mac-plugin.h (module 'pmtmgmp'): void ns3::WmnWifiInterfaceMacPlugin::UpdateBeacon(ns3::WmnWifiBeacon & beacon) const [member function]
+    cls.add_method('UpdateBeacon', 
+                   'void', 
+                   [param('ns3::WmnWifiBeacon &', 'beacon')], 
+                   is_pure_virtual=True, is_const=True, is_virtual=True)
+    ## wmn-wifi-interface-mac-plugin.h (module 'pmtmgmp'): bool ns3::WmnWifiInterfaceMacPlugin::UpdateOutcomingFrame(ns3::Ptr<ns3::Packet> packet, ns3::WifiMacHeader & header, ns3::Mac48Address from, ns3::Mac48Address to) [member function]
+    cls.add_method('UpdateOutcomingFrame', 
+                   'bool', 
+                   [param('ns3::Ptr< ns3::Packet >', 'packet'), param('ns3::WifiMacHeader &', 'header'), param('ns3::Mac48Address', 'from'), param('ns3::Mac48Address', 'to')], 
+                   is_pure_virtual=True, is_virtual=True)
+    return
+
 def register_Ns3AttributeAccessor_methods(root_module, cls):
     ## attribute.h (module 'core'): ns3::AttributeAccessor::AttributeAccessor(ns3::AttributeAccessor const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::AttributeAccessor const &', 'arg0')])
@@ -8341,108 +8415,43 @@ def register_Ns3Mac48AddressValue_methods(root_module, cls):
                    [param('ns3::Mac48Address const &', 'value')])
     return
 
-def register_Ns3WmnInformationElementVector_methods(root_module, cls):
-    ## wmn-information-element-vector.h (module 'wmn'): ns3::WmnInformationElementVector::WmnInformationElementVector() [constructor]
-    cls.add_constructor([])
-    ## wmn-information-element-vector.h (module 'wmn'): ns3::WmnInformationElementVector::WmnInformationElementVector(ns3::WmnInformationElementVector const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::WmnInformationElementVector const &', 'arg0')])
-    ## wmn-information-element-vector.h (module 'wmn'): uint32_t ns3::WmnInformationElementVector::DeserializeSingleIe(ns3::Buffer::Iterator start) [member function]
-    cls.add_method('DeserializeSingleIe', 
-                   'uint32_t', 
-                   [param('ns3::Buffer::Iterator', 'start')], 
-                   is_virtual=True)
-    return
-
-def register_Ns3WmnL2RoutingProtocol_methods(root_module, cls):
-    ## wmn-l2-routing-protocol.h (module 'wmn'): ns3::WmnL2RoutingProtocol::WmnL2RoutingProtocol() [constructor]
-    cls.add_constructor([])
-    ## wmn-l2-routing-protocol.h (module 'wmn'): ns3::WmnL2RoutingProtocol::WmnL2RoutingProtocol(ns3::WmnL2RoutingProtocol const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::WmnL2RoutingProtocol const &', 'arg0')])
-    ## wmn-l2-routing-protocol.h (module 'wmn'): ns3::Ptr<ns3::WmnPointDevice> ns3::WmnL2RoutingProtocol::GetWmnPoint() const [member function]
-    cls.add_method('GetWmnPoint', 
-                   'ns3::Ptr< ns3::WmnPointDevice >', 
-                   [], 
-                   is_const=True)
-    ## wmn-l2-routing-protocol.h (module 'wmn'): static ns3::TypeId ns3::WmnL2RoutingProtocol::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## wmn-l2-routing-protocol.h (module 'wmn'): bool ns3::WmnL2RoutingProtocol::RemoveRoutingStuff(uint32_t fromIface, ns3::Mac48Address const source, ns3::Mac48Address const destination, ns3::Ptr<ns3::Packet> packet, uint16_t & protocolType) [member function]
-    cls.add_method('RemoveRoutingStuff', 
-                   'bool', 
-                   [param('uint32_t', 'fromIface'), param('ns3::Mac48Address const', 'source'), param('ns3::Mac48Address const', 'destination'), param('ns3::Ptr< ns3::Packet >', 'packet'), param('uint16_t &', 'protocolType')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## wmn-l2-routing-protocol.h (module 'wmn'): bool ns3::WmnL2RoutingProtocol::RequestRoute(uint32_t sourceIface, ns3::Mac48Address const source, ns3::Mac48Address const destination, ns3::Ptr<ns3::Packet const> packet, uint16_t protocolType, ns3::Callback<void, bool, ns3::Ptr<ns3::Packet>, ns3::Mac48Address, ns3::Mac48Address, unsigned short, unsigned int, ns3::empty, ns3::empty, ns3::empty> routeReply) [member function]
-    cls.add_method('RequestRoute', 
-                   'bool', 
-                   [param('uint32_t', 'sourceIface'), param('ns3::Mac48Address const', 'source'), param('ns3::Mac48Address const', 'destination'), param('ns3::Ptr< ns3::Packet const >', 'packet'), param('uint16_t', 'protocolType'), param('ns3::Callback< void, bool, ns3::Ptr< ns3::Packet >, ns3::Mac48Address, ns3::Mac48Address, unsigned short, unsigned int, ns3::empty, ns3::empty, ns3::empty >', 'routeReply')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## wmn-l2-routing-protocol.h (module 'wmn'): void ns3::WmnL2RoutingProtocol::SetWmnPoint(ns3::Ptr<ns3::WmnPointDevice> mp) [member function]
-    cls.add_method('SetWmnPoint', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::WmnPointDevice >', 'mp')])
-    return
-
-def register_Ns3WmnStack_methods(root_module, cls):
-    ## wmn-stack-installer.h (module 'wmn'): ns3::WmnStack::WmnStack() [constructor]
-    cls.add_constructor([])
-    ## wmn-stack-installer.h (module 'wmn'): ns3::WmnStack::WmnStack(ns3::WmnStack const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::WmnStack const &', 'arg0')])
-    ## wmn-stack-installer.h (module 'wmn'): bool ns3::WmnStack::InstallStack(ns3::Ptr<ns3::WmnPointDevice> mp) [member function]
-    cls.add_method('InstallStack', 
-                   'bool', 
-                   [param('ns3::Ptr< ns3::WmnPointDevice >', 'mp')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## wmn-stack-installer.h (module 'wmn'): void ns3::WmnStack::Report(ns3::Ptr<ns3::WmnPointDevice> const mp, std::ostream & arg1) [member function]
-    cls.add_method('Report', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::WmnPointDevice > const', 'mp'), param('std::ostream &', 'arg1')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## wmn-stack-installer.h (module 'wmn'): void ns3::WmnStack::ResetStats(ns3::Ptr<ns3::WmnPointDevice> const mp) [member function]
-    cls.add_method('ResetStats', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::WmnPointDevice > const', 'mp')], 
-                   is_pure_virtual=True, is_virtual=True)
-    return
-
-def register_Ns3WmnWifiInterfaceMacPlugin_methods(root_module, cls):
-    ## wmn-wifi-interface-mac-plugin.h (module 'wmn'): ns3::WmnWifiInterfaceMacPlugin::WmnWifiInterfaceMacPlugin() [constructor]
-    cls.add_constructor([])
-    ## wmn-wifi-interface-mac-plugin.h (module 'wmn'): ns3::WmnWifiInterfaceMacPlugin::WmnWifiInterfaceMacPlugin(ns3::WmnWifiInterfaceMacPlugin const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::WmnWifiInterfaceMacPlugin const &', 'arg0')])
-    ## wmn-wifi-interface-mac-plugin.h (module 'wmn'): int64_t ns3::WmnWifiInterfaceMacPlugin::AssignStreams(int64_t stream) [member function]
-    cls.add_method('AssignStreams', 
-                   'int64_t', 
-                   [param('int64_t', 'stream')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## wmn-wifi-interface-mac-plugin.h (module 'wmn'): bool ns3::WmnWifiInterfaceMacPlugin::Receive(ns3::Ptr<ns3::Packet> packet, ns3::WifiMacHeader const & header) [member function]
-    cls.add_method('Receive', 
-                   'bool', 
-                   [param('ns3::Ptr< ns3::Packet >', 'packet'), param('ns3::WifiMacHeader const &', 'header')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## wmn-wifi-interface-mac-plugin.h (module 'wmn'): void ns3::WmnWifiInterfaceMacPlugin::SetParent(ns3::Ptr<ns3::WmnWifiInterfaceMac> parent) [member function]
-    cls.add_method('SetParent', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::WmnWifiInterfaceMac >', 'parent')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## wmn-wifi-interface-mac-plugin.h (module 'wmn'): void ns3::WmnWifiInterfaceMacPlugin::UpdateBeacon(ns3::WmnWifiBeacon & beacon) const [member function]
-    cls.add_method('UpdateBeacon', 
-                   'void', 
-                   [param('ns3::WmnWifiBeacon &', 'beacon')], 
-                   is_pure_virtual=True, is_const=True, is_virtual=True)
-    ## wmn-wifi-interface-mac-plugin.h (module 'wmn'): bool ns3::WmnWifiInterfaceMacPlugin::UpdateOutcomingFrame(ns3::Ptr<ns3::Packet> packet, ns3::WifiMacHeader & header, ns3::Mac48Address from, ns3::Mac48Address to) [member function]
-    cls.add_method('UpdateOutcomingFrame', 
-                   'bool', 
-                   [param('ns3::Ptr< ns3::Packet >', 'packet'), param('ns3::WifiMacHeader &', 'header'), param('ns3::Mac48Address', 'from'), param('ns3::Mac48Address', 'to')], 
-                   is_pure_virtual=True, is_virtual=True)
-    return
-
 def register_Ns3MgtBeaconHeader_methods(root_module, cls):
     ## mgt-headers.h (module 'wifi'): ns3::MgtBeaconHeader::MgtBeaconHeader() [constructor]
     cls.add_constructor([])
     ## mgt-headers.h (module 'wifi'): ns3::MgtBeaconHeader::MgtBeaconHeader(ns3::MgtBeaconHeader const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::MgtBeaconHeader const &', 'arg0')])
+    return
+
+def register_Ns3My11sStack_methods(root_module, cls):
+    ## my11s-installer.h (module 'pmtmgmp'): ns3::My11sStack::My11sStack(ns3::My11sStack const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::My11sStack const &', 'arg0')])
+    ## my11s-installer.h (module 'pmtmgmp'): ns3::My11sStack::My11sStack() [constructor]
+    cls.add_constructor([])
+    ## my11s-installer.h (module 'pmtmgmp'): void ns3::My11sStack::DoDispose() [member function]
+    cls.add_method('DoDispose', 
+                   'void', 
+                   [], 
+                   is_virtual=True)
+    ## my11s-installer.h (module 'pmtmgmp'): static ns3::TypeId ns3::My11sStack::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_static=True)
+    ## my11s-installer.h (module 'pmtmgmp'): bool ns3::My11sStack::InstallStack(ns3::Ptr<ns3::WmnPointDevice> mp) [member function]
+    cls.add_method('InstallStack', 
+                   'bool', 
+                   [param('ns3::Ptr< ns3::WmnPointDevice >', 'mp')], 
+                   is_virtual=True)
+    ## my11s-installer.h (module 'pmtmgmp'): void ns3::My11sStack::Report(ns3::Ptr<ns3::WmnPointDevice> const mp, std::ostream & arg1) [member function]
+    cls.add_method('Report', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::WmnPointDevice > const', 'mp'), param('std::ostream &', 'arg1')], 
+                   is_virtual=True)
+    ## my11s-installer.h (module 'pmtmgmp'): void ns3::My11sStack::ResetStats(ns3::Ptr<ns3::WmnPointDevice> const mp) [member function]
+    cls.add_method('ResetStats', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::WmnPointDevice > const', 'mp')], 
+                   is_virtual=True)
     return
 
 def register_Ns3NetDevice_methods(root_module, cls):
@@ -9529,6 +9538,318 @@ def register_Ns3WifiModeValue_methods(root_module, cls):
                    [param('ns3::WifiMode const &', 'value')])
     return
 
+def register_Ns3WmnPointDevice_methods(root_module, cls):
+    ## wmn-point-device.h (module 'pmtmgmp'): ns3::WmnPointDevice::WmnPointDevice(ns3::WmnPointDevice const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::WmnPointDevice const &', 'arg0')])
+    ## wmn-point-device.h (module 'pmtmgmp'): ns3::WmnPointDevice::WmnPointDevice() [constructor]
+    cls.add_constructor([])
+    ## wmn-point-device.h (module 'pmtmgmp'): void ns3::WmnPointDevice::AddInterface(ns3::Ptr<ns3::NetDevice> port) [member function]
+    cls.add_method('AddInterface', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::NetDevice >', 'port')])
+    ## wmn-point-device.h (module 'pmtmgmp'): void ns3::WmnPointDevice::AddLinkChangeCallback(ns3::Callback<void, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> callback) [member function]
+    cls.add_method('AddLinkChangeCallback', 
+                   'void', 
+                   [param('ns3::Callback< void, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'callback')], 
+                   is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): void ns3::WmnPointDevice::DoDispose() [member function]
+    cls.add_method('DoDispose', 
+                   'void', 
+                   [], 
+                   is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): ns3::Address ns3::WmnPointDevice::GetAddress() const [member function]
+    cls.add_method('GetAddress', 
+                   'ns3::Address', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): ns3::Address ns3::WmnPointDevice::GetBroadcast() const [member function]
+    cls.add_method('GetBroadcast', 
+                   'ns3::Address', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): ns3::Ptr<ns3::Channel> ns3::WmnPointDevice::GetChannel() const [member function]
+    cls.add_method('GetChannel', 
+                   'ns3::Ptr< ns3::Channel >', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): uint32_t ns3::WmnPointDevice::GetIfIndex() const [member function]
+    cls.add_method('GetIfIndex', 
+                   'uint32_t', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): ns3::Ptr<ns3::NetDevice> ns3::WmnPointDevice::GetInterface(uint32_t id) const [member function]
+    cls.add_method('GetInterface', 
+                   'ns3::Ptr< ns3::NetDevice >', 
+                   [param('uint32_t', 'id')], 
+                   is_const=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): std::vector<ns3::Ptr<ns3::NetDevice>, std::allocator<ns3::Ptr<ns3::NetDevice> > > ns3::WmnPointDevice::GetInterfaces() const [member function]
+    cls.add_method('GetInterfaces', 
+                   'std::vector< ns3::Ptr< ns3::NetDevice > >', 
+                   [], 
+                   is_const=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): uint16_t ns3::WmnPointDevice::GetMtu() const [member function]
+    cls.add_method('GetMtu', 
+                   'uint16_t', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): ns3::Address ns3::WmnPointDevice::GetMulticast(ns3::Ipv4Address multicastGroup) const [member function]
+    cls.add_method('GetMulticast', 
+                   'ns3::Address', 
+                   [param('ns3::Ipv4Address', 'multicastGroup')], 
+                   is_const=True, is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): ns3::Address ns3::WmnPointDevice::GetMulticast(ns3::Ipv6Address addr) const [member function]
+    cls.add_method('GetMulticast', 
+                   'ns3::Address', 
+                   [param('ns3::Ipv6Address', 'addr')], 
+                   is_const=True, is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): uint32_t ns3::WmnPointDevice::GetNInterfaces() const [member function]
+    cls.add_method('GetNInterfaces', 
+                   'uint32_t', 
+                   [], 
+                   is_const=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): ns3::Ptr<ns3::Node> ns3::WmnPointDevice::GetNode() const [member function]
+    cls.add_method('GetNode', 
+                   'ns3::Ptr< ns3::Node >', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): ns3::Ptr<ns3::WmnL2RoutingProtocol> ns3::WmnPointDevice::GetRoutingProtocol() const [member function]
+    cls.add_method('GetRoutingProtocol', 
+                   'ns3::Ptr< ns3::WmnL2RoutingProtocol >', 
+                   [], 
+                   is_const=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): static ns3::TypeId ns3::WmnPointDevice::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_static=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): bool ns3::WmnPointDevice::IsBridge() const [member function]
+    cls.add_method('IsBridge', 
+                   'bool', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): bool ns3::WmnPointDevice::IsBroadcast() const [member function]
+    cls.add_method('IsBroadcast', 
+                   'bool', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): bool ns3::WmnPointDevice::IsLinkUp() const [member function]
+    cls.add_method('IsLinkUp', 
+                   'bool', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): bool ns3::WmnPointDevice::IsMulticast() const [member function]
+    cls.add_method('IsMulticast', 
+                   'bool', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): bool ns3::WmnPointDevice::IsPointToPoint() const [member function]
+    cls.add_method('IsPointToPoint', 
+                   'bool', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): bool ns3::WmnPointDevice::NeedsArp() const [member function]
+    cls.add_method('NeedsArp', 
+                   'bool', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): void ns3::WmnPointDevice::Report(std::ostream & os) const [member function]
+    cls.add_method('Report', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): void ns3::WmnPointDevice::ResetStats() [member function]
+    cls.add_method('ResetStats', 
+                   'void', 
+                   [])
+    ## wmn-point-device.h (module 'pmtmgmp'): bool ns3::WmnPointDevice::Send(ns3::Ptr<ns3::Packet> packet, ns3::Address const & dest, uint16_t protocolNumber) [member function]
+    cls.add_method('Send', 
+                   'bool', 
+                   [param('ns3::Ptr< ns3::Packet >', 'packet'), param('ns3::Address const &', 'dest'), param('uint16_t', 'protocolNumber')], 
+                   is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): bool ns3::WmnPointDevice::SendFrom(ns3::Ptr<ns3::Packet> packet, ns3::Address const & source, ns3::Address const & dest, uint16_t protocolNumber) [member function]
+    cls.add_method('SendFrom', 
+                   'bool', 
+                   [param('ns3::Ptr< ns3::Packet >', 'packet'), param('ns3::Address const &', 'source'), param('ns3::Address const &', 'dest'), param('uint16_t', 'protocolNumber')], 
+                   is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): void ns3::WmnPointDevice::SetAddress(ns3::Address a) [member function]
+    cls.add_method('SetAddress', 
+                   'void', 
+                   [param('ns3::Address', 'a')], 
+                   is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): void ns3::WmnPointDevice::SetIfIndex(uint32_t const index) [member function]
+    cls.add_method('SetIfIndex', 
+                   'void', 
+                   [param('uint32_t const', 'index')], 
+                   is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): bool ns3::WmnPointDevice::SetMtu(uint16_t const mtu) [member function]
+    cls.add_method('SetMtu', 
+                   'bool', 
+                   [param('uint16_t const', 'mtu')], 
+                   is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): void ns3::WmnPointDevice::SetNode(ns3::Ptr<ns3::Node> node) [member function]
+    cls.add_method('SetNode', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::Node >', 'node')], 
+                   is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): void ns3::WmnPointDevice::SetPromiscReceiveCallback(ns3::Callback<bool, ns3::Ptr<ns3::NetDevice>, ns3::Ptr<ns3::Packet const>, unsigned short, ns3::Address const&, ns3::Address const&, ns3::NetDevice::PacketType, ns3::empty, ns3::empty, ns3::empty> cb) [member function]
+    cls.add_method('SetPromiscReceiveCallback', 
+                   'void', 
+                   [param('ns3::Callback< bool, ns3::Ptr< ns3::NetDevice >, ns3::Ptr< ns3::Packet const >, unsigned short, ns3::Address const &, ns3::Address const &, ns3::NetDevice::PacketType, ns3::empty, ns3::empty, ns3::empty >', 'cb')], 
+                   is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): void ns3::WmnPointDevice::SetReceiveCallback(ns3::Callback<bool, ns3::Ptr<ns3::NetDevice>, ns3::Ptr<ns3::Packet const>, unsigned short, ns3::Address const&, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> cb) [member function]
+    cls.add_method('SetReceiveCallback', 
+                   'void', 
+                   [param('ns3::Callback< bool, ns3::Ptr< ns3::NetDevice >, ns3::Ptr< ns3::Packet const >, unsigned short, ns3::Address const &, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'cb')], 
+                   is_virtual=True)
+    ## wmn-point-device.h (module 'pmtmgmp'): void ns3::WmnPointDevice::SetRoutingProtocol(ns3::Ptr<ns3::WmnL2RoutingProtocol> protocol) [member function]
+    cls.add_method('SetRoutingProtocol', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::WmnL2RoutingProtocol >', 'protocol')])
+    ## wmn-point-device.h (module 'pmtmgmp'): bool ns3::WmnPointDevice::SupportsSendFrom() const [member function]
+    cls.add_method('SupportsSendFrom', 
+                   'bool', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    return
+
+def register_Ns3WmnWifiInterfaceMac_methods(root_module, cls):
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): ns3::WmnWifiInterfaceMac::WmnWifiInterfaceMac() [constructor]
+    cls.add_constructor([])
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): int64_t ns3::WmnWifiInterfaceMac::AssignStreams(int64_t stream) [member function]
+    cls.add_method('AssignStreams', 
+                   'int64_t', 
+                   [param('int64_t', 'stream')])
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): bool ns3::WmnWifiInterfaceMac::CheckSupportedRates(ns3::SupportedRates rates) const [member function]
+    cls.add_method('CheckSupportedRates', 
+                   'bool', 
+                   [param('ns3::SupportedRates', 'rates')], 
+                   is_const=True)
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): void ns3::WmnWifiInterfaceMac::Enqueue(ns3::Ptr<ns3::Packet const> packet, ns3::Mac48Address to, ns3::Mac48Address from) [member function]
+    cls.add_method('Enqueue', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::Packet const >', 'packet'), param('ns3::Mac48Address', 'to'), param('ns3::Mac48Address', 'from')], 
+                   is_virtual=True)
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): void ns3::WmnWifiInterfaceMac::Enqueue(ns3::Ptr<ns3::Packet const> packet, ns3::Mac48Address to) [member function]
+    cls.add_method('Enqueue', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::Packet const >', 'packet'), param('ns3::Mac48Address', 'to')], 
+                   is_virtual=True)
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): void ns3::WmnWifiInterfaceMac::FinishConfigureStandard(ns3::WifiPhyStandard standard) [member function]
+    cls.add_method('FinishConfigureStandard', 
+                   'void', 
+                   [param('ns3::WifiPhyStandard', 'standard')], 
+                   is_virtual=True)
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): ns3::Time ns3::WmnWifiInterfaceMac::GetBeaconInterval() const [member function]
+    cls.add_method('GetBeaconInterval', 
+                   'ns3::Time', 
+                   [], 
+                   is_const=True)
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): uint16_t ns3::WmnWifiInterfaceMac::GetFrequencyChannel() const [member function]
+    cls.add_method('GetFrequencyChannel', 
+                   'uint16_t', 
+                   [], 
+                   is_const=True)
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): uint32_t ns3::WmnWifiInterfaceMac::GetLinkMetric(ns3::Mac48Address peerAddress) [member function]
+    cls.add_method('GetLinkMetric', 
+                   'uint32_t', 
+                   [param('ns3::Mac48Address', 'peerAddress')])
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): ns3::WifiPhyStandard ns3::WmnWifiInterfaceMac::GetPhyStandard() const [member function]
+    cls.add_method('GetPhyStandard', 
+                   'ns3::WifiPhyStandard', 
+                   [], 
+                   is_const=True)
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): ns3::SupportedRates ns3::WmnWifiInterfaceMac::GetSupportedRates() const [member function]
+    cls.add_method('GetSupportedRates', 
+                   'ns3::SupportedRates', 
+                   [], 
+                   is_const=True)
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): ns3::Time ns3::WmnWifiInterfaceMac::GetTbtt() const [member function]
+    cls.add_method('GetTbtt', 
+                   'ns3::Time', 
+                   [], 
+                   is_const=True)
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): static ns3::TypeId ns3::WmnWifiInterfaceMac::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_static=True)
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): ns3::Mac48Address ns3::WmnWifiInterfaceMac::GetWmnPointAddress() const [member function]
+    cls.add_method('GetWmnPointAddress', 
+                   'ns3::Mac48Address', 
+                   [], 
+                   is_const=True)
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): void ns3::WmnWifiInterfaceMac::InstallPlugin(ns3::Ptr<ns3::WmnWifiInterfaceMacPlugin> plugin) [member function]
+    cls.add_method('InstallPlugin', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::WmnWifiInterfaceMacPlugin >', 'plugin')])
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): void ns3::WmnWifiInterfaceMac::Report(std::ostream & arg0) const [member function]
+    cls.add_method('Report', 
+                   'void', 
+                   [param('std::ostream &', 'arg0')], 
+                   is_const=True)
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): void ns3::WmnWifiInterfaceMac::ResetStats() [member function]
+    cls.add_method('ResetStats', 
+                   'void', 
+                   [])
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): void ns3::WmnWifiInterfaceMac::SendManagementFrame(ns3::Ptr<ns3::Packet> frame, ns3::WifiMacHeader const & hdr) [member function]
+    cls.add_method('SendManagementFrame', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::Packet >', 'frame'), param('ns3::WifiMacHeader const &', 'hdr')])
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): void ns3::WmnWifiInterfaceMac::SetBeaconGeneration(bool enable) [member function]
+    cls.add_method('SetBeaconGeneration', 
+                   'void', 
+                   [param('bool', 'enable')])
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): void ns3::WmnWifiInterfaceMac::SetBeaconInterval(ns3::Time interval) [member function]
+    cls.add_method('SetBeaconInterval', 
+                   'void', 
+                   [param('ns3::Time', 'interval')])
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): void ns3::WmnWifiInterfaceMac::SetLinkMetricCallback(ns3::Callback<unsigned int, ns3::Mac48Address, ns3::Ptr<ns3::WmnWifiInterfaceMac>, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> cb) [member function]
+    cls.add_method('SetLinkMetricCallback', 
+                   'void', 
+                   [param('ns3::Callback< unsigned int, ns3::Mac48Address, ns3::Ptr< ns3::WmnWifiInterfaceMac >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'cb')])
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): void ns3::WmnWifiInterfaceMac::SetLinkUpCallback(ns3::Callback<void, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> linkUp) [member function]
+    cls.add_method('SetLinkUpCallback', 
+                   'void', 
+                   [param('ns3::Callback< void, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'linkUp')], 
+                   is_virtual=True)
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): void ns3::WmnWifiInterfaceMac::SetRandomStartDelay(ns3::Time interval) [member function]
+    cls.add_method('SetRandomStartDelay', 
+                   'void', 
+                   [param('ns3::Time', 'interval')])
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): void ns3::WmnWifiInterfaceMac::SetWmnPointAddress(ns3::Mac48Address arg0) [member function]
+    cls.add_method('SetWmnPointAddress', 
+                   'void', 
+                   [param('ns3::Mac48Address', 'arg0')])
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): void ns3::WmnWifiInterfaceMac::ShiftTbtt(ns3::Time shift) [member function]
+    cls.add_method('ShiftTbtt', 
+                   'void', 
+                   [param('ns3::Time', 'shift')])
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): bool ns3::WmnWifiInterfaceMac::SupportsSendFrom() const [member function]
+    cls.add_method('SupportsSendFrom', 
+                   'bool', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): void ns3::WmnWifiInterfaceMac::SwitchFrequencyChannel(uint16_t new_id) [member function]
+    cls.add_method('SwitchFrequencyChannel', 
+                   'void', 
+                   [param('uint16_t', 'new_id')])
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): void ns3::WmnWifiInterfaceMac::DoDispose() [member function]
+    cls.add_method('DoDispose', 
+                   'void', 
+                   [], 
+                   visibility='private', is_virtual=True)
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): void ns3::WmnWifiInterfaceMac::DoInitialize() [member function]
+    cls.add_method('DoInitialize', 
+                   'void', 
+                   [], 
+                   visibility='private', is_virtual=True)
+    ## wmn-wifi-interface-mac.h (module 'pmtmgmp'): void ns3::WmnWifiInterfaceMac::Receive(ns3::Ptr<ns3::Packet> packet, ns3::WifiMacHeader const * hdr) [member function]
+    cls.add_method('Receive', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::Packet >', 'packet'), param('ns3::WifiMacHeader const *', 'hdr')], 
+                   visibility='private', is_virtual=True)
+    return
+
 def register_Ns3AddressChecker_methods(root_module, cls):
     ## address.h (module 'network'): ns3::AddressChecker::AddressChecker() [constructor]
     cls.add_constructor([])
@@ -9680,382 +10001,6 @@ def register_Ns3DcaTxop_methods(root_module, cls):
                    visibility='private', is_virtual=True)
     return
 
-def register_Ns3My11sStack_methods(root_module, cls):
-    ## my11s-installer.h (module 'wmn'): ns3::My11sStack::My11sStack(ns3::My11sStack const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::My11sStack const &', 'arg0')])
-    ## my11s-installer.h (module 'wmn'): ns3::My11sStack::My11sStack() [constructor]
-    cls.add_constructor([])
-    ## my11s-installer.h (module 'wmn'): void ns3::My11sStack::DoDispose() [member function]
-    cls.add_method('DoDispose', 
-                   'void', 
-                   [], 
-                   is_virtual=True)
-    ## my11s-installer.h (module 'wmn'): static ns3::TypeId ns3::My11sStack::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## my11s-installer.h (module 'wmn'): bool ns3::My11sStack::InstallStack(ns3::Ptr<ns3::WmnPointDevice> mp) [member function]
-    cls.add_method('InstallStack', 
-                   'bool', 
-                   [param('ns3::Ptr< ns3::WmnPointDevice >', 'mp')], 
-                   is_virtual=True)
-    ## my11s-installer.h (module 'wmn'): void ns3::My11sStack::Report(ns3::Ptr<ns3::WmnPointDevice> const mp, std::ostream & arg1) [member function]
-    cls.add_method('Report', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::WmnPointDevice > const', 'mp'), param('std::ostream &', 'arg1')], 
-                   is_virtual=True)
-    ## my11s-installer.h (module 'wmn'): void ns3::My11sStack::ResetStats(ns3::Ptr<ns3::WmnPointDevice> const mp) [member function]
-    cls.add_method('ResetStats', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::WmnPointDevice > const', 'mp')], 
-                   is_virtual=True)
-    return
-
-def register_Ns3FlameStack_methods(root_module, cls):
-    ## flame-installer.h (module 'wmn'): ns3::FlameStack::FlameStack(ns3::FlameStack const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::FlameStack const &', 'arg0')])
-    ## flame-installer.h (module 'wmn'): ns3::FlameStack::FlameStack() [constructor]
-    cls.add_constructor([])
-    ## flame-installer.h (module 'wmn'): void ns3::FlameStack::DoDispose() [member function]
-    cls.add_method('DoDispose', 
-                   'void', 
-                   [], 
-                   is_virtual=True)
-    ## flame-installer.h (module 'wmn'): static ns3::TypeId ns3::FlameStack::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## flame-installer.h (module 'wmn'): bool ns3::FlameStack::InstallStack(ns3::Ptr<ns3::WmnPointDevice> mp) [member function]
-    cls.add_method('InstallStack', 
-                   'bool', 
-                   [param('ns3::Ptr< ns3::WmnPointDevice >', 'mp')], 
-                   is_virtual=True)
-    ## flame-installer.h (module 'wmn'): void ns3::FlameStack::Report(ns3::Ptr<ns3::WmnPointDevice> const mp, std::ostream & arg1) [member function]
-    cls.add_method('Report', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::WmnPointDevice > const', 'mp'), param('std::ostream &', 'arg1')], 
-                   is_virtual=True)
-    ## flame-installer.h (module 'wmn'): void ns3::FlameStack::ResetStats(ns3::Ptr<ns3::WmnPointDevice> const mp) [member function]
-    cls.add_method('ResetStats', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::WmnPointDevice > const', 'mp')], 
-                   is_virtual=True)
-    return
-
-def register_Ns3WmnPointDevice_methods(root_module, cls):
-    ## wmn-point-device.h (module 'wmn'): ns3::WmnPointDevice::WmnPointDevice(ns3::WmnPointDevice const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::WmnPointDevice const &', 'arg0')])
-    ## wmn-point-device.h (module 'wmn'): ns3::WmnPointDevice::WmnPointDevice() [constructor]
-    cls.add_constructor([])
-    ## wmn-point-device.h (module 'wmn'): void ns3::WmnPointDevice::AddInterface(ns3::Ptr<ns3::NetDevice> port) [member function]
-    cls.add_method('AddInterface', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::NetDevice >', 'port')])
-    ## wmn-point-device.h (module 'wmn'): void ns3::WmnPointDevice::AddLinkChangeCallback(ns3::Callback<void, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> callback) [member function]
-    cls.add_method('AddLinkChangeCallback', 
-                   'void', 
-                   [param('ns3::Callback< void, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'callback')], 
-                   is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): void ns3::WmnPointDevice::DoDispose() [member function]
-    cls.add_method('DoDispose', 
-                   'void', 
-                   [], 
-                   is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): ns3::Address ns3::WmnPointDevice::GetAddress() const [member function]
-    cls.add_method('GetAddress', 
-                   'ns3::Address', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): ns3::Address ns3::WmnPointDevice::GetBroadcast() const [member function]
-    cls.add_method('GetBroadcast', 
-                   'ns3::Address', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): ns3::Ptr<ns3::Channel> ns3::WmnPointDevice::GetChannel() const [member function]
-    cls.add_method('GetChannel', 
-                   'ns3::Ptr< ns3::Channel >', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): uint32_t ns3::WmnPointDevice::GetIfIndex() const [member function]
-    cls.add_method('GetIfIndex', 
-                   'uint32_t', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): ns3::Ptr<ns3::NetDevice> ns3::WmnPointDevice::GetInterface(uint32_t id) const [member function]
-    cls.add_method('GetInterface', 
-                   'ns3::Ptr< ns3::NetDevice >', 
-                   [param('uint32_t', 'id')], 
-                   is_const=True)
-    ## wmn-point-device.h (module 'wmn'): std::vector<ns3::Ptr<ns3::NetDevice>, std::allocator<ns3::Ptr<ns3::NetDevice> > > ns3::WmnPointDevice::GetInterfaces() const [member function]
-    cls.add_method('GetInterfaces', 
-                   'std::vector< ns3::Ptr< ns3::NetDevice > >', 
-                   [], 
-                   is_const=True)
-    ## wmn-point-device.h (module 'wmn'): uint16_t ns3::WmnPointDevice::GetMtu() const [member function]
-    cls.add_method('GetMtu', 
-                   'uint16_t', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): ns3::Address ns3::WmnPointDevice::GetMulticast(ns3::Ipv4Address multicastGroup) const [member function]
-    cls.add_method('GetMulticast', 
-                   'ns3::Address', 
-                   [param('ns3::Ipv4Address', 'multicastGroup')], 
-                   is_const=True, is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): ns3::Address ns3::WmnPointDevice::GetMulticast(ns3::Ipv6Address addr) const [member function]
-    cls.add_method('GetMulticast', 
-                   'ns3::Address', 
-                   [param('ns3::Ipv6Address', 'addr')], 
-                   is_const=True, is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): uint32_t ns3::WmnPointDevice::GetNInterfaces() const [member function]
-    cls.add_method('GetNInterfaces', 
-                   'uint32_t', 
-                   [], 
-                   is_const=True)
-    ## wmn-point-device.h (module 'wmn'): ns3::Ptr<ns3::Node> ns3::WmnPointDevice::GetNode() const [member function]
-    cls.add_method('GetNode', 
-                   'ns3::Ptr< ns3::Node >', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): ns3::Ptr<ns3::WmnL2RoutingProtocol> ns3::WmnPointDevice::GetRoutingProtocol() const [member function]
-    cls.add_method('GetRoutingProtocol', 
-                   'ns3::Ptr< ns3::WmnL2RoutingProtocol >', 
-                   [], 
-                   is_const=True)
-    ## wmn-point-device.h (module 'wmn'): static ns3::TypeId ns3::WmnPointDevice::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## wmn-point-device.h (module 'wmn'): bool ns3::WmnPointDevice::IsBridge() const [member function]
-    cls.add_method('IsBridge', 
-                   'bool', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): bool ns3::WmnPointDevice::IsBroadcast() const [member function]
-    cls.add_method('IsBroadcast', 
-                   'bool', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): bool ns3::WmnPointDevice::IsLinkUp() const [member function]
-    cls.add_method('IsLinkUp', 
-                   'bool', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): bool ns3::WmnPointDevice::IsMulticast() const [member function]
-    cls.add_method('IsMulticast', 
-                   'bool', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): bool ns3::WmnPointDevice::IsPointToPoint() const [member function]
-    cls.add_method('IsPointToPoint', 
-                   'bool', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): bool ns3::WmnPointDevice::NeedsArp() const [member function]
-    cls.add_method('NeedsArp', 
-                   'bool', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): void ns3::WmnPointDevice::Report(std::ostream & os) const [member function]
-    cls.add_method('Report', 
-                   'void', 
-                   [param('std::ostream &', 'os')], 
-                   is_const=True)
-    ## wmn-point-device.h (module 'wmn'): void ns3::WmnPointDevice::ResetStats() [member function]
-    cls.add_method('ResetStats', 
-                   'void', 
-                   [])
-    ## wmn-point-device.h (module 'wmn'): bool ns3::WmnPointDevice::Send(ns3::Ptr<ns3::Packet> packet, ns3::Address const & dest, uint16_t protocolNumber) [member function]
-    cls.add_method('Send', 
-                   'bool', 
-                   [param('ns3::Ptr< ns3::Packet >', 'packet'), param('ns3::Address const &', 'dest'), param('uint16_t', 'protocolNumber')], 
-                   is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): bool ns3::WmnPointDevice::SendFrom(ns3::Ptr<ns3::Packet> packet, ns3::Address const & source, ns3::Address const & dest, uint16_t protocolNumber) [member function]
-    cls.add_method('SendFrom', 
-                   'bool', 
-                   [param('ns3::Ptr< ns3::Packet >', 'packet'), param('ns3::Address const &', 'source'), param('ns3::Address const &', 'dest'), param('uint16_t', 'protocolNumber')], 
-                   is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): void ns3::WmnPointDevice::SetAddress(ns3::Address a) [member function]
-    cls.add_method('SetAddress', 
-                   'void', 
-                   [param('ns3::Address', 'a')], 
-                   is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): void ns3::WmnPointDevice::SetIfIndex(uint32_t const index) [member function]
-    cls.add_method('SetIfIndex', 
-                   'void', 
-                   [param('uint32_t const', 'index')], 
-                   is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): bool ns3::WmnPointDevice::SetMtu(uint16_t const mtu) [member function]
-    cls.add_method('SetMtu', 
-                   'bool', 
-                   [param('uint16_t const', 'mtu')], 
-                   is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): void ns3::WmnPointDevice::SetNode(ns3::Ptr<ns3::Node> node) [member function]
-    cls.add_method('SetNode', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Node >', 'node')], 
-                   is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): void ns3::WmnPointDevice::SetPromiscReceiveCallback(ns3::Callback<bool, ns3::Ptr<ns3::NetDevice>, ns3::Ptr<ns3::Packet const>, unsigned short, ns3::Address const&, ns3::Address const&, ns3::NetDevice::PacketType, ns3::empty, ns3::empty, ns3::empty> cb) [member function]
-    cls.add_method('SetPromiscReceiveCallback', 
-                   'void', 
-                   [param('ns3::Callback< bool, ns3::Ptr< ns3::NetDevice >, ns3::Ptr< ns3::Packet const >, unsigned short, ns3::Address const &, ns3::Address const &, ns3::NetDevice::PacketType, ns3::empty, ns3::empty, ns3::empty >', 'cb')], 
-                   is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): void ns3::WmnPointDevice::SetReceiveCallback(ns3::Callback<bool, ns3::Ptr<ns3::NetDevice>, ns3::Ptr<ns3::Packet const>, unsigned short, ns3::Address const&, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> cb) [member function]
-    cls.add_method('SetReceiveCallback', 
-                   'void', 
-                   [param('ns3::Callback< bool, ns3::Ptr< ns3::NetDevice >, ns3::Ptr< ns3::Packet const >, unsigned short, ns3::Address const &, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'cb')], 
-                   is_virtual=True)
-    ## wmn-point-device.h (module 'wmn'): void ns3::WmnPointDevice::SetRoutingProtocol(ns3::Ptr<ns3::WmnL2RoutingProtocol> protocol) [member function]
-    cls.add_method('SetRoutingProtocol', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::WmnL2RoutingProtocol >', 'protocol')])
-    ## wmn-point-device.h (module 'wmn'): bool ns3::WmnPointDevice::SupportsSendFrom() const [member function]
-    cls.add_method('SupportsSendFrom', 
-                   'bool', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    return
-
-def register_Ns3WmnWifiInterfaceMac_methods(root_module, cls):
-    ## wmn-wifi-interface-mac.h (module 'wmn'): ns3::WmnWifiInterfaceMac::WmnWifiInterfaceMac() [constructor]
-    cls.add_constructor([])
-    ## wmn-wifi-interface-mac.h (module 'wmn'): int64_t ns3::WmnWifiInterfaceMac::AssignStreams(int64_t stream) [member function]
-    cls.add_method('AssignStreams', 
-                   'int64_t', 
-                   [param('int64_t', 'stream')])
-    ## wmn-wifi-interface-mac.h (module 'wmn'): bool ns3::WmnWifiInterfaceMac::CheckSupportedRates(ns3::SupportedRates rates) const [member function]
-    cls.add_method('CheckSupportedRates', 
-                   'bool', 
-                   [param('ns3::SupportedRates', 'rates')], 
-                   is_const=True)
-    ## wmn-wifi-interface-mac.h (module 'wmn'): void ns3::WmnWifiInterfaceMac::Enqueue(ns3::Ptr<ns3::Packet const> packet, ns3::Mac48Address to, ns3::Mac48Address from) [member function]
-    cls.add_method('Enqueue', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Packet const >', 'packet'), param('ns3::Mac48Address', 'to'), param('ns3::Mac48Address', 'from')], 
-                   is_virtual=True)
-    ## wmn-wifi-interface-mac.h (module 'wmn'): void ns3::WmnWifiInterfaceMac::Enqueue(ns3::Ptr<ns3::Packet const> packet, ns3::Mac48Address to) [member function]
-    cls.add_method('Enqueue', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Packet const >', 'packet'), param('ns3::Mac48Address', 'to')], 
-                   is_virtual=True)
-    ## wmn-wifi-interface-mac.h (module 'wmn'): void ns3::WmnWifiInterfaceMac::FinishConfigureStandard(ns3::WifiPhyStandard standard) [member function]
-    cls.add_method('FinishConfigureStandard', 
-                   'void', 
-                   [param('ns3::WifiPhyStandard', 'standard')], 
-                   is_virtual=True)
-    ## wmn-wifi-interface-mac.h (module 'wmn'): ns3::Time ns3::WmnWifiInterfaceMac::GetBeaconInterval() const [member function]
-    cls.add_method('GetBeaconInterval', 
-                   'ns3::Time', 
-                   [], 
-                   is_const=True)
-    ## wmn-wifi-interface-mac.h (module 'wmn'): uint16_t ns3::WmnWifiInterfaceMac::GetFrequencyChannel() const [member function]
-    cls.add_method('GetFrequencyChannel', 
-                   'uint16_t', 
-                   [], 
-                   is_const=True)
-    ## wmn-wifi-interface-mac.h (module 'wmn'): uint32_t ns3::WmnWifiInterfaceMac::GetLinkMetric(ns3::Mac48Address peerAddress) [member function]
-    cls.add_method('GetLinkMetric', 
-                   'uint32_t', 
-                   [param('ns3::Mac48Address', 'peerAddress')])
-    ## wmn-wifi-interface-mac.h (module 'wmn'): ns3::Mac48Address ns3::WmnWifiInterfaceMac::GetWmnPointAddress() const [member function]
-    cls.add_method('GetWmnPointAddress', 
-                   'ns3::Mac48Address', 
-                   [], 
-                   is_const=True)
-    ## wmn-wifi-interface-mac.h (module 'wmn'): ns3::WifiPhyStandard ns3::WmnWifiInterfaceMac::GetPhyStandard() const [member function]
-    cls.add_method('GetPhyStandard', 
-                   'ns3::WifiPhyStandard', 
-                   [], 
-                   is_const=True)
-    ## wmn-wifi-interface-mac.h (module 'wmn'): ns3::SupportedRates ns3::WmnWifiInterfaceMac::GetSupportedRates() const [member function]
-    cls.add_method('GetSupportedRates', 
-                   'ns3::SupportedRates', 
-                   [], 
-                   is_const=True)
-    ## wmn-wifi-interface-mac.h (module 'wmn'): ns3::Time ns3::WmnWifiInterfaceMac::GetTbtt() const [member function]
-    cls.add_method('GetTbtt', 
-                   'ns3::Time', 
-                   [], 
-                   is_const=True)
-    ## wmn-wifi-interface-mac.h (module 'wmn'): static ns3::TypeId ns3::WmnWifiInterfaceMac::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## wmn-wifi-interface-mac.h (module 'wmn'): void ns3::WmnWifiInterfaceMac::InstallPlugin(ns3::Ptr<ns3::WmnWifiInterfaceMacPlugin> plugin) [member function]
-    cls.add_method('InstallPlugin', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::WmnWifiInterfaceMacPlugin >', 'plugin')])
-    ## wmn-wifi-interface-mac.h (module 'wmn'): void ns3::WmnWifiInterfaceMac::Report(std::ostream & arg0) const [member function]
-    cls.add_method('Report', 
-                   'void', 
-                   [param('std::ostream &', 'arg0')], 
-                   is_const=True)
-    ## wmn-wifi-interface-mac.h (module 'wmn'): void ns3::WmnWifiInterfaceMac::ResetStats() [member function]
-    cls.add_method('ResetStats', 
-                   'void', 
-                   [])
-    ## wmn-wifi-interface-mac.h (module 'wmn'): void ns3::WmnWifiInterfaceMac::SendManagementFrame(ns3::Ptr<ns3::Packet> frame, ns3::WifiMacHeader const & hdr) [member function]
-    cls.add_method('SendManagementFrame', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Packet >', 'frame'), param('ns3::WifiMacHeader const &', 'hdr')])
-    ## wmn-wifi-interface-mac.h (module 'wmn'): void ns3::WmnWifiInterfaceMac::SetBeaconGeneration(bool enable) [member function]
-    cls.add_method('SetBeaconGeneration', 
-                   'void', 
-                   [param('bool', 'enable')])
-    ## wmn-wifi-interface-mac.h (module 'wmn'): void ns3::WmnWifiInterfaceMac::SetBeaconInterval(ns3::Time interval) [member function]
-    cls.add_method('SetBeaconInterval', 
-                   'void', 
-                   [param('ns3::Time', 'interval')])
-    ## wmn-wifi-interface-mac.h (module 'wmn'): void ns3::WmnWifiInterfaceMac::SetLinkMetricCallback(ns3::Callback<unsigned int, ns3::Mac48Address, ns3::Ptr<ns3::WmnWifiInterfaceMac>, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> cb) [member function]
-    cls.add_method('SetLinkMetricCallback', 
-                   'void', 
-                   [param('ns3::Callback< unsigned int, ns3::Mac48Address, ns3::Ptr< ns3::WmnWifiInterfaceMac >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'cb')])
-    ## wmn-wifi-interface-mac.h (module 'wmn'): void ns3::WmnWifiInterfaceMac::SetLinkUpCallback(ns3::Callback<void, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> linkUp) [member function]
-    cls.add_method('SetLinkUpCallback', 
-                   'void', 
-                   [param('ns3::Callback< void, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'linkUp')], 
-                   is_virtual=True)
-    ## wmn-wifi-interface-mac.h (module 'wmn'): void ns3::WmnWifiInterfaceMac::SetWmnPointAddress(ns3::Mac48Address arg0) [member function]
-    cls.add_method('SetWmnPointAddress', 
-                   'void', 
-                   [param('ns3::Mac48Address', 'arg0')])
-    ## wmn-wifi-interface-mac.h (module 'wmn'): void ns3::WmnWifiInterfaceMac::SetRandomStartDelay(ns3::Time interval) [member function]
-    cls.add_method('SetRandomStartDelay', 
-                   'void', 
-                   [param('ns3::Time', 'interval')])
-    ## wmn-wifi-interface-mac.h (module 'wmn'): void ns3::WmnWifiInterfaceMac::ShiftTbtt(ns3::Time shift) [member function]
-    cls.add_method('ShiftTbtt', 
-                   'void', 
-                   [param('ns3::Time', 'shift')])
-    ## wmn-wifi-interface-mac.h (module 'wmn'): bool ns3::WmnWifiInterfaceMac::SupportsSendFrom() const [member function]
-    cls.add_method('SupportsSendFrom', 
-                   'bool', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## wmn-wifi-interface-mac.h (module 'wmn'): void ns3::WmnWifiInterfaceMac::SwitchFrequencyChannel(uint16_t new_id) [member function]
-    cls.add_method('SwitchFrequencyChannel', 
-                   'void', 
-                   [param('uint16_t', 'new_id')])
-    ## wmn-wifi-interface-mac.h (module 'wmn'): void ns3::WmnWifiInterfaceMac::DoDispose() [member function]
-    cls.add_method('DoDispose', 
-                   'void', 
-                   [], 
-                   visibility='private', is_virtual=True)
-    ## wmn-wifi-interface-mac.h (module 'wmn'): void ns3::WmnWifiInterfaceMac::DoInitialize() [member function]
-    cls.add_method('DoInitialize', 
-                   'void', 
-                   [], 
-                   visibility='private', is_virtual=True)
-    ## wmn-wifi-interface-mac.h (module 'wmn'): void ns3::WmnWifiInterfaceMac::Receive(ns3::Ptr<ns3::Packet> packet, ns3::WifiMacHeader const * hdr) [member function]
-    cls.add_method('Receive', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Packet >', 'packet'), param('ns3::WifiMacHeader const *', 'hdr')], 
-                   visibility='private', is_virtual=True)
-    return
-
 def register_Ns3HashImplementation_methods(root_module, cls):
     ## hash-function.h (module 'core'): ns3::Hash::Implementation::Implementation(ns3::Hash::Implementation const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::Hash::Implementation const &', 'arg0')])
@@ -10163,301 +10108,89 @@ def register_Ns3HashFunctionMurmur3_methods(root_module, cls):
 
 def register_Ns3My11sDestinationAddressUnit_methods(root_module, cls):
     cls.add_binary_comparison_operator('==')
-    ## ie-my11s-preq.h (module 'wmn'): ns3::my11s::DestinationAddressUnit::DestinationAddressUnit(ns3::my11s::DestinationAddressUnit const & arg0) [copy constructor]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): ns3::my11s::DestinationAddressUnit::DestinationAddressUnit(ns3::my11s::DestinationAddressUnit const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::my11s::DestinationAddressUnit const &', 'arg0')])
-    ## ie-my11s-preq.h (module 'wmn'): ns3::my11s::DestinationAddressUnit::DestinationAddressUnit() [constructor]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): ns3::my11s::DestinationAddressUnit::DestinationAddressUnit() [constructor]
     cls.add_constructor([])
-    ## ie-my11s-preq.h (module 'wmn'): uint32_t ns3::my11s::DestinationAddressUnit::GetDestSeqNumber() const [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): uint32_t ns3::my11s::DestinationAddressUnit::GetDestSeqNumber() const [member function]
     cls.add_method('GetDestSeqNumber', 
                    'uint32_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-preq.h (module 'wmn'): ns3::Mac48Address ns3::my11s::DestinationAddressUnit::GetDestinationAddress() const [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::DestinationAddressUnit::GetDestinationAddress() const [member function]
     cls.add_method('GetDestinationAddress', 
                    'ns3::Mac48Address', 
                    [], 
                    is_const=True)
-    ## ie-my11s-preq.h (module 'wmn'): bool ns3::my11s::DestinationAddressUnit::IsDo() [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): bool ns3::my11s::DestinationAddressUnit::IsDo() [member function]
     cls.add_method('IsDo', 
                    'bool', 
                    [])
-    ## ie-my11s-preq.h (module 'wmn'): bool ns3::my11s::DestinationAddressUnit::IsRf() [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): bool ns3::my11s::DestinationAddressUnit::IsRf() [member function]
     cls.add_method('IsRf', 
                    'bool', 
                    [])
-    ## ie-my11s-preq.h (module 'wmn'): bool ns3::my11s::DestinationAddressUnit::IsUsn() [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): bool ns3::my11s::DestinationAddressUnit::IsUsn() [member function]
     cls.add_method('IsUsn', 
                    'bool', 
                    [])
-    ## ie-my11s-preq.h (module 'wmn'): void ns3::my11s::DestinationAddressUnit::SetDestSeqNumber(uint32_t dest_seq_number) [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): void ns3::my11s::DestinationAddressUnit::SetDestSeqNumber(uint32_t dest_seq_number) [member function]
     cls.add_method('SetDestSeqNumber', 
                    'void', 
                    [param('uint32_t', 'dest_seq_number')])
-    ## ie-my11s-preq.h (module 'wmn'): void ns3::my11s::DestinationAddressUnit::SetDestinationAddress(ns3::Mac48Address dest_address) [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): void ns3::my11s::DestinationAddressUnit::SetDestinationAddress(ns3::Mac48Address dest_address) [member function]
     cls.add_method('SetDestinationAddress', 
                    'void', 
                    [param('ns3::Mac48Address', 'dest_address')])
-    ## ie-my11s-preq.h (module 'wmn'): void ns3::my11s::DestinationAddressUnit::SetFlags(bool doFlag, bool rfFlag, bool usnFlag) [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): void ns3::my11s::DestinationAddressUnit::SetFlags(bool doFlag, bool rfFlag, bool usnFlag) [member function]
     cls.add_method('SetFlags', 
                    'void', 
                    [param('bool', 'doFlag'), param('bool', 'rfFlag'), param('bool', 'usnFlag')])
     return
 
-def register_Ns3My11sMy11sWmnCapability_methods(root_module, cls):
-    cls.add_binary_comparison_operator('==')
-    ## ie-my11s-configuration.h (module 'wmn'): ns3::my11s::My11sWmnCapability::My11sWmnCapability(ns3::my11s::My11sWmnCapability const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::my11s::My11sWmnCapability const &', 'arg0')])
-    ## ie-my11s-configuration.h (module 'wmn'): ns3::my11s::My11sWmnCapability::My11sWmnCapability() [constructor]
-    cls.add_constructor([])
-    ## ie-my11s-configuration.h (module 'wmn'): ns3::Buffer::Iterator ns3::my11s::My11sWmnCapability::Deserialize(ns3::Buffer::Iterator i) [member function]
-    cls.add_method('Deserialize', 
-                   'ns3::Buffer::Iterator', 
-                   [param('ns3::Buffer::Iterator', 'i')])
-    ## ie-my11s-configuration.h (module 'wmn'): uint8_t ns3::my11s::My11sWmnCapability::GetSerializedSize() const [member function]
-    cls.add_method('GetSerializedSize', 
-                   'uint8_t', 
-                   [], 
-                   is_const=True)
-    ## ie-my11s-configuration.h (module 'wmn'): uint8_t ns3::my11s::My11sWmnCapability::GetUint8() const [member function]
-    cls.add_method('GetUint8', 
-                   'uint8_t', 
-                   [], 
-                   is_const=True)
-    ## ie-my11s-configuration.h (module 'wmn'): bool ns3::my11s::My11sWmnCapability::Is(uint8_t cap, uint8_t n) const [member function]
-    cls.add_method('Is', 
-                   'bool', 
-                   [param('uint8_t', 'cap'), param('uint8_t', 'n')], 
-                   is_const=True)
-    ## ie-my11s-configuration.h (module 'wmn'): ns3::Buffer::Iterator ns3::my11s::My11sWmnCapability::Serialize(ns3::Buffer::Iterator i) const [member function]
-    cls.add_method('Serialize', 
-                   'ns3::Buffer::Iterator', 
-                   [param('ns3::Buffer::Iterator', 'i')], 
-                   is_const=True)
-    ## ie-my11s-configuration.h (module 'wmn'): ns3::my11s::My11sWmnCapability::MCCAEnabled [variable]
-    cls.add_instance_attribute('MCCAEnabled', 'bool', is_const=False)
-    ## ie-my11s-configuration.h (module 'wmn'): ns3::my11s::My11sWmnCapability::MCCASupported [variable]
-    cls.add_instance_attribute('MCCASupported', 'bool', is_const=False)
-    ## ie-my11s-configuration.h (module 'wmn'): ns3::my11s::My11sWmnCapability::TBTTAdjustment [variable]
-    cls.add_instance_attribute('TBTTAdjustment', 'bool', is_const=False)
-    ## ie-my11s-configuration.h (module 'wmn'): ns3::my11s::My11sWmnCapability::acceptPeerLinks [variable]
-    cls.add_instance_attribute('acceptPeerLinks', 'bool', is_const=False)
-    ## ie-my11s-configuration.h (module 'wmn'): ns3::my11s::My11sWmnCapability::beaconTimingReport [variable]
-    cls.add_instance_attribute('beaconTimingReport', 'bool', is_const=False)
-    ## ie-my11s-configuration.h (module 'wmn'): ns3::my11s::My11sWmnCapability::forwarding [variable]
-    cls.add_instance_attribute('forwarding', 'bool', is_const=False)
-    ## ie-my11s-configuration.h (module 'wmn'): ns3::my11s::My11sWmnCapability::powerSaveLevel [variable]
-    cls.add_instance_attribute('powerSaveLevel', 'bool', is_const=False)
-    return
-
-def register_Ns3My11sPmtmgmpProtocol_methods(root_module, cls):
-    ## pmtmgmp-protocol.h (module 'wmn'): ns3::my11s::PmtmgmpProtocol::PmtmgmpProtocol() [constructor]
-    cls.add_constructor([])
-    ## pmtmgmp-protocol.h (module 'wmn'): int64_t ns3::my11s::PmtmgmpProtocol::AssignStreams(int64_t stream) [member function]
-    cls.add_method('AssignStreams', 
-                   'int64_t', 
-                   [param('int64_t', 'stream')])
-    ## pmtmgmp-protocol.h (module 'wmn'): void ns3::my11s::PmtmgmpProtocol::DoDispose() [member function]
-    cls.add_method('DoDispose', 
-                   'void', 
-                   [], 
-                   is_virtual=True)
-    ## pmtmgmp-protocol.h (module 'wmn'): static ns3::TypeId ns3::my11s::PmtmgmpProtocol::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## pmtmgmp-protocol.h (module 'wmn'): bool ns3::my11s::PmtmgmpProtocol::Install(ns3::Ptr<ns3::WmnPointDevice> arg0) [member function]
-    cls.add_method('Install', 
-                   'bool', 
-                   [param('ns3::Ptr< ns3::WmnPointDevice >', 'arg0')])
-    ## pmtmgmp-protocol.h (module 'wmn'): void ns3::my11s::PmtmgmpProtocol::PeerLinkStatus(ns3::Mac48Address wmnPontAddress, ns3::Mac48Address peerAddress, uint32_t interface, bool status) [member function]
-    cls.add_method('PeerLinkStatus', 
-                   'void', 
-                   [param('ns3::Mac48Address', 'wmnPontAddress'), param('ns3::Mac48Address', 'peerAddress'), param('uint32_t', 'interface'), param('bool', 'status')])
-    ## pmtmgmp-protocol.h (module 'wmn'): bool ns3::my11s::PmtmgmpProtocol::RemoveRoutingStuff(uint32_t fromIface, ns3::Mac48Address const source, ns3::Mac48Address const destination, ns3::Ptr<ns3::Packet> packet, uint16_t & protocolType) [member function]
-    cls.add_method('RemoveRoutingStuff', 
-                   'bool', 
-                   [param('uint32_t', 'fromIface'), param('ns3::Mac48Address const', 'source'), param('ns3::Mac48Address const', 'destination'), param('ns3::Ptr< ns3::Packet >', 'packet'), param('uint16_t &', 'protocolType')], 
-                   is_virtual=True)
-    ## pmtmgmp-protocol.h (module 'wmn'): void ns3::my11s::PmtmgmpProtocol::Report(std::ostream & arg0) const [member function]
-    cls.add_method('Report', 
-                   'void', 
-                   [param('std::ostream &', 'arg0')], 
-                   is_const=True)
-    ## pmtmgmp-protocol.h (module 'wmn'): bool ns3::my11s::PmtmgmpProtocol::RequestRoute(uint32_t sourceIface, ns3::Mac48Address const source, ns3::Mac48Address const destination, ns3::Ptr<ns3::Packet const> packet, uint16_t protocolType, ns3::Callback<void, bool, ns3::Ptr<ns3::Packet>, ns3::Mac48Address, ns3::Mac48Address, unsigned short, unsigned int, ns3::empty, ns3::empty, ns3::empty> routeReply) [member function]
-    cls.add_method('RequestRoute', 
-                   'bool', 
-                   [param('uint32_t', 'sourceIface'), param('ns3::Mac48Address const', 'source'), param('ns3::Mac48Address const', 'destination'), param('ns3::Ptr< ns3::Packet const >', 'packet'), param('uint16_t', 'protocolType'), param('ns3::Callback< void, bool, ns3::Ptr< ns3::Packet >, ns3::Mac48Address, ns3::Mac48Address, unsigned short, unsigned int, ns3::empty, ns3::empty, ns3::empty >', 'routeReply')], 
-                   is_virtual=True)
-    ## pmtmgmp-protocol.h (module 'wmn'): void ns3::my11s::PmtmgmpProtocol::ResetStats() [member function]
-    cls.add_method('ResetStats', 
-                   'void', 
-                   [])
-    ## pmtmgmp-protocol.h (module 'wmn'): void ns3::my11s::PmtmgmpProtocol::SetNeighboursCallback(ns3::Callback<std::vector<ns3::Mac48Address, std::allocator<ns3::Mac48Address> >, unsigned int, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> cb) [member function]
-    cls.add_method('SetNeighboursCallback', 
-                   'void', 
-                   [param('ns3::Callback< std::vector< ns3::Mac48Address >, unsigned int, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'cb')])
-    ## pmtmgmp-protocol.h (module 'wmn'): void ns3::my11s::PmtmgmpProtocol::SetRoot() [member function]
-    cls.add_method('SetRoot', 
-                   'void', 
-                   [])
-    ## pmtmgmp-protocol.h (module 'wmn'): void ns3::my11s::PmtmgmpProtocol::UnsetRoot() [member function]
-    cls.add_method('UnsetRoot', 
-                   'void', 
-                   [])
-    ## pmtmgmp-protocol.h (module 'wmn'): void ns3::my11s::PmtmgmpProtocol::DoInitialize() [member function]
-    cls.add_method('DoInitialize', 
-                   'void', 
-                   [], 
-                   visibility='private', is_virtual=True)
-    return
-
-def register_Ns3My11sPmtmgmpProtocolFailedDestination_methods(root_module, cls):
-    ## pmtmgmp-protocol.h (module 'wmn'): ns3::my11s::PmtmgmpProtocol::FailedDestination::FailedDestination() [constructor]
-    cls.add_constructor([])
-    ## pmtmgmp-protocol.h (module 'wmn'): ns3::my11s::PmtmgmpProtocol::FailedDestination::FailedDestination(ns3::my11s::PmtmgmpProtocol::FailedDestination const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::my11s::PmtmgmpProtocol::FailedDestination const &', 'arg0')])
-    ## pmtmgmp-protocol.h (module 'wmn'): ns3::my11s::PmtmgmpProtocol::FailedDestination::destination [variable]
-    cls.add_instance_attribute('destination', 'ns3::Mac48Address', is_const=False)
-    ## pmtmgmp-protocol.h (module 'wmn'): ns3::my11s::PmtmgmpProtocol::FailedDestination::seqnum [variable]
-    cls.add_instance_attribute('seqnum', 'uint32_t', is_const=False)
-    return
-
-def register_Ns3My11sPmtmgmpRtable_methods(root_module, cls):
-    ## pmtmgmp-rtable.h (module 'wmn'): ns3::my11s::PmtmgmpRtable::PmtmgmpRtable(ns3::my11s::PmtmgmpRtable const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::my11s::PmtmgmpRtable const &', 'arg0')])
-    ## pmtmgmp-rtable.h (module 'wmn'): ns3::my11s::PmtmgmpRtable::PmtmgmpRtable() [constructor]
-    cls.add_constructor([])
-    ## pmtmgmp-rtable.h (module 'wmn'): void ns3::my11s::PmtmgmpRtable::AddPrecursor(ns3::Mac48Address destination, uint32_t precursorInterface, ns3::Mac48Address precursorAddress, ns3::Time lifetime) [member function]
-    cls.add_method('AddPrecursor', 
-                   'void', 
-                   [param('ns3::Mac48Address', 'destination'), param('uint32_t', 'precursorInterface'), param('ns3::Mac48Address', 'precursorAddress'), param('ns3::Time', 'lifetime')])
-    ## pmtmgmp-rtable.h (module 'wmn'): void ns3::my11s::PmtmgmpRtable::AddProactivePath(uint32_t metric, ns3::Mac48Address root, ns3::Mac48Address retransmitter, uint32_t interface, ns3::Time lifetime, uint32_t seqnum) [member function]
-    cls.add_method('AddProactivePath', 
-                   'void', 
-                   [param('uint32_t', 'metric'), param('ns3::Mac48Address', 'root'), param('ns3::Mac48Address', 'retransmitter'), param('uint32_t', 'interface'), param('ns3::Time', 'lifetime'), param('uint32_t', 'seqnum')])
-    ## pmtmgmp-rtable.h (module 'wmn'): void ns3::my11s::PmtmgmpRtable::AddReactivePath(ns3::Mac48Address destination, ns3::Mac48Address retransmitter, uint32_t interface, uint32_t metric, ns3::Time lifetime, uint32_t seqnum) [member function]
-    cls.add_method('AddReactivePath', 
-                   'void', 
-                   [param('ns3::Mac48Address', 'destination'), param('ns3::Mac48Address', 'retransmitter'), param('uint32_t', 'interface'), param('uint32_t', 'metric'), param('ns3::Time', 'lifetime'), param('uint32_t', 'seqnum')])
-    ## pmtmgmp-rtable.h (module 'wmn'): void ns3::my11s::PmtmgmpRtable::DeleteProactivePath() [member function]
-    cls.add_method('DeleteProactivePath', 
-                   'void', 
-                   [])
-    ## pmtmgmp-rtable.h (module 'wmn'): void ns3::my11s::PmtmgmpRtable::DeleteProactivePath(ns3::Mac48Address root) [member function]
-    cls.add_method('DeleteProactivePath', 
-                   'void', 
-                   [param('ns3::Mac48Address', 'root')])
-    ## pmtmgmp-rtable.h (module 'wmn'): void ns3::my11s::PmtmgmpRtable::DeleteReactivePath(ns3::Mac48Address destination) [member function]
-    cls.add_method('DeleteReactivePath', 
-                   'void', 
-                   [param('ns3::Mac48Address', 'destination')])
-    ## pmtmgmp-rtable.h (module 'wmn'): void ns3::my11s::PmtmgmpRtable::DoDispose() [member function]
-    cls.add_method('DoDispose', 
-                   'void', 
-                   [], 
-                   is_virtual=True)
-    ## pmtmgmp-rtable.h (module 'wmn'): std::vector<std::pair<unsigned int, ns3::Mac48Address>, std::allocator<std::pair<unsigned int, ns3::Mac48Address> > > ns3::my11s::PmtmgmpRtable::GetPrecursors(ns3::Mac48Address destination) [member function]
-    cls.add_method('GetPrecursors', 
-                   'std::vector< std::pair< unsigned int, ns3::Mac48Address > >', 
-                   [param('ns3::Mac48Address', 'destination')])
-    ## pmtmgmp-rtable.h (module 'wmn'): static ns3::TypeId ns3::my11s::PmtmgmpRtable::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## pmtmgmp-rtable.h (module 'wmn'): std::vector<ns3::my11s::PmtmgmpProtocol::FailedDestination, std::allocator<ns3::my11s::PmtmgmpProtocol::FailedDestination> > ns3::my11s::PmtmgmpRtable::GetUnreachableDestinations(ns3::Mac48Address peerAddress) [member function]
-    cls.add_method('GetUnreachableDestinations', 
-                   'std::vector< ns3::my11s::PmtmgmpProtocol::FailedDestination >', 
-                   [param('ns3::Mac48Address', 'peerAddress')])
-    ## pmtmgmp-rtable.h (module 'wmn'): ns3::my11s::PmtmgmpRtable::LookupResult ns3::my11s::PmtmgmpRtable::LookupProactive() [member function]
-    cls.add_method('LookupProactive', 
-                   'ns3::my11s::PmtmgmpRtable::LookupResult', 
-                   [])
-    ## pmtmgmp-rtable.h (module 'wmn'): ns3::my11s::PmtmgmpRtable::LookupResult ns3::my11s::PmtmgmpRtable::LookupProactiveExpired() [member function]
-    cls.add_method('LookupProactiveExpired', 
-                   'ns3::my11s::PmtmgmpRtable::LookupResult', 
-                   [])
-    ## pmtmgmp-rtable.h (module 'wmn'): ns3::my11s::PmtmgmpRtable::LookupResult ns3::my11s::PmtmgmpRtable::LookupReactive(ns3::Mac48Address destination) [member function]
-    cls.add_method('LookupReactive', 
-                   'ns3::my11s::PmtmgmpRtable::LookupResult', 
-                   [param('ns3::Mac48Address', 'destination')])
-    ## pmtmgmp-rtable.h (module 'wmn'): ns3::my11s::PmtmgmpRtable::LookupResult ns3::my11s::PmtmgmpRtable::LookupReactiveExpired(ns3::Mac48Address destination) [member function]
-    cls.add_method('LookupReactiveExpired', 
-                   'ns3::my11s::PmtmgmpRtable::LookupResult', 
-                   [param('ns3::Mac48Address', 'destination')])
-    ## pmtmgmp-rtable.h (module 'wmn'): ns3::my11s::PmtmgmpRtable::INTERFACE_ANY [variable]
-    cls.add_static_attribute('INTERFACE_ANY', 'uint32_t const', is_const=True)
-    ## pmtmgmp-rtable.h (module 'wmn'): ns3::my11s::PmtmgmpRtable::MAX_METRIC [variable]
-    cls.add_static_attribute('MAX_METRIC', 'uint32_t const', is_const=True)
-    return
-
-def register_Ns3My11sPmtmgmpRtableLookupResult_methods(root_module, cls):
-    cls.add_binary_comparison_operator('==')
-    ## pmtmgmp-rtable.h (module 'wmn'): ns3::my11s::PmtmgmpRtable::LookupResult::LookupResult(ns3::my11s::PmtmgmpRtable::LookupResult const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::my11s::PmtmgmpRtable::LookupResult const &', 'arg0')])
-    ## pmtmgmp-rtable.h (module 'wmn'): ns3::my11s::PmtmgmpRtable::LookupResult::LookupResult(ns3::Mac48Address r=ns3::Mac48Address::GetBroadcast(), uint32_t i=ns3::my11s::PmtmgmpRtable::INTERFACE_ANY, uint32_t m=ns3::my11s::PmtmgmpRtable::MAX_METRIC, uint32_t s=0, ns3::Time l=ns3::Seconds( )) [constructor]
-    cls.add_constructor([param('ns3::Mac48Address', 'r', default_value='ns3::Mac48Address::GetBroadcast()'), param('uint32_t', 'i', default_value='ns3::my11s::PmtmgmpRtable::INTERFACE_ANY'), param('uint32_t', 'm', default_value='ns3::my11s::PmtmgmpRtable::MAX_METRIC'), param('uint32_t', 's', default_value='0'), param('ns3::Time', 'l', default_value='ns3::Seconds(0)')])
-    ## pmtmgmp-rtable.h (module 'wmn'): bool ns3::my11s::PmtmgmpRtable::LookupResult::IsValid() const [member function]
-    cls.add_method('IsValid', 
-                   'bool', 
-                   [], 
-                   is_const=True)
-    ## pmtmgmp-rtable.h (module 'wmn'): ns3::my11s::PmtmgmpRtable::LookupResult::ifIndex [variable]
-    cls.add_instance_attribute('ifIndex', 'uint32_t', is_const=False)
-    ## pmtmgmp-rtable.h (module 'wmn'): ns3::my11s::PmtmgmpRtable::LookupResult::lifetime [variable]
-    cls.add_instance_attribute('lifetime', 'ns3::Time', is_const=False)
-    ## pmtmgmp-rtable.h (module 'wmn'): ns3::my11s::PmtmgmpRtable::LookupResult::metric [variable]
-    cls.add_instance_attribute('metric', 'uint32_t', is_const=False)
-    ## pmtmgmp-rtable.h (module 'wmn'): ns3::my11s::PmtmgmpRtable::LookupResult::retransmitter [variable]
-    cls.add_instance_attribute('retransmitter', 'ns3::Mac48Address', is_const=False)
-    ## pmtmgmp-rtable.h (module 'wmn'): ns3::my11s::PmtmgmpRtable::LookupResult::seqnum [variable]
-    cls.add_instance_attribute('seqnum', 'uint32_t', is_const=False)
-    return
-
 def register_Ns3My11sIeBeaconTiming_methods(root_module, cls):
     cls.add_output_stream_operator()
-    ## ie-my11s-beacon-timing.h (module 'wmn'): ns3::my11s::IeBeaconTiming::IeBeaconTiming(ns3::my11s::IeBeaconTiming const & arg0) [copy constructor]
+    ## ie-my11s-beacon-timing.h (module 'pmtmgmp'): ns3::my11s::IeBeaconTiming::IeBeaconTiming(ns3::my11s::IeBeaconTiming const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::my11s::IeBeaconTiming const &', 'arg0')])
-    ## ie-my11s-beacon-timing.h (module 'wmn'): ns3::my11s::IeBeaconTiming::IeBeaconTiming() [constructor]
+    ## ie-my11s-beacon-timing.h (module 'pmtmgmp'): ns3::my11s::IeBeaconTiming::IeBeaconTiming() [constructor]
     cls.add_constructor([])
-    ## ie-my11s-beacon-timing.h (module 'wmn'): void ns3::my11s::IeBeaconTiming::AddNeighboursTimingElementUnit(uint16_t aid, ns3::Time last_beacon, ns3::Time beacon_interval) [member function]
+    ## ie-my11s-beacon-timing.h (module 'pmtmgmp'): void ns3::my11s::IeBeaconTiming::AddNeighboursTimingElementUnit(uint16_t aid, ns3::Time last_beacon, ns3::Time beacon_interval) [member function]
     cls.add_method('AddNeighboursTimingElementUnit', 
                    'void', 
                    [param('uint16_t', 'aid'), param('ns3::Time', 'last_beacon'), param('ns3::Time', 'beacon_interval')])
-    ## ie-my11s-beacon-timing.h (module 'wmn'): void ns3::my11s::IeBeaconTiming::ClearTimingElement() [member function]
+    ## ie-my11s-beacon-timing.h (module 'pmtmgmp'): void ns3::my11s::IeBeaconTiming::ClearTimingElement() [member function]
     cls.add_method('ClearTimingElement', 
                    'void', 
                    [])
-    ## ie-my11s-beacon-timing.h (module 'wmn'): void ns3::my11s::IeBeaconTiming::DelNeighboursTimingElementUnit(uint16_t aid, ns3::Time last_beacon, ns3::Time beacon_interval) [member function]
+    ## ie-my11s-beacon-timing.h (module 'pmtmgmp'): void ns3::my11s::IeBeaconTiming::DelNeighboursTimingElementUnit(uint16_t aid, ns3::Time last_beacon, ns3::Time beacon_interval) [member function]
     cls.add_method('DelNeighboursTimingElementUnit', 
                    'void', 
                    [param('uint16_t', 'aid'), param('ns3::Time', 'last_beacon'), param('ns3::Time', 'beacon_interval')])
-    ## ie-my11s-beacon-timing.h (module 'wmn'): uint8_t ns3::my11s::IeBeaconTiming::DeserializeInformationField(ns3::Buffer::Iterator i, uint8_t length) [member function]
+    ## ie-my11s-beacon-timing.h (module 'pmtmgmp'): uint8_t ns3::my11s::IeBeaconTiming::DeserializeInformationField(ns3::Buffer::Iterator i, uint8_t length) [member function]
     cls.add_method('DeserializeInformationField', 
                    'uint8_t', 
                    [param('ns3::Buffer::Iterator', 'i'), param('uint8_t', 'length')], 
                    is_virtual=True)
-    ## ie-my11s-beacon-timing.h (module 'wmn'): ns3::WifiInformationElementId ns3::my11s::IeBeaconTiming::ElementId() const [member function]
+    ## ie-my11s-beacon-timing.h (module 'pmtmgmp'): ns3::WifiInformationElementId ns3::my11s::IeBeaconTiming::ElementId() const [member function]
     cls.add_method('ElementId', 
                    'ns3::WifiInformationElementId', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-beacon-timing.h (module 'wmn'): uint8_t ns3::my11s::IeBeaconTiming::GetInformationFieldSize() const [member function]
+    ## ie-my11s-beacon-timing.h (module 'pmtmgmp'): uint8_t ns3::my11s::IeBeaconTiming::GetInformationFieldSize() const [member function]
     cls.add_method('GetInformationFieldSize', 
                    'uint8_t', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-beacon-timing.h (module 'wmn'): std::vector<ns3::Ptr<ns3::my11s::IeBeaconTimingUnit>, std::allocator<ns3::Ptr<ns3::my11s::IeBeaconTimingUnit> > > ns3::my11s::IeBeaconTiming::GetNeighboursTimingElementsList() [member function]
+    ## ie-my11s-beacon-timing.h (module 'pmtmgmp'): std::vector<ns3::Ptr<ns3::my11s::IeBeaconTimingUnit>, std::allocator<ns3::Ptr<ns3::my11s::IeBeaconTimingUnit> > > ns3::my11s::IeBeaconTiming::GetNeighboursTimingElementsList() [member function]
     cls.add_method('GetNeighboursTimingElementsList', 
                    'std::vector< ns3::Ptr< ns3::my11s::IeBeaconTimingUnit > >', 
                    [])
-    ## ie-my11s-beacon-timing.h (module 'wmn'): void ns3::my11s::IeBeaconTiming::Print(std::ostream & os) const [member function]
+    ## ie-my11s-beacon-timing.h (module 'pmtmgmp'): void ns3::my11s::IeBeaconTiming::Print(std::ostream & os) const [member function]
     cls.add_method('Print', 
                    'void', 
                    [param('std::ostream &', 'os')], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-beacon-timing.h (module 'wmn'): void ns3::my11s::IeBeaconTiming::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
+    ## ie-my11s-beacon-timing.h (module 'pmtmgmp'): void ns3::my11s::IeBeaconTiming::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
     cls.add_method('SerializeInformationField', 
                    'void', 
                    [param('ns3::Buffer::Iterator', 'i')], 
@@ -10466,34 +10199,34 @@ def register_Ns3My11sIeBeaconTiming_methods(root_module, cls):
 
 def register_Ns3My11sIeBeaconTimingUnit_methods(root_module, cls):
     cls.add_binary_comparison_operator('==')
-    ## ie-my11s-beacon-timing.h (module 'wmn'): ns3::my11s::IeBeaconTimingUnit::IeBeaconTimingUnit(ns3::my11s::IeBeaconTimingUnit const & arg0) [copy constructor]
+    ## ie-my11s-beacon-timing.h (module 'pmtmgmp'): ns3::my11s::IeBeaconTimingUnit::IeBeaconTimingUnit(ns3::my11s::IeBeaconTimingUnit const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::my11s::IeBeaconTimingUnit const &', 'arg0')])
-    ## ie-my11s-beacon-timing.h (module 'wmn'): ns3::my11s::IeBeaconTimingUnit::IeBeaconTimingUnit() [constructor]
+    ## ie-my11s-beacon-timing.h (module 'pmtmgmp'): ns3::my11s::IeBeaconTimingUnit::IeBeaconTimingUnit() [constructor]
     cls.add_constructor([])
-    ## ie-my11s-beacon-timing.h (module 'wmn'): uint8_t ns3::my11s::IeBeaconTimingUnit::GetAid() const [member function]
+    ## ie-my11s-beacon-timing.h (module 'pmtmgmp'): uint8_t ns3::my11s::IeBeaconTimingUnit::GetAid() const [member function]
     cls.add_method('GetAid', 
                    'uint8_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-beacon-timing.h (module 'wmn'): uint16_t ns3::my11s::IeBeaconTimingUnit::GetBeaconInterval() const [member function]
+    ## ie-my11s-beacon-timing.h (module 'pmtmgmp'): uint16_t ns3::my11s::IeBeaconTimingUnit::GetBeaconInterval() const [member function]
     cls.add_method('GetBeaconInterval', 
                    'uint16_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-beacon-timing.h (module 'wmn'): uint16_t ns3::my11s::IeBeaconTimingUnit::GetLastBeacon() const [member function]
+    ## ie-my11s-beacon-timing.h (module 'pmtmgmp'): uint16_t ns3::my11s::IeBeaconTimingUnit::GetLastBeacon() const [member function]
     cls.add_method('GetLastBeacon', 
                    'uint16_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-beacon-timing.h (module 'wmn'): void ns3::my11s::IeBeaconTimingUnit::SetAid(uint8_t aid) [member function]
+    ## ie-my11s-beacon-timing.h (module 'pmtmgmp'): void ns3::my11s::IeBeaconTimingUnit::SetAid(uint8_t aid) [member function]
     cls.add_method('SetAid', 
                    'void', 
                    [param('uint8_t', 'aid')])
-    ## ie-my11s-beacon-timing.h (module 'wmn'): void ns3::my11s::IeBeaconTimingUnit::SetBeaconInterval(uint16_t beaconInterval) [member function]
+    ## ie-my11s-beacon-timing.h (module 'pmtmgmp'): void ns3::my11s::IeBeaconTimingUnit::SetBeaconInterval(uint16_t beaconInterval) [member function]
     cls.add_method('SetBeaconInterval', 
                    'void', 
                    [param('uint16_t', 'beaconInterval')])
-    ## ie-my11s-beacon-timing.h (module 'wmn'): void ns3::my11s::IeBeaconTimingUnit::SetLastBeacon(uint16_t lastBeacon) [member function]
+    ## ie-my11s-beacon-timing.h (module 'pmtmgmp'): void ns3::my11s::IeBeaconTimingUnit::SetLastBeacon(uint16_t lastBeacon) [member function]
     cls.add_method('SetLastBeacon', 
                    'void', 
                    [param('uint16_t', 'lastBeacon')])
@@ -10502,63 +10235,63 @@ def register_Ns3My11sIeBeaconTimingUnit_methods(root_module, cls):
 def register_Ns3My11sIeConfiguration_methods(root_module, cls):
     cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('==')
-    ## ie-my11s-configuration.h (module 'wmn'): ns3::my11s::IeConfiguration::IeConfiguration(ns3::my11s::IeConfiguration const & arg0) [copy constructor]
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): ns3::my11s::IeConfiguration::IeConfiguration(ns3::my11s::IeConfiguration const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::my11s::IeConfiguration const &', 'arg0')])
-    ## ie-my11s-configuration.h (module 'wmn'): ns3::my11s::IeConfiguration::IeConfiguration() [constructor]
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): ns3::my11s::IeConfiguration::IeConfiguration() [constructor]
     cls.add_constructor([])
-    ## ie-my11s-configuration.h (module 'wmn'): uint8_t ns3::my11s::IeConfiguration::DeserializeInformationField(ns3::Buffer::Iterator i, uint8_t length) [member function]
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): uint8_t ns3::my11s::IeConfiguration::DeserializeInformationField(ns3::Buffer::Iterator i, uint8_t length) [member function]
     cls.add_method('DeserializeInformationField', 
                    'uint8_t', 
                    [param('ns3::Buffer::Iterator', 'i'), param('uint8_t', 'length')], 
                    is_virtual=True)
-    ## ie-my11s-configuration.h (module 'wmn'): ns3::WifiInformationElementId ns3::my11s::IeConfiguration::ElementId() const [member function]
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): ns3::WifiInformationElementId ns3::my11s::IeConfiguration::ElementId() const [member function]
     cls.add_method('ElementId', 
                    'ns3::WifiInformationElementId', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-configuration.h (module 'wmn'): uint8_t ns3::my11s::IeConfiguration::GetInformationFieldSize() const [member function]
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): uint8_t ns3::my11s::IeConfiguration::GetInformationFieldSize() const [member function]
     cls.add_method('GetInformationFieldSize', 
                    'uint8_t', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-configuration.h (module 'wmn'): uint8_t ns3::my11s::IeConfiguration::GetNeighborCount() [member function]
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): uint8_t ns3::my11s::IeConfiguration::GetNeighborCount() [member function]
     cls.add_method('GetNeighborCount', 
                    'uint8_t', 
                    [])
-    ## ie-my11s-configuration.h (module 'wmn'): bool ns3::my11s::IeConfiguration::IsAirtime() [member function]
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): bool ns3::my11s::IeConfiguration::IsAirtime() [member function]
     cls.add_method('IsAirtime', 
                    'bool', 
                    [])
-    ## ie-my11s-configuration.h (module 'wmn'): bool ns3::my11s::IeConfiguration::IsPMTMGMP() [member function]
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): bool ns3::my11s::IeConfiguration::IsPMTMGMP() [member function]
     cls.add_method('IsPMTMGMP', 
                    'bool', 
                    [])
-    ## ie-my11s-configuration.h (module 'wmn'): ns3::my11s::My11sWmnCapability const & ns3::my11s::IeConfiguration::WmnCapability() [member function]
-    cls.add_method('WmnCapability', 
-                   'ns3::my11s::My11sWmnCapability const &', 
-                   [])
-    ## ie-my11s-configuration.h (module 'wmn'): void ns3::my11s::IeConfiguration::Print(std::ostream & os) const [member function]
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): void ns3::my11s::IeConfiguration::Print(std::ostream & os) const [member function]
     cls.add_method('Print', 
                    'void', 
                    [param('std::ostream &', 'os')], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-configuration.h (module 'wmn'): void ns3::my11s::IeConfiguration::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): void ns3::my11s::IeConfiguration::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
     cls.add_method('SerializeInformationField', 
                    'void', 
                    [param('ns3::Buffer::Iterator', 'i')], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-configuration.h (module 'wmn'): void ns3::my11s::IeConfiguration::SetMetric(ns3::my11s::my11sPathSelectionMetric metricId) [member function]
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): void ns3::my11s::IeConfiguration::SetMetric(ns3::my11s::my11sPathSelectionMetric metricId) [member function]
     cls.add_method('SetMetric', 
                    'void', 
                    [param('ns3::my11s::my11sPathSelectionMetric', 'metricId')])
-    ## ie-my11s-configuration.h (module 'wmn'): void ns3::my11s::IeConfiguration::SetNeighborCount(uint8_t neighbors) [member function]
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): void ns3::my11s::IeConfiguration::SetNeighborCount(uint8_t neighbors) [member function]
     cls.add_method('SetNeighborCount', 
                    'void', 
                    [param('uint8_t', 'neighbors')])
-    ## ie-my11s-configuration.h (module 'wmn'): void ns3::my11s::IeConfiguration::SetRouting(ns3::my11s::my11sPathSelectionProtocol routingId) [member function]
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): void ns3::my11s::IeConfiguration::SetRouting(ns3::my11s::my11sPathSelectionProtocol routingId) [member function]
     cls.add_method('SetRouting', 
                    'void', 
                    [param('ns3::my11s::my11sPathSelectionProtocol', 'routingId')])
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): ns3::my11s::My11sWmnCapability const & ns3::my11s::IeConfiguration::WmnCapability() [member function]
+    cls.add_method('WmnCapability', 
+                   'ns3::my11s::My11sWmnCapability const &', 
+                   [])
     return
 
 def register_Ns3My11sIeLinkMetricReport_methods(root_module, cls):
@@ -10566,213 +10299,122 @@ def register_Ns3My11sIeLinkMetricReport_methods(root_module, cls):
     cls.add_binary_comparison_operator('>')
     cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('==')
-    ## ie-my11s-metric-report.h (module 'wmn'): ns3::my11s::IeLinkMetricReport::IeLinkMetricReport(ns3::my11s::IeLinkMetricReport const & arg0) [copy constructor]
+    ## ie-my11s-metric-report.h (module 'pmtmgmp'): ns3::my11s::IeLinkMetricReport::IeLinkMetricReport(ns3::my11s::IeLinkMetricReport const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::my11s::IeLinkMetricReport const &', 'arg0')])
-    ## ie-my11s-metric-report.h (module 'wmn'): ns3::my11s::IeLinkMetricReport::IeLinkMetricReport() [constructor]
+    ## ie-my11s-metric-report.h (module 'pmtmgmp'): ns3::my11s::IeLinkMetricReport::IeLinkMetricReport() [constructor]
     cls.add_constructor([])
-    ## ie-my11s-metric-report.h (module 'wmn'): ns3::my11s::IeLinkMetricReport::IeLinkMetricReport(uint32_t metric) [constructor]
+    ## ie-my11s-metric-report.h (module 'pmtmgmp'): ns3::my11s::IeLinkMetricReport::IeLinkMetricReport(uint32_t metric) [constructor]
     cls.add_constructor([param('uint32_t', 'metric')])
-    ## ie-my11s-metric-report.h (module 'wmn'): uint8_t ns3::my11s::IeLinkMetricReport::DeserializeInformationField(ns3::Buffer::Iterator start, uint8_t length) [member function]
+    ## ie-my11s-metric-report.h (module 'pmtmgmp'): uint8_t ns3::my11s::IeLinkMetricReport::DeserializeInformationField(ns3::Buffer::Iterator start, uint8_t length) [member function]
     cls.add_method('DeserializeInformationField', 
                    'uint8_t', 
                    [param('ns3::Buffer::Iterator', 'start'), param('uint8_t', 'length')], 
                    is_virtual=True)
-    ## ie-my11s-metric-report.h (module 'wmn'): ns3::WifiInformationElementId ns3::my11s::IeLinkMetricReport::ElementId() const [member function]
+    ## ie-my11s-metric-report.h (module 'pmtmgmp'): ns3::WifiInformationElementId ns3::my11s::IeLinkMetricReport::ElementId() const [member function]
     cls.add_method('ElementId', 
                    'ns3::WifiInformationElementId', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-metric-report.h (module 'wmn'): uint8_t ns3::my11s::IeLinkMetricReport::GetInformationFieldSize() const [member function]
+    ## ie-my11s-metric-report.h (module 'pmtmgmp'): uint8_t ns3::my11s::IeLinkMetricReport::GetInformationFieldSize() const [member function]
     cls.add_method('GetInformationFieldSize', 
                    'uint8_t', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-metric-report.h (module 'wmn'): uint32_t ns3::my11s::IeLinkMetricReport::GetMetric() [member function]
+    ## ie-my11s-metric-report.h (module 'pmtmgmp'): uint32_t ns3::my11s::IeLinkMetricReport::GetMetric() [member function]
     cls.add_method('GetMetric', 
                    'uint32_t', 
                    [])
-    ## ie-my11s-metric-report.h (module 'wmn'): void ns3::my11s::IeLinkMetricReport::Print(std::ostream & os) const [member function]
+    ## ie-my11s-metric-report.h (module 'pmtmgmp'): void ns3::my11s::IeLinkMetricReport::Print(std::ostream & os) const [member function]
     cls.add_method('Print', 
                    'void', 
                    [param('std::ostream &', 'os')], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-metric-report.h (module 'wmn'): void ns3::my11s::IeLinkMetricReport::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
+    ## ie-my11s-metric-report.h (module 'pmtmgmp'): void ns3::my11s::IeLinkMetricReport::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
     cls.add_method('SerializeInformationField', 
                    'void', 
                    [param('ns3::Buffer::Iterator', 'i')], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-metric-report.h (module 'wmn'): void ns3::my11s::IeLinkMetricReport::SetMetric(uint32_t metric) [member function]
+    ## ie-my11s-metric-report.h (module 'pmtmgmp'): void ns3::my11s::IeLinkMetricReport::SetMetric(uint32_t metric) [member function]
     cls.add_method('SetMetric', 
                    'void', 
                    [param('uint32_t', 'metric')])
     return
 
-def register_Ns3My11sIeWmnId_methods(root_module, cls):
-    cls.add_output_stream_operator()
-    cls.add_binary_comparison_operator('==')
-    ## ie-my11s-id.h (module 'wmn'): ns3::my11s::IeWmnId::IeWmnId(ns3::my11s::IeWmnId const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::my11s::IeWmnId const &', 'arg0')])
-    ## ie-my11s-id.h (module 'wmn'): ns3::my11s::IeWmnId::IeWmnId() [constructor]
-    cls.add_constructor([])
-    ## ie-my11s-id.h (module 'wmn'): ns3::my11s::IeWmnId::IeWmnId(std::string s) [constructor]
-    cls.add_constructor([param('std::string', 's')])
-    ## ie-my11s-id.h (module 'wmn'): uint8_t ns3::my11s::IeWmnId::DeserializeInformationField(ns3::Buffer::Iterator start, uint8_t length) [member function]
-    cls.add_method('DeserializeInformationField', 
-                   'uint8_t', 
-                   [param('ns3::Buffer::Iterator', 'start'), param('uint8_t', 'length')], 
-                   is_virtual=True)
-    ## ie-my11s-id.h (module 'wmn'): ns3::WifiInformationElementId ns3::my11s::IeWmnId::ElementId() const [member function]
-    cls.add_method('ElementId', 
-                   'ns3::WifiInformationElementId', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## ie-my11s-id.h (module 'wmn'): uint8_t ns3::my11s::IeWmnId::GetInformationFieldSize() const [member function]
-    cls.add_method('GetInformationFieldSize', 
-                   'uint8_t', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## ie-my11s-id.h (module 'wmn'): bool ns3::my11s::IeWmnId::IsBroadcast() const [member function]
-    cls.add_method('IsBroadcast', 
-                   'bool', 
-                   [], 
-                   is_const=True)
-    ## ie-my11s-id.h (module 'wmn'): bool ns3::my11s::IeWmnId::IsEqual(ns3::my11s::IeWmnId const & o) const [member function]
-    cls.add_method('IsEqual', 
-                   'bool', 
-                   [param('ns3::my11s::IeWmnId const &', 'o')], 
-                   is_const=True)
-    ## ie-my11s-id.h (module 'wmn'): char * ns3::my11s::IeWmnId::PeekString() const [member function]
-    cls.add_method('PeekString', 
-                   'char *', 
-                   [], 
-                   is_const=True)
-    ## ie-my11s-id.h (module 'wmn'): void ns3::my11s::IeWmnId::Print(std::ostream & os) const [member function]
-    cls.add_method('Print', 
-                   'void', 
-                   [param('std::ostream &', 'os')], 
-                   is_const=True, is_virtual=True)
-    ## ie-my11s-id.h (module 'wmn'): void ns3::my11s::IeWmnId::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
-    cls.add_method('SerializeInformationField', 
-                   'void', 
-                   [param('ns3::Buffer::Iterator', 'i')], 
-                   is_const=True, is_virtual=True)
-    return
-
-def register_Ns3My11sIeWmnIdChecker_methods(root_module, cls):
-    ## ie-my11s-id.h (module 'wmn'): ns3::my11s::IeWmnIdChecker::IeWmnIdChecker() [constructor]
-    cls.add_constructor([])
-    ## ie-my11s-id.h (module 'wmn'): ns3::my11s::IeWmnIdChecker::IeWmnIdChecker(ns3::my11s::IeWmnIdChecker const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::my11s::IeWmnIdChecker const &', 'arg0')])
-    return
-
-def register_Ns3My11sIeWmnIdValue_methods(root_module, cls):
-    ## ie-my11s-id.h (module 'wmn'): ns3::my11s::IeWmnIdValue::IeWmnIdValue() [constructor]
-    cls.add_constructor([])
-    ## ie-my11s-id.h (module 'wmn'): ns3::my11s::IeWmnIdValue::IeWmnIdValue(ns3::my11s::IeWmnIdValue const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::my11s::IeWmnIdValue const &', 'arg0')])
-    ## ie-my11s-id.h (module 'wmn'): ns3::my11s::IeWmnIdValue::IeWmnIdValue(ns3::my11s::IeWmnId const & value) [constructor]
-    cls.add_constructor([param('ns3::my11s::IeWmnId const &', 'value')])
-    ## ie-my11s-id.h (module 'wmn'): ns3::Ptr<ns3::AttributeValue> ns3::my11s::IeWmnIdValue::Copy() const [member function]
-    cls.add_method('Copy', 
-                   'ns3::Ptr< ns3::AttributeValue >', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## ie-my11s-id.h (module 'wmn'): bool ns3::my11s::IeWmnIdValue::DeserializeFromString(std::string value, ns3::Ptr<ns3::AttributeChecker const> checker) [member function]
-    cls.add_method('DeserializeFromString', 
-                   'bool', 
-                   [param('std::string', 'value'), param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
-                   is_virtual=True)
-    ## ie-my11s-id.h (module 'wmn'): ns3::my11s::IeWmnId ns3::my11s::IeWmnIdValue::Get() const [member function]
-    cls.add_method('Get', 
-                   'ns3::my11s::IeWmnId', 
-                   [], 
-                   is_const=True)
-    ## ie-my11s-id.h (module 'wmn'): std::string ns3::my11s::IeWmnIdValue::SerializeToString(ns3::Ptr<ns3::AttributeChecker const> checker) const [member function]
-    cls.add_method('SerializeToString', 
-                   'std::string', 
-                   [param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
-                   is_const=True, is_virtual=True)
-    ## ie-my11s-id.h (module 'wmn'): void ns3::my11s::IeWmnIdValue::Set(ns3::my11s::IeWmnId const & value) [member function]
-    cls.add_method('Set', 
-                   'void', 
-                   [param('ns3::my11s::IeWmnId const &', 'value')])
-    return
-
 def register_Ns3My11sIePeerManagement_methods(root_module, cls):
     cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('==')
-    ## ie-my11s-peer-management.h (module 'wmn'): ns3::my11s::IePeerManagement::IePeerManagement(ns3::my11s::IePeerManagement const & arg0) [copy constructor]
+    ## ie-my11s-peer-management.h (module 'pmtmgmp'): ns3::my11s::IePeerManagement::IePeerManagement(ns3::my11s::IePeerManagement const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::my11s::IePeerManagement const &', 'arg0')])
-    ## ie-my11s-peer-management.h (module 'wmn'): ns3::my11s::IePeerManagement::IePeerManagement() [constructor]
+    ## ie-my11s-peer-management.h (module 'pmtmgmp'): ns3::my11s::IePeerManagement::IePeerManagement() [constructor]
     cls.add_constructor([])
-    ## ie-my11s-peer-management.h (module 'wmn'): uint8_t ns3::my11s::IePeerManagement::DeserializeInformationField(ns3::Buffer::Iterator i, uint8_t length) [member function]
+    ## ie-my11s-peer-management.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePeerManagement::DeserializeInformationField(ns3::Buffer::Iterator i, uint8_t length) [member function]
     cls.add_method('DeserializeInformationField', 
                    'uint8_t', 
                    [param('ns3::Buffer::Iterator', 'i'), param('uint8_t', 'length')], 
                    is_virtual=True)
-    ## ie-my11s-peer-management.h (module 'wmn'): ns3::WifiInformationElementId ns3::my11s::IePeerManagement::ElementId() const [member function]
+    ## ie-my11s-peer-management.h (module 'pmtmgmp'): ns3::WifiInformationElementId ns3::my11s::IePeerManagement::ElementId() const [member function]
     cls.add_method('ElementId', 
                    'ns3::WifiInformationElementId', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-peer-management.h (module 'wmn'): uint8_t ns3::my11s::IePeerManagement::GetInformationFieldSize() const [member function]
+    ## ie-my11s-peer-management.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePeerManagement::GetInformationFieldSize() const [member function]
     cls.add_method('GetInformationFieldSize', 
                    'uint8_t', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-peer-management.h (module 'wmn'): uint16_t ns3::my11s::IePeerManagement::GetLocalLinkId() const [member function]
+    ## ie-my11s-peer-management.h (module 'pmtmgmp'): uint16_t ns3::my11s::IePeerManagement::GetLocalLinkId() const [member function]
     cls.add_method('GetLocalLinkId', 
                    'uint16_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-peer-management.h (module 'wmn'): uint16_t ns3::my11s::IePeerManagement::GetPeerLinkId() const [member function]
-    cls.add_method('GetPeerLinkId', 
+    ## ie-my11s-peer-management.h (module 'pmtmgmp'): uint16_t ns3::my11s::IePeerManagement::GetPmtmgmpPeerLinkId() const [member function]
+    cls.add_method('GetPmtmgmpPeerLinkId', 
                    'uint16_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-peer-management.h (module 'wmn'): ns3::my11s::PmpReasonCode ns3::my11s::IePeerManagement::GetReasonCode() const [member function]
+    ## ie-my11s-peer-management.h (module 'pmtmgmp'): ns3::my11s::PmpReasonCode ns3::my11s::IePeerManagement::GetReasonCode() const [member function]
     cls.add_method('GetReasonCode', 
                    'ns3::my11s::PmpReasonCode', 
                    [], 
                    is_const=True)
-    ## ie-my11s-peer-management.h (module 'wmn'): uint8_t ns3::my11s::IePeerManagement::GetSubtype() const [member function]
+    ## ie-my11s-peer-management.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePeerManagement::GetSubtype() const [member function]
     cls.add_method('GetSubtype', 
                    'uint8_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-peer-management.h (module 'wmn'): void ns3::my11s::IePeerManagement::Print(std::ostream & os) const [member function]
+    ## ie-my11s-peer-management.h (module 'pmtmgmp'): void ns3::my11s::IePeerManagement::Print(std::ostream & os) const [member function]
     cls.add_method('Print', 
                    'void', 
                    [param('std::ostream &', 'os')], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-peer-management.h (module 'wmn'): void ns3::my11s::IePeerManagement::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
+    ## ie-my11s-peer-management.h (module 'pmtmgmp'): void ns3::my11s::IePeerManagement::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
     cls.add_method('SerializeInformationField', 
                    'void', 
                    [param('ns3::Buffer::Iterator', 'i')], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-peer-management.h (module 'wmn'): void ns3::my11s::IePeerManagement::SetPeerClose(uint16_t localLinkID, uint16_t peerLinkId, ns3::my11s::PmpReasonCode reasonCode) [member function]
+    ## ie-my11s-peer-management.h (module 'pmtmgmp'): void ns3::my11s::IePeerManagement::SetPeerClose(uint16_t localLinkID, uint16_t PmtmgmpPeerLinkId, ns3::my11s::PmpReasonCode reasonCode) [member function]
     cls.add_method('SetPeerClose', 
                    'void', 
-                   [param('uint16_t', 'localLinkID'), param('uint16_t', 'peerLinkId'), param('ns3::my11s::PmpReasonCode', 'reasonCode')])
-    ## ie-my11s-peer-management.h (module 'wmn'): void ns3::my11s::IePeerManagement::SetPeerConfirm(uint16_t localLinkID, uint16_t peerLinkId) [member function]
+                   [param('uint16_t', 'localLinkID'), param('uint16_t', 'PmtmgmpPeerLinkId'), param('ns3::my11s::PmpReasonCode', 'reasonCode')])
+    ## ie-my11s-peer-management.h (module 'pmtmgmp'): void ns3::my11s::IePeerManagement::SetPeerConfirm(uint16_t localLinkID, uint16_t PmtmgmpPeerLinkId) [member function]
     cls.add_method('SetPeerConfirm', 
                    'void', 
-                   [param('uint16_t', 'localLinkID'), param('uint16_t', 'peerLinkId')])
-    ## ie-my11s-peer-management.h (module 'wmn'): void ns3::my11s::IePeerManagement::SetPeerOpen(uint16_t localLinkId) [member function]
+                   [param('uint16_t', 'localLinkID'), param('uint16_t', 'PmtmgmpPeerLinkId')])
+    ## ie-my11s-peer-management.h (module 'pmtmgmp'): void ns3::my11s::IePeerManagement::SetPeerOpen(uint16_t localLinkId) [member function]
     cls.add_method('SetPeerOpen', 
                    'void', 
                    [param('uint16_t', 'localLinkId')])
-    ## ie-my11s-peer-management.h (module 'wmn'): bool ns3::my11s::IePeerManagement::SubtypeIsClose() const [member function]
+    ## ie-my11s-peer-management.h (module 'pmtmgmp'): bool ns3::my11s::IePeerManagement::SubtypeIsClose() const [member function]
     cls.add_method('SubtypeIsClose', 
                    'bool', 
                    [], 
                    is_const=True)
-    ## ie-my11s-peer-management.h (module 'wmn'): bool ns3::my11s::IePeerManagement::SubtypeIsConfirm() const [member function]
+    ## ie-my11s-peer-management.h (module 'pmtmgmp'): bool ns3::my11s::IePeerManagement::SubtypeIsConfirm() const [member function]
     cls.add_method('SubtypeIsConfirm', 
                    'bool', 
                    [], 
                    is_const=True)
-    ## ie-my11s-peer-management.h (module 'wmn'): bool ns3::my11s::IePeerManagement::SubtypeIsOpen() const [member function]
+    ## ie-my11s-peer-management.h (module 'pmtmgmp'): bool ns3::my11s::IePeerManagement::SubtypeIsOpen() const [member function]
     cls.add_method('SubtypeIsOpen', 
                    'bool', 
                    [], 
@@ -10780,31 +10422,31 @@ def register_Ns3My11sIePeerManagement_methods(root_module, cls):
     return
 
 def register_Ns3My11sIePeeringProtocol_methods(root_module, cls):
-    ## ie-my11s-peering-protocol.h (module 'wmn'): ns3::my11s::IePeeringProtocol::IePeeringProtocol(ns3::my11s::IePeeringProtocol const & arg0) [copy constructor]
+    ## ie-my11s-peering-protocol.h (module 'pmtmgmp'): ns3::my11s::IePeeringProtocol::IePeeringProtocol(ns3::my11s::IePeeringProtocol const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::my11s::IePeeringProtocol const &', 'arg0')])
-    ## ie-my11s-peering-protocol.h (module 'wmn'): ns3::my11s::IePeeringProtocol::IePeeringProtocol() [constructor]
+    ## ie-my11s-peering-protocol.h (module 'pmtmgmp'): ns3::my11s::IePeeringProtocol::IePeeringProtocol() [constructor]
     cls.add_constructor([])
-    ## ie-my11s-peering-protocol.h (module 'wmn'): uint8_t ns3::my11s::IePeeringProtocol::DeserializeInformationField(ns3::Buffer::Iterator i, uint8_t length) [member function]
+    ## ie-my11s-peering-protocol.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePeeringProtocol::DeserializeInformationField(ns3::Buffer::Iterator i, uint8_t length) [member function]
     cls.add_method('DeserializeInformationField', 
                    'uint8_t', 
                    [param('ns3::Buffer::Iterator', 'i'), param('uint8_t', 'length')], 
                    is_virtual=True)
-    ## ie-my11s-peering-protocol.h (module 'wmn'): ns3::WifiInformationElementId ns3::my11s::IePeeringProtocol::ElementId() const [member function]
+    ## ie-my11s-peering-protocol.h (module 'pmtmgmp'): ns3::WifiInformationElementId ns3::my11s::IePeeringProtocol::ElementId() const [member function]
     cls.add_method('ElementId', 
                    'ns3::WifiInformationElementId', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-peering-protocol.h (module 'wmn'): uint8_t ns3::my11s::IePeeringProtocol::GetInformationFieldSize() const [member function]
+    ## ie-my11s-peering-protocol.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePeeringProtocol::GetInformationFieldSize() const [member function]
     cls.add_method('GetInformationFieldSize', 
                    'uint8_t', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-peering-protocol.h (module 'wmn'): void ns3::my11s::IePeeringProtocol::Print(std::ostream & os) const [member function]
+    ## ie-my11s-peering-protocol.h (module 'pmtmgmp'): void ns3::my11s::IePeeringProtocol::Print(std::ostream & os) const [member function]
     cls.add_method('Print', 
                    'void', 
                    [param('std::ostream &', 'os')], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-peering-protocol.h (module 'wmn'): void ns3::my11s::IePeeringProtocol::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
+    ## ie-my11s-peering-protocol.h (module 'pmtmgmp'): void ns3::my11s::IePeeringProtocol::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
     cls.add_method('SerializeInformationField', 
                    'void', 
                    [param('ns3::Buffer::Iterator', 'i')], 
@@ -10814,58 +10456,58 @@ def register_Ns3My11sIePeeringProtocol_methods(root_module, cls):
 def register_Ns3My11sIePerr_methods(root_module, cls):
     cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('==')
-    ## ie-my11s-perr.h (module 'wmn'): ns3::my11s::IePerr::IePerr(ns3::my11s::IePerr const & arg0) [copy constructor]
+    ## ie-my11s-perr.h (module 'pmtmgmp'): ns3::my11s::IePerr::IePerr(ns3::my11s::IePerr const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::my11s::IePerr const &', 'arg0')])
-    ## ie-my11s-perr.h (module 'wmn'): ns3::my11s::IePerr::IePerr() [constructor]
+    ## ie-my11s-perr.h (module 'pmtmgmp'): ns3::my11s::IePerr::IePerr() [constructor]
     cls.add_constructor([])
-    ## ie-my11s-perr.h (module 'wmn'): void ns3::my11s::IePerr::AddAddressUnit(ns3::my11s::PmtmgmpProtocol::FailedDestination unit) [member function]
+    ## ie-my11s-perr.h (module 'pmtmgmp'): void ns3::my11s::IePerr::AddAddressUnit(ns3::my11s::PmtmgmpProtocol::FailedDestination unit) [member function]
     cls.add_method('AddAddressUnit', 
                    'void', 
                    [param('ns3::my11s::PmtmgmpProtocol::FailedDestination', 'unit')])
-    ## ie-my11s-perr.h (module 'wmn'): void ns3::my11s::IePerr::DeleteAddressUnit(ns3::Mac48Address address) [member function]
+    ## ie-my11s-perr.h (module 'pmtmgmp'): void ns3::my11s::IePerr::DeleteAddressUnit(ns3::Mac48Address address) [member function]
     cls.add_method('DeleteAddressUnit', 
                    'void', 
                    [param('ns3::Mac48Address', 'address')])
-    ## ie-my11s-perr.h (module 'wmn'): uint8_t ns3::my11s::IePerr::DeserializeInformationField(ns3::Buffer::Iterator start, uint8_t length) [member function]
+    ## ie-my11s-perr.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePerr::DeserializeInformationField(ns3::Buffer::Iterator start, uint8_t length) [member function]
     cls.add_method('DeserializeInformationField', 
                    'uint8_t', 
                    [param('ns3::Buffer::Iterator', 'start'), param('uint8_t', 'length')], 
                    is_virtual=True)
-    ## ie-my11s-perr.h (module 'wmn'): ns3::WifiInformationElementId ns3::my11s::IePerr::ElementId() const [member function]
+    ## ie-my11s-perr.h (module 'pmtmgmp'): ns3::WifiInformationElementId ns3::my11s::IePerr::ElementId() const [member function]
     cls.add_method('ElementId', 
                    'ns3::WifiInformationElementId', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-perr.h (module 'wmn'): std::vector<ns3::my11s::PmtmgmpProtocol::FailedDestination, std::allocator<ns3::my11s::PmtmgmpProtocol::FailedDestination> > ns3::my11s::IePerr::GetAddressUnitVector() const [member function]
+    ## ie-my11s-perr.h (module 'pmtmgmp'): std::vector<ns3::my11s::PmtmgmpProtocol::FailedDestination, std::allocator<ns3::my11s::PmtmgmpProtocol::FailedDestination> > ns3::my11s::IePerr::GetAddressUnitVector() const [member function]
     cls.add_method('GetAddressUnitVector', 
                    'std::vector< ns3::my11s::PmtmgmpProtocol::FailedDestination >', 
                    [], 
                    is_const=True)
-    ## ie-my11s-perr.h (module 'wmn'): uint8_t ns3::my11s::IePerr::GetInformationFieldSize() const [member function]
+    ## ie-my11s-perr.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePerr::GetInformationFieldSize() const [member function]
     cls.add_method('GetInformationFieldSize', 
                    'uint8_t', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-perr.h (module 'wmn'): uint8_t ns3::my11s::IePerr::GetNumOfDest() const [member function]
+    ## ie-my11s-perr.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePerr::GetNumOfDest() const [member function]
     cls.add_method('GetNumOfDest', 
                    'uint8_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-perr.h (module 'wmn'): bool ns3::my11s::IePerr::IsFull() const [member function]
+    ## ie-my11s-perr.h (module 'pmtmgmp'): bool ns3::my11s::IePerr::IsFull() const [member function]
     cls.add_method('IsFull', 
                    'bool', 
                    [], 
                    is_const=True)
-    ## ie-my11s-perr.h (module 'wmn'): void ns3::my11s::IePerr::Print(std::ostream & os) const [member function]
+    ## ie-my11s-perr.h (module 'pmtmgmp'): void ns3::my11s::IePerr::Print(std::ostream & os) const [member function]
     cls.add_method('Print', 
                    'void', 
                    [param('std::ostream &', 'os')], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-perr.h (module 'wmn'): void ns3::my11s::IePerr::ResetPerr() [member function]
+    ## ie-my11s-perr.h (module 'pmtmgmp'): void ns3::my11s::IePerr::ResetPerr() [member function]
     cls.add_method('ResetPerr', 
                    'void', 
                    [])
-    ## ie-my11s-perr.h (module 'wmn'): void ns3::my11s::IePerr::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
+    ## ie-my11s-perr.h (module 'pmtmgmp'): void ns3::my11s::IePerr::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
     cls.add_method('SerializeInformationField', 
                    'void', 
                    [param('ns3::Buffer::Iterator', 'i')], 
@@ -10875,121 +10517,121 @@ def register_Ns3My11sIePerr_methods(root_module, cls):
 def register_Ns3My11sIePrep_methods(root_module, cls):
     cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('==')
-    ## ie-my11s-prep.h (module 'wmn'): ns3::my11s::IePrep::IePrep(ns3::my11s::IePrep const & arg0) [copy constructor]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): ns3::my11s::IePrep::IePrep(ns3::my11s::IePrep const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::my11s::IePrep const &', 'arg0')])
-    ## ie-my11s-prep.h (module 'wmn'): ns3::my11s::IePrep::IePrep() [constructor]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): ns3::my11s::IePrep::IePrep() [constructor]
     cls.add_constructor([])
-    ## ie-my11s-prep.h (module 'wmn'): void ns3::my11s::IePrep::DecrementTtl() [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): void ns3::my11s::IePrep::DecrementTtl() [member function]
     cls.add_method('DecrementTtl', 
                    'void', 
                    [])
-    ## ie-my11s-prep.h (module 'wmn'): uint8_t ns3::my11s::IePrep::DeserializeInformationField(ns3::Buffer::Iterator start, uint8_t length) [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePrep::DeserializeInformationField(ns3::Buffer::Iterator start, uint8_t length) [member function]
     cls.add_method('DeserializeInformationField', 
                    'uint8_t', 
                    [param('ns3::Buffer::Iterator', 'start'), param('uint8_t', 'length')], 
                    is_virtual=True)
-    ## ie-my11s-prep.h (module 'wmn'): ns3::WifiInformationElementId ns3::my11s::IePrep::ElementId() const [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): ns3::WifiInformationElementId ns3::my11s::IePrep::ElementId() const [member function]
     cls.add_method('ElementId', 
                    'ns3::WifiInformationElementId', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-prep.h (module 'wmn'): ns3::Mac48Address ns3::my11s::IePrep::GetDestinationAddress() const [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::IePrep::GetDestinationAddress() const [member function]
     cls.add_method('GetDestinationAddress', 
                    'ns3::Mac48Address', 
                    [], 
                    is_const=True)
-    ## ie-my11s-prep.h (module 'wmn'): uint32_t ns3::my11s::IePrep::GetDestinationSeqNumber() const [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): uint32_t ns3::my11s::IePrep::GetDestinationSeqNumber() const [member function]
     cls.add_method('GetDestinationSeqNumber', 
                    'uint32_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-prep.h (module 'wmn'): uint8_t ns3::my11s::IePrep::GetFlags() const [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePrep::GetFlags() const [member function]
     cls.add_method('GetFlags', 
                    'uint8_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-prep.h (module 'wmn'): uint8_t ns3::my11s::IePrep::GetHopcount() const [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePrep::GetHopcount() const [member function]
     cls.add_method('GetHopcount', 
                    'uint8_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-prep.h (module 'wmn'): uint8_t ns3::my11s::IePrep::GetInformationFieldSize() const [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePrep::GetInformationFieldSize() const [member function]
     cls.add_method('GetInformationFieldSize', 
                    'uint8_t', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-prep.h (module 'wmn'): uint32_t ns3::my11s::IePrep::GetLifetime() const [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): uint32_t ns3::my11s::IePrep::GetLifetime() const [member function]
     cls.add_method('GetLifetime', 
                    'uint32_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-prep.h (module 'wmn'): uint32_t ns3::my11s::IePrep::GetMetric() const [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): uint32_t ns3::my11s::IePrep::GetMetric() const [member function]
     cls.add_method('GetMetric', 
                    'uint32_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-prep.h (module 'wmn'): ns3::Mac48Address ns3::my11s::IePrep::GetOriginatorAddress() const [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::IePrep::GetOriginatorAddress() const [member function]
     cls.add_method('GetOriginatorAddress', 
                    'ns3::Mac48Address', 
                    [], 
                    is_const=True)
-    ## ie-my11s-prep.h (module 'wmn'): uint32_t ns3::my11s::IePrep::GetOriginatorSeqNumber() const [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): uint32_t ns3::my11s::IePrep::GetOriginatorSeqNumber() const [member function]
     cls.add_method('GetOriginatorSeqNumber', 
                    'uint32_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-prep.h (module 'wmn'): uint32_t ns3::my11s::IePrep::GetTtl() const [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): uint32_t ns3::my11s::IePrep::GetTtl() const [member function]
     cls.add_method('GetTtl', 
                    'uint32_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-prep.h (module 'wmn'): void ns3::my11s::IePrep::IncrementMetric(uint32_t metric) [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): void ns3::my11s::IePrep::IncrementMetric(uint32_t metric) [member function]
     cls.add_method('IncrementMetric', 
                    'void', 
                    [param('uint32_t', 'metric')])
-    ## ie-my11s-prep.h (module 'wmn'): void ns3::my11s::IePrep::Print(std::ostream & os) const [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): void ns3::my11s::IePrep::Print(std::ostream & os) const [member function]
     cls.add_method('Print', 
                    'void', 
                    [param('std::ostream &', 'os')], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-prep.h (module 'wmn'): void ns3::my11s::IePrep::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): void ns3::my11s::IePrep::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
     cls.add_method('SerializeInformationField', 
                    'void', 
                    [param('ns3::Buffer::Iterator', 'i')], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-prep.h (module 'wmn'): void ns3::my11s::IePrep::SetDestinationAddress(ns3::Mac48Address dest_address) [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): void ns3::my11s::IePrep::SetDestinationAddress(ns3::Mac48Address dest_address) [member function]
     cls.add_method('SetDestinationAddress', 
                    'void', 
                    [param('ns3::Mac48Address', 'dest_address')])
-    ## ie-my11s-prep.h (module 'wmn'): void ns3::my11s::IePrep::SetDestinationSeqNumber(uint32_t dest_seq_number) [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): void ns3::my11s::IePrep::SetDestinationSeqNumber(uint32_t dest_seq_number) [member function]
     cls.add_method('SetDestinationSeqNumber', 
                    'void', 
                    [param('uint32_t', 'dest_seq_number')])
-    ## ie-my11s-prep.h (module 'wmn'): void ns3::my11s::IePrep::SetFlags(uint8_t flags) [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): void ns3::my11s::IePrep::SetFlags(uint8_t flags) [member function]
     cls.add_method('SetFlags', 
                    'void', 
                    [param('uint8_t', 'flags')])
-    ## ie-my11s-prep.h (module 'wmn'): void ns3::my11s::IePrep::SetHopcount(uint8_t hopcount) [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): void ns3::my11s::IePrep::SetHopcount(uint8_t hopcount) [member function]
     cls.add_method('SetHopcount', 
                    'void', 
                    [param('uint8_t', 'hopcount')])
-    ## ie-my11s-prep.h (module 'wmn'): void ns3::my11s::IePrep::SetLifetime(uint32_t lifetime) [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): void ns3::my11s::IePrep::SetLifetime(uint32_t lifetime) [member function]
     cls.add_method('SetLifetime', 
                    'void', 
                    [param('uint32_t', 'lifetime')])
-    ## ie-my11s-prep.h (module 'wmn'): void ns3::my11s::IePrep::SetMetric(uint32_t metric) [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): void ns3::my11s::IePrep::SetMetric(uint32_t metric) [member function]
     cls.add_method('SetMetric', 
                    'void', 
                    [param('uint32_t', 'metric')])
-    ## ie-my11s-prep.h (module 'wmn'): void ns3::my11s::IePrep::SetOriginatorAddress(ns3::Mac48Address originator_address) [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): void ns3::my11s::IePrep::SetOriginatorAddress(ns3::Mac48Address originator_address) [member function]
     cls.add_method('SetOriginatorAddress', 
                    'void', 
                    [param('ns3::Mac48Address', 'originator_address')])
-    ## ie-my11s-prep.h (module 'wmn'): void ns3::my11s::IePrep::SetOriginatorSeqNumber(uint32_t originator_seq_number) [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): void ns3::my11s::IePrep::SetOriginatorSeqNumber(uint32_t originator_seq_number) [member function]
     cls.add_method('SetOriginatorSeqNumber', 
                    'void', 
                    [param('uint32_t', 'originator_seq_number')])
-    ## ie-my11s-prep.h (module 'wmn'): void ns3::my11s::IePrep::SetTtl(uint8_t ttl) [member function]
+    ## ie-my11s-prep.h (module 'pmtmgmp'): void ns3::my11s::IePrep::SetTtl(uint8_t ttl) [member function]
     cls.add_method('SetTtl', 
                    'void', 
                    [param('uint8_t', 'ttl')])
@@ -10998,155 +10640,155 @@ def register_Ns3My11sIePrep_methods(root_module, cls):
 def register_Ns3My11sIePreq_methods(root_module, cls):
     cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('==')
-    ## ie-my11s-preq.h (module 'wmn'): ns3::my11s::IePreq::IePreq(ns3::my11s::IePreq const & arg0) [copy constructor]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): ns3::my11s::IePreq::IePreq(ns3::my11s::IePreq const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::my11s::IePreq const &', 'arg0')])
-    ## ie-my11s-preq.h (module 'wmn'): ns3::my11s::IePreq::IePreq() [constructor]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): ns3::my11s::IePreq::IePreq() [constructor]
     cls.add_constructor([])
-    ## ie-my11s-preq.h (module 'wmn'): void ns3::my11s::IePreq::AddDestinationAddressElement(bool doFlag, bool rfFlag, ns3::Mac48Address dest_address, uint32_t dest_seq_number) [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): void ns3::my11s::IePreq::AddDestinationAddressElement(bool doFlag, bool rfFlag, ns3::Mac48Address dest_address, uint32_t dest_seq_number) [member function]
     cls.add_method('AddDestinationAddressElement', 
                    'void', 
                    [param('bool', 'doFlag'), param('bool', 'rfFlag'), param('ns3::Mac48Address', 'dest_address'), param('uint32_t', 'dest_seq_number')])
-    ## ie-my11s-preq.h (module 'wmn'): void ns3::my11s::IePreq::ClearDestinationAddressElements() [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): void ns3::my11s::IePreq::ClearDestinationAddressElements() [member function]
     cls.add_method('ClearDestinationAddressElements', 
                    'void', 
                    [])
-    ## ie-my11s-preq.h (module 'wmn'): void ns3::my11s::IePreq::DecrementTtl() [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): void ns3::my11s::IePreq::DecrementTtl() [member function]
     cls.add_method('DecrementTtl', 
                    'void', 
                    [])
-    ## ie-my11s-preq.h (module 'wmn'): void ns3::my11s::IePreq::DelDestinationAddressElement(ns3::Mac48Address dest_address) [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): void ns3::my11s::IePreq::DelDestinationAddressElement(ns3::Mac48Address dest_address) [member function]
     cls.add_method('DelDestinationAddressElement', 
                    'void', 
                    [param('ns3::Mac48Address', 'dest_address')])
-    ## ie-my11s-preq.h (module 'wmn'): uint8_t ns3::my11s::IePreq::DeserializeInformationField(ns3::Buffer::Iterator i, uint8_t length) [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePreq::DeserializeInformationField(ns3::Buffer::Iterator i, uint8_t length) [member function]
     cls.add_method('DeserializeInformationField', 
                    'uint8_t', 
                    [param('ns3::Buffer::Iterator', 'i'), param('uint8_t', 'length')], 
                    is_virtual=True)
-    ## ie-my11s-preq.h (module 'wmn'): ns3::WifiInformationElementId ns3::my11s::IePreq::ElementId() const [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): ns3::WifiInformationElementId ns3::my11s::IePreq::ElementId() const [member function]
     cls.add_method('ElementId', 
                    'ns3::WifiInformationElementId', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-preq.h (module 'wmn'): uint8_t ns3::my11s::IePreq::GetDestCount() const [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePreq::GetDestCount() const [member function]
     cls.add_method('GetDestCount', 
                    'uint8_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-preq.h (module 'wmn'): std::vector<ns3::Ptr<ns3::my11s::DestinationAddressUnit>, std::allocator<ns3::Ptr<ns3::my11s::DestinationAddressUnit> > > ns3::my11s::IePreq::GetDestinationList() [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): std::vector<ns3::Ptr<ns3::my11s::DestinationAddressUnit>, std::allocator<ns3::Ptr<ns3::my11s::DestinationAddressUnit> > > ns3::my11s::IePreq::GetDestinationList() [member function]
     cls.add_method('GetDestinationList', 
                    'std::vector< ns3::Ptr< ns3::my11s::DestinationAddressUnit > >', 
                    [])
-    ## ie-my11s-preq.h (module 'wmn'): uint8_t ns3::my11s::IePreq::GetHopCount() const [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePreq::GetHopCount() const [member function]
     cls.add_method('GetHopCount', 
                    'uint8_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-preq.h (module 'wmn'): uint8_t ns3::my11s::IePreq::GetInformationFieldSize() const [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePreq::GetInformationFieldSize() const [member function]
     cls.add_method('GetInformationFieldSize', 
                    'uint8_t', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-preq.h (module 'wmn'): uint32_t ns3::my11s::IePreq::GetLifetime() const [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): uint32_t ns3::my11s::IePreq::GetLifetime() const [member function]
     cls.add_method('GetLifetime', 
                    'uint32_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-preq.h (module 'wmn'): uint32_t ns3::my11s::IePreq::GetMetric() const [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): uint32_t ns3::my11s::IePreq::GetMetric() const [member function]
     cls.add_method('GetMetric', 
                    'uint32_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-preq.h (module 'wmn'): ns3::Mac48Address ns3::my11s::IePreq::GetOriginatorAddress() const [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::IePreq::GetOriginatorAddress() const [member function]
     cls.add_method('GetOriginatorAddress', 
                    'ns3::Mac48Address', 
                    [], 
                    is_const=True)
-    ## ie-my11s-preq.h (module 'wmn'): uint32_t ns3::my11s::IePreq::GetOriginatorSeqNumber() const [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): uint32_t ns3::my11s::IePreq::GetOriginatorSeqNumber() const [member function]
     cls.add_method('GetOriginatorSeqNumber', 
                    'uint32_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-preq.h (module 'wmn'): uint32_t ns3::my11s::IePreq::GetPreqID() const [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): uint32_t ns3::my11s::IePreq::GetPreqID() const [member function]
     cls.add_method('GetPreqID', 
                    'uint32_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-preq.h (module 'wmn'): uint8_t ns3::my11s::IePreq::GetTtl() const [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePreq::GetTtl() const [member function]
     cls.add_method('GetTtl', 
                    'uint8_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-preq.h (module 'wmn'): void ns3::my11s::IePreq::IncrementMetric(uint32_t metric) [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): void ns3::my11s::IePreq::IncrementMetric(uint32_t metric) [member function]
     cls.add_method('IncrementMetric', 
                    'void', 
                    [param('uint32_t', 'metric')])
-    ## ie-my11s-preq.h (module 'wmn'): bool ns3::my11s::IePreq::IsFull() const [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): bool ns3::my11s::IePreq::IsFull() const [member function]
     cls.add_method('IsFull', 
                    'bool', 
                    [], 
                    is_const=True)
-    ## ie-my11s-preq.h (module 'wmn'): bool ns3::my11s::IePreq::IsNeedNotPrep() const [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): bool ns3::my11s::IePreq::IsNeedNotPrep() const [member function]
     cls.add_method('IsNeedNotPrep', 
                    'bool', 
                    [], 
                    is_const=True)
-    ## ie-my11s-preq.h (module 'wmn'): bool ns3::my11s::IePreq::IsUnicastPreq() const [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): bool ns3::my11s::IePreq::IsUnicastPreq() const [member function]
     cls.add_method('IsUnicastPreq', 
                    'bool', 
                    [], 
                    is_const=True)
-    ## ie-my11s-preq.h (module 'wmn'): bool ns3::my11s::IePreq::MayAddAddress(ns3::Mac48Address originator) [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): bool ns3::my11s::IePreq::MayAddAddress(ns3::Mac48Address originator) [member function]
     cls.add_method('MayAddAddress', 
                    'bool', 
                    [param('ns3::Mac48Address', 'originator')])
-    ## ie-my11s-preq.h (module 'wmn'): void ns3::my11s::IePreq::Print(std::ostream & os) const [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): void ns3::my11s::IePreq::Print(std::ostream & os) const [member function]
     cls.add_method('Print', 
                    'void', 
                    [param('std::ostream &', 'os')], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-preq.h (module 'wmn'): void ns3::my11s::IePreq::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): void ns3::my11s::IePreq::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
     cls.add_method('SerializeInformationField', 
                    'void', 
                    [param('ns3::Buffer::Iterator', 'i')], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-preq.h (module 'wmn'): void ns3::my11s::IePreq::SetDestCount(uint8_t dest_count) [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): void ns3::my11s::IePreq::SetDestCount(uint8_t dest_count) [member function]
     cls.add_method('SetDestCount', 
                    'void', 
                    [param('uint8_t', 'dest_count')])
-    ## ie-my11s-preq.h (module 'wmn'): void ns3::my11s::IePreq::SetHopcount(uint8_t hopcount) [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): void ns3::my11s::IePreq::SetHopcount(uint8_t hopcount) [member function]
     cls.add_method('SetHopcount', 
                    'void', 
                    [param('uint8_t', 'hopcount')])
-    ## ie-my11s-preq.h (module 'wmn'): void ns3::my11s::IePreq::SetLifetime(uint32_t lifetime) [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): void ns3::my11s::IePreq::SetLifetime(uint32_t lifetime) [member function]
     cls.add_method('SetLifetime', 
                    'void', 
                    [param('uint32_t', 'lifetime')])
-    ## ie-my11s-preq.h (module 'wmn'): void ns3::my11s::IePreq::SetMetric(uint32_t metric) [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): void ns3::my11s::IePreq::SetMetric(uint32_t metric) [member function]
     cls.add_method('SetMetric', 
                    'void', 
                    [param('uint32_t', 'metric')])
-    ## ie-my11s-preq.h (module 'wmn'): void ns3::my11s::IePreq::SetNeedNotPrep() [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): void ns3::my11s::IePreq::SetNeedNotPrep() [member function]
     cls.add_method('SetNeedNotPrep', 
                    'void', 
                    [])
-    ## ie-my11s-preq.h (module 'wmn'): void ns3::my11s::IePreq::SetOriginatorAddress(ns3::Mac48Address originator_address) [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): void ns3::my11s::IePreq::SetOriginatorAddress(ns3::Mac48Address originator_address) [member function]
     cls.add_method('SetOriginatorAddress', 
                    'void', 
                    [param('ns3::Mac48Address', 'originator_address')])
-    ## ie-my11s-preq.h (module 'wmn'): void ns3::my11s::IePreq::SetOriginatorSeqNumber(uint32_t originator_seq_number) [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): void ns3::my11s::IePreq::SetOriginatorSeqNumber(uint32_t originator_seq_number) [member function]
     cls.add_method('SetOriginatorSeqNumber', 
                    'void', 
                    [param('uint32_t', 'originator_seq_number')])
-    ## ie-my11s-preq.h (module 'wmn'): void ns3::my11s::IePreq::SetPreqID(uint32_t id) [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): void ns3::my11s::IePreq::SetPreqID(uint32_t id) [member function]
     cls.add_method('SetPreqID', 
                    'void', 
                    [param('uint32_t', 'id')])
-    ## ie-my11s-preq.h (module 'wmn'): void ns3::my11s::IePreq::SetTTL(uint8_t ttl) [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): void ns3::my11s::IePreq::SetTTL(uint8_t ttl) [member function]
     cls.add_method('SetTTL', 
                    'void', 
                    [param('uint8_t', 'ttl')])
-    ## ie-my11s-preq.h (module 'wmn'): void ns3::my11s::IePreq::SetUnicastPreq() [member function]
+    ## ie-my11s-preq.h (module 'pmtmgmp'): void ns3::my11s::IePreq::SetUnicastPreq() [member function]
     cls.add_method('SetUnicastPreq', 
                    'void', 
                    [])
@@ -11155,743 +10797,923 @@ def register_Ns3My11sIePreq_methods(root_module, cls):
 def register_Ns3My11sIeRann_methods(root_module, cls):
     cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('==')
-    ## ie-my11s-rann.h (module 'wmn'): ns3::my11s::IeRann::IeRann(ns3::my11s::IeRann const & arg0) [copy constructor]
+    ## ie-my11s-rann.h (module 'pmtmgmp'): ns3::my11s::IeRann::IeRann(ns3::my11s::IeRann const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::my11s::IeRann const &', 'arg0')])
-    ## ie-my11s-rann.h (module 'wmn'): ns3::my11s::IeRann::IeRann() [constructor]
+    ## ie-my11s-rann.h (module 'pmtmgmp'): ns3::my11s::IeRann::IeRann() [constructor]
     cls.add_constructor([])
-    ## ie-my11s-rann.h (module 'wmn'): void ns3::my11s::IeRann::DecrementTtl() [member function]
+    ## ie-my11s-rann.h (module 'pmtmgmp'): void ns3::my11s::IeRann::DecrementTtl() [member function]
     cls.add_method('DecrementTtl', 
                    'void', 
                    [])
-    ## ie-my11s-rann.h (module 'wmn'): uint8_t ns3::my11s::IeRann::DeserializeInformationField(ns3::Buffer::Iterator start, uint8_t length) [member function]
+    ## ie-my11s-rann.h (module 'pmtmgmp'): uint8_t ns3::my11s::IeRann::DeserializeInformationField(ns3::Buffer::Iterator start, uint8_t length) [member function]
     cls.add_method('DeserializeInformationField', 
                    'uint8_t', 
                    [param('ns3::Buffer::Iterator', 'start'), param('uint8_t', 'length')], 
                    is_virtual=True)
-    ## ie-my11s-rann.h (module 'wmn'): ns3::WifiInformationElementId ns3::my11s::IeRann::ElementId() const [member function]
+    ## ie-my11s-rann.h (module 'pmtmgmp'): ns3::WifiInformationElementId ns3::my11s::IeRann::ElementId() const [member function]
     cls.add_method('ElementId', 
                    'ns3::WifiInformationElementId', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-rann.h (module 'wmn'): uint32_t ns3::my11s::IeRann::GetDestSeqNumber() [member function]
+    ## ie-my11s-rann.h (module 'pmtmgmp'): uint32_t ns3::my11s::IeRann::GetDestSeqNumber() [member function]
     cls.add_method('GetDestSeqNumber', 
                    'uint32_t', 
                    [])
-    ## ie-my11s-rann.h (module 'wmn'): uint8_t ns3::my11s::IeRann::GetFlags() [member function]
+    ## ie-my11s-rann.h (module 'pmtmgmp'): uint8_t ns3::my11s::IeRann::GetFlags() [member function]
     cls.add_method('GetFlags', 
                    'uint8_t', 
                    [])
-    ## ie-my11s-rann.h (module 'wmn'): uint8_t ns3::my11s::IeRann::GetHopcount() [member function]
+    ## ie-my11s-rann.h (module 'pmtmgmp'): uint8_t ns3::my11s::IeRann::GetHopcount() [member function]
     cls.add_method('GetHopcount', 
                    'uint8_t', 
                    [])
-    ## ie-my11s-rann.h (module 'wmn'): uint8_t ns3::my11s::IeRann::GetInformationFieldSize() const [member function]
+    ## ie-my11s-rann.h (module 'pmtmgmp'): uint8_t ns3::my11s::IeRann::GetInformationFieldSize() const [member function]
     cls.add_method('GetInformationFieldSize', 
                    'uint8_t', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-rann.h (module 'wmn'): uint32_t ns3::my11s::IeRann::GetMetric() [member function]
+    ## ie-my11s-rann.h (module 'pmtmgmp'): uint32_t ns3::my11s::IeRann::GetMetric() [member function]
     cls.add_method('GetMetric', 
                    'uint32_t', 
                    [])
-    ## ie-my11s-rann.h (module 'wmn'): ns3::Mac48Address ns3::my11s::IeRann::GetOriginatorAddress() [member function]
+    ## ie-my11s-rann.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::IeRann::GetOriginatorAddress() [member function]
     cls.add_method('GetOriginatorAddress', 
                    'ns3::Mac48Address', 
                    [])
-    ## ie-my11s-rann.h (module 'wmn'): uint8_t ns3::my11s::IeRann::GetTtl() [member function]
+    ## ie-my11s-rann.h (module 'pmtmgmp'): uint8_t ns3::my11s::IeRann::GetTtl() [member function]
     cls.add_method('GetTtl', 
                    'uint8_t', 
                    [])
-    ## ie-my11s-rann.h (module 'wmn'): void ns3::my11s::IeRann::IncrementMetric(uint32_t metric) [member function]
+    ## ie-my11s-rann.h (module 'pmtmgmp'): void ns3::my11s::IeRann::IncrementMetric(uint32_t metric) [member function]
     cls.add_method('IncrementMetric', 
                    'void', 
                    [param('uint32_t', 'metric')])
-    ## ie-my11s-rann.h (module 'wmn'): void ns3::my11s::IeRann::Print(std::ostream & os) const [member function]
+    ## ie-my11s-rann.h (module 'pmtmgmp'): void ns3::my11s::IeRann::Print(std::ostream & os) const [member function]
     cls.add_method('Print', 
                    'void', 
                    [param('std::ostream &', 'os')], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-rann.h (module 'wmn'): void ns3::my11s::IeRann::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
+    ## ie-my11s-rann.h (module 'pmtmgmp'): void ns3::my11s::IeRann::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
     cls.add_method('SerializeInformationField', 
                    'void', 
                    [param('ns3::Buffer::Iterator', 'i')], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-rann.h (module 'wmn'): void ns3::my11s::IeRann::SetDestSeqNumber(uint32_t dest_seq_number) [member function]
+    ## ie-my11s-rann.h (module 'pmtmgmp'): void ns3::my11s::IeRann::SetDestSeqNumber(uint32_t dest_seq_number) [member function]
     cls.add_method('SetDestSeqNumber', 
                    'void', 
                    [param('uint32_t', 'dest_seq_number')])
-    ## ie-my11s-rann.h (module 'wmn'): void ns3::my11s::IeRann::SetFlags(uint8_t flags) [member function]
+    ## ie-my11s-rann.h (module 'pmtmgmp'): void ns3::my11s::IeRann::SetFlags(uint8_t flags) [member function]
     cls.add_method('SetFlags', 
                    'void', 
                    [param('uint8_t', 'flags')])
-    ## ie-my11s-rann.h (module 'wmn'): void ns3::my11s::IeRann::SetHopcount(uint8_t hopcount) [member function]
+    ## ie-my11s-rann.h (module 'pmtmgmp'): void ns3::my11s::IeRann::SetHopcount(uint8_t hopcount) [member function]
     cls.add_method('SetHopcount', 
                    'void', 
                    [param('uint8_t', 'hopcount')])
-    ## ie-my11s-rann.h (module 'wmn'): void ns3::my11s::IeRann::SetMetric(uint32_t metric) [member function]
+    ## ie-my11s-rann.h (module 'pmtmgmp'): void ns3::my11s::IeRann::SetMetric(uint32_t metric) [member function]
     cls.add_method('SetMetric', 
                    'void', 
                    [param('uint32_t', 'metric')])
-    ## ie-my11s-rann.h (module 'wmn'): void ns3::my11s::IeRann::SetOriginatorAddress(ns3::Mac48Address originator_address) [member function]
+    ## ie-my11s-rann.h (module 'pmtmgmp'): void ns3::my11s::IeRann::SetOriginatorAddress(ns3::Mac48Address originator_address) [member function]
     cls.add_method('SetOriginatorAddress', 
                    'void', 
                    [param('ns3::Mac48Address', 'originator_address')])
-    ## ie-my11s-rann.h (module 'wmn'): void ns3::my11s::IeRann::SetTTL(uint8_t ttl) [member function]
+    ## ie-my11s-rann.h (module 'pmtmgmp'): void ns3::my11s::IeRann::SetTTL(uint8_t ttl) [member function]
     cls.add_method('SetTTL', 
                    'void', 
                    [param('uint8_t', 'ttl')])
     return
 
-def register_Ns3My11sWmnHeader_methods(root_module, cls):
+def register_Ns3My11sIeSecrep_methods(root_module, cls):
+    cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('==')
-    ## my11s-mac-header.h (module 'wmn'): ns3::my11s::WmnHeader::WmnHeader(ns3::my11s::WmnHeader const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::my11s::WmnHeader const &', 'arg0')])
-    ## my11s-mac-header.h (module 'wmn'): ns3::my11s::WmnHeader::WmnHeader() [constructor]
+    ## ie-my11s-secrep.h (module 'pmtmgmp'): ns3::my11s::IeSecrep::IeSecrep(ns3::my11s::IeSecrep const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::my11s::IeSecrep const &', 'arg0')])
+    ## ie-my11s-secrep.h (module 'pmtmgmp'): ns3::my11s::IeSecrep::IeSecrep() [constructor]
     cls.add_constructor([])
-    ## my11s-mac-header.h (module 'wmn'): uint32_t ns3::my11s::WmnHeader::Deserialize(ns3::Buffer::Iterator start) [member function]
-    cls.add_method('Deserialize', 
-                   'uint32_t', 
-                   [param('ns3::Buffer::Iterator', 'start')], 
+    ## ie-my11s-secrep.h (module 'pmtmgmp'): uint8_t ns3::my11s::IeSecrep::DeserializeInformationField(ns3::Buffer::Iterator i, uint8_t length) [member function]
+    cls.add_method('DeserializeInformationField', 
+                   'uint8_t', 
+                   [param('ns3::Buffer::Iterator', 'i'), param('uint8_t', 'length')], 
                    is_virtual=True)
-    ## my11s-mac-header.h (module 'wmn'): ns3::Mac48Address ns3::my11s::WmnHeader::GetAddr4() const [member function]
-    cls.add_method('GetAddr4', 
-                   'ns3::Mac48Address', 
+    ## ie-my11s-secrep.h (module 'pmtmgmp'): ns3::WifiInformationElementId ns3::my11s::IeSecrep::ElementId() const [member function]
+    cls.add_method('ElementId', 
+                   'ns3::WifiInformationElementId', 
                    [], 
-                   is_const=True)
-    ## my11s-mac-header.h (module 'wmn'): ns3::Mac48Address ns3::my11s::WmnHeader::GetAddr5() const [member function]
-    cls.add_method('GetAddr5', 
-                   'ns3::Mac48Address', 
-                   [], 
-                   is_const=True)
-    ## my11s-mac-header.h (module 'wmn'): ns3::Mac48Address ns3::my11s::WmnHeader::GetAddr6() const [member function]
-    cls.add_method('GetAddr6', 
-                   'ns3::Mac48Address', 
-                   [], 
-                   is_const=True)
-    ## my11s-mac-header.h (module 'wmn'): uint8_t ns3::my11s::WmnHeader::GetAddressExt() const [member function]
-    cls.add_method('GetAddressExt', 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-secrep.h (module 'pmtmgmp'): uint8_t ns3::my11s::IeSecrep::GetAffiliatedMTERPnum() const [member function]
+    cls.add_method('GetAffiliatedMTERPnum', 
                    'uint8_t', 
                    [], 
                    is_const=True)
-    ## my11s-mac-header.h (module 'wmn'): ns3::TypeId ns3::my11s::WmnHeader::GetInstanceTypeId() const [member function]
-    cls.add_method('GetInstanceTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## my11s-mac-header.h (module 'wmn'): uint32_t ns3::my11s::WmnHeader::GetWmnSeqno() const [member function]
-    cls.add_method('GetWmnSeqno', 
-                   'uint32_t', 
+    ## ie-my11s-secrep.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::IeSecrep::GetCandidateMSECPaddress() const [member function]
+    cls.add_method('GetCandidateMSECPaddress', 
+                   'ns3::Mac48Address', 
                    [], 
                    is_const=True)
-    ## my11s-mac-header.h (module 'wmn'): uint8_t ns3::my11s::WmnHeader::GetWmnTtl() const [member function]
-    cls.add_method('GetWmnTtl', 
+    ## ie-my11s-secrep.h (module 'pmtmgmp'): uint8_t ns3::my11s::IeSecrep::GetInformationFieldSize() const [member function]
+    cls.add_method('GetInformationFieldSize', 
                    'uint8_t', 
                    [], 
-                   is_const=True)
-    ## my11s-mac-header.h (module 'wmn'): uint32_t ns3::my11s::WmnHeader::GetSerializedSize() const [member function]
-    cls.add_method('GetSerializedSize', 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-secrep.h (module 'pmtmgmp'): uint32_t ns3::my11s::IeSecrep::GetMSECPSelectIndex() const [member function]
+    cls.add_method('GetMSECPSelectIndex', 
                    'uint32_t', 
                    [], 
-                   is_const=True, is_virtual=True)
-    ## my11s-mac-header.h (module 'wmn'): static ns3::TypeId ns3::my11s::WmnHeader::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
+                   is_const=True)
+    ## ie-my11s-secrep.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::IeSecrep::GetOriginatorAddress() const [member function]
+    cls.add_method('GetOriginatorAddress', 
+                   'ns3::Mac48Address', 
                    [], 
-                   is_static=True)
-    ## my11s-mac-header.h (module 'wmn'): void ns3::my11s::WmnHeader::Print(std::ostream & os) const [member function]
+                   is_const=True)
+    ## ie-my11s-secrep.h (module 'pmtmgmp'): void ns3::my11s::IeSecrep::Print(std::ostream & os) const [member function]
     cls.add_method('Print', 
                    'void', 
                    [param('std::ostream &', 'os')], 
                    is_const=True, is_virtual=True)
-    ## my11s-mac-header.h (module 'wmn'): void ns3::my11s::WmnHeader::Serialize(ns3::Buffer::Iterator start) const [member function]
-    cls.add_method('Serialize', 
+    ## ie-my11s-secrep.h (module 'pmtmgmp'): void ns3::my11s::IeSecrep::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
+    cls.add_method('SerializeInformationField', 
                    'void', 
-                   [param('ns3::Buffer::Iterator', 'start')], 
+                   [param('ns3::Buffer::Iterator', 'i')], 
                    is_const=True, is_virtual=True)
-    ## my11s-mac-header.h (module 'wmn'): void ns3::my11s::WmnHeader::SetAddr4(ns3::Mac48Address address) [member function]
-    cls.add_method('SetAddr4', 
+    ## ie-my11s-secrep.h (module 'pmtmgmp'): void ns3::my11s::IeSecrep::SetAffiliatedMTERPnum(uint8_t mTERP_number) [member function]
+    cls.add_method('SetAffiliatedMTERPnum', 
                    'void', 
-                   [param('ns3::Mac48Address', 'address')])
-    ## my11s-mac-header.h (module 'wmn'): void ns3::my11s::WmnHeader::SetAddr5(ns3::Mac48Address address) [member function]
-    cls.add_method('SetAddr5', 
+                   [param('uint8_t', 'mTERP_number')])
+    ## ie-my11s-secrep.h (module 'pmtmgmp'): void ns3::my11s::IeSecrep::SetCandidateMSECPaddress(ns3::Mac48Address candidateMSECP_address) [member function]
+    cls.add_method('SetCandidateMSECPaddress', 
                    'void', 
-                   [param('ns3::Mac48Address', 'address')])
-    ## my11s-mac-header.h (module 'wmn'): void ns3::my11s::WmnHeader::SetAddr6(ns3::Mac48Address address) [member function]
-    cls.add_method('SetAddr6', 
+                   [param('ns3::Mac48Address', 'candidateMSECP_address')])
+    ## ie-my11s-secrep.h (module 'pmtmgmp'): void ns3::my11s::IeSecrep::SetMSECPSelectIndex(uint32_t index) [member function]
+    cls.add_method('SetMSECPSelectIndex', 
                    'void', 
-                   [param('ns3::Mac48Address', 'address')])
-    ## my11s-mac-header.h (module 'wmn'): void ns3::my11s::WmnHeader::SetAddressExt(uint8_t num_of_addresses) [member function]
-    cls.add_method('SetAddressExt', 
+                   [param('uint32_t', 'index')])
+    ## ie-my11s-secrep.h (module 'pmtmgmp'): void ns3::my11s::IeSecrep::SetOriginatorAddress(ns3::Mac48Address originator_address) [member function]
+    cls.add_method('SetOriginatorAddress', 
                    'void', 
-                   [param('uint8_t', 'num_of_addresses')])
-    ## my11s-mac-header.h (module 'wmn'): void ns3::my11s::WmnHeader::SetWmnSeqno(uint32_t seqno) [member function]
-    cls.add_method('SetWmnSeqno', 
-                   'void', 
-                   [param('uint32_t', 'seqno')])
-    ## my11s-mac-header.h (module 'wmn'): void ns3::my11s::WmnHeader::SetWmnTtl(uint8_t TTL) [member function]
-    cls.add_method('SetWmnTtl', 
-                   'void', 
-                   [param('uint8_t', 'TTL')])
+                   [param('ns3::Mac48Address', 'originator_address')])
     return
 
-def register_Ns3My11sPeerLink_methods(root_module, cls):
-    ## pmtmgmp-peer-link.h (module 'wmn'): static ns3::TypeId ns3::my11s::PeerLink::GetTypeId() [member function]
+def register_Ns3My11sIeSecreq_methods(root_module, cls):
+    cls.add_output_stream_operator()
+    cls.add_binary_comparison_operator('==')
+    ## ie-my11s-secreq.h (module 'pmtmgmp'): ns3::my11s::IeSecreq::IeSecreq(ns3::my11s::IeSecreq const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::my11s::IeSecreq const &', 'arg0')])
+    ## ie-my11s-secreq.h (module 'pmtmgmp'): ns3::my11s::IeSecreq::IeSecreq() [constructor]
+    cls.add_constructor([])
+    ## ie-my11s-secreq.h (module 'pmtmgmp'): uint8_t ns3::my11s::IeSecreq::DeserializeInformationField(ns3::Buffer::Iterator i, uint8_t length) [member function]
+    cls.add_method('DeserializeInformationField', 
+                   'uint8_t', 
+                   [param('ns3::Buffer::Iterator', 'i'), param('uint8_t', 'length')], 
+                   is_virtual=True)
+    ## ie-my11s-secreq.h (module 'pmtmgmp'): ns3::WifiInformationElementId ns3::my11s::IeSecreq::ElementId() const [member function]
+    cls.add_method('ElementId', 
+                   'ns3::WifiInformationElementId', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-secreq.h (module 'pmtmgmp'): uint8_t ns3::my11s::IeSecreq::GetInformationFieldSize() const [member function]
+    cls.add_method('GetInformationFieldSize', 
+                   'uint8_t', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-secreq.h (module 'pmtmgmp'): uint32_t ns3::my11s::IeSecreq::GetMSECPSelectIndex() const [member function]
+    cls.add_method('GetMSECPSelectIndex', 
+                   'uint32_t', 
+                   [], 
+                   is_const=True)
+    ## ie-my11s-secreq.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::IeSecreq::GetOriginatorAddress() const [member function]
+    cls.add_method('GetOriginatorAddress', 
+                   'ns3::Mac48Address', 
+                   [], 
+                   is_const=True)
+    ## ie-my11s-secreq.h (module 'pmtmgmp'): void ns3::my11s::IeSecreq::Print(std::ostream & os) const [member function]
+    cls.add_method('Print', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-secreq.h (module 'pmtmgmp'): void ns3::my11s::IeSecreq::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
+    cls.add_method('SerializeInformationField', 
+                   'void', 
+                   [param('ns3::Buffer::Iterator', 'i')], 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-secreq.h (module 'pmtmgmp'): void ns3::my11s::IeSecreq::SetMSECPSelectIndex(uint32_t index) [member function]
+    cls.add_method('SetMSECPSelectIndex', 
+                   'void', 
+                   [param('uint32_t', 'index')])
+    ## ie-my11s-secreq.h (module 'pmtmgmp'): void ns3::my11s::IeSecreq::SetOriginatorAddress(ns3::Mac48Address originator_address) [member function]
+    cls.add_method('SetOriginatorAddress', 
+                   'void', 
+                   [param('ns3::Mac48Address', 'originator_address')])
+    return
+
+def register_Ns3My11sIeWmnId_methods(root_module, cls):
+    cls.add_output_stream_operator()
+    cls.add_binary_comparison_operator('==')
+    ## ie-my11s-id.h (module 'pmtmgmp'): ns3::my11s::IeWmnId::IeWmnId(ns3::my11s::IeWmnId const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::my11s::IeWmnId const &', 'arg0')])
+    ## ie-my11s-id.h (module 'pmtmgmp'): ns3::my11s::IeWmnId::IeWmnId() [constructor]
+    cls.add_constructor([])
+    ## ie-my11s-id.h (module 'pmtmgmp'): ns3::my11s::IeWmnId::IeWmnId(std::string s) [constructor]
+    cls.add_constructor([param('std::string', 's')])
+    ## ie-my11s-id.h (module 'pmtmgmp'): uint8_t ns3::my11s::IeWmnId::DeserializeInformationField(ns3::Buffer::Iterator start, uint8_t length) [member function]
+    cls.add_method('DeserializeInformationField', 
+                   'uint8_t', 
+                   [param('ns3::Buffer::Iterator', 'start'), param('uint8_t', 'length')], 
+                   is_virtual=True)
+    ## ie-my11s-id.h (module 'pmtmgmp'): ns3::WifiInformationElementId ns3::my11s::IeWmnId::ElementId() const [member function]
+    cls.add_method('ElementId', 
+                   'ns3::WifiInformationElementId', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-id.h (module 'pmtmgmp'): uint8_t ns3::my11s::IeWmnId::GetInformationFieldSize() const [member function]
+    cls.add_method('GetInformationFieldSize', 
+                   'uint8_t', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-id.h (module 'pmtmgmp'): bool ns3::my11s::IeWmnId::IsBroadcast() const [member function]
+    cls.add_method('IsBroadcast', 
+                   'bool', 
+                   [], 
+                   is_const=True)
+    ## ie-my11s-id.h (module 'pmtmgmp'): bool ns3::my11s::IeWmnId::IsEqual(ns3::my11s::IeWmnId const & o) const [member function]
+    cls.add_method('IsEqual', 
+                   'bool', 
+                   [param('ns3::my11s::IeWmnId const &', 'o')], 
+                   is_const=True)
+    ## ie-my11s-id.h (module 'pmtmgmp'): char * ns3::my11s::IeWmnId::PeekString() const [member function]
+    cls.add_method('PeekString', 
+                   'char *', 
+                   [], 
+                   is_const=True)
+    ## ie-my11s-id.h (module 'pmtmgmp'): void ns3::my11s::IeWmnId::Print(std::ostream & os) const [member function]
+    cls.add_method('Print', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-id.h (module 'pmtmgmp'): void ns3::my11s::IeWmnId::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
+    cls.add_method('SerializeInformationField', 
+                   'void', 
+                   [param('ns3::Buffer::Iterator', 'i')], 
+                   is_const=True, is_virtual=True)
+    return
+
+def register_Ns3My11sIeWmnIdChecker_methods(root_module, cls):
+    ## ie-my11s-id.h (module 'pmtmgmp'): ns3::my11s::IeWmnIdChecker::IeWmnIdChecker() [constructor]
+    cls.add_constructor([])
+    ## ie-my11s-id.h (module 'pmtmgmp'): ns3::my11s::IeWmnIdChecker::IeWmnIdChecker(ns3::my11s::IeWmnIdChecker const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::my11s::IeWmnIdChecker const &', 'arg0')])
+    return
+
+def register_Ns3My11sIeWmnIdValue_methods(root_module, cls):
+    ## ie-my11s-id.h (module 'pmtmgmp'): ns3::my11s::IeWmnIdValue::IeWmnIdValue() [constructor]
+    cls.add_constructor([])
+    ## ie-my11s-id.h (module 'pmtmgmp'): ns3::my11s::IeWmnIdValue::IeWmnIdValue(ns3::my11s::IeWmnIdValue const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::my11s::IeWmnIdValue const &', 'arg0')])
+    ## ie-my11s-id.h (module 'pmtmgmp'): ns3::my11s::IeWmnIdValue::IeWmnIdValue(ns3::my11s::IeWmnId const & value) [constructor]
+    cls.add_constructor([param('ns3::my11s::IeWmnId const &', 'value')])
+    ## ie-my11s-id.h (module 'pmtmgmp'): ns3::Ptr<ns3::AttributeValue> ns3::my11s::IeWmnIdValue::Copy() const [member function]
+    cls.add_method('Copy', 
+                   'ns3::Ptr< ns3::AttributeValue >', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-id.h (module 'pmtmgmp'): bool ns3::my11s::IeWmnIdValue::DeserializeFromString(std::string value, ns3::Ptr<ns3::AttributeChecker const> checker) [member function]
+    cls.add_method('DeserializeFromString', 
+                   'bool', 
+                   [param('std::string', 'value'), param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
+                   is_virtual=True)
+    ## ie-my11s-id.h (module 'pmtmgmp'): ns3::my11s::IeWmnId ns3::my11s::IeWmnIdValue::Get() const [member function]
+    cls.add_method('Get', 
+                   'ns3::my11s::IeWmnId', 
+                   [], 
+                   is_const=True)
+    ## ie-my11s-id.h (module 'pmtmgmp'): std::string ns3::my11s::IeWmnIdValue::SerializeToString(ns3::Ptr<ns3::AttributeChecker const> checker) const [member function]
+    cls.add_method('SerializeToString', 
+                   'std::string', 
+                   [param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-id.h (module 'pmtmgmp'): void ns3::my11s::IeWmnIdValue::Set(ns3::my11s::IeWmnId const & value) [member function]
+    cls.add_method('Set', 
+                   'void', 
+                   [param('ns3::my11s::IeWmnId const &', 'value')])
+    return
+
+def register_Ns3My11sMy11sWmnCapability_methods(root_module, cls):
+    cls.add_binary_comparison_operator('==')
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): ns3::my11s::My11sWmnCapability::My11sWmnCapability(ns3::my11s::My11sWmnCapability const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::my11s::My11sWmnCapability const &', 'arg0')])
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): ns3::my11s::My11sWmnCapability::My11sWmnCapability() [constructor]
+    cls.add_constructor([])
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): ns3::Buffer::Iterator ns3::my11s::My11sWmnCapability::Deserialize(ns3::Buffer::Iterator i) [member function]
+    cls.add_method('Deserialize', 
+                   'ns3::Buffer::Iterator', 
+                   [param('ns3::Buffer::Iterator', 'i')])
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): uint8_t ns3::my11s::My11sWmnCapability::GetSerializedSize() const [member function]
+    cls.add_method('GetSerializedSize', 
+                   'uint8_t', 
+                   [], 
+                   is_const=True)
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): uint8_t ns3::my11s::My11sWmnCapability::GetUint8() const [member function]
+    cls.add_method('GetUint8', 
+                   'uint8_t', 
+                   [], 
+                   is_const=True)
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): bool ns3::my11s::My11sWmnCapability::Is(uint8_t cap, uint8_t n) const [member function]
+    cls.add_method('Is', 
+                   'bool', 
+                   [param('uint8_t', 'cap'), param('uint8_t', 'n')], 
+                   is_const=True)
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): ns3::Buffer::Iterator ns3::my11s::My11sWmnCapability::Serialize(ns3::Buffer::Iterator i) const [member function]
+    cls.add_method('Serialize', 
+                   'ns3::Buffer::Iterator', 
+                   [param('ns3::Buffer::Iterator', 'i')], 
+                   is_const=True)
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): ns3::my11s::My11sWmnCapability::MCCAEnabled [variable]
+    cls.add_instance_attribute('MCCAEnabled', 'bool', is_const=False)
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): ns3::my11s::My11sWmnCapability::MCCASupported [variable]
+    cls.add_instance_attribute('MCCASupported', 'bool', is_const=False)
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): ns3::my11s::My11sWmnCapability::TBTTAdjustment [variable]
+    cls.add_instance_attribute('TBTTAdjustment', 'bool', is_const=False)
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): ns3::my11s::My11sWmnCapability::acceptPmtmgmpPeerLinks [variable]
+    cls.add_instance_attribute('acceptPmtmgmpPeerLinks', 'bool', is_const=False)
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): ns3::my11s::My11sWmnCapability::beaconTimingReport [variable]
+    cls.add_instance_attribute('beaconTimingReport', 'bool', is_const=False)
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): ns3::my11s::My11sWmnCapability::forwarding [variable]
+    cls.add_instance_attribute('forwarding', 'bool', is_const=False)
+    ## ie-my11s-configuration.h (module 'pmtmgmp'): ns3::my11s::My11sWmnCapability::powerSaveLevel [variable]
+    cls.add_instance_attribute('powerSaveLevel', 'bool', is_const=False)
+    return
+
+def register_Ns3My11sPmtmgmpPeerLink_methods(root_module, cls):
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): static ns3::TypeId ns3::my11s::PmtmgmpPeerLink::GetTypeId() [member function]
     cls.add_method('GetTypeId', 
                    'ns3::TypeId', 
                    [], 
                    is_static=True)
-    ## pmtmgmp-peer-link.h (module 'wmn'): ns3::my11s::PeerLink::PeerLink() [constructor]
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpPeerLink::PmtmgmpPeerLink() [constructor]
     cls.add_constructor([])
-    ## pmtmgmp-peer-link.h (module 'wmn'): void ns3::my11s::PeerLink::DoDispose() [member function]
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerLink::DoDispose() [member function]
     cls.add_method('DoDispose', 
                    'void', 
                    [], 
                    is_virtual=True)
-    ## pmtmgmp-peer-link.h (module 'wmn'): void ns3::my11s::PeerLink::SetBeaconInformation(ns3::Time lastBeacon, ns3::Time BeaconInterval) [member function]
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerLink::SetBeaconInformation(ns3::Time lastBeacon, ns3::Time BeaconInterval) [member function]
     cls.add_method('SetBeaconInformation', 
                    'void', 
                    [param('ns3::Time', 'lastBeacon'), param('ns3::Time', 'BeaconInterval')])
-    ## pmtmgmp-peer-link.h (module 'wmn'): void ns3::my11s::PeerLink::SetLinkStatusCallback(ns3::Callback<void,unsigned int,ns3::Mac48Address,bool,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty> cb) [member function]
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerLink::SetLinkStatusCallback(ns3::Callback<void,unsigned int,ns3::Mac48Address,bool,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty> cb) [member function]
     cls.add_method('SetLinkStatusCallback', 
                    'void', 
                    [param('ns3::Callback< void, unsigned int, ns3::Mac48Address, bool, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'cb')])
-    ## pmtmgmp-peer-link.h (module 'wmn'): void ns3::my11s::PeerLink::SetPeerAddress(ns3::Mac48Address macaddr) [member function]
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerLink::SetPeerAddress(ns3::Mac48Address macaddr) [member function]
     cls.add_method('SetPeerAddress', 
                    'void', 
                    [param('ns3::Mac48Address', 'macaddr')])
-    ## pmtmgmp-peer-link.h (module 'wmn'): void ns3::my11s::PeerLink::SetPeerWmnPointAddress(ns3::Mac48Address macaddr) [member function]
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerLink::SetPeerWmnPointAddress(ns3::Mac48Address macaddr) [member function]
     cls.add_method('SetPeerWmnPointAddress', 
                    'void', 
                    [param('ns3::Mac48Address', 'macaddr')])
-    ## pmtmgmp-peer-link.h (module 'wmn'): void ns3::my11s::PeerLink::SetInterface(uint32_t interface) [member function]
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerLink::SetInterface(uint32_t interface) [member function]
     cls.add_method('SetInterface', 
                    'void', 
                    [param('uint32_t', 'interface')])
-    ## pmtmgmp-peer-link.h (module 'wmn'): void ns3::my11s::PeerLink::SetLocalLinkId(uint16_t id) [member function]
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerLink::SetLocalLinkId(uint16_t id) [member function]
     cls.add_method('SetLocalLinkId', 
                    'void', 
                    [param('uint16_t', 'id')])
-    ## pmtmgmp-peer-link.h (module 'wmn'): void ns3::my11s::PeerLink::SetLocalAid(uint16_t aid) [member function]
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerLink::SetLocalAid(uint16_t aid) [member function]
     cls.add_method('SetLocalAid', 
                    'void', 
                    [param('uint16_t', 'aid')])
-    ## pmtmgmp-peer-link.h (module 'wmn'): uint16_t ns3::my11s::PeerLink::GetPeerAid() const [member function]
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): uint16_t ns3::my11s::PmtmgmpPeerLink::GetPeerAid() const [member function]
     cls.add_method('GetPeerAid', 
                    'uint16_t', 
                    [], 
                    is_const=True)
-    ## pmtmgmp-peer-link.h (module 'wmn'): void ns3::my11s::PeerLink::SetBeaconTimingElement(ns3::my11s::IeBeaconTiming beaconTiming) [member function]
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerLink::SetBeaconTimingElement(ns3::my11s::IeBeaconTiming beaconTiming) [member function]
     cls.add_method('SetBeaconTimingElement', 
                    'void', 
                    [param('ns3::my11s::IeBeaconTiming', 'beaconTiming')])
-    ## pmtmgmp-peer-link.h (module 'wmn'): ns3::Mac48Address ns3::my11s::PeerLink::GetPeerAddress() const [member function]
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::PmtmgmpPeerLink::GetPeerAddress() const [member function]
     cls.add_method('GetPeerAddress', 
                    'ns3::Mac48Address', 
                    [], 
                    is_const=True)
-    ## pmtmgmp-peer-link.h (module 'wmn'): uint16_t ns3::my11s::PeerLink::GetLocalAid() const [member function]
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): uint16_t ns3::my11s::PmtmgmpPeerLink::GetLocalAid() const [member function]
     cls.add_method('GetLocalAid', 
                    'uint16_t', 
                    [], 
                    is_const=True)
-    ## pmtmgmp-peer-link.h (module 'wmn'): ns3::Time ns3::my11s::PeerLink::GetLastBeacon() const [member function]
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): ns3::Time ns3::my11s::PmtmgmpPeerLink::GetLastBeacon() const [member function]
     cls.add_method('GetLastBeacon', 
                    'ns3::Time', 
                    [], 
                    is_const=True)
-    ## pmtmgmp-peer-link.h (module 'wmn'): ns3::Time ns3::my11s::PeerLink::GetBeaconInterval() const [member function]
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): ns3::Time ns3::my11s::PmtmgmpPeerLink::GetBeaconInterval() const [member function]
     cls.add_method('GetBeaconInterval', 
                    'ns3::Time', 
                    [], 
                    is_const=True)
-    ## pmtmgmp-peer-link.h (module 'wmn'): ns3::my11s::IeBeaconTiming ns3::my11s::PeerLink::GetBeaconTimingElement() const [member function]
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): ns3::my11s::IeBeaconTiming ns3::my11s::PmtmgmpPeerLink::GetBeaconTimingElement() const [member function]
     cls.add_method('GetBeaconTimingElement', 
                    'ns3::my11s::IeBeaconTiming', 
                    [], 
                    is_const=True)
-    ## pmtmgmp-peer-link.h (module 'wmn'): void ns3::my11s::PeerLink::MLMECancelPeerLink(ns3::my11s::PmpReasonCode reason) [member function]
-    cls.add_method('MLMECancelPeerLink', 
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerLink::MLMECancelPmtmgmpPeerLink(ns3::my11s::PmpReasonCode reason) [member function]
+    cls.add_method('MLMECancelPmtmgmpPeerLink', 
                    'void', 
                    [param('ns3::my11s::PmpReasonCode', 'reason')])
-    ## pmtmgmp-peer-link.h (module 'wmn'): void ns3::my11s::PeerLink::MLMEActivePeerLinkOpen() [member function]
-    cls.add_method('MLMEActivePeerLinkOpen', 
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerLink::MLMEActivePmtmgmpPeerLinkOpen() [member function]
+    cls.add_method('MLMEActivePmtmgmpPeerLinkOpen', 
                    'void', 
                    [])
-    ## pmtmgmp-peer-link.h (module 'wmn'): void ns3::my11s::PeerLink::MLMEPeeringRequestReject() [member function]
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerLink::MLMEPeeringRequestReject() [member function]
     cls.add_method('MLMEPeeringRequestReject', 
                    'void', 
                    [])
-    ## pmtmgmp-peer-link.h (module 'wmn'): void ns3::my11s::PeerLink::MLMESetSignalStatusCallback(ns3::Callback<void, unsigned int, ns3::Mac48Address, ns3::Mac48Address, ns3::my11s::PeerLink::PeerState, ns3::my11s::PeerLink::PeerState, ns3::empty, ns3::empty, ns3::empty, ns3::empty> arg0) [member function]
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerLink::MLMESetSignalStatusCallback(ns3::Callback<void, unsigned int, ns3::Mac48Address, ns3::Mac48Address, ns3::my11s::PmtmgmpPeerLink::PeerState, ns3::my11s::PmtmgmpPeerLink::PeerState, ns3::empty, ns3::empty, ns3::empty, ns3::empty> arg0) [member function]
     cls.add_method('MLMESetSignalStatusCallback', 
                    'void', 
-                   [param('ns3::Callback< void, unsigned int, ns3::Mac48Address, ns3::Mac48Address, ns3::my11s::PeerLink::PeerState, ns3::my11s::PeerLink::PeerState, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'arg0')])
-    ## pmtmgmp-peer-link.h (module 'wmn'): void ns3::my11s::PeerLink::TransmissionSuccess() [member function]
+                   [param('ns3::Callback< void, unsigned int, ns3::Mac48Address, ns3::Mac48Address, ns3::my11s::PmtmgmpPeerLink::PeerState, ns3::my11s::PmtmgmpPeerLink::PeerState, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'arg0')])
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerLink::TransmissionSuccess() [member function]
     cls.add_method('TransmissionSuccess', 
                    'void', 
                    [])
-    ## pmtmgmp-peer-link.h (module 'wmn'): void ns3::my11s::PeerLink::TransmissionFailure() [member function]
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerLink::TransmissionFailure() [member function]
     cls.add_method('TransmissionFailure', 
                    'void', 
                    [])
-    ## pmtmgmp-peer-link.h (module 'wmn'): void ns3::my11s::PeerLink::Report(std::ostream & os) const [member function]
+    ## pmtmgmp-peer-link.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerLink::Report(std::ostream & os) const [member function]
     cls.add_method('Report', 
                    'void', 
                    [param('std::ostream &', 'os')], 
                    is_const=True)
     return
 
-def register_Ns3My11sPeerLinkFrameStart_methods(root_module, cls):
+def register_Ns3My11sPmtmgmpPeerLinkFrameStart_methods(root_module, cls):
     cls.add_binary_comparison_operator('==')
-    ## pmtmgmp-peer-link-frame.h (module 'wmn'): ns3::my11s::PeerLinkFrameStart::PeerLinkFrameStart() [constructor]
+    ## pmtmgmp-peer-link-frame.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpPeerLinkFrameStart::PmtmgmpPeerLinkFrameStart() [constructor]
     cls.add_constructor([])
-    ## pmtmgmp-peer-link-frame.h (module 'wmn'): uint32_t ns3::my11s::PeerLinkFrameStart::Deserialize(ns3::Buffer::Iterator start) [member function]
+    ## pmtmgmp-peer-link-frame.h (module 'pmtmgmp'): uint32_t ns3::my11s::PmtmgmpPeerLinkFrameStart::Deserialize(ns3::Buffer::Iterator start) [member function]
     cls.add_method('Deserialize', 
                    'uint32_t', 
                    [param('ns3::Buffer::Iterator', 'start')], 
                    is_virtual=True)
-    ## pmtmgmp-peer-link-frame.h (module 'wmn'): ns3::my11s::PeerLinkFrameStart::PlinkFrameStartFields ns3::my11s::PeerLinkFrameStart::GetFields() const [member function]
+    ## pmtmgmp-peer-link-frame.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpPeerLinkFrameStart::PlinkFrameStartFields ns3::my11s::PmtmgmpPeerLinkFrameStart::GetFields() const [member function]
     cls.add_method('GetFields', 
-                   'ns3::my11s::PeerLinkFrameStart::PlinkFrameStartFields', 
+                   'ns3::my11s::PmtmgmpPeerLinkFrameStart::PlinkFrameStartFields', 
                    [], 
                    is_const=True)
-    ## pmtmgmp-peer-link-frame.h (module 'wmn'): ns3::TypeId ns3::my11s::PeerLinkFrameStart::GetInstanceTypeId() const [member function]
+    ## pmtmgmp-peer-link-frame.h (module 'pmtmgmp'): ns3::TypeId ns3::my11s::PmtmgmpPeerLinkFrameStart::GetInstanceTypeId() const [member function]
     cls.add_method('GetInstanceTypeId', 
                    'ns3::TypeId', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## pmtmgmp-peer-link-frame.h (module 'wmn'): uint32_t ns3::my11s::PeerLinkFrameStart::GetSerializedSize() const [member function]
+    ## pmtmgmp-peer-link-frame.h (module 'pmtmgmp'): uint32_t ns3::my11s::PmtmgmpPeerLinkFrameStart::GetSerializedSize() const [member function]
     cls.add_method('GetSerializedSize', 
                    'uint32_t', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## pmtmgmp-peer-link-frame.h (module 'wmn'): static ns3::TypeId ns3::my11s::PeerLinkFrameStart::GetTypeId() [member function]
+    ## pmtmgmp-peer-link-frame.h (module 'pmtmgmp'): static ns3::TypeId ns3::my11s::PmtmgmpPeerLinkFrameStart::GetTypeId() [member function]
     cls.add_method('GetTypeId', 
                    'ns3::TypeId', 
                    [], 
                    is_static=True)
-    ## pmtmgmp-peer-link-frame.h (module 'wmn'): void ns3::my11s::PeerLinkFrameStart::Print(std::ostream & os) const [member function]
+    ## pmtmgmp-peer-link-frame.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerLinkFrameStart::Print(std::ostream & os) const [member function]
     cls.add_method('Print', 
                    'void', 
                    [param('std::ostream &', 'os')], 
                    is_const=True, is_virtual=True)
-    ## pmtmgmp-peer-link-frame.h (module 'wmn'): void ns3::my11s::PeerLinkFrameStart::Serialize(ns3::Buffer::Iterator start) const [member function]
+    ## pmtmgmp-peer-link-frame.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerLinkFrameStart::Serialize(ns3::Buffer::Iterator start) const [member function]
     cls.add_method('Serialize', 
                    'void', 
                    [param('ns3::Buffer::Iterator', 'start')], 
                    is_const=True, is_virtual=True)
-    ## pmtmgmp-peer-link-frame.h (module 'wmn'): void ns3::my11s::PeerLinkFrameStart::SetPlinkFrameStart(ns3::my11s::PeerLinkFrameStart::PlinkFrameStartFields arg0) [member function]
+    ## pmtmgmp-peer-link-frame.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerLinkFrameStart::SetPlinkFrameStart(ns3::my11s::PmtmgmpPeerLinkFrameStart::PlinkFrameStartFields arg0) [member function]
     cls.add_method('SetPlinkFrameStart', 
                    'void', 
-                   [param('ns3::my11s::PeerLinkFrameStart::PlinkFrameStartFields', 'arg0')])
-    ## pmtmgmp-peer-link-frame.h (module 'wmn'): void ns3::my11s::PeerLinkFrameStart::SetPlinkFrameSubtype(uint8_t subtype) [member function]
+                   [param('ns3::my11s::PmtmgmpPeerLinkFrameStart::PlinkFrameStartFields', 'arg0')])
+    ## pmtmgmp-peer-link-frame.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerLinkFrameStart::SetPlinkFrameSubtype(uint8_t subtype) [member function]
     cls.add_method('SetPlinkFrameSubtype', 
                    'void', 
                    [param('uint8_t', 'subtype')])
     return
 
-def register_Ns3My11sPeerLinkFrameStartPlinkFrameStartFields_methods(root_module, cls):
-    ## pmtmgmp-peer-link-frame.h (module 'wmn'): ns3::my11s::PeerLinkFrameStart::PlinkFrameStartFields::PlinkFrameStartFields() [constructor]
+def register_Ns3My11sPmtmgmpPeerLinkFrameStartPlinkFrameStartFields_methods(root_module, cls):
+    ## pmtmgmp-peer-link-frame.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpPeerLinkFrameStart::PlinkFrameStartFields::PlinkFrameStartFields() [constructor]
     cls.add_constructor([])
-    ## pmtmgmp-peer-link-frame.h (module 'wmn'): ns3::my11s::PeerLinkFrameStart::PlinkFrameStartFields::PlinkFrameStartFields(ns3::my11s::PeerLinkFrameStart::PlinkFrameStartFields const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::my11s::PeerLinkFrameStart::PlinkFrameStartFields const &', 'arg0')])
-    ## pmtmgmp-peer-link-frame.h (module 'wmn'): ns3::my11s::PeerLinkFrameStart::PlinkFrameStartFields::aid [variable]
+    ## pmtmgmp-peer-link-frame.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpPeerLinkFrameStart::PlinkFrameStartFields::PlinkFrameStartFields(ns3::my11s::PmtmgmpPeerLinkFrameStart::PlinkFrameStartFields const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::my11s::PmtmgmpPeerLinkFrameStart::PlinkFrameStartFields const &', 'arg0')])
+    ## pmtmgmp-peer-link-frame.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpPeerLinkFrameStart::PlinkFrameStartFields::aid [variable]
     cls.add_instance_attribute('aid', 'uint16_t', is_const=False)
-    ## pmtmgmp-peer-link-frame.h (module 'wmn'): ns3::my11s::PeerLinkFrameStart::PlinkFrameStartFields::capability [variable]
+    ## pmtmgmp-peer-link-frame.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpPeerLinkFrameStart::PlinkFrameStartFields::capability [variable]
     cls.add_instance_attribute('capability', 'uint16_t', is_const=False)
-    ## pmtmgmp-peer-link-frame.h (module 'wmn'): ns3::my11s::PeerLinkFrameStart::PlinkFrameStartFields::config [variable]
+    ## pmtmgmp-peer-link-frame.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpPeerLinkFrameStart::PlinkFrameStartFields::config [variable]
     cls.add_instance_attribute('config', 'ns3::my11s::IeConfiguration', is_const=False)
-    ## pmtmgmp-peer-link-frame.h (module 'wmn'): ns3::my11s::PeerLinkFrameStart::PlinkFrameStartFields::wmnId [variable]
-    cls.add_instance_attribute('wmnId', 'ns3::my11s::IeWmnId', is_const=False)
-    ## pmtmgmp-peer-link-frame.h (module 'wmn'): ns3::my11s::PeerLinkFrameStart::PlinkFrameStartFields::protocol [variable]
+    ## pmtmgmp-peer-link-frame.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpPeerLinkFrameStart::PlinkFrameStartFields::protocol [variable]
     cls.add_instance_attribute('protocol', 'ns3::my11s::IePeeringProtocol', is_const=False)
-    ## pmtmgmp-peer-link-frame.h (module 'wmn'): ns3::my11s::PeerLinkFrameStart::PlinkFrameStartFields::rates [variable]
+    ## pmtmgmp-peer-link-frame.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpPeerLinkFrameStart::PlinkFrameStartFields::rates [variable]
     cls.add_instance_attribute('rates', 'ns3::SupportedRates', is_const=False)
-    ## pmtmgmp-peer-link-frame.h (module 'wmn'): ns3::my11s::PeerLinkFrameStart::PlinkFrameStartFields::reasonCode [variable]
+    ## pmtmgmp-peer-link-frame.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpPeerLinkFrameStart::PlinkFrameStartFields::reasonCode [variable]
     cls.add_instance_attribute('reasonCode', 'uint16_t', is_const=False)
-    ## pmtmgmp-peer-link-frame.h (module 'wmn'): ns3::my11s::PeerLinkFrameStart::PlinkFrameStartFields::subtype [variable]
+    ## pmtmgmp-peer-link-frame.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpPeerLinkFrameStart::PlinkFrameStartFields::subtype [variable]
     cls.add_instance_attribute('subtype', 'uint8_t', is_const=False)
+    ## pmtmgmp-peer-link-frame.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpPeerLinkFrameStart::PlinkFrameStartFields::wmnId [variable]
+    cls.add_instance_attribute('wmnId', 'ns3::my11s::IeWmnId', is_const=False)
     return
 
-def register_Ns3My11sPeerManagementProtocol_methods(root_module, cls):
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): ns3::my11s::PeerManagementProtocol::PeerManagementProtocol() [constructor]
+def register_Ns3My11sPmtmgmpPeerManagementProtocol_methods(root_module, cls):
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpPeerManagementProtocol::PmtmgmpPeerManagementProtocol() [constructor]
     cls.add_constructor([])
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): int64_t ns3::my11s::PeerManagementProtocol::AssignStreams(int64_t stream) [member function]
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): int64_t ns3::my11s::PmtmgmpPeerManagementProtocol::AssignStreams(int64_t stream) [member function]
     cls.add_method('AssignStreams', 
                    'int64_t', 
                    [param('int64_t', 'stream')])
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): void ns3::my11s::PeerManagementProtocol::ConfigurationMismatch(uint32_t interface, ns3::Mac48Address peerAddress) [member function]
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerManagementProtocol::ConfigurationMismatch(uint32_t interface, ns3::Mac48Address peerAddress) [member function]
     cls.add_method('ConfigurationMismatch', 
                    'void', 
                    [param('uint32_t', 'interface'), param('ns3::Mac48Address', 'peerAddress')])
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): void ns3::my11s::PeerManagementProtocol::DoDispose() [member function]
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerManagementProtocol::DoDispose() [member function]
     cls.add_method('DoDispose', 
                    'void', 
                    [], 
                    is_virtual=True)
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): ns3::Ptr<ns3::my11s::PeerLink> ns3::my11s::PeerManagementProtocol::FindPeerLink(uint32_t interface, ns3::Mac48Address peerAddress) [member function]
-    cls.add_method('FindPeerLink', 
-                   'ns3::Ptr< ns3::my11s::PeerLink >', 
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): ns3::Ptr<ns3::my11s::PmtmgmpPeerLink> ns3::my11s::PmtmgmpPeerManagementProtocol::FindPmtmgmpPeerLink(uint32_t interface, ns3::Mac48Address peerAddress) [member function]
+    cls.add_method('FindPmtmgmpPeerLink', 
+                   'ns3::Ptr< ns3::my11s::PmtmgmpPeerLink >', 
                    [param('uint32_t', 'interface'), param('ns3::Mac48Address', 'peerAddress')])
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): ns3::Mac48Address ns3::my11s::PeerManagementProtocol::GetAddress() [member function]
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::PmtmgmpPeerManagementProtocol::GetAddress() [member function]
     cls.add_method('GetAddress', 
                    'ns3::Mac48Address', 
                    [])
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): bool ns3::my11s::PeerManagementProtocol::GetBeaconCollisionAvoidance() const [member function]
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpPeerManagementProtocol::GetBeaconCollisionAvoidance() const [member function]
     cls.add_method('GetBeaconCollisionAvoidance', 
                    'bool', 
                    [], 
                    is_const=True)
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): ns3::Ptr<ns3::my11s::IeBeaconTiming> ns3::my11s::PeerManagementProtocol::GetBeaconTimingElement(uint32_t interface) [member function]
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): ns3::Ptr<ns3::my11s::IeBeaconTiming> ns3::my11s::PmtmgmpPeerManagementProtocol::GetBeaconTimingElement(uint32_t interface) [member function]
     cls.add_method('GetBeaconTimingElement', 
                    'ns3::Ptr< ns3::my11s::IeBeaconTiming >', 
                    [param('uint32_t', 'interface')])
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): ns3::Ptr<ns3::my11s::IeWmnId> ns3::my11s::PeerManagementProtocol::GetWmnId() const [member function]
-    cls.add_method('GetWmnId', 
-                   'ns3::Ptr< ns3::my11s::IeWmnId >', 
-                   [], 
-                   is_const=True)
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): uint8_t ns3::my11s::PeerManagementProtocol::GetNumberOfLinks() [member function]
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): uint8_t ns3::my11s::PmtmgmpPeerManagementProtocol::GetNumberOfLinks() [member function]
     cls.add_method('GetNumberOfLinks', 
                    'uint8_t', 
                    [])
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): std::vector<ns3::Ptr<ns3::my11s::PeerLink>,std::allocator<ns3::Ptr<ns3::my11s::PeerLink> > > ns3::my11s::PeerManagementProtocol::GetPeerLinks() const [member function]
-    cls.add_method('GetPeerLinks', 
-                   'std::vector< ns3::Ptr< ns3::my11s::PeerLink > >', 
-                   [], 
-                   is_const=True)
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): std::vector<ns3::Mac48Address,std::allocator<ns3::Mac48Address> > ns3::my11s::PeerManagementProtocol::GetPeers(uint32_t interface) const [member function]
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): std::vector<ns3::Mac48Address,std::allocator<ns3::Mac48Address> > ns3::my11s::PmtmgmpPeerManagementProtocol::GetPeers(uint32_t interface) const [member function]
     cls.add_method('GetPeers', 
                    'std::vector< ns3::Mac48Address >', 
                    [param('uint32_t', 'interface')], 
                    is_const=True)
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): static ns3::TypeId ns3::my11s::PeerManagementProtocol::GetTypeId() [member function]
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): std::vector<ns3::Ptr<ns3::my11s::PmtmgmpPeerLink>,std::allocator<ns3::Ptr<ns3::my11s::PmtmgmpPeerLink> > > ns3::my11s::PmtmgmpPeerManagementProtocol::GetPmtmgmpPeerLinks() const [member function]
+    cls.add_method('GetPmtmgmpPeerLinks', 
+                   'std::vector< ns3::Ptr< ns3::my11s::PmtmgmpPeerLink > >', 
+                   [], 
+                   is_const=True)
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): static ns3::TypeId ns3::my11s::PmtmgmpPeerManagementProtocol::GetTypeId() [member function]
     cls.add_method('GetTypeId', 
                    'ns3::TypeId', 
                    [], 
                    is_static=True)
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): bool ns3::my11s::PeerManagementProtocol::Install(ns3::Ptr<ns3::WmnPointDevice> arg0) [member function]
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): ns3::Ptr<ns3::my11s::IeWmnId> ns3::my11s::PmtmgmpPeerManagementProtocol::GetWmnId() const [member function]
+    cls.add_method('GetWmnId', 
+                   'ns3::Ptr< ns3::my11s::IeWmnId >', 
+                   [], 
+                   is_const=True)
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpPeerManagementProtocol::Install(ns3::Ptr<ns3::WmnPointDevice> arg0) [member function]
     cls.add_method('Install', 
                    'bool', 
                    [param('ns3::Ptr< ns3::WmnPointDevice >', 'arg0')])
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): bool ns3::my11s::PeerManagementProtocol::IsActiveLink(uint32_t interface, ns3::Mac48Address peerAddress) [member function]
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpPeerManagementProtocol::IsActiveLink(uint32_t interface, ns3::Mac48Address peerAddress) [member function]
     cls.add_method('IsActiveLink', 
                    'bool', 
                    [param('uint32_t', 'interface'), param('ns3::Mac48Address', 'peerAddress')])
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): void ns3::my11s::PeerManagementProtocol::NotifyBeaconSent(uint32_t interface, ns3::Time beaconInterval) [member function]
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerManagementProtocol::NotifyBeaconSent(uint32_t interface, ns3::Time beaconInterval) [member function]
     cls.add_method('NotifyBeaconSent', 
                    'void', 
                    [param('uint32_t', 'interface'), param('ns3::Time', 'beaconInterval')])
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): void ns3::my11s::PeerManagementProtocol::ReceiveBeacon(uint32_t interface, ns3::Mac48Address peerAddress, ns3::Time beaconInterval, ns3::Ptr<ns3::my11s::IeBeaconTiming> beaconTiming) [member function]
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerManagementProtocol::ReceiveBeacon(uint32_t interface, ns3::Mac48Address peerAddress, ns3::Time beaconInterval, ns3::Ptr<ns3::my11s::IeBeaconTiming> beaconTiming) [member function]
     cls.add_method('ReceiveBeacon', 
                    'void', 
                    [param('uint32_t', 'interface'), param('ns3::Mac48Address', 'peerAddress'), param('ns3::Time', 'beaconInterval'), param('ns3::Ptr< ns3::my11s::IeBeaconTiming >', 'beaconTiming')])
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): void ns3::my11s::PeerManagementProtocol::ReceivePeerLinkFrame(uint32_t interface, ns3::Mac48Address peerAddress, ns3::Mac48Address peerWmnPointAddress, uint16_t aid, ns3::my11s::IePeerManagement peerManagementElement, ns3::my11s::IeConfiguration wmnConfig) [member function]
-    cls.add_method('ReceivePeerLinkFrame', 
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerManagementProtocol::ReceivePmtmgmpPeerLinkFrame(uint32_t interface, ns3::Mac48Address peerAddress, ns3::Mac48Address peerWmnPointAddress, uint16_t aid, ns3::my11s::IePeerManagement peerManagementElement, ns3::my11s::IeConfiguration wmnConfig) [member function]
+    cls.add_method('ReceivePmtmgmpPeerLinkFrame', 
                    'void', 
                    [param('uint32_t', 'interface'), param('ns3::Mac48Address', 'peerAddress'), param('ns3::Mac48Address', 'peerWmnPointAddress'), param('uint16_t', 'aid'), param('ns3::my11s::IePeerManagement', 'peerManagementElement'), param('ns3::my11s::IeConfiguration', 'wmnConfig')])
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): void ns3::my11s::PeerManagementProtocol::Report(std::ostream & arg0) const [member function]
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerManagementProtocol::Report(std::ostream & arg0) const [member function]
     cls.add_method('Report', 
                    'void', 
                    [param('std::ostream &', 'arg0')], 
                    is_const=True)
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): void ns3::my11s::PeerManagementProtocol::ResetStats() [member function]
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerManagementProtocol::ResetStats() [member function]
     cls.add_method('ResetStats', 
                    'void', 
                    [])
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): void ns3::my11s::PeerManagementProtocol::SetBeaconCollisionAvoidance(bool enable) [member function]
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerManagementProtocol::SetBeaconCollisionAvoidance(bool enable) [member function]
     cls.add_method('SetBeaconCollisionAvoidance', 
                    'void', 
                    [param('bool', 'enable')])
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): void ns3::my11s::PeerManagementProtocol::SetWmnId(std::string s) [member function]
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerManagementProtocol::SetPmtmgmpPeerLinkStatusCallback(ns3::Callback<void, ns3::Mac48Address, ns3::Mac48Address, unsigned int, bool, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> cb) [member function]
+    cls.add_method('SetPmtmgmpPeerLinkStatusCallback', 
+                   'void', 
+                   [param('ns3::Callback< void, ns3::Mac48Address, ns3::Mac48Address, unsigned int, bool, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'cb')])
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerManagementProtocol::SetWmnId(std::string s) [member function]
     cls.add_method('SetWmnId', 
                    'void', 
                    [param('std::string', 's')])
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): void ns3::my11s::PeerManagementProtocol::SetPeerLinkStatusCallback(ns3::Callback<void, ns3::Mac48Address, ns3::Mac48Address, unsigned int, bool, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> cb) [member function]
-    cls.add_method('SetPeerLinkStatusCallback', 
-                   'void', 
-                   [param('ns3::Callback< void, ns3::Mac48Address, ns3::Mac48Address, unsigned int, bool, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'cb')])
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): void ns3::my11s::PeerManagementProtocol::TransmissionFailure(uint32_t interface, ns3::Mac48Address const peerAddress) [member function]
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerManagementProtocol::TransmissionFailure(uint32_t interface, ns3::Mac48Address const peerAddress) [member function]
     cls.add_method('TransmissionFailure', 
                    'void', 
                    [param('uint32_t', 'interface'), param('ns3::Mac48Address const', 'peerAddress')])
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): void ns3::my11s::PeerManagementProtocol::TransmissionSuccess(uint32_t interface, ns3::Mac48Address const peerAddress) [member function]
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerManagementProtocol::TransmissionSuccess(uint32_t interface, ns3::Mac48Address const peerAddress) [member function]
     cls.add_method('TransmissionSuccess', 
                    'void', 
                    [param('uint32_t', 'interface'), param('ns3::Mac48Address const', 'peerAddress')])
-    ## pmtmgmp-peer-management-protocol.h (module 'wmn'): void ns3::my11s::PeerManagementProtocol::DoInitialize() [member function]
+    ## pmtmgmp-peer-management-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpPeerManagementProtocol::DoInitialize() [member function]
     cls.add_method('DoInitialize', 
                    'void', 
                    [], 
                    visibility='private', is_virtual=True)
     return
 
-def register_Ns3FlameFlameHeader_methods(root_module, cls):
-    cls.add_binary_comparison_operator('==')
-    ## flame-header.h (module 'wmn'): ns3::flame::FlameHeader::FlameHeader(ns3::flame::FlameHeader const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::flame::FlameHeader const &', 'arg0')])
-    ## flame-header.h (module 'wmn'): ns3::flame::FlameHeader::FlameHeader() [constructor]
+def register_Ns3My11sPmtmgmpProtocol_methods(root_module, cls):
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpProtocol::PmtmgmpProtocol() [constructor]
     cls.add_constructor([])
-    ## flame-header.h (module 'wmn'): void ns3::flame::FlameHeader::AddCost(uint8_t cost) [member function]
-    cls.add_method('AddCost', 
-                   'void', 
-                   [param('uint8_t', 'cost')])
-    ## flame-header.h (module 'wmn'): uint32_t ns3::flame::FlameHeader::Deserialize(ns3::Buffer::Iterator start) [member function]
-    cls.add_method('Deserialize', 
-                   'uint32_t', 
-                   [param('ns3::Buffer::Iterator', 'start')], 
-                   is_virtual=True)
-    ## flame-header.h (module 'wmn'): uint8_t ns3::flame::FlameHeader::GetCost() const [member function]
-    cls.add_method('GetCost', 
-                   'uint8_t', 
-                   [], 
-                   is_const=True)
-    ## flame-header.h (module 'wmn'): ns3::TypeId ns3::flame::FlameHeader::GetInstanceTypeId() const [member function]
-    cls.add_method('GetInstanceTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## flame-header.h (module 'wmn'): ns3::Mac48Address ns3::flame::FlameHeader::GetOrigDst() const [member function]
-    cls.add_method('GetOrigDst', 
-                   'ns3::Mac48Address', 
-                   [], 
-                   is_const=True)
-    ## flame-header.h (module 'wmn'): ns3::Mac48Address ns3::flame::FlameHeader::GetOrigSrc() const [member function]
-    cls.add_method('GetOrigSrc', 
-                   'ns3::Mac48Address', 
-                   [], 
-                   is_const=True)
-    ## flame-header.h (module 'wmn'): uint16_t ns3::flame::FlameHeader::GetProtocol() const [member function]
-    cls.add_method('GetProtocol', 
-                   'uint16_t', 
-                   [], 
-                   is_const=True)
-    ## flame-header.h (module 'wmn'): uint16_t ns3::flame::FlameHeader::GetSeqno() const [member function]
-    cls.add_method('GetSeqno', 
-                   'uint16_t', 
-                   [], 
-                   is_const=True)
-    ## flame-header.h (module 'wmn'): uint32_t ns3::flame::FlameHeader::GetSerializedSize() const [member function]
-    cls.add_method('GetSerializedSize', 
-                   'uint32_t', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## flame-header.h (module 'wmn'): static ns3::TypeId ns3::flame::FlameHeader::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## flame-header.h (module 'wmn'): void ns3::flame::FlameHeader::Print(std::ostream & os) const [member function]
-    cls.add_method('Print', 
-                   'void', 
-                   [param('std::ostream &', 'os')], 
-                   is_const=True, is_virtual=True)
-    ## flame-header.h (module 'wmn'): void ns3::flame::FlameHeader::Serialize(ns3::Buffer::Iterator start) const [member function]
-    cls.add_method('Serialize', 
-                   'void', 
-                   [param('ns3::Buffer::Iterator', 'start')], 
-                   is_const=True, is_virtual=True)
-    ## flame-header.h (module 'wmn'): void ns3::flame::FlameHeader::SetOrigDst(ns3::Mac48Address dst) [member function]
-    cls.add_method('SetOrigDst', 
-                   'void', 
-                   [param('ns3::Mac48Address', 'dst')])
-    ## flame-header.h (module 'wmn'): void ns3::flame::FlameHeader::SetOrigSrc(ns3::Mac48Address OrigSrc) [member function]
-    cls.add_method('SetOrigSrc', 
-                   'void', 
-                   [param('ns3::Mac48Address', 'OrigSrc')])
-    ## flame-header.h (module 'wmn'): void ns3::flame::FlameHeader::SetProtocol(uint16_t protocol) [member function]
-    cls.add_method('SetProtocol', 
-                   'void', 
-                   [param('uint16_t', 'protocol')])
-    ## flame-header.h (module 'wmn'): void ns3::flame::FlameHeader::SetSeqno(uint16_t seqno) [member function]
-    cls.add_method('SetSeqno', 
-                   'void', 
-                   [param('uint16_t', 'seqno')])
-    return
-
-def register_Ns3FlameFlameProtocol_methods(root_module, cls):
-    ## flame-protocol.h (module 'wmn'): ns3::flame::FlameProtocol::FlameProtocol() [constructor]
-    cls.add_constructor([])
-    ## flame-protocol.h (module 'wmn'): void ns3::flame::FlameProtocol::DoDispose() [member function]
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): int64_t ns3::my11s::PmtmgmpProtocol::AssignStreams(int64_t stream) [member function]
+    cls.add_method('AssignStreams', 
+                   'int64_t', 
+                   [param('int64_t', 'stream')])
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpProtocol::DoDispose() [member function]
     cls.add_method('DoDispose', 
                    'void', 
                    [], 
                    is_virtual=True)
-    ## flame-protocol.h (module 'wmn'): ns3::Mac48Address ns3::flame::FlameProtocol::GetAddress() [member function]
-    cls.add_method('GetAddress', 
-                   'ns3::Mac48Address', 
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpProtocol::NodeType ns3::my11s::PmtmgmpProtocol::GetNodeType() [member function]
+    cls.add_method('GetNodeType', 
+                   'ns3::my11s::PmtmgmpProtocol::NodeType', 
                    [])
-    ## flame-protocol.h (module 'wmn'): static ns3::TypeId ns3::flame::FlameProtocol::GetTypeId() [member function]
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRtable ns3::my11s::PmtmgmpProtocol::GetPmtmgmpRtable() [member function]
+    cls.add_method('GetPmtmgmpRtable', 
+                   'ns3::my11s::PmtmgmpRtable', 
+                   [])
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): static ns3::TypeId ns3::my11s::PmtmgmpProtocol::GetTypeId() [member function]
     cls.add_method('GetTypeId', 
                    'ns3::TypeId', 
                    [], 
                    is_static=True)
-    ## flame-protocol.h (module 'wmn'): bool ns3::flame::FlameProtocol::Install(ns3::Ptr<ns3::WmnPointDevice> arg0) [member function]
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpProtocol::Install(ns3::Ptr<ns3::WmnPointDevice> arg0) [member function]
     cls.add_method('Install', 
                    'bool', 
                    [param('ns3::Ptr< ns3::WmnPointDevice >', 'arg0')])
-    ## flame-protocol.h (module 'wmn'): bool ns3::flame::FlameProtocol::RemoveRoutingStuff(uint32_t fromIface, ns3::Mac48Address const source, ns3::Mac48Address const destination, ns3::Ptr<ns3::Packet> packet, uint16_t & protocolType) [member function]
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpProtocol::MSECPSearch() [member function]
+    cls.add_method('MSECPSearch', 
+                   'void', 
+                   [])
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpProtocol::PmtmgmpPeerLinkStatus(ns3::Mac48Address wmnPontAddress, ns3::Mac48Address peerAddress, uint32_t interface, bool status) [member function]
+    cls.add_method('PmtmgmpPeerLinkStatus', 
+                   'void', 
+                   [param('ns3::Mac48Address', 'wmnPontAddress'), param('ns3::Mac48Address', 'peerAddress'), param('uint32_t', 'interface'), param('bool', 'status')])
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpProtocol::RemoveRoutingStuff(uint32_t fromIface, ns3::Mac48Address const source, ns3::Mac48Address const destination, ns3::Ptr<ns3::Packet> packet, uint16_t & protocolType) [member function]
     cls.add_method('RemoveRoutingStuff', 
                    'bool', 
                    [param('uint32_t', 'fromIface'), param('ns3::Mac48Address const', 'source'), param('ns3::Mac48Address const', 'destination'), param('ns3::Ptr< ns3::Packet >', 'packet'), param('uint16_t &', 'protocolType')], 
                    is_virtual=True)
-    ## flame-protocol.h (module 'wmn'): void ns3::flame::FlameProtocol::Report(std::ostream & arg0) const [member function]
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpProtocol::Report(std::ostream & arg0) const [member function]
     cls.add_method('Report', 
                    'void', 
                    [param('std::ostream &', 'arg0')], 
                    is_const=True)
-    ## flame-protocol.h (module 'wmn'): bool ns3::flame::FlameProtocol::RequestRoute(uint32_t sourceIface, ns3::Mac48Address const source, ns3::Mac48Address const destination, ns3::Ptr<ns3::Packet const> packet, uint16_t protocolType, ns3::Callback<void, bool, ns3::Ptr<ns3::Packet>, ns3::Mac48Address, ns3::Mac48Address, unsigned short, unsigned int, ns3::empty, ns3::empty, ns3::empty> routeReply) [member function]
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpProtocol::RequestRoute(uint32_t sourceIface, ns3::Mac48Address const source, ns3::Mac48Address const destination, ns3::Ptr<ns3::Packet const> packet, uint16_t protocolType, ns3::Callback<void, bool, ns3::Ptr<ns3::Packet>, ns3::Mac48Address, ns3::Mac48Address, unsigned short, unsigned int, ns3::empty, ns3::empty, ns3::empty> routeReply) [member function]
     cls.add_method('RequestRoute', 
                    'bool', 
                    [param('uint32_t', 'sourceIface'), param('ns3::Mac48Address const', 'source'), param('ns3::Mac48Address const', 'destination'), param('ns3::Ptr< ns3::Packet const >', 'packet'), param('uint16_t', 'protocolType'), param('ns3::Callback< void, bool, ns3::Ptr< ns3::Packet >, ns3::Mac48Address, ns3::Mac48Address, unsigned short, unsigned int, ns3::empty, ns3::empty, ns3::empty >', 'routeReply')], 
                    is_virtual=True)
-    ## flame-protocol.h (module 'wmn'): void ns3::flame::FlameProtocol::ResetStats() [member function]
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpProtocol::ResetStats() [member function]
     cls.add_method('ResetStats', 
                    'void', 
                    [])
-    return
-
-def register_Ns3FlameFlameProtocolMac_methods(root_module, cls):
-    ## flame-protocol-mac.h (module 'wmn'): ns3::flame::FlameProtocolMac::FlameProtocolMac(ns3::flame::FlameProtocolMac const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::flame::FlameProtocolMac const &', 'arg0')])
-    ## flame-protocol-mac.h (module 'wmn'): ns3::flame::FlameProtocolMac::FlameProtocolMac(ns3::Ptr<ns3::flame::FlameProtocol> arg0) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::flame::FlameProtocol >', 'arg0')])
-    ## flame-protocol-mac.h (module 'wmn'): int64_t ns3::flame::FlameProtocolMac::AssignStreams(int64_t stream) [member function]
-    cls.add_method('AssignStreams', 
-                   'int64_t', 
-                   [param('int64_t', 'stream')], 
-                   is_virtual=True)
-    ## flame-protocol-mac.h (module 'wmn'): uint16_t ns3::flame::FlameProtocolMac::GetChannelId() const [member function]
-    cls.add_method('GetChannelId', 
-                   'uint16_t', 
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpProtocol::SetNeighboursCallback(ns3::Callback<std::vector<ns3::Mac48Address, std::allocator<ns3::Mac48Address> >, unsigned int, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> cb) [member function]
+    cls.add_method('SetNeighboursCallback', 
+                   'void', 
+                   [param('ns3::Callback< std::vector< ns3::Mac48Address >, unsigned int, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'cb')])
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpProtocol::SetNodeType(ns3::my11s::PmtmgmpProtocol::NodeType nodeType) [member function]
+    cls.add_method('SetNodeType', 
+                   'void', 
+                   [param('ns3::my11s::PmtmgmpProtocol::NodeType', 'nodeType')])
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpProtocol::SetRoot() [member function]
+    cls.add_method('SetRoot', 
+                   'void', 
+                   [])
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpProtocol::UnsetRoot() [member function]
+    cls.add_method('UnsetRoot', 
+                   'void', 
+                   [])
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpProtocol::DoInitialize() [member function]
+    cls.add_method('DoInitialize', 
+                   'void', 
                    [], 
-                   is_const=True)
-    ## flame-protocol-mac.h (module 'wmn'): bool ns3::flame::FlameProtocolMac::Receive(ns3::Ptr<ns3::Packet> packet, ns3::WifiMacHeader const & header) [member function]
-    cls.add_method('Receive', 
-                   'bool', 
-                   [param('ns3::Ptr< ns3::Packet >', 'packet'), param('ns3::WifiMacHeader const &', 'header')], 
-                   is_virtual=True)
-    ## flame-protocol-mac.h (module 'wmn'): void ns3::flame::FlameProtocolMac::Report(std::ostream & arg0) const [member function]
-    cls.add_method('Report', 
-                   'void', 
-                   [param('std::ostream &', 'arg0')], 
-                   is_const=True)
-    ## flame-protocol-mac.h (module 'wmn'): void ns3::flame::FlameProtocolMac::ResetStats() [member function]
-    cls.add_method('ResetStats', 
-                   'void', 
-                   [])
-    ## flame-protocol-mac.h (module 'wmn'): void ns3::flame::FlameProtocolMac::SetParent(ns3::Ptr<ns3::WmnWifiInterfaceMac> parent) [member function]
-    cls.add_method('SetParent', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::WmnWifiInterfaceMac >', 'parent')], 
-                   is_virtual=True)
-    ## flame-protocol-mac.h (module 'wmn'): void ns3::flame::FlameProtocolMac::UpdateBeacon(ns3::WmnWifiBeacon & beacon) const [member function]
-    cls.add_method('UpdateBeacon', 
-                   'void', 
-                   [param('ns3::WmnWifiBeacon &', 'beacon')], 
-                   is_const=True, is_virtual=True)
-    ## flame-protocol-mac.h (module 'wmn'): bool ns3::flame::FlameProtocolMac::UpdateOutcomingFrame(ns3::Ptr<ns3::Packet> packet, ns3::WifiMacHeader & header, ns3::Mac48Address from, ns3::Mac48Address to) [member function]
-    cls.add_method('UpdateOutcomingFrame', 
-                   'bool', 
-                   [param('ns3::Ptr< ns3::Packet >', 'packet'), param('ns3::WifiMacHeader &', 'header'), param('ns3::Mac48Address', 'from'), param('ns3::Mac48Address', 'to')], 
-                   is_virtual=True)
+                   visibility='private', is_virtual=True)
     return
 
-def register_Ns3FlameFlameRtable_methods(root_module, cls):
-    ## flame-rtable.h (module 'wmn'): ns3::flame::FlameRtable::FlameRtable() [constructor]
+def register_Ns3My11sPmtmgmpProtocolFailedDestination_methods(root_module, cls):
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpProtocol::FailedDestination::FailedDestination() [constructor]
     cls.add_constructor([])
-    ## flame-rtable.h (module 'wmn'): void ns3::flame::FlameRtable::AddPath(ns3::Mac48Address const destination, ns3::Mac48Address const retransmitter, uint32_t const interface, uint8_t const cost, uint16_t const seqnum) [member function]
-    cls.add_method('AddPath', 
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpProtocol::FailedDestination::FailedDestination(ns3::my11s::PmtmgmpProtocol::FailedDestination const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::my11s::PmtmgmpProtocol::FailedDestination const &', 'arg0')])
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpProtocol::FailedDestination::destination [variable]
+    cls.add_instance_attribute('destination', 'ns3::Mac48Address', is_const=False)
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpProtocol::FailedDestination::seqnum [variable]
+    cls.add_instance_attribute('seqnum', 'uint32_t', is_const=False)
+    return
+
+def register_Ns3My11sPmtmgmpRtable_methods(root_module, cls):
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRtable::PmtmgmpRtable(ns3::my11s::PmtmgmpRtable const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::my11s::PmtmgmpRtable const &', 'arg0')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRtable::PmtmgmpRtable() [constructor]
+    cls.add_constructor([])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRtable::AddPrecursor(ns3::Mac48Address destination, uint32_t precursorInterface, ns3::Mac48Address precursorAddress, ns3::Time lifetime) [member function]
+    cls.add_method('AddPrecursor', 
                    'void', 
-                   [param('ns3::Mac48Address const', 'destination'), param('ns3::Mac48Address const', 'retransmitter'), param('uint32_t const', 'interface'), param('uint8_t const', 'cost'), param('uint16_t const', 'seqnum')])
-    ## flame-rtable.h (module 'wmn'): void ns3::flame::FlameRtable::DoDispose() [member function]
+                   [param('ns3::Mac48Address', 'destination'), param('uint32_t', 'precursorInterface'), param('ns3::Mac48Address', 'precursorAddress'), param('ns3::Time', 'lifetime')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRtable::AddProactivePath(uint32_t metric, ns3::Mac48Address root, ns3::Mac48Address retransmitter, uint32_t interface, ns3::Time lifetime, uint32_t seqnum) [member function]
+    cls.add_method('AddProactivePath', 
+                   'void', 
+                   [param('uint32_t', 'metric'), param('ns3::Mac48Address', 'root'), param('ns3::Mac48Address', 'retransmitter'), param('uint32_t', 'interface'), param('ns3::Time', 'lifetime'), param('uint32_t', 'seqnum')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRtable::AddReactivePath(ns3::Mac48Address destination, ns3::Mac48Address retransmitter, uint32_t interface, uint32_t metric, ns3::Time lifetime, uint32_t seqnum) [member function]
+    cls.add_method('AddReactivePath', 
+                   'void', 
+                   [param('ns3::Mac48Address', 'destination'), param('ns3::Mac48Address', 'retransmitter'), param('uint32_t', 'interface'), param('uint32_t', 'metric'), param('ns3::Time', 'lifetime'), param('uint32_t', 'seqnum')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRtable::DeleteProactivePath() [member function]
+    cls.add_method('DeleteProactivePath', 
+                   'void', 
+                   [])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRtable::DeleteProactivePath(ns3::Mac48Address root) [member function]
+    cls.add_method('DeleteProactivePath', 
+                   'void', 
+                   [param('ns3::Mac48Address', 'root')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRtable::DeleteReactivePath(ns3::Mac48Address destination) [member function]
+    cls.add_method('DeleteReactivePath', 
+                   'void', 
+                   [param('ns3::Mac48Address', 'destination')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRtable::DoDispose() [member function]
     cls.add_method('DoDispose', 
                    'void', 
                    [], 
                    is_virtual=True)
-    ## flame-rtable.h (module 'wmn'): static ns3::TypeId ns3::flame::FlameRtable::GetTypeId() [member function]
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): std::vector<std::pair<unsigned int, ns3::Mac48Address>, std::allocator<std::pair<unsigned int, ns3::Mac48Address> > > ns3::my11s::PmtmgmpRtable::GetPrecursors(ns3::Mac48Address destination) [member function]
+    cls.add_method('GetPrecursors', 
+                   'std::vector< std::pair< unsigned int, ns3::Mac48Address > >', 
+                   [param('ns3::Mac48Address', 'destination')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): static ns3::TypeId ns3::my11s::PmtmgmpRtable::GetTypeId() [member function]
     cls.add_method('GetTypeId', 
                    'ns3::TypeId', 
                    [], 
                    is_static=True)
-    ## flame-rtable.h (module 'wmn'): ns3::flame::FlameRtable::LookupResult ns3::flame::FlameRtable::Lookup(ns3::Mac48Address destination) [member function]
-    cls.add_method('Lookup', 
-                   'ns3::flame::FlameRtable::LookupResult', 
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): std::vector<ns3::my11s::PmtmgmpProtocol::FailedDestination, std::allocator<ns3::my11s::PmtmgmpProtocol::FailedDestination> > ns3::my11s::PmtmgmpRtable::GetUnreachableDestinations(ns3::Mac48Address peerAddress) [member function]
+    cls.add_method('GetUnreachableDestinations', 
+                   'std::vector< ns3::my11s::PmtmgmpProtocol::FailedDestination >', 
+                   [param('ns3::Mac48Address', 'peerAddress')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRtable::LookupResult ns3::my11s::PmtmgmpRtable::LookupProactive() [member function]
+    cls.add_method('LookupProactive', 
+                   'ns3::my11s::PmtmgmpRtable::LookupResult', 
+                   [])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRtable::LookupResult ns3::my11s::PmtmgmpRtable::LookupProactiveExpired() [member function]
+    cls.add_method('LookupProactiveExpired', 
+                   'ns3::my11s::PmtmgmpRtable::LookupResult', 
+                   [])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRtable::LookupResult ns3::my11s::PmtmgmpRtable::LookupReactive(ns3::Mac48Address destination) [member function]
+    cls.add_method('LookupReactive', 
+                   'ns3::my11s::PmtmgmpRtable::LookupResult', 
                    [param('ns3::Mac48Address', 'destination')])
-    ## flame-rtable.h (module 'wmn'): ns3::flame::FlameRtable::INTERFACE_ANY [variable]
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRtable::LookupResult ns3::my11s::PmtmgmpRtable::LookupReactiveExpired(ns3::Mac48Address destination) [member function]
+    cls.add_method('LookupReactiveExpired', 
+                   'ns3::my11s::PmtmgmpRtable::LookupResult', 
+                   [param('ns3::Mac48Address', 'destination')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRtable::INTERFACE_ANY [variable]
     cls.add_static_attribute('INTERFACE_ANY', 'uint32_t const', is_const=True)
-    ## flame-rtable.h (module 'wmn'): ns3::flame::FlameRtable::MAX_COST [variable]
-    cls.add_static_attribute('MAX_COST', 'uint32_t const', is_const=True)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRtable::MAX_METRIC [variable]
+    cls.add_static_attribute('MAX_METRIC', 'uint32_t const', is_const=True)
     return
 
-def register_Ns3FlameFlameRtableLookupResult_methods(root_module, cls):
+def register_Ns3My11sPmtmgmpRtableLookupResult_methods(root_module, cls):
     cls.add_binary_comparison_operator('==')
-    ## flame-rtable.h (module 'wmn'): ns3::flame::FlameRtable::LookupResult::LookupResult(ns3::flame::FlameRtable::LookupResult const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::flame::FlameRtable::LookupResult const &', 'arg0')])
-    ## flame-rtable.h (module 'wmn'): ns3::flame::FlameRtable::LookupResult::LookupResult(ns3::Mac48Address r=ns3::Mac48Address::GetBroadcast(), uint32_t i=ns3::flame::FlameRtable::INTERFACE_ANY, uint8_t c=ns3::flame::FlameRtable::MAX_COST, uint16_t s=0) [constructor]
-    cls.add_constructor([param('ns3::Mac48Address', 'r', default_value='ns3::Mac48Address::GetBroadcast()'), param('uint32_t', 'i', default_value='ns3::flame::FlameRtable::INTERFACE_ANY'), param('uint8_t', 'c', default_value='ns3::flame::FlameRtable::MAX_COST'), param('uint16_t', 's', default_value='0')])
-    ## flame-rtable.h (module 'wmn'): bool ns3::flame::FlameRtable::LookupResult::IsValid() const [member function]
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRtable::LookupResult::LookupResult(ns3::my11s::PmtmgmpRtable::LookupResult const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::my11s::PmtmgmpRtable::LookupResult const &', 'arg0')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRtable::LookupResult::LookupResult(ns3::Mac48Address r=ns3::Mac48Address::GetBroadcast(), uint32_t i=ns3::my11s::PmtmgmpRtable::INTERFACE_ANY, uint32_t m=ns3::my11s::PmtmgmpRtable::MAX_METRIC, uint32_t s=0, ns3::Time l=ns3::Seconds( )) [constructor]
+    cls.add_constructor([param('ns3::Mac48Address', 'r', default_value='ns3::Mac48Address::GetBroadcast()'), param('uint32_t', 'i', default_value='ns3::my11s::PmtmgmpRtable::INTERFACE_ANY'), param('uint32_t', 'm', default_value='ns3::my11s::PmtmgmpRtable::MAX_METRIC'), param('uint32_t', 's', default_value='0'), param('ns3::Time', 'l', default_value='ns3::Seconds(0)')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpRtable::LookupResult::IsValid() const [member function]
     cls.add_method('IsValid', 
                    'bool', 
                    [], 
                    is_const=True)
-    ## flame-rtable.h (module 'wmn'): ns3::flame::FlameRtable::LookupResult::cost [variable]
-    cls.add_instance_attribute('cost', 'uint8_t', is_const=False)
-    ## flame-rtable.h (module 'wmn'): ns3::flame::FlameRtable::LookupResult::ifIndex [variable]
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRtable::LookupResult::ifIndex [variable]
     cls.add_instance_attribute('ifIndex', 'uint32_t', is_const=False)
-    ## flame-rtable.h (module 'wmn'): ns3::flame::FlameRtable::LookupResult::retransmitter [variable]
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRtable::LookupResult::lifetime [variable]
+    cls.add_instance_attribute('lifetime', 'ns3::Time', is_const=False)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRtable::LookupResult::metric [variable]
+    cls.add_instance_attribute('metric', 'uint32_t', is_const=False)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRtable::LookupResult::retransmitter [variable]
     cls.add_instance_attribute('retransmitter', 'ns3::Mac48Address', is_const=False)
-    ## flame-rtable.h (module 'wmn'): ns3::flame::FlameRtable::LookupResult::seqnum [variable]
-    cls.add_instance_attribute('seqnum', 'uint16_t', is_const=False)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRtable::LookupResult::seqnum [variable]
+    cls.add_instance_attribute('seqnum', 'uint32_t', is_const=False)
     return
 
-def register_Ns3FlameFlameTag_methods(root_module, cls):
-    ## flame-protocol.h (module 'wmn'): ns3::flame::FlameTag::FlameTag(ns3::flame::FlameTag const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::flame::FlameTag const &', 'arg0')])
-    ## flame-protocol.h (module 'wmn'): ns3::flame::FlameTag::FlameTag(ns3::Mac48Address a=ns3::Mac48Address()) [constructor]
-    cls.add_constructor([param('ns3::Mac48Address', 'a', default_value='ns3::Mac48Address()')])
-    ## flame-protocol.h (module 'wmn'): void ns3::flame::FlameTag::Deserialize(ns3::TagBuffer i) [member function]
+def register_Ns3My11sWmnHeader_methods(root_module, cls):
+    cls.add_binary_comparison_operator('==')
+    ## my11s-mac-header.h (module 'pmtmgmp'): ns3::my11s::WmnHeader::WmnHeader(ns3::my11s::WmnHeader const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::my11s::WmnHeader const &', 'arg0')])
+    ## my11s-mac-header.h (module 'pmtmgmp'): ns3::my11s::WmnHeader::WmnHeader() [constructor]
+    cls.add_constructor([])
+    ## my11s-mac-header.h (module 'pmtmgmp'): uint32_t ns3::my11s::WmnHeader::Deserialize(ns3::Buffer::Iterator start) [member function]
     cls.add_method('Deserialize', 
-                   'void', 
-                   [param('ns3::TagBuffer', 'i')], 
+                   'uint32_t', 
+                   [param('ns3::Buffer::Iterator', 'start')], 
                    is_virtual=True)
-    ## flame-protocol.h (module 'wmn'): ns3::TypeId ns3::flame::FlameTag::GetInstanceTypeId() const [member function]
+    ## my11s-mac-header.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::WmnHeader::GetAddr4() const [member function]
+    cls.add_method('GetAddr4', 
+                   'ns3::Mac48Address', 
+                   [], 
+                   is_const=True)
+    ## my11s-mac-header.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::WmnHeader::GetAddr5() const [member function]
+    cls.add_method('GetAddr5', 
+                   'ns3::Mac48Address', 
+                   [], 
+                   is_const=True)
+    ## my11s-mac-header.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::WmnHeader::GetAddr6() const [member function]
+    cls.add_method('GetAddr6', 
+                   'ns3::Mac48Address', 
+                   [], 
+                   is_const=True)
+    ## my11s-mac-header.h (module 'pmtmgmp'): uint8_t ns3::my11s::WmnHeader::GetAddressExt() const [member function]
+    cls.add_method('GetAddressExt', 
+                   'uint8_t', 
+                   [], 
+                   is_const=True)
+    ## my11s-mac-header.h (module 'pmtmgmp'): ns3::TypeId ns3::my11s::WmnHeader::GetInstanceTypeId() const [member function]
     cls.add_method('GetInstanceTypeId', 
                    'ns3::TypeId', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## flame-protocol.h (module 'wmn'): uint32_t ns3::flame::FlameTag::GetSerializedSize() const [member function]
+    ## my11s-mac-header.h (module 'pmtmgmp'): uint32_t ns3::my11s::WmnHeader::GetSerializedSize() const [member function]
     cls.add_method('GetSerializedSize', 
                    'uint32_t', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## flame-protocol.h (module 'wmn'): static ns3::TypeId ns3::flame::FlameTag::GetTypeId() [member function]
+    ## my11s-mac-header.h (module 'pmtmgmp'): static ns3::TypeId ns3::my11s::WmnHeader::GetTypeId() [member function]
     cls.add_method('GetTypeId', 
                    'ns3::TypeId', 
                    [], 
                    is_static=True)
-    ## flame-protocol.h (module 'wmn'): void ns3::flame::FlameTag::Print(std::ostream & os) const [member function]
+    ## my11s-mac-header.h (module 'pmtmgmp'): uint32_t ns3::my11s::WmnHeader::GetWmnSeqno() const [member function]
+    cls.add_method('GetWmnSeqno', 
+                   'uint32_t', 
+                   [], 
+                   is_const=True)
+    ## my11s-mac-header.h (module 'pmtmgmp'): uint8_t ns3::my11s::WmnHeader::GetWmnTtl() const [member function]
+    cls.add_method('GetWmnTtl', 
+                   'uint8_t', 
+                   [], 
+                   is_const=True)
+    ## my11s-mac-header.h (module 'pmtmgmp'): void ns3::my11s::WmnHeader::Print(std::ostream & os) const [member function]
     cls.add_method('Print', 
                    'void', 
                    [param('std::ostream &', 'os')], 
                    is_const=True, is_virtual=True)
-    ## flame-protocol.h (module 'wmn'): void ns3::flame::FlameTag::Serialize(ns3::TagBuffer i) const [member function]
+    ## my11s-mac-header.h (module 'pmtmgmp'): void ns3::my11s::WmnHeader::Serialize(ns3::Buffer::Iterator start) const [member function]
     cls.add_method('Serialize', 
                    'void', 
-                   [param('ns3::TagBuffer', 'i')], 
+                   [param('ns3::Buffer::Iterator', 'start')], 
                    is_const=True, is_virtual=True)
-    ## flame-protocol.h (module 'wmn'): ns3::flame::FlameTag::receiver [variable]
-    cls.add_instance_attribute('receiver', 'ns3::Mac48Address', is_const=False)
-    ## flame-protocol.h (module 'wmn'): ns3::flame::FlameTag::transmitter [variable]
-    cls.add_instance_attribute('transmitter', 'ns3::Mac48Address', is_const=False)
+    ## my11s-mac-header.h (module 'pmtmgmp'): void ns3::my11s::WmnHeader::SetAddr4(ns3::Mac48Address address) [member function]
+    cls.add_method('SetAddr4', 
+                   'void', 
+                   [param('ns3::Mac48Address', 'address')])
+    ## my11s-mac-header.h (module 'pmtmgmp'): void ns3::my11s::WmnHeader::SetAddr5(ns3::Mac48Address address) [member function]
+    cls.add_method('SetAddr5', 
+                   'void', 
+                   [param('ns3::Mac48Address', 'address')])
+    ## my11s-mac-header.h (module 'pmtmgmp'): void ns3::my11s::WmnHeader::SetAddr6(ns3::Mac48Address address) [member function]
+    cls.add_method('SetAddr6', 
+                   'void', 
+                   [param('ns3::Mac48Address', 'address')])
+    ## my11s-mac-header.h (module 'pmtmgmp'): void ns3::my11s::WmnHeader::SetAddressExt(uint8_t num_of_addresses) [member function]
+    cls.add_method('SetAddressExt', 
+                   'void', 
+                   [param('uint8_t', 'num_of_addresses')])
+    ## my11s-mac-header.h (module 'pmtmgmp'): void ns3::my11s::WmnHeader::SetWmnSeqno(uint32_t seqno) [member function]
+    cls.add_method('SetWmnSeqno', 
+                   'void', 
+                   [param('uint32_t', 'seqno')])
+    ## my11s-mac-header.h (module 'pmtmgmp'): void ns3::my11s::WmnHeader::SetWmnTtl(uint8_t TTL) [member function]
+    cls.add_method('SetWmnTtl', 
+                   'void', 
+                   [param('uint8_t', 'TTL')])
     return
 
 def register_functions(root_module):
     module = root_module
     register_functions_ns3_FatalImpl(module.get_submodule('FatalImpl'), root_module)
     register_functions_ns3_Hash(module.get_submodule('Hash'), root_module)
-    register_functions_ns3_my11s(module.get_submodule('my11s'), root_module)
-    register_functions_ns3_flame(module.get_submodule('flame'), root_module)
     register_functions_ns3_internal(module.get_submodule('internal'), root_module)
+    register_functions_ns3_my11s(module.get_submodule('my11s'), root_module)
     return
 
 def register_functions_ns3_FatalImpl(module, root_module):
@@ -11904,17 +11726,14 @@ def register_functions_ns3_Hash(module, root_module):
 def register_functions_ns3_Hash_Function(module, root_module):
     return
 
+def register_functions_ns3_internal(module, root_module):
+    return
+
 def register_functions_ns3_my11s(module, root_module):
-    ## ie-my11s-id.h (module 'wmn'): extern ns3::Ptr<ns3::AttributeChecker const> ns3::my11s::MakeIeWmnIdChecker() [free function]
+    ## ie-my11s-id.h (module 'pmtmgmp'): extern ns3::Ptr<ns3::AttributeChecker const> ns3::my11s::MakeIeWmnIdChecker() [free function]
     module.add_function('MakeIeWmnIdChecker', 
                         'ns3::Ptr< ns3::AttributeChecker const >', 
                         [])
-    return
-
-def register_functions_ns3_flame(module, root_module):
-    return
-
-def register_functions_ns3_internal(module, root_module):
     return
 
 def main():
