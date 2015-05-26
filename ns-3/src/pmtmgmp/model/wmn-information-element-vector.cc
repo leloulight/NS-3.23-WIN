@@ -37,6 +37,7 @@
 #ifndef PMTMGMP_UNUSED_MY_CODE
 #include "ns3/ie-my11s-secreq.h"
 #include "ns3/ie-my11s-secrep.h"
+#include "ns3/ie-my11s-secack.h"
 #endif
 
 namespace ns3 {
@@ -83,6 +84,9 @@ namespace ns3 {
 			break;
 		case IE11S_SECREP:
 			newElement = Create<my11s::IeSecrep>();
+			break;
+		case IE11S_SECACK:
+			newElement = Create<my11s::IeSecack>();
 			break;
 #endif
 		case IE11S_WMN_PMTMGMP_PEERING_PROTOCOL_VERSION:

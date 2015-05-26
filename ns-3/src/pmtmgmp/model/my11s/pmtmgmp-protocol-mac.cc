@@ -35,6 +35,7 @@
 #ifndef PMTMGMP_UNUSED_MY_CODE
 #include "ie-my11s-secreq.h"
 #include "ie-my11s-secrep.h"
+#include "ie-my11s-secack.h"
 #endif
 
 namespace ns3 {
@@ -164,15 +165,22 @@ namespace ns3 {
 				{
 					Ptr<IeSecreq> secreq = DynamicCast<IeSecreq>(*i);
 					NS_ASSERT(secreq != 0);
-					m_stats.rxPreq++;
+					m_stats.rxSecreq++;
 					m_protocol->ReceiveSecreq(*secreq, header.GetAddr2(), m_ifIndex, header.GetAddr3(), m_parent->GetLinkMetric(header.GetAddr2()));
 				}
 				if ((*i)->ElementId() == IE11S_SECREP)
 				{
 					Ptr<IeSecrep> secrep = DynamicCast<IeSecrep>(*i);
 					NS_ASSERT(secrep != 0);
-					m_stats.rxPrep++;
+					m_stats.rxSecrep++;
 					m_protocol->ReceiveSecrep(*secrep, header.GetAddr2(), m_ifIndex, header.GetAddr3(), m_parent->GetLinkMetric(header.GetAddr2()));
+				}
+				if ((*i)->ElementId() == IE11S_SECACK)
+				{
+					Ptr<IeSecack> secack = DynamicCast<IeSecack>(*i);
+					NS_ASSERT(secack != 0);
+					m_stats.rxSecack++;
+					m_protocol->ReceiveSecack(*secack, header.GetAddr2(), m_ifIndex, header.GetAddr3(), m_parent->GetLinkMetric(header.GetAddr2()));
 				}
 #endif
 			}
@@ -569,7 +577,39 @@ namespace ns3 {
 			hdr.SetAddr3(m_protocol->GetAddress());
 			//Send Management frame
 			hdr.SetAddr1(receiver);
-			m_stats.txSecreq++;
+			m_stats.txSecrep++;
+			m_stats.txMgt++;
+			m_stats.txMgtBytes += packet->GetSize();
+			m_parent->SendManagementFrame(packet, hdr);
+		}
+		////·¢ËÍSECACK
+		void PmtmgmpProtocolMac::SendSecack(IeSecack secack, Mac48Address receiver)
+		{
+			NS_LOG_FUNCTION_NOARGS();
+			std::vector<IeSecack> secack_vector;
+			secack_vector.push_back(secack);
+			SendSecack(secack_vector, receiver);
+		}
+		void PmtmgmpProtocolMac::SendSecack(std::vector<IeSecack> secack, Mac48Address receiver)
+		{
+			Ptr<Packet> packet = Create<Packet>();
+			WmnInformationElementVector elements;
+			for (std::vector<IeSecack>::iterator i = secack.begin(); i != secack.end(); i++)
+			{
+				elements.AddInformationElement(Ptr<IeSecack>(&(*i)));
+			}
+			packet->AddHeader(elements);
+			packet->AddHeader(GetWifiActionHeader());
+			//create 802.11 header:
+			WifiMacHeader hdr;
+			hdr.SetAction();
+			hdr.SetDsNotFrom();
+			hdr.SetDsNotTo();
+			hdr.SetAddr2(m_parent->GetAddress());
+			hdr.SetAddr3(m_protocol->GetAddress());
+			//Send Management frame
+			hdr.SetAddr1(receiver);
+			m_stats.txSecack++;
 			m_stats.txMgt++;
 			m_stats.txMgtBytes += packet->GetSize();
 			m_parent->SendManagementFrame(packet, hdr);

@@ -54,6 +54,7 @@ namespace ns3 {
 #ifndef PMTMGMP_UNUSED_MY_CODE
 #define IE11S_SECREQ                             ((WifiInformationElementId)255)
 #define IE11S_SECREP                             ((WifiInformationElementId)254)
+#define IE11S_SECACK                             ((WifiInformationElementId)253)
 #endif
 #define IE11S_WMN_PMTMGMP_PEERING_PROTOCOL_VERSION    ((WifiInformationElementId)74)
 }

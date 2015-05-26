@@ -19,31 +19,30 @@
 */
 
 #ifndef PMTMGMP_UNUSED_MY_CODE
-#ifndef PMTMGMP_WIFI_SECREP_INFORMATION_ELEMENT_H
-#define PMTMGMP_WIFI_SECREP_INFORMATION_ELEMENT_H
+#ifndef PMTMGMP_WIFI_SECACK_INFORMATION_ELEMENT_H
+#define PMTMGMP_WIFI_SECACK_INFORMATION_ELEMENT_H
 
 #include "ns3/mac48-address.h"
 #include "ns3/wmn-information-element-vector.h"
+#include "ns3/pmtmgmp-protocol.h"
 
 namespace ns3 {
 	namespace my11s {
-		class IeSecrep : public WifiInformationElement
+		class IeSecack : public WifiInformationElement
 		{
 		public:
-			IeSecrep();
-			~IeSecrep();
+			IeSecack();
+			~IeSecack();
 
 			// Setters for fields:
 			void SetOriginatorAddress(Mac48Address originator_address);
-			void SetCandidateMSECPaddress(Mac48Address candidateMSECP_address);
-			void SetAffiliatedMTERPnum(uint8_t mTERP_number);
 			void SetPathGenerationSequenceNumber(uint32_t index);
+			void SetNodeType(PmtmgmpProtocol::NodeType nodeType);
 
 			// Getters for fields:
 			Mac48Address GetOriginatorAddress() const;
-			Mac48Address GetCandidateMSECPaddress() const;
-			uint8_t GetAffiliatedMTERPnum() const;
 			uint32_t GetPathGenerationSequenceNumber() const;
+			PmtmgmpProtocol::NodeType GetNodeType() const;
 
 			// Inherited from WifiInformationElement
 			virtual WifiInformationElementId ElementId() const;
@@ -59,14 +58,13 @@ namespace ns3 {
 			uint8_t m_maxSize;
 
 			Mac48Address m_originatorAddress;
-			Mac48Address m_candidateMSECPaddress;
-			uint8_t m_affiliatedMTERPnum;
 			uint32_t m_PathGenerationSequenceNumber;
-			friend bool operator== (const IeSecrep & a, const IeSecrep & b);
+			PmtmgmpProtocol::NodeType m_NodeType;
+			friend bool operator== (const IeSecack & a, const IeSecack & b);
 
 		};
-		bool operator== (const IeSecrep & a, const IeSecrep & b);
-		std::ostream &operator << (std::ostream &os, const IeSecrep &secreq);
+		bool operator== (const IeSecack & a, const IeSecack & b);
+		std::ostream &operator << (std::ostream &os, const IeSecack &secack);
 	}
 }
 #endif

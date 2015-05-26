@@ -24,6 +24,7 @@
 
 #include "ns3/mac48-address.h"
 #include "ns3/wmn-information-element-vector.h"
+#include "ns3/pmtmgmp-protocol.h"
 
 namespace ns3 {
 	namespace my11s {
@@ -35,11 +36,13 @@ namespace ns3 {
 
 			// Setters for fields:
 			void SetOriginatorAddress(Mac48Address originator_address);
-			void SetMSECPSelectIndex(uint32_t index);
+			void SetPathGenerationSequenceNumber(uint32_t index);
+			void SetNodeType(PmtmgmpProtocol::NodeType nodeType);
 
 			// Getters for fields:
 			Mac48Address GetOriginatorAddress() const;
-			uint32_t GetMSECPSelectIndex() const;
+			uint32_t GetPathGenerationSequenceNumber() const;
+			PmtmgmpProtocol::NodeType GetNodeType() const;
 
 			// Inherited from WifiInformationElement
 			virtual WifiInformationElementId ElementId() const;
@@ -55,7 +58,8 @@ namespace ns3 {
 			uint8_t m_maxSize;
 
 			Mac48Address m_originatorAddress;
-			uint32_t m_MSECPSelectIndex;
+			uint32_t m_PathGenerationSequenceNumber;
+			PmtmgmpProtocol::NodeType m_NodeType;
 			friend bool operator== (const IeSecreq & a, const IeSecreq & b);
 
 		};

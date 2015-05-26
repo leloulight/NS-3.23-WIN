@@ -101,6 +101,9 @@
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-secrep.h">
       <Filter>model</Filter>
     </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-secack.h">
+      <Filter>model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="helper">
@@ -196,6 +199,9 @@
       <Filter>model</Filter>
     </ClCompile>
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-secrep.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-secack.cc">
       <Filter>model</Filter>
     </ClCompile>
   </ItemGroup>

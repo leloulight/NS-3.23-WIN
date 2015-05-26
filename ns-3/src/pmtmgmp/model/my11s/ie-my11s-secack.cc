@@ -19,7 +19,7 @@
 */
 
 #ifndef PMTMGMP_UNUSED_MY_CODE
-#include "ie-my11s-secreq.h"
+#include "ie-my11s-secack.h"
 #include "ns3/address-utils.h"
 #include "ns3/assert.h"
 #include "ns3/packet.h"
@@ -27,42 +27,42 @@
 
 namespace ns3 {
 	namespace my11s {
-		IeSecreq::~IeSecreq()
+		IeSecack::~IeSecack()
 		{
 		}
-		IeSecreq::IeSecreq()
+		IeSecack::IeSecack()
 		{
 
 		}
-		void IeSecreq::SetOriginatorAddress(Mac48Address originator_address)
+		void IeSecack::SetOriginatorAddress(Mac48Address originator_address)
 		{
 			m_originatorAddress = originator_address;
 		}
-		void IeSecreq::SetPathGenerationSequenceNumber(uint32_t index)
+		void IeSecack::SetPathGenerationSequenceNumber(uint32_t index)
 		{
 			m_PathGenerationSequenceNumber = index;
 		}
-		void IeSecreq::SetNodeType(PmtmgmpProtocol::NodeType nodeType)
+		void IeSecack::SetNodeType(PmtmgmpProtocol::NodeType nodeType)
 		{
 			m_NodeType = nodeType;
 		}
-		Mac48Address IeSecreq::GetOriginatorAddress() const
+		Mac48Address IeSecack::GetOriginatorAddress() const
 		{
 			return m_originatorAddress;
 		}
-		uint32_t IeSecreq::GetPathGenerationSequenceNumber() const
+		uint32_t IeSecack::GetPathGenerationSequenceNumber() const
 		{
 			return m_PathGenerationSequenceNumber;
 		}
-		PmtmgmpProtocol::NodeType IeSecreq::GetNodeType() const
+		PmtmgmpProtocol::NodeType IeSecack::GetNodeType() const
 		{
 			return m_NodeType;
 		}
-		WifiInformationElementId IeSecreq::ElementId() const
+		WifiInformationElementId IeSecack::ElementId() const
 		{
-			return IE11S_SECREQ;
+			return IE11S_SECACK;
 		}
-		void IeSecreq::Print(std::ostream &os) const
+		void IeSecack::Print(std::ostream &os) const
 		{
 			os << std::endl << "<information_element id=" << ElementId() << ">" << std::endl;
 			os << " originator address  = " << m_originatorAddress << std::endl;
@@ -70,13 +70,13 @@ namespace ns3 {
 			os << " node type = " << m_NodeType << std::endl;
 			os << "</information_element>" << std::endl;
 		}
-		void IeSecreq::SerializeInformationField(Buffer::Iterator i) const
+		void IeSecack::SerializeInformationField(Buffer::Iterator i) const
 		{
 			WriteTo(i, m_originatorAddress);
 			i.WriteHtolsbU32(m_PathGenerationSequenceNumber);
 			i.WriteU8(m_NodeType);
 		}
-		uint8_t IeSecreq::DeserializeInformationField(Buffer::Iterator start, uint8_t length)
+		uint8_t IeSecack::DeserializeInformationField(Buffer::Iterator start, uint8_t length)
 		{
 			Buffer::Iterator i = start;
 			ReadFrom(i, m_originatorAddress);
@@ -84,21 +84,21 @@ namespace ns3 {
 			m_NodeType = (PmtmgmpProtocol::NodeType) i.ReadU8();
 			return i.GetDistanceFrom(start);
 		}
-		uint8_t IeSecreq::GetInformationFieldSize() const
+		uint8_t IeSecack::GetInformationFieldSize() const
 		{
 			uint8_t retval = 6	//Source address (originator)
 				+ 4;			//MSECP Select Index
 				+ 1;			//NodeType
 			return retval;
 		}
-		bool operator== (const IeSecreq & a, const IeSecreq & b)
+		bool operator== (const IeSecack & a, const IeSecack & b)
 		{
 			return true;
 		}
 		std::ostream &
-			operator << (std::ostream &os, const IeSecreq &secreq)
+			operator << (std::ostream &os, const IeSecack &secack)
 		{
-			secreq.Print(os);
+			secack.Print(os);
 			return os;
 		}
 	}

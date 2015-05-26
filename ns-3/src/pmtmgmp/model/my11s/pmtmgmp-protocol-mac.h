@@ -38,6 +38,7 @@ namespace ns3 {
 #ifndef PMTMGMP_UNUSED_MY_CODE
 		class IeSecreq;
 		class IeSecrep;
+		class IeSecack;
 #endif
 
 		/**
@@ -100,6 +101,9 @@ namespace ns3 {
 			////·¢ËÍSECREP
 			void SendSecrep(IeSecrep secrep, Mac48Address receiver);
 			void SendSecrep(std::vector<IeSecrep> secrep, Mac48Address receiver);
+			////·¢ËÍSECACK
+			void SendSecack(IeSecack secack, Mac48Address receiver);
+			void SendSecack(std::vector<IeSecack> secack, Mac48Address receiver);
 #endif
 		private:
 			Ptr<WmnWifiInterfaceMac> m_parent;
@@ -134,6 +138,8 @@ namespace ns3 {
 				uint16_t rxSecreq;
 				uint16_t txSecrep;
 				uint16_t rxSecrep;
+				uint16_t txSecack;
+				uint16_t rxSecack;
 #endif
 				uint16_t txMgt;
 				uint32_t txMgtBytes;

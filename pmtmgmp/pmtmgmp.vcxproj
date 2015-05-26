@@ -24,6 +24,7 @@
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-prep.h" />
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-preq.h" />
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-rann.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-secack.h" />
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-secrep.h" />
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-secreq.h" />
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\my11s-mac-header.h" />
@@ -59,6 +60,7 @@
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-prep.cc" />
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-preq.cc" />
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-rann.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-secack.cc" />
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-secrep.cc" />
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-secreq.cc" />
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\my11s-mac-header.cc" />

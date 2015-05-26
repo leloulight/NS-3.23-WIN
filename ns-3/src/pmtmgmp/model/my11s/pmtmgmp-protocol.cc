@@ -42,6 +42,7 @@
 
 #include "ns3/ie-my11s-secreq.h"
 #include "ns3/ie-my11s-secrep.h"
+#include "ns3/ie-my11s-secack.h"
 #endif
 
 namespace ns3 {
@@ -244,7 +245,7 @@ namespace ns3 {
 			m_rfFlag(false),
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			m_NodeType(Mesh_STA),
-			m_MSECPSelectIndex(0),
+			m_PathGenerationSequenceNumber(0),
 			m_MSECPnumForMTERP(2)
 #endif
 		{
@@ -1267,8 +1268,8 @@ namespace ns3 {
 		void PmtmgmpProtocol::MSECPSearch()
 		{
 			NS_LOG_DEBUG("MSECP Search start");
-			m_MSECPSelectIndex += 1;
-			m_SECREPInformation.clear();
+			m_PathGenerationSequenceNumber += 1;
+			m_SECREPinformation.clear();
 			m_SECREQTimer = Simulator::Schedule(m_My11WmnPMTMGMPsecStartDelayTime, &PmtmgmpProtocol::SendSecreq, this);
 		}
 		////发送SECREQ
@@ -1277,7 +1278,8 @@ namespace ns3 {
 			NS_LOG_DEBUG("Send SECREP");
 			IeSecreq secreq;
 			secreq.SetOriginatorAddress(GetAddress());
-			secreq.SetMSECPSelectIndex(m_MSECPSelectIndex);
+			secreq.SetPathGenerationSequenceNumber(m_PathGenerationSequenceNumber);
+			secreq.SetNodeType(m_NodeType);
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
 				i->second->SendSecreq(secreq);
@@ -1307,18 +1309,31 @@ namespace ns3 {
 			////终端节点不会作为其他的终端节点的辅助节点
 			if (! IsMTERP())
 			{
-				SendSecrep(secreq.GetOriginatorAddress(), secreq.GetMSECPSelectIndex());
+				std::vector<MSECPaffiliatedMSECPInformation>::iterator iter = std::find_if(m_AffiliatedMTERPlist.begin(), m_AffiliatedMTERPlist.end(), MSECPaffiliatedMSECPInformation_Finder(secreq.GetOriginatorAddress()));
+				if (iter != m_AffiliatedMTERPlist.end()) m_AffiliatedMTERPlist.erase(iter);
+				if (m_AffiliatedMTERPlist.size() == 0) m_NodeType = Mesh_STA;
+				SendSecrep(secreq.GetOriginatorAddress(), secreq.GetPathGenerationSequenceNumber(), secreq.GetNodeType());
 			}
 		}
+		////获取非同类（MAP，MPP）终端节点数量
+		uint8_t PmtmgmpProtocol::GetDifferentTypeMTERPnum(NodeType type)
+		{
+			uint8_t i = 0;
+			for (std::vector<MSECPaffiliatedMSECPInformation>::iterator selectIter = m_AffiliatedMTERPlist.begin(); selectIter != m_AffiliatedMTERPlist.end(); selectIter++)
+			{
+				if (selectIter->nodeType != type) i++;
+			}
+			return i;
+		}
 		////发送SECREP
-		void PmtmgmpProtocol::SendSecrep(Mac48Address receiver, uint32_t index)
+		void PmtmgmpProtocol::SendSecrep(Mac48Address receiver, uint32_t index, NodeType type)
 		{
 			NS_LOG_DEBUG("Send SECREP to " << receiver);
 			IeSecrep secrep;
 			secrep.SetOriginatorAddress(receiver);
 			secrep.SetCandidateMSECPaddress(GetAddress());
-			secrep.SetAffiliatedMTERPnum(m_AffiliatedAddress.size());
-			secrep.SetMSECPSelectIndex(index);
+			secrep.SetAffiliatedMTERPnum(GetDifferentTypeMTERPnum(type));
+			secrep.SetPathGenerationSequenceNumber(index);
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
 				i->second->SendSecrep(secrep, receiver);
@@ -1328,13 +1343,13 @@ namespace ns3 {
 		void PmtmgmpProtocol::ReceiveSecrep(IeSecrep secrep, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
 			NS_LOG_DEBUG("Receive SECREP from " << from << " at interface " << interface << " while metric is " << metric);
-			if ((secrep.GetMSECPSelectIndex() != m_MSECPSelectIndex) || (secrep.GetOriginatorAddress() != m_address)) 
+			if ((secrep.GetPathGenerationSequenceNumber() != m_PathGenerationSequenceNumber) || (secrep.GetOriginatorAddress() != m_address)) 
 				return;////过期SECREP将会被丢弃
-			SECREPInformation newInformation;
+			SECREPinformation newInformation;
 			newInformation.address = secrep.GetCandidateMSECPaddress();
 			newInformation.metric = metric;
 			newInformation.affiliatedNumber = secrep.GetAffiliatedMTERPnum();
-			m_SECREPInformation.push_back(newInformation);
+			m_SECREPinformation.push_back(newInformation);
 		}
 		////设置和获取当前节点类型
 		void PmtmgmpProtocol::SetNodeType(NodeType nodeType)
@@ -1354,30 +1369,61 @@ namespace ns3 {
 		////延迟整理SECREP信息，选取可接受的MSECP
 		void PmtmgmpProtocol::SelectMSECP()
 		{
-			NS_LOG_DEBUG("Receive SECREP:" << m_SECREPInformation.size());
-			m_MSECPSelectIndex += 1;
-			for (std::vector<SECREPInformation>::iterator selectIter = m_SECREPInformation.begin(); selectIter != m_SECREPInformation.end(); selectIter++)
+			NS_LOG_DEBUG("Receive SECREP:" << m_SECREPinformation.size());
+			m_PathGenerationSequenceNumber += 1;
+			for (std::vector<SECREPinformation>::iterator selectIter = m_SECREPinformation.begin(); selectIter != m_SECREPinformation.end(); selectIter++)
 			{
-				std::vector<SECREPInformation>::iterator iter = std::find_if(m_AffiliatedAddress.begin(), m_AffiliatedAddress.end(), finder_t(selectIter->address));
-				if (iter == m_AffiliatedAddress.end())
+				std::vector<SECREPinformation>::iterator iter = std::find_if(m_AffiliatedMSECPlist.begin(), m_AffiliatedMSECPlist.end(), SECREPinformation_Finder(selectIter->address));
+				if (iter == m_AffiliatedMSECPlist.end())
 				{
-					m_AffiliatedAddress.push_back(*selectIter);
+					m_AffiliatedMSECPlist.push_back(*selectIter);
 				}
 				else
 				{
 					iter = selectIter;
 				}
 			}
-			std::sort(m_AffiliatedAddress.begin(), m_AffiliatedAddress.end());
+			std::sort(m_AffiliatedMSECPlist.begin(), m_AffiliatedMSECPlist.end());
 			
 			////丢弃Metric过大的结果。
-			if (m_AffiliatedAddress.size() > m_MSECPnumForMTERP)
+			if (m_AffiliatedMSECPlist.size() > m_MSECPnumForMTERP)
 			{
-				for (int i = m_AffiliatedAddress.size() - m_MSECPnumForMTERP; i > 0; i--)
+				for (int i = m_AffiliatedMSECPlist.size() - m_MSECPnumForMTERP; i > 0; i--)
 				{
-					m_AffiliatedAddress.pop_back();
+					m_AffiliatedMSECPlist.pop_back();
 				}
 			}
+			
+			///为筛选出的结果发送SECACK
+			SendSecack();
+		}
+		////发送SECACK
+		void PmtmgmpProtocol::SendSecack()
+		{
+			NS_LOG_DEBUG("Send SECACK");
+			IeSecack secack;
+			secack.SetOriginatorAddress(GetAddress());
+			secack.SetPathGenerationSequenceNumber(m_PathGenerationSequenceNumber);
+			secack.SetNodeType(m_NodeType);
+			for (std::vector<SECREPinformation>::iterator selectIter = m_AffiliatedMSECPlist.begin(); selectIter != m_AffiliatedMSECPlist.end(); selectIter++)
+			{
+				for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
+				{
+					i->second->SendSecack(secack, selectIter->address);
+				}
+			}
+		}
+				////接收SECACK
+		void PmtmgmpProtocol::ReceiveSecack(IeSecack secack, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
+		{
+			NS_LOG_DEBUG("Receive SECREP from " << from << " at interface " << interface << " while metric is " << metric);
+			
+			MSECPaffiliatedMSECPInformation newInformation;
+			newInformation.address = secack.GetOriginatorAddress();
+			newInformation.metric = metric;
+			newInformation.nodeType = secack.GetNodeType();
+			newInformation.selectIndex = secack.GetPathGenerationSequenceNumber();
+			m_AffiliatedMTERPlist.push_back(newInformation);
 		}
 #endif
 	} // namespace my11s

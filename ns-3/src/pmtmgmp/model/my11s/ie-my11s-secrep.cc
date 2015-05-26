@@ -46,9 +46,9 @@ namespace ns3 {
 		{
 			m_affiliatedMTERPnum = mTERP_number;
 		}
-		void IeSecrep::SetMSECPSelectIndex(uint32_t index)
+		void IeSecrep::SetPathGenerationSequenceNumber(uint32_t index)
 		{
-			m_MSECPSelectIndex = index;
+			m_PathGenerationSequenceNumber = index;
 		}
 		Mac48Address IeSecrep::GetOriginatorAddress() const
 		{
@@ -62,9 +62,9 @@ namespace ns3 {
 		{
 			return m_affiliatedMTERPnum;
 		}
-		uint32_t IeSecrep::GetMSECPSelectIndex() const
+		uint32_t IeSecrep::GetPathGenerationSequenceNumber() const
 		{
-			return m_MSECPSelectIndex;
+			return m_PathGenerationSequenceNumber;
 		}
 		WifiInformationElementId IeSecrep::ElementId() const
 		{
@@ -84,7 +84,7 @@ namespace ns3 {
 			WriteTo(i, m_originatorAddress);
 			WriteTo(i, m_candidateMSECPaddress);
 			i.WriteU8(m_affiliatedMTERPnum);
-			i.WriteHtolsbU32(m_MSECPSelectIndex);
+			i.WriteHtolsbU32(m_PathGenerationSequenceNumber);
 		}
 		uint8_t IeSecrep::DeserializeInformationField(Buffer::Iterator start, uint8_t length)
 		{
@@ -92,7 +92,7 @@ namespace ns3 {
 			ReadFrom(i, m_originatorAddress);
 			ReadFrom(i, m_candidateMSECPaddress);
 			m_affiliatedMTERPnum = i.ReadU8();
-			m_MSECPSelectIndex = i.ReadLsbtohU32();
+			m_PathGenerationSequenceNumber = i.ReadLsbtohU32();
 			return i.GetDistanceFrom(start);
 		}
 		uint8_t IeSecrep::GetInformationFieldSize() const

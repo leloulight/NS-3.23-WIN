@@ -42,6 +42,7 @@ namespace ns3 {
 #ifndef PMTMGMP_UNUSED_MY_CODE
 		class IeSecreq;
 		class IeSecrep;
+		class IeSecack;
 #endif
 		/**
 		 * \ingroup my11s
@@ -236,15 +237,15 @@ namespace ns3 {
 			///\}
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			////SECREP信息记录
-			struct SECREPInformation
+			struct SECREPinformation
 			{
 				////升序
-				bool operator < (const SECREPInformation si) const
+				bool operator < (const SECREPinformation si) const
 				{
 					return metric * (affiliatedNumber + 1) < si.metric * (si.affiliatedNumber + 1);
 				}
 				////降序
-				//bool operator > (const SECREPInformation si) const
+				//bool operator > (const SECREPinformation si) const
 				//{
 				//	return metric * (affiliatedNumber + 1) > si.metric * (si.affiliatedNumber + 1);
 				//}
@@ -252,10 +253,28 @@ namespace ns3 {
 				uint32_t metric;
 				uint8_t affiliatedNumber;
 			};
-			struct finder_t
+			////SECREPinformation搜索器
+			struct SECREPinformation_Finder
 			{
-				finder_t(Mac48Address address) :address(address){};
-				bool operator()(SECREPInformation p)
+				SECREPinformation_Finder(Mac48Address address) :address(address){};
+				bool operator()(SECREPinformation p)
+				{
+					return address == p.address;
+				}
+				Mac48Address address;
+			};
+			struct MSECPaffiliatedMSECPInformation
+			{
+				Mac48Address address;
+				uint32_t selectIndex;
+				uint32_t metric;
+				NodeType nodeType;
+			};
+			////SECREPinformation搜索器
+			struct MSECPaffiliatedMSECPInformation_Finder
+			{
+				MSECPaffiliatedMSECPInformation_Finder(Mac48Address address) :address(address){};
+				bool operator()(MSECPaffiliatedMSECPInformation p)
 				{
 					return address == p.address;
 				}
@@ -267,14 +286,20 @@ namespace ns3 {
 			std::vector<Mac48Address> GetSecreqReceivers(uint32_t interface);
 			////接收SECREQ
 			void ReceiveSecreq(IeSecreq secreq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
+			////获取非同类（MAP，MPP）终端节点数量
+			uint8_t GetDifferentTypeMTERPnum(NodeType type);
 			////发送SECREP
-			void SendSecrep(Mac48Address receiver, uint32_t index);
+			void SendSecrep(Mac48Address receiver, uint32_t index, NodeType type);
 			////接收SECREP
 			void ReceiveSecrep(IeSecrep secrep, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
 			////验证协议所属结点是否为终端节点MTERP
 			bool IsMTERP();
 			////延迟整理SECREP信息，选取可接受的MSECP
 			void SelectMSECP();
+			////发送SECACK
+			void SendSecack();
+			////接收SECACK
+			void ReceiveSecack(IeSecack secack, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
 #endif
 		private:
 			///\name Statistics:
@@ -356,16 +381,18 @@ namespace ns3 {
 			uint8_t m_UnicastSecreqThreshold;
 			////节点类型属性
 			NodeType m_NodeType;
-			////所属MTERP列表
-			std::vector<SECREPInformation> m_AffiliatedAddress;
+			////MTERP的辅助节点列表
+			std::vector<SECREPinformation> m_AffiliatedMSECPlist;
+			////MSECP从属的辅助节点列表
+			std::vector<MSECPaffiliatedMSECPInformation> m_AffiliatedMTERPlist;
 			////MSECP搜索初始延迟
 			Time m_My11WmnPMTMGMPsecStartDelayTime;
 			////SECREQ设置延迟
 			Time m_My11WmnPMTMGMPsecSetTime;
 			////SECREP接收信息记录
-			std::vector<SECREPInformation> m_SECREPInformation;
+			std::vector<SECREPinformation> m_SECREPinformation;
 			////MSECP选择序号（从零开始，奇数开启，偶数关闭。）
-			uint32_t m_MSECPSelectIndex;
+			uint32_t m_PathGenerationSequenceNumber;
 			////每个MTERP可有的SECREP的最大数量
 			uint8_t m_MSECPnumForMTERP;
 #endif
