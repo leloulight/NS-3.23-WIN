@@ -540,6 +540,8 @@ namespace ns3 {
 			hdr.SetAddr2(m_parent->GetAddress());
 			hdr.SetAddr3(m_protocol->GetAddress());
 			//Send Management frame
+#ifdef PMTMGMP_USE_MULTICAST
+			////注释为多播，使用为广播
 			std::vector<Mac48Address> receivers = m_protocol->GetSecreqReceivers(m_ifIndex);
 			for (std::vector<Mac48Address>::const_iterator i = receivers.begin(); i != receivers.end(); i++)
 			{
@@ -549,6 +551,13 @@ namespace ns3 {
 				m_stats.txMgtBytes += packet->GetSize();
 				m_parent->SendManagementFrame(packet, hdr);
 			}
+#else
+			hdr.SetAddr1(Mac48Address::GetBroadcast());
+			m_stats.txSecrep++;
+			m_stats.txMgt++;
+			m_stats.txMgtBytes += packet->GetSize();
+			m_parent->SendManagementFrame(packet, hdr);
+#endif
 		}
 		////发送SECREP
 		void PmtmgmpProtocolMac::SendSecrep(IeSecrep secrep, Mac48Address receiver)
