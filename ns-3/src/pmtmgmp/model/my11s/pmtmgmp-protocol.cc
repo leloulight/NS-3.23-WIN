@@ -129,22 +129,6 @@ namespace ns3 {
 				&PmtmgmpProtocol::m_My11WmnPMTMGMPrannInterval),
 				MakeTimeChecker()
 				)
-#ifndef PMTMGMP_UNUSED_MY_CODE
-				.AddAttribute("My11WmnPMTMGMPsecStartDelayTime",
-				"Delay time of start MSECP search",
-				TimeValue(MicroSeconds(1024 * 50000)),
-				MakeTimeAccessor(
-				&PmtmgmpProtocol::m_My11WmnPMTMGMPsecStartDelayTime),
-				MakeTimeChecker()
-				)
-				.AddAttribute("My11WmnPMTMGMPsecSetTime",
-				"Delay time of waiting for accept SECREP",
-				TimeValue(MicroSeconds(1024 * 2000)),
-				MakeTimeAccessor(
-				&PmtmgmpProtocol::m_My11WmnPMTMGMPsecSetTime),
-				MakeTimeChecker()
-				)
-#endif
 				.AddAttribute("MaxTtl",
 				"Initial value of Time To Live field",
 				UintegerValue(32),
@@ -166,15 +150,6 @@ namespace ns3 {
 				&PmtmgmpProtocol::m_unicastPreqThreshold),
 				MakeUintegerChecker<uint8_t>(1)
 				)
-#ifndef PMTMGMP_UNUSED_MY_CODE
-				.AddAttribute("UnicastSecreqThreshold",
-				"Maximum number of SecREQ receivers, when we send a SECREQ as a chain of unicasts",
-				UintegerValue(10),
-				MakeUintegerAccessor(
-				&PmtmgmpProtocol::m_UnicastSecreqThreshold),
-				MakeUintegerChecker<uint8_t>(1)
-				)
-#endif
 				.AddAttribute("UnicastDataThreshold",
 				"Maximum number ofbroadcast receivers, when we send a broadcast as a chain of unicasts",
 				UintegerValue(1),
@@ -203,12 +178,54 @@ namespace ns3 {
 				"ns3::Time::TracedCallback"
 				)
 #ifndef PMTMGMP_UNUSED_MY_CODE
+				.AddAttribute("My11WmnPMTMGMPsecStartDelayTime",
+				"Delay time of start MSECP search",
+				TimeValue(MicroSeconds(1024 * 50000)),
+				MakeTimeAccessor(
+				&PmtmgmpProtocol::m_My11WmnPMTMGMPsecStartDelayTime),
+				MakeTimeChecker()
+				)
+				.AddAttribute("My11WmnPMTMGMPsecSetTime",
+				"Delay time of waiting for accept SECREP",
+				TimeValue(MicroSeconds(1024 * 2000)),
+				MakeTimeAccessor(
+				&PmtmgmpProtocol::m_My11WmnPMTMGMPsecSetTime),
+				MakeTimeChecker()
+				)
+				.AddAttribute("UnicastSecreqThreshold",
+				"Maximum number of SecREQ receivers, when we send a SECREQ as a chain of unicasts",
+				UintegerValue(10),
+				MakeUintegerAccessor(
+				&PmtmgmpProtocol::m_UnicastSecreqThreshold),
+				MakeUintegerChecker<uint8_t>(1)
+				)
 				.AddAttribute("MSECPnumForMTERP",
 				"The number of MESCP that each MTERP can have.",
 				UintegerValue(2),
 				MakeUintegerAccessor(
 				&PmtmgmpProtocol::m_MSECPnumForMTERP),
 				MakeUintegerChecker<uint8_t>(1)
+				)
+				.AddAttribute("PMTMGMPpgenNodeListNum",
+				"Maximum number of the last part of the path that PGEN have generationed, which is used for computing the repeatability of path.",
+				UintegerValue(4),
+				MakeUintegerAccessor(
+				&PmtmgmpProtocol::m_PMTMGMPpgenNodeListNum),
+				MakeUintegerChecker<uint8_t>(0)
+				)
+				.AddAttribute("PMTMGMPmterpAALMmagnification",
+				"The magnification of the value as M in MTERP node when Compute AALM.",
+				DoubleValue(3),
+				MakeDoubleAccessor(
+				&PmtmgmpProtocol::m_PMTMGMPmterpAALMmagnification),
+				MakeDoubleChecker<double>(1)
+				)
+				.AddAttribute("PMTMGMPpgenNodeListNum",
+				"The magnification of the value as M in MSECP node when Compute AALM.",
+				DoubleValue(2),
+				MakeDoubleAccessor(
+				&PmtmgmpProtocol::m_PMTMGMPmsecpAALMmagnification),
+				MakeDoubleChecker<double>(1)
 				)
 #endif
 				;
@@ -230,23 +247,23 @@ namespace ns3 {
 			m_My11WmnPMTMGMPactivePathTimeout(MicroSeconds(1024 * 5000)),
 			m_My11WmnPMTMGMPpathToRootInterval(MicroSeconds(1024 * 2000)),
 			m_My11WmnPMTMGMPrannInterval(MicroSeconds(1024 * 5000)),
-#ifndef PMTMGMP_UNUSED_MY_CODE
-			//m_My11WmnPMTMGMPsecSetTime(MicroSeconds(1024 * 2000)),
-#endif
 			m_isRoot(false),
 			m_maxTtl(32),
 			m_unicastPerrThreshold(32),
 			m_unicastPreqThreshold(1),
-#ifndef PMTMGMP_UNUSED_MY_CODE
-			//m_UnicastSecreqThreshold(10),
-#endif
 			m_unicastDataThreshold(1),
 			m_doFlag(false),
 			m_rfFlag(false),
 #ifndef PMTMGMP_UNUSED_MY_CODE
+			//m_My11WmnPMTMGMPsecStartDelayTime(MicroSeconds(1024 * 2000)),
+			//m_My11WmnPMTMGMPsecSetTime(MicroSeconds(1024 * 2000)),
+			//m_UnicastSecreqThreshold(10),
 			m_NodeType(Mesh_STA),
-			m_PathGenerationSequenceNumber(0),
-			m_MSECPnumForMTERP(2)
+			m_PathGenerationSeqNumber(0),
+			m_MSECPnumForMTERP(2),
+			m_PMTMGMPpgenNodeListNum(4),
+			m_PMTMGMPmterpAALMmagnification(3),
+			m_PMTMGMPmsecpAALMmagnification(2)
 #endif
 		{
 			NS_LOG_FUNCTION_NOARGS();
@@ -1268,7 +1285,7 @@ namespace ns3 {
 		void PmtmgmpProtocol::MSECPSearch()
 		{
 			NS_LOG_DEBUG("MSECP Search start");
-			m_PathGenerationSequenceNumber += 1;
+			m_PathGenerationSeqNumber += 1;
 			m_SECREPinformation.clear();
 			m_SECREQTimer = Simulator::Schedule(m_My11WmnPMTMGMPsecStartDelayTime, &PmtmgmpProtocol::SendSecreq, this);
 		}
@@ -1278,7 +1295,7 @@ namespace ns3 {
 			NS_LOG_DEBUG("Send SECREP");
 			IeSecreq secreq;
 			secreq.SetOriginatorAddress(GetAddress());
-			secreq.SetPathGenerationSequenceNumber(m_PathGenerationSequenceNumber);
+			secreq.SetPathGenerationSequenceNumber(m_PathGenerationSeqNumber);
 			secreq.SetNodeType(m_NodeType);
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
@@ -1316,12 +1333,12 @@ namespace ns3 {
 			}
 		}
 		////获取非同类（MAP，MPP）终端节点数量
-		uint8_t PmtmgmpProtocol::GetDifferentTypeMTERPnum(NodeType type)
+		uint8_t PmtmgmpProtocol::GetDifferentTypeMTERPnum(NodeType type, Mac48Address source)
 		{
 			uint8_t i = 0;
 			for (std::vector<MSECPaffiliatedMSECPInformation>::iterator selectIter = m_AffiliatedMTERPlist.begin(); selectIter != m_AffiliatedMTERPlist.end(); selectIter++)
 			{
-				if (selectIter->nodeType != type) i++;
+				if (selectIter->nodeType != type && selectIter->address != source) i++;
 			}
 			return i;
 		}
@@ -1332,7 +1349,7 @@ namespace ns3 {
 			IeSecrep secrep;
 			secrep.SetOriginatorAddress(receiver);
 			secrep.SetCandidateMSECPaddress(GetAddress());
-			secrep.SetAffiliatedMTERPnum(GetDifferentTypeMTERPnum(type));
+			secrep.SetAffiliatedMTERPnum(GetDifferentTypeMTERPnum(type, receiver));
 			secrep.SetPathGenerationSequenceNumber(index);
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
@@ -1343,7 +1360,7 @@ namespace ns3 {
 		void PmtmgmpProtocol::ReceiveSecrep(IeSecrep secrep, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
 			NS_LOG_DEBUG("Receive SECREP from " << from << " at interface " << interface << " while metric is " << metric);
-			if ((secrep.GetPathGenerationSequenceNumber() != m_PathGenerationSequenceNumber) || (secrep.GetOriginatorAddress() != m_address)) 
+			if ((secrep.GetPathGenerationSequenceNumber() != m_PathGenerationSeqNumber) || (secrep.GetOriginatorAddress() != m_address)) 
 				return;////过期SECREP将会被丢弃
 			SECREPinformation newInformation;
 			newInformation.address = secrep.GetCandidateMSECPaddress();
@@ -1361,6 +1378,19 @@ namespace ns3 {
 		{
 			return m_NodeType;
 		}
+		////获取AALM技术时采用的m的值
+		uint8_t PmtmgmpProtocol::GetValueMForAALM()
+		{
+			if (m_NodeType == Mesh_Access_Point || m_NodeType == Mesh_Portal)
+			{
+				return m_PMTMGMPmterpAALMmagnification;
+			}
+			if (m_NodeType == Mesh_Secondary_Point)
+			{
+				return m_PMTMGMPmterpAALMmagnification;
+			}
+			return 1;
+		}
 		////验证协议所属结点是否为终端节点MTERP
 		bool PmtmgmpProtocol::IsMTERP()
 		{
@@ -1370,7 +1400,7 @@ namespace ns3 {
 		void PmtmgmpProtocol::SelectMSECP()
 		{
 			NS_LOG_DEBUG("Receive SECREP:" << m_SECREPinformation.size());
-			m_PathGenerationSequenceNumber += 1;
+			m_PathGenerationSeqNumber += 1;
 			for (std::vector<SECREPinformation>::iterator selectIter = m_SECREPinformation.begin(); selectIter != m_SECREPinformation.end(); selectIter++)
 			{
 				std::vector<SECREPinformation>::iterator iter = std::find_if(m_AffiliatedMSECPlist.begin(), m_AffiliatedMSECPlist.end(), SECREPinformation_Finder(selectIter->address));
@@ -1403,7 +1433,7 @@ namespace ns3 {
 			NS_LOG_DEBUG("Send SECACK");
 			IeSecack secack;
 			secack.SetOriginatorAddress(GetAddress());
-			secack.SetPathGenerationSequenceNumber(m_PathGenerationSequenceNumber);
+			secack.SetPathGenerationSequenceNumber(m_PathGenerationSeqNumber);
 			secack.SetNodeType(m_NodeType);
 			for (std::vector<SECREPinformation>::iterator selectIter = m_AffiliatedMSECPlist.begin(); selectIter != m_AffiliatedMSECPlist.end(); selectIter++)
 			{

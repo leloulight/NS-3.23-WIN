@@ -37,7 +37,7 @@ namespace ns3 {
 			void SetOriginatorAddress(Mac48Address originator_address);
 			void SetCandidateMSECPaddress(Mac48Address candidateMSECP_address);
 			void SetAffiliatedMTERPnum(uint8_t mTERP_number);
-			void SetPathGenerationSequenceNumber(uint32_t index);
+			void SetPathGenerationSequenceNumber(uint32_t seq_number);
 
 			// Getters for fields:
 			Mac48Address GetOriginatorAddress() const;
@@ -52,16 +52,11 @@ namespace ns3 {
 			virtual uint8_t GetInformationFieldSize() const;
 			virtual void Print(std::ostream& os) const;
 		private:
-			/**
-			* how many destinations we support
-			* \todo make as an attribute
-			*/
-			uint8_t m_maxSize;
-
 			Mac48Address m_originatorAddress;
 			Mac48Address m_candidateMSECPaddress;
 			uint8_t m_affiliatedMTERPnum;
-			uint32_t m_PathGenerationSequenceNumber;
+			uint32_t m_PathGenerationSeqNumber;
+
 			friend bool operator== (const IeSecrep & a, const IeSecrep & b);
 
 		};

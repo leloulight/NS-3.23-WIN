@@ -36,7 +36,7 @@ namespace ns3 {
 
 			// Setters for fields:
 			void SetOriginatorAddress(Mac48Address originator_address);
-			void SetPathGenerationSequenceNumber(uint32_t index);
+			void SetPathGenerationSequenceNumber(uint32_t seq_number);
 			void SetNodeType(PmtmgmpProtocol::NodeType nodeType);
 
 			// Getters for fields:
@@ -51,15 +51,10 @@ namespace ns3 {
 			virtual uint8_t GetInformationFieldSize() const;
 			virtual void Print(std::ostream& os) const;
 		private:
-			/**
-			* how many destinations we support
-			* \todo make as an attribute
-			*/
-			uint8_t m_maxSize;
-
 			Mac48Address m_originatorAddress;
-			uint32_t m_PathGenerationSequenceNumber;
+			uint32_t m_PathGenerationSeqNumber;
 			PmtmgmpProtocol::NodeType m_NodeType;
+
 			friend bool operator== (const IeSecack & a, const IeSecack & b);
 
 		};

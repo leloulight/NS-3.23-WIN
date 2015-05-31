@@ -38,9 +38,9 @@ namespace ns3 {
 		{
 			m_originatorAddress = originator_address;
 		}
-		void IeSecreq::SetPathGenerationSequenceNumber(uint32_t index)
+		void IeSecreq::SetPathGenerationSequenceNumber(uint32_t seq_number)
 		{
-			m_PathGenerationSequenceNumber = index;
+			m_PathGenerationSeqNumber = seq_number;
 		}
 		void IeSecreq::SetNodeType(PmtmgmpProtocol::NodeType nodeType)
 		{
@@ -52,7 +52,7 @@ namespace ns3 {
 		}
 		uint32_t IeSecreq::GetPathGenerationSequenceNumber() const
 		{
-			return m_PathGenerationSequenceNumber;
+			return m_PathGenerationSeqNumber;
 		}
 		PmtmgmpProtocol::NodeType IeSecreq::GetNodeType() const
 		{
@@ -65,29 +65,29 @@ namespace ns3 {
 		void IeSecreq::Print(std::ostream &os) const
 		{
 			os << std::endl << "<information_element id=" << ElementId() << ">" << std::endl;
-			os << " originator address  = " << m_originatorAddress << std::endl;
-			os << " MSECP Select Index  = " << m_originatorAddress << std::endl;
-			os << " node type = " << m_NodeType << std::endl;
+			os << " originator address               = " << m_originatorAddress << std::endl; 
+			os << " path generation sequence number  = " << m_PathGenerationSeqNumber << std::endl; 
+			os << " node type                        = " << m_NodeType << std::endl;
 			os << "</information_element>" << std::endl;
 		}
 		void IeSecreq::SerializeInformationField(Buffer::Iterator i) const
 		{
 			WriteTo(i, m_originatorAddress);
-			i.WriteHtolsbU32(m_PathGenerationSequenceNumber);
+			i.WriteHtolsbU32(m_PathGenerationSeqNumber);
 			i.WriteU8(m_NodeType);
 		}
 		uint8_t IeSecreq::DeserializeInformationField(Buffer::Iterator start, uint8_t length)
 		{
 			Buffer::Iterator i = start;
 			ReadFrom(i, m_originatorAddress);
-			m_PathGenerationSequenceNumber = i.ReadLsbtohU32();
+			m_PathGenerationSeqNumber = i.ReadLsbtohU32();
 			m_NodeType = (PmtmgmpProtocol::NodeType) i.ReadU8();
 			return i.GetDistanceFrom(start);
 		}
 		uint8_t IeSecreq::GetInformationFieldSize() const
 		{
 			uint8_t retval = 6	//Source address (originator)
-				+ 4;			//MSECP Select Index
+				+ 4 			//MSECP Select Index
 				+ 1;			//NodeType
 			return retval;
 		}

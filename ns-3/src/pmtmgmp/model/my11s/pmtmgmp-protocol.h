@@ -117,6 +117,8 @@ namespace ns3 {
 			////设置和获取当前节点类型
 			void SetNodeType(NodeType nodeType);
 			NodeType GetNodeType();
+			////获取AALM技术时采用的m的值
+			uint8_t GetValueMForAALM();
 #endif
 
 		private:
@@ -287,7 +289,7 @@ namespace ns3 {
 			////接收SECREQ
 			void ReceiveSecreq(IeSecreq secreq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
 			////获取非同类（MAP，MPP）终端节点数量
-			uint8_t GetDifferentTypeMTERPnum(NodeType type);
+			uint8_t GetDifferentTypeMTERPnum(NodeType type, Mac48Address source);
 			////发送SECREP
 			void SendSecrep(Mac48Address receiver, uint32_t index, NodeType type);
 			////接收SECREP
@@ -392,9 +394,15 @@ namespace ns3 {
 			////SECREP接收信息记录
 			std::vector<SECREPinformation> m_SECREPinformation;
 			////MSECP选择序号（从零开始，奇数开启，偶数关闭。）
-			uint32_t m_PathGenerationSequenceNumber;
+			uint32_t m_PathGenerationSeqNumber;
 			////每个MTERP可有的SECREP的最大数量
 			uint8_t m_MSECPnumForMTERP;
+			////路径生帧成附带节点数量
+			uint8_t m_PMTMGMPpgenNodeListNum;
+			////MTERP积累传播时间链接度量倍率
+			double m_PMTMGMPmterpAALMmagnification;
+			////MSECP积累传播时间链接度量倍率
+			double m_PMTMGMPmsecpAALMmagnification;
 #endif
 		};
 	} // namespace my11s

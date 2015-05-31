@@ -46,9 +46,9 @@ namespace ns3 {
 		{
 			m_affiliatedMTERPnum = mTERP_number;
 		}
-		void IeSecrep::SetPathGenerationSequenceNumber(uint32_t index)
+		void IeSecrep::SetPathGenerationSequenceNumber(uint32_t seq_number)
 		{
-			m_PathGenerationSequenceNumber = index;
+			m_PathGenerationSeqNumber = seq_number;
 		}
 		Mac48Address IeSecrep::GetOriginatorAddress() const
 		{
@@ -64,7 +64,7 @@ namespace ns3 {
 		}
 		uint32_t IeSecrep::GetPathGenerationSequenceNumber() const
 		{
-			return m_PathGenerationSequenceNumber;
+			return m_PathGenerationSeqNumber;
 		}
 		WifiInformationElementId IeSecrep::ElementId() const
 		{
@@ -73,10 +73,10 @@ namespace ns3 {
 		void IeSecrep::Print(std::ostream &os) const
 		{
 			os << std::endl << "<information_element id=" << ElementId() << ">" << std::endl;
-			os << " originator address  = " << m_originatorAddress << std::endl;
-			os << " candidate MSECP address  = " << m_candidateMSECPaddress << std::endl;
-			os << " belong MTERP number  = " << m_affiliatedMTERPnum << std::endl;
-			os << " MSECP Select Index  = " << m_originatorAddress << std::endl;
+			os << " originator address               = " << m_originatorAddress << std::endl;
+			os << " candidate MSECP address          = " << m_candidateMSECPaddress << std::endl;
+			os << " belong MTERP number              = " << m_affiliatedMTERPnum << std::endl; 
+			os << " path generation sequence number  = " << m_PathGenerationSeqNumber << std::endl;
 			os << "</information_element>" << std::endl;
 		}
 		void IeSecrep::SerializeInformationField(Buffer::Iterator i) const
@@ -84,7 +84,7 @@ namespace ns3 {
 			WriteTo(i, m_originatorAddress);
 			WriteTo(i, m_candidateMSECPaddress);
 			i.WriteU8(m_affiliatedMTERPnum);
-			i.WriteHtolsbU32(m_PathGenerationSequenceNumber);
+			i.WriteHtolsbU32(m_PathGenerationSeqNumber);
 		}
 		uint8_t IeSecrep::DeserializeInformationField(Buffer::Iterator start, uint8_t length)
 		{
@@ -92,7 +92,7 @@ namespace ns3 {
 			ReadFrom(i, m_originatorAddress);
 			ReadFrom(i, m_candidateMSECPaddress);
 			m_affiliatedMTERPnum = i.ReadU8();
-			m_PathGenerationSequenceNumber = i.ReadLsbtohU32();
+			m_PathGenerationSeqNumber = i.ReadLsbtohU32();
 			return i.GetDistanceFrom(start);
 		}
 		uint8_t IeSecrep::GetInformationFieldSize() const

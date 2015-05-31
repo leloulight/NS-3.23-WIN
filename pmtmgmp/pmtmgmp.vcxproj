@@ -21,6 +21,7 @@
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-peer-management.h" />
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-peering-protocol.h" />
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-perr.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-pgen.h" />
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-prep.h" />
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-preq.h" />
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-rann.h" />
@@ -57,6 +58,7 @@
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-peer-management.cc" />
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-peering-protocol.cc" />
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-perr.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-pgen.cc" />
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-prep.cc" />
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-preq.cc" />
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-rann.cc" />
