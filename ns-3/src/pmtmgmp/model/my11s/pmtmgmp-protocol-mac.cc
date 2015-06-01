@@ -36,6 +36,7 @@
 #include "ie-my11s-secreq.h"
 #include "ie-my11s-secrep.h"
 #include "ie-my11s-secack.h"
+#include "ie-my11s-pgen.h"
 #endif
 
 namespace ns3 {
@@ -181,6 +182,13 @@ namespace ns3 {
 					NS_ASSERT(secack != 0);
 					m_stats.rxSecack++;
 					m_protocol->ReceiveSecack(*secack, header.GetAddr2(), m_ifIndex, header.GetAddr3(), m_parent->GetLinkMetric(header.GetAddr2()));
+				}
+				if ((*i)->ElementId() == IE11S_PGEN)
+				{
+					Ptr<IePgen> pgen = DynamicCast<IePgen>(*i);
+					NS_ASSERT(pgen != 0);
+					m_stats.rxPgen++;
+					m_protocol->ReceivePgen(*pgen, header.GetAddr2(), m_ifIndex, header.GetAddr3(), m_parent->GetLinkMetric(header.GetAddr2()));
 				}
 #endif
 			}
@@ -481,9 +489,21 @@ namespace ns3 {
 				"txPreq= \"" << txPreq << "\"" << std::endl <<
 				"txPrep=\"" << txPrep << "\"" << std::endl <<
 				"txPerr=\"" << txPerr << "\"" << std::endl <<
+#ifndef PMTMGMP_UNUSED_MY_CODE
+				"txSecreq=\"" << txSecreq << "\"" << std::endl <<
+				"txSecrep=\"" << txSecrep << "\"" << std::endl <<
+				"txSecack=\"" << txSecack << "\"" << std::endl <<
+				"txPgen=\"" << txPgen << "\"" << std::endl <<
+#endif
 				"rxPreq=\"" << rxPreq << "\"" << std::endl <<
 				"rxPrep=\"" << rxPrep << "\"" << std::endl <<
 				"rxPerr=\"" << rxPerr << "\"" << std::endl <<
+#ifndef PMTMGMP_UNUSED_MY_CODE
+				"rxSecreq=\"" << rxSecreq << "\"" << std::endl <<
+				"rxSecrep=\"" << rxSecrep << "\"" << std::endl <<
+				"rxSecack=\"" << rxSecack << "\"" << std::endl <<
+				"rxPgen=\"" << rxPgen << "\"" << std::endl <<
+#endif
 				"txMgt=\"" << txMgt << "\"" << std::endl <<
 				"txMgtBytes=\"" << txMgtBytes << "\"" << std::endl <<
 				"rxMgt=\"" << rxMgt << "\"" << std::endl <<
@@ -553,7 +573,7 @@ namespace ns3 {
 			}
 #else
 			hdr.SetAddr1(Mac48Address::GetBroadcast());
-			m_stats.txSecrep++;
+			m_stats.txSecreq++;
 			m_stats.txMgt++;
 			m_stats.txMgtBytes += packet->GetSize();
 			m_parent->SendManagementFrame(packet, hdr);
@@ -622,6 +642,51 @@ namespace ns3 {
 			m_stats.txMgt++;
 			m_stats.txMgtBytes += packet->GetSize();
 			m_parent->SendManagementFrame(packet, hdr);
+		}
+		////发送PGEN
+		void PmtmgmpProtocolMac::SendPgen(IePgen pgen)
+		{
+			NS_LOG_FUNCTION_NOARGS();
+			std::vector<IePgen> pgen_vector;
+			pgen_vector.push_back(pgen);
+			SendPgen(pgen_vector);
+		}
+		void PmtmgmpProtocolMac::SendPgen(std::vector<IePgen> pgen)
+		{
+			Ptr<Packet> packet = Create<Packet>();
+			WmnInformationElementVector elements;
+			for (std::vector<IePgen>::iterator i = pgen.begin(); i != pgen.end(); i++)
+			{
+				elements.AddInformationElement(Ptr<IePgen>(&(*i)));
+			}
+			packet->AddHeader(elements);
+			packet->AddHeader(GetWifiActionHeader());
+			//create 802.11 header:
+			WifiMacHeader hdr;
+			hdr.SetAction();
+			hdr.SetDsNotFrom();
+			hdr.SetDsNotTo();
+			hdr.SetAddr2(m_parent->GetAddress());
+			hdr.SetAddr3(m_protocol->GetAddress());
+			//Send Management frame
+#ifdef PMTMGMP_USE_MULTICAST
+			////注释为多播，使用为广播
+			std::vector<Mac48Address> receivers = m_protocol->GetPgenReceivers(m_ifIndex);
+			for (std::vector<Mac48Address>::const_iterator i = receivers.begin(); i != receivers.end(); i++)
+			{
+				hdr.SetAddr1(*i);
+				m_stats.txPgen++;
+				m_stats.txMgt++;
+				m_stats.txMgtBytes += packet->GetSize();
+				m_parent->SendManagementFrame(packet, hdr);
+			}
+#else
+			hdr.SetAddr1(Mac48Address::GetBroadcast());
+			m_stats.txPgen++;
+			m_stats.txMgt++;
+			m_stats.txMgtBytes += packet->GetSize();
+			m_parent->SendManagementFrame(packet, hdr);
+#endif
 		}
 #endif
 	} // namespace my11s

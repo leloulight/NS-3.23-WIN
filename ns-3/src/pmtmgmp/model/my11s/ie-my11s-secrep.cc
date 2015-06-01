@@ -100,7 +100,7 @@ namespace ns3 {
 			uint8_t retval = 6	//Source address (originator)
 				+ 6				//Candidate MSECP address
 				+ 1				//Affiliated MTERP number
-				+ 4;			//MSECP Select Index
+				+ 4;			//Path Generation Sequence Number
 			return retval;
 		}
 		bool operator== (const IeSecrep & a, const IeSecrep & b)

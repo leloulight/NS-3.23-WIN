@@ -42,6 +42,10 @@ namespace ns3 {
 		{
 			m_PathGenerationSeqNumber = seq_number;
 		}
+		void IeSecack::SetPathUpdateSeqNumber(uint32_t seq_number)
+		{
+			m_PathUpdateSeqNumber = seq_number;
+		}
 		void IeSecack::SetNodeType(PmtmgmpProtocol::NodeType nodeType)
 		{
 			m_NodeType = nodeType;
@@ -53,6 +57,10 @@ namespace ns3 {
 		uint32_t IeSecack::GetPathGenerationSequenceNumber() const
 		{
 			return m_PathGenerationSeqNumber;
+		}
+		uint32_t IeSecack::GetPathUpdateSeqNumber() const
+		{
+			return m_PathUpdateSeqNumber;
 		}
 		PmtmgmpProtocol::NodeType IeSecack::GetNodeType() const
 		{
@@ -67,6 +75,7 @@ namespace ns3 {
 			os << std::endl << "<information_element id=" << ElementId() << ">" << std::endl;
 			os << " originator address               = " << m_originatorAddress << std::endl; 
 			os << " path generation sequence number  = " << m_PathGenerationSeqNumber << std::endl;
+			os << " path update sequence number      = " << m_PathUpdateSeqNumber << std::endl;
 			os << " node type                        = " << m_NodeType << std::endl;
 			os << "</information_element>" << std::endl;
 		}
@@ -74,6 +83,7 @@ namespace ns3 {
 		{
 			WriteTo(i, m_originatorAddress);
 			i.WriteHtolsbU32(m_PathGenerationSeqNumber);
+			i.WriteHtolsbU32(m_PathUpdateSeqNumber);
 			i.WriteU8(m_NodeType);
 		}
 		uint8_t IeSecack::DeserializeInformationField(Buffer::Iterator start, uint8_t length)
@@ -81,13 +91,15 @@ namespace ns3 {
 			Buffer::Iterator i = start;
 			ReadFrom(i, m_originatorAddress);
 			m_PathGenerationSeqNumber = i.ReadLsbtohU32();
+			m_PathUpdateSeqNumber = i.ReadLsbtohU32();
 			m_NodeType = (PmtmgmpProtocol::NodeType) i.ReadU8();
 			return i.GetDistanceFrom(start);
 		}
 		uint8_t IeSecack::GetInformationFieldSize() const
 		{
 			uint8_t retval = 6	//Source address (originator)
-				+ 4 			//MSECP Select Index
+				+ 4 			//Path Generation Sequence Number
+				+ 4				//Path Update Sequence Number
 				+ 1;			//NodeType
 			return retval;
 		}

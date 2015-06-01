@@ -43,6 +43,7 @@ namespace ns3 {
 		class IeSecreq;
 		class IeSecrep;
 		class IeSecack;
+		class IePgen;
 #endif
 		/**
 		 * \ingroup my11s
@@ -302,6 +303,10 @@ namespace ns3 {
 			void SendSecack();
 			////接收SECACK
 			void ReceiveSecack(IeSecack secack, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
+			////发送PGEN
+			void SendFirstPgen(Mac48Address originator, uint32_t genNum, uint32_t updateNum, NodeType type);
+			////接收PGEN
+			void ReceivePgen(IePgen pgen, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
 #endif
 		private:
 			///\name Statistics:
@@ -395,6 +400,8 @@ namespace ns3 {
 			std::vector<SECREPinformation> m_SECREPinformation;
 			////MSECP选择序号（从零开始，奇数开启，偶数关闭。）
 			uint32_t m_PathGenerationSeqNumber;
+			////路径更新序号
+			uint32_t m_PathUpdateSeqNumber;
 			////每个MTERP可有的SECREP的最大数量
 			uint8_t m_MSECPnumForMTERP;
 			////路径生帧成附带节点数量

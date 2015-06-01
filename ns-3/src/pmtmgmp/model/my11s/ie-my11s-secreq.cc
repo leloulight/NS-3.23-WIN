@@ -87,7 +87,7 @@ namespace ns3 {
 		uint8_t IeSecreq::GetInformationFieldSize() const
 		{
 			uint8_t retval = 6	//Source address (originator)
-				+ 4 			//MSECP Select Index
+				+ 4 			//Path Generation Sequence Number
 				+ 1;			//NodeType
 			return retval;
 		}

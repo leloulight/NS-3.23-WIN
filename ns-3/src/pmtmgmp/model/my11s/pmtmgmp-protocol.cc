@@ -43,6 +43,7 @@
 #include "ns3/ie-my11s-secreq.h"
 #include "ns3/ie-my11s-secrep.h"
 #include "ns3/ie-my11s-secack.h"
+#include "ns3/ie-my11s-pgen.h"
 #endif
 
 namespace ns3 {
@@ -220,7 +221,7 @@ namespace ns3 {
 				&PmtmgmpProtocol::m_PMTMGMPmterpAALMmagnification),
 				MakeDoubleChecker<double>(1)
 				)
-				.AddAttribute("PMTMGMPpgenNodeListNum",
+				.AddAttribute("PMTMGMPmsecpAALMmagnification",
 				"The magnification of the value as M in MSECP node when Compute AALM.",
 				DoubleValue(2),
 				MakeDoubleAccessor(
@@ -260,6 +261,7 @@ namespace ns3 {
 			//m_UnicastSecreqThreshold(10),
 			m_NodeType(Mesh_STA),
 			m_PathGenerationSeqNumber(0),
+			m_PathUpdateSeqNumber(0),
 			m_MSECPnumForMTERP(2),
 			m_PMTMGMPpgenNodeListNum(4),
 			m_PMTMGMPmterpAALMmagnification(3),
@@ -1378,7 +1380,7 @@ namespace ns3 {
 		{
 			return m_NodeType;
 		}
-		////获取AALM技术时采用的m的值
+		////获取AALM时采用的m的值
 		uint8_t PmtmgmpProtocol::GetValueMForAALM()
 		{
 			if (m_NodeType == Mesh_Access_Point || m_NodeType == Mesh_Portal)
@@ -1434,6 +1436,11 @@ namespace ns3 {
 			IeSecack secack;
 			secack.SetOriginatorAddress(GetAddress());
 			secack.SetPathGenerationSequenceNumber(m_PathGenerationSeqNumber);
+
+			////终端节点递增度量信息更新帧顺序号
+			m_PathUpdateSeqNumber++;
+
+			secack.SetPathGenerationSequenceNumber(m_PathUpdateSeqNumber);
 			secack.SetNodeType(m_NodeType);
 			for (std::vector<SECREPinformation>::iterator selectIter = m_AffiliatedMSECPlist.begin(); selectIter != m_AffiliatedMSECPlist.end(); selectIter++)
 			{
@@ -1443,7 +1450,7 @@ namespace ns3 {
 				}
 			}
 		}
-				////接收SECACK
+		////接收SECACK
 		void PmtmgmpProtocol::ReceiveSecack(IeSecack secack, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
 			NS_LOG_DEBUG("Receive SECREP from " << from << " at interface " << interface << " while metric is " << metric);
@@ -1454,6 +1461,34 @@ namespace ns3 {
 			newInformation.nodeType = secack.GetNodeType();
 			newInformation.selectIndex = secack.GetPathGenerationSequenceNumber();
 			m_AffiliatedMTERPlist.push_back(newInformation);
+			SendFirstPgen(secack.GetOriginatorAddress(), secack.GetPathGenerationSequenceNumber(), secack.GetPathUpdateSeqNumber(), secack.GetNodeType());
+		}
+		////MSECP发送PGEN
+		void PmtmgmpProtocol::SendFirstPgen(Mac48Address originator, uint32_t genNum, uint32_t updateNum, NodeType type)
+		{
+			NS_LOG_DEBUG("Send PGEN");
+			IePgen Pgen;
+			Pgen.SetOriginatorAddress(originator);
+			Pgen.SetMSECPaddress(m_address);
+			Pgen.SetPathGenerationSequenceNumber(m_PathGenerationSeqNumber);
+			Pgen.SetPathUpdateSeqNumber(m_PathUpdateSeqNumber);
+			Pgen.SetNodeType(m_NodeType);
+			Pgen.SetHopcount(1);
+			Pgen.SetTTL(1);
+			Pgen.SetMetric(1);
+			////添加原始默认路径（源节点到当前辅助节点）
+			Pgen.AddPartPathNode(originator, m_PMTMGMPpgenNodeListNum);
+			Pgen.AddPartPathNode(m_address, m_PMTMGMPpgenNodeListNum);
+
+			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
+			{
+				i->second->SendPgen(Pgen);
+			}
+		}
+		////接收PGEN
+		void PmtmgmpProtocol::ReceivePgen(IePgen pgen, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
+		{
+			int i = 0;
 		}
 #endif
 	} // namespace my11s
