@@ -207,13 +207,6 @@ namespace ns3 {
 				&PmtmgmpProtocol::m_MSECPnumForMTERP),
 				MakeUintegerChecker<uint8_t>(1)
 				)
-				.AddAttribute("PMTMGMPpgenNodeListNum",
-				"Maximum number of the last part of the path that PGEN have generationed, which is used for computing the repeatability of path.",
-				UintegerValue(4),
-				MakeUintegerAccessor(
-				&PmtmgmpProtocol::m_PMTMGMPpgenNodeListNum),
-				MakeUintegerChecker<uint8_t>(0)
-				)
 				.AddAttribute("PMTMGMPmterpAALMmagnification",
 				"The magnification of the value as M in MTERP node when Compute AALM.",
 				DoubleValue(3),
@@ -263,7 +256,6 @@ namespace ns3 {
 			m_PathGenerationSeqNumber(0),
 			m_PathUpdateSeqNumber(0),
 			m_MSECPnumForMTERP(2),
-			m_PMTMGMPpgenNodeListNum(4),
 			m_PMTMGMPmterpAALMmagnification(3),
 			m_PMTMGMPmsecpAALMmagnification(2)
 #endif
@@ -1440,7 +1432,8 @@ namespace ns3 {
 			////终端节点递增度量信息更新帧顺序号
 			m_PathUpdateSeqNumber++;
 
-			secack.SetPathGenerationSequenceNumber(m_PathUpdateSeqNumber);
+			secack.SetPathUpdateSeqNumber(m_PathUpdateSeqNumber);
+
 			secack.SetNodeType(m_NodeType);
 			for (std::vector<SECREPinformation>::iterator selectIter = m_AffiliatedMSECPlist.begin(); selectIter != m_AffiliatedMSECPlist.end(); selectIter++)
 			{
@@ -1461,24 +1454,24 @@ namespace ns3 {
 			newInformation.nodeType = secack.GetNodeType();
 			newInformation.selectIndex = secack.GetPathGenerationSequenceNumber();
 			m_AffiliatedMTERPlist.push_back(newInformation);
-			SendFirstPgen(secack.GetOriginatorAddress(), secack.GetPathGenerationSequenceNumber(), secack.GetPathUpdateSeqNumber(), secack.GetNodeType());
+			SendFirstPgen(secack);
 		}
 		////MSECP发送PGEN
-		void PmtmgmpProtocol::SendFirstPgen(Mac48Address originator, uint32_t genNum, uint32_t updateNum, NodeType type)
+		void PmtmgmpProtocol::SendFirstPgen(IeSecack secack)
 		{
 			NS_LOG_DEBUG("Send PGEN");
 			IePgen Pgen;
-			Pgen.SetOriginatorAddress(originator);
+			Pgen.SetOriginatorAddress(secack.GetOriginatorAddress());
 			Pgen.SetMSECPaddress(m_address);
-			Pgen.SetPathGenerationSequenceNumber(m_PathGenerationSeqNumber);
-			Pgen.SetPathUpdateSeqNumber(m_PathUpdateSeqNumber);
-			Pgen.SetNodeType(m_NodeType);
+			Pgen.SetPathGenerationSequenceNumber(secack.GetPathGenerationSequenceNumber());
+			Pgen.SetPathUpdateSeqNumber(secack.GetPathUpdateSeqNumber());
+			Pgen.SetNodeType(secack.GetNodeType());
 			Pgen.SetHopcount(1);
 			Pgen.SetTTL(1);
 			Pgen.SetMetric(1);
 			////添加原始默认路径（源节点到当前辅助节点）
-			Pgen.AddPartPathNode(originator, m_PMTMGMPpgenNodeListNum);
-			Pgen.AddPartPathNode(m_address, m_PMTMGMPpgenNodeListNum);
+			Pgen.AddPartPathNode(secack.GetOriginatorAddress());
+			Pgen.AddPartPathNode(m_address);
 
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{

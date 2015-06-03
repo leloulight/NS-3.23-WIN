@@ -28,15 +28,11 @@
 namespace ns3 {
 	namespace my11s {
 		////附带路径相关函数
-		void IePgen::AddPartPathNode(Mac48Address address, uint8_t pathLength)
+		void IePgen::AddPartPathNode(Mac48Address address)
 		{
-			while (m_partPath.size() >= pathLength)
-			{
-				m_partPath.erase(m_partPath.begin());
-			}
-			m_partPath.push_back(address);
+			m_partPath->AddPartPathNode(address);
 		}
-		std::vector<Mac48Address> IePgen::GetPartPathNodeList()
+		Ptr<PmtmgmpRPpath> IePgen::GetPartPathNodeList()
 		{
 			return m_partPath;
 		}
@@ -46,15 +42,15 @@ namespace ns3 {
 		}
 		IePgen::IePgen()
 		{
-
+			m_partPath = CreateObject<PmtmgmpRPpath>();
 		}
 		void IePgen::SetOriginatorAddress(Mac48Address originator_address)
 		{
-			m_originatorAddress = originator_address;
+			m_partPath->SetMTERPaddress(originator_address);
 		}
 		void IePgen::SetMSECPaddress(Mac48Address mSECP_address)
 		{
-			m_MSECPaddress = mSECP_address;
+			m_partPath->SetMSECPaddress(mSECP_address);
 		}
 		void IePgen::SetPathGenerationSequenceNumber(uint32_t seq_number)
 		{
@@ -82,11 +78,11 @@ namespace ns3 {
 		}
 		Mac48Address IePgen::GetOriginatorAddress() const
 		{
-			return m_originatorAddress;
+			return m_partPath->GetMTERPaddress();
 		}
 		Mac48Address IePgen::GetMSECPaddress() const
 		{
-			return m_MSECPaddress;
+			return m_partPath->GetMSECPaddress();
 		}
 		uint32_t IePgen::GetPathGenerationSequenceNumber() const
 		{
@@ -131,8 +127,8 @@ namespace ns3 {
 		void IePgen::Print(std::ostream &os) const
 		{
 			os << std::endl << "<information_element id=" << ElementId() << ">" << std::endl;
-			os << " originator address               = " << m_originatorAddress << std::endl;
-			os << " MSECP address                    = " << m_MSECPaddress << std::endl;
+			os << " originator address               = " << m_partPath->GetMSECPaddress() << std::endl;
+			os << " MSECP address                    = " << m_partPath->GetMSECPaddress() << std::endl;
 			os << " path generation sequence number  = " << m_PathGenerationSeqNumber << std::endl;
 			os << " path update sequence number      = " << m_PathUpdateSeqNumber << std::endl;
 			os << " node type                        = " << m_NodeType << std::endl;
@@ -140,8 +136,8 @@ namespace ns3 {
 			os << " hop count                        = " << (uint16_t)m_hopCount << std::endl;
 			os << " metric                           = " << m_metric << std::endl;
 			os << " Part Path Node List are:" << std::endl;
-			for (std::vector<Mac48Address>::const_iterator iter = m_partPath.begin(); iter
-				!= m_partPath.end(); iter++)
+			for (std::vector<Mac48Address>::const_iterator iter = m_partPath->GetPartPath().begin(); iter
+				!= m_partPath->GetPartPath().end(); iter++)
 			{
 				os << "    " << *iter << std::endl;
 			}
@@ -149,17 +145,20 @@ namespace ns3 {
 		}
 		void IePgen::SerializeInformationField(Buffer::Iterator i) const
 		{
-			WriteTo(i, m_originatorAddress);
-			WriteTo(i, m_MSECPaddress);
+			WriteTo(i, m_partPath->GetMSECPaddress());
+			WriteTo(i, m_partPath->GetMSECPaddress());
 			i.WriteHtolsbU32(m_PathGenerationSeqNumber);
 			i.WriteHtolsbU32(m_PathUpdateSeqNumber);
 			i.WriteU8(m_NodeType);
 			i.WriteU8(m_hopCount);
 			i.WriteU8(m_ttl);
 			i.WriteHtolsbU32(m_metric);
-			i.WriteU8(m_partPath.size());
-			for (std::vector<Mac48Address>::const_iterator iter = m_partPath.begin(); iter
-				!= m_partPath.end(); iter++)
+			i.WriteU8(m_partPath->GetCurrentNodeListNum());
+
+			////避免 vector循环报错
+			std::vector<Mac48Address> nodelist = m_partPath->GetPartPath();
+
+			for (std::vector<Mac48Address>::const_iterator iter = nodelist.begin(); iter != nodelist.end(); iter++)
 			{
 				WriteTo(i, *iter);
 			}
@@ -167,8 +166,11 @@ namespace ns3 {
 		uint8_t IePgen::DeserializeInformationField(Buffer::Iterator start, uint8_t length)
 		{
 			Buffer::Iterator i = start;
-			ReadFrom(i, m_originatorAddress);
-			ReadFrom(i, m_MSECPaddress);
+			Mac48Address address;
+			ReadFrom(i, address);
+			m_partPath->SetMTERPaddress(address);
+			ReadFrom(i, address);
+			m_partPath->SetMSECPaddress(address);
 			m_PathGenerationSeqNumber = i.ReadLsbtohU32();
 			m_PathUpdateSeqNumber = i.ReadLsbtohU32();
 			m_NodeType = (PmtmgmpProtocol::NodeType) i.ReadU8();
@@ -176,26 +178,26 @@ namespace ns3 {
 			m_ttl = i.ReadU8();
 			m_metric = i.ReadLsbtohU32();
 			uint8_t size = i.ReadU8();
+			Mac48Address temp;
 			for (int j = 0; j < size; j++)
 			{
-				Mac48Address address; 
-				ReadFrom(i, address);
-				m_partPath.push_back(address);
+				ReadFrom(i, temp);
+				m_partPath->AddPartPathNode(temp);
 			}
 			return i.GetDistanceFrom(start);
 		}
 		uint8_t IePgen::GetInformationFieldSize() const
 		{
-			uint8_t retval = 6			//Source address (originator)
-				+ 6						//MSECP address
-				+ 4						//Path Generation Sequence Number
-				+ 4						//Path Update Sequence Number
-				+ 1 					//NodeType
-				+ 1						//Hopcount
-				+ 1						//TTL
-				+ 4						//metric
-				+ 1						//Part Path Node List Size
-				+ m_partPath.size() * 6;//Part Path Node List
+			uint8_t retval = 6							//Source address (originator)
+				+ 6										//MSECP address
+				+ 4										//Path Generation Sequence Number
+				+ 4										//Path Update Sequence Number
+				+ 1 									//NodeType
+				+ 1										//Hopcount
+				+ 1										//TTL
+				+ 4										//metric
+				+ 1										//Part Path Node List Size
+				+ m_partPath->GetPartPath().size() * 6;	//Part Path Node List
 			return retval;
 		}
 		bool operator== (const IePgen & a, const IePgen & b)

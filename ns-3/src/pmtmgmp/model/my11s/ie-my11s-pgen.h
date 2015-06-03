@@ -25,6 +25,7 @@
 #include "ns3/mac48-address.h"
 #include "ns3/wmn-information-element-vector.h"
 #include "ns3/pmtmgmp-protocol.h"
+#include "ns3/pmtmgmp-rtable.h"
 
 namespace ns3 {
 	namespace my11s {
@@ -35,8 +36,8 @@ namespace ns3 {
 			~IePgen();
 
 			////附带路径相关函数
-			void AddPartPathNode(Mac48Address address, uint8_t pathLength);
-			std::vector<Mac48Address> GetPartPathNodeList();
+			void AddPartPathNode(Mac48Address address);
+			Ptr<PmtmgmpRPpath> GetPartPathNodeList();
 			
 			// Setters for fields:
 			void SetOriginatorAddress(Mac48Address originator_address);
@@ -69,15 +70,14 @@ namespace ns3 {
 			virtual uint8_t GetInformationFieldSize() const;
 			virtual void Print(std::ostream& os) const;
 		private:
-			Mac48Address m_originatorAddress;
-			Mac48Address m_MSECPaddress;
+			
 			uint32_t m_PathGenerationSeqNumber;
 			uint32_t m_PathUpdateSeqNumber;
 			PmtmgmpProtocol::NodeType m_NodeType;
 			uint8_t  m_hopCount;
 			uint8_t  m_ttl;
 			uint32_t m_metric;
-			std::vector<Mac48Address>  m_partPath;
+			Ptr<PmtmgmpRPpath> m_partPath;
 
 			friend bool operator== (const IePgen & a, const IePgen & b);
 		};
