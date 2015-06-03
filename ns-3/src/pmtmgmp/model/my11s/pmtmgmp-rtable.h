@@ -79,6 +79,7 @@ namespace ns3 {
 		public:
 			PmtmgmpRPTree();
 			~PmtmgmpRPTree();
+			PmtmgmpRPpath GetPathByMSECPaddress(Mac48Address address);
 		private:
 			////Â·ÓÉ±íÊ÷ËÑË÷Æ÷
 			struct PmtmgmpRPtree_Finder

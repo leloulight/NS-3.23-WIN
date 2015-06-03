@@ -1454,10 +1454,10 @@ namespace ns3 {
 			newInformation.nodeType = secack.GetNodeType();
 			newInformation.selectIndex = secack.GetPathGenerationSequenceNumber();
 			m_AffiliatedMTERPlist.push_back(newInformation);
-			SendFirstPgen(secack);
+			SendFirstPgen(secack, metric);
 		}
 		////MSECP发送PGEN
-		void PmtmgmpProtocol::SendFirstPgen(IeSecack secack)
+		void PmtmgmpProtocol::SendFirstPgen(IeSecack secack, uint32_t metric)
 		{
 			NS_LOG_DEBUG("Send PGEN");
 			IePgen Pgen;
@@ -1468,7 +1468,7 @@ namespace ns3 {
 			Pgen.SetNodeType(secack.GetNodeType());
 			Pgen.SetHopcount(1);
 			Pgen.SetTTL(1);
-			Pgen.SetMetric(1);
+			Pgen.SetMetric(metric);
 			////添加原始默认路径（源节点到当前辅助节点）
 			Pgen.AddPartPathNode(secack.GetOriginatorAddress());
 			Pgen.AddPartPathNode(m_address);
@@ -1481,7 +1481,18 @@ namespace ns3 {
 		////接收PGEN
 		void PmtmgmpProtocol::ReceivePgen(IePgen pgen, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
-			int i = 0;
+			switch (pgen.GetNodeType())
+			{
+			case Mesh_Access_Point:
+			case Mesh_Portal:
+				break;
+			case Mesh_Secondary_Point:
+				break;
+			case Mesh_STA:
+				break;
+			default:
+				NS_LOG_ERROR("Error node type.");
+			}
 		}
 #endif
 	} // namespace my11s
