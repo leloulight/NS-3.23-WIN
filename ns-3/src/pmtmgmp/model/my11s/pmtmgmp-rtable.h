@@ -41,10 +41,12 @@ namespace ns3 {
 
 			void SetMTERPaddress(Mac48Address address);
 			void SetMSECPaddress(Mac48Address address);
+			void SetMetric(uint32_t metric);
 
 			Mac48Address GetMTERPaddress() const;
 			Mac48Address GetMSECPaddress() const;
 			std::vector<Mac48Address> GetPartPath() const;
+			uint32_t GetMetric() const;
 
 			////添加节点
 			void AddPartPathNode(Mac48Address address);
@@ -58,42 +60,70 @@ namespace ns3 {
 			////路由表路径搜索器
 			struct PmtmgmpRPpath_Finder
 			{
-				PmtmgmpRPpath_Finder(Mac48Address address) :address(address) {};
+				PmtmgmpRPpath_Finder(Mac48Address address) :m_address(address) {};
 				bool operator()(Mac48Address p)
 				{
-					return address == p;
+					return m_address == p;
 				}
-				Mac48Address address;
+				Mac48Address m_address;
 			};
 		private:
 			std::vector<Mac48Address>  m_partPath;
 			Mac48Address m_MTERPaddress;
 			Mac48Address m_MSECPaddress; 
+			uint32_t m_metric;
 
 			////最大允许的部分路径长度
 			uint8_t m_PMTMGMPpathNodeListNum;
 		};
 		////路由表树
-		class PmtmgmpRPTree : public Object
+		class PmtmgmpRPtree : public Object
 		{
 		public:
-			PmtmgmpRPTree();
-			~PmtmgmpRPTree();
-			PmtmgmpRPpath GetPathByMSECPaddress(Mac48Address address);
+			PmtmgmpRPtree();
+			~PmtmgmpRPtree();
+
+			void SetMTERPaddress(Mac48Address address);
+
+			Mac48Address GetMTERPaddress() const;
+
+			Ptr<PmtmgmpRPpath> GetPathByMACaddress(Mac48Address mterp, Mac48Address msecp);
+			std::vector<Ptr<PmtmgmpRPpath>> GetBestPath();
 		private:
 			////路由表树搜索器
 			struct PmtmgmpRPtree_Finder
 			{
-				PmtmgmpRPtree_Finder(Mac48Address mterp, Mac48Address msecp) :mterp(mterp), msecp(msecp){};
-				bool operator()(PmtmgmpRPpath p)
+				PmtmgmpRPtree_Finder(Mac48Address mterp, Mac48Address msecp) :m_mterp(mterp), m_msecp(msecp){};
+				bool operator()(Ptr<PmtmgmpRPpath> p)
 				{
-					return mterp == p.GetMTERPaddress() && msecp == p.GetMSECPaddress();
+					return m_mterp == p->GetMTERPaddress() && m_msecp == p->GetMSECPaddress();
 				}
-				Mac48Address mterp;
-				Mac48Address msecp;
+				Mac48Address m_mterp;
+				Mac48Address m_msecp;
 			};
 		private:
 			std::vector<Ptr<PmtmgmpRPpath>>  m_partTree;
+			Mac48Address m_MTERPaddress;
+		};
+		////路由表
+		class PmtmgmpRPRouteTable : public Object
+		{
+		public:
+			PmtmgmpRPRouteTable();
+			~PmtmgmpRPRouteTable();
+		private:
+			////路由表路径搜索器
+			struct PmtmgmpRPtree_Finder
+			{
+				PmtmgmpRPtree_Finder(Mac48Address address) :m_address(address) {};
+				bool operator()(Ptr<PmtmgmpRPtree> p)
+				{
+					return m_address == p->GetMTERPaddress();
+				}
+				Mac48Address m_address;
+			};
+		private:
+			std::vector<Ptr<PmtmgmpRPtree>>  m_partTable;
 		};
 #endif
 		/**

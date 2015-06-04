@@ -74,7 +74,7 @@ namespace ns3 {
 		}
 		void IePgen::SetMetric(uint32_t metric)
 		{
-			m_metric = metric;
+			m_partPath->SetMetric(metric);
 		}
 		Mac48Address IePgen::GetOriginatorAddress() const
 		{
@@ -106,7 +106,7 @@ namespace ns3 {
 		}
 		uint32_t IePgen::GetMetric() const
 		{
-			return m_metric;
+			return m_partPath->GetMetric();
 		}
 		void IePgen::DecrementTtl()
 		{
@@ -115,10 +115,10 @@ namespace ns3 {
 		}
 		void IePgen::IncrementMetric(uint32_t metric, double m, uint8_t q)
 		{
-			double lastAALM = m_metric;
+			double lastAALM = m_partPath->GetMetric();
 			double newALM = metric;
 			////按公式积累计算度量，见AALM计算公式
-			m_metric = std::floor((2 * m * newALM * (q + 1) + (m_hopCount - 1)) / (m_hopCount + 1) + 0.5);
+			m_partPath->SetMetric(std::floor((2 * m * newALM * (q + 1) + (m_hopCount - 1)) / (m_hopCount + 1) + 0.5));
 		}
 		WifiInformationElementId IePgen::ElementId() const
 		{
@@ -134,7 +134,7 @@ namespace ns3 {
 			os << " node type                        = " << m_NodeType << std::endl;
 			os << " TTL                              = " << (uint16_t)m_ttl << std::endl;
 			os << " hop count                        = " << (uint16_t)m_hopCount << std::endl;
-			os << " metric                           = " << m_metric << std::endl;
+			os << " metric                           = " << m_partPath->GetMetric() << std::endl;
 			os << " Part Path Node List are:" << std::endl;
 			for (std::vector<Mac48Address>::const_iterator iter = m_partPath->GetPartPath().begin(); iter
 				!= m_partPath->GetPartPath().end(); iter++)
@@ -152,7 +152,7 @@ namespace ns3 {
 			i.WriteU8(m_NodeType);
 			i.WriteU8(m_hopCount);
 			i.WriteU8(m_ttl);
-			i.WriteHtolsbU32(m_metric);
+			i.WriteHtolsbU32(m_partPath->GetMetric());
 			i.WriteU8(m_partPath->GetCurrentNodeListNum());
 
 			////避免 vector循环报错
@@ -176,7 +176,7 @@ namespace ns3 {
 			m_NodeType = (PmtmgmpProtocol::NodeType) i.ReadU8();
 			m_hopCount = i.ReadU8();
 			m_ttl = i.ReadU8();
-			m_metric = i.ReadLsbtohU32();
+			m_partPath->SetMetric(i.ReadLsbtohU32());
 			uint8_t size = i.ReadU8();
 			Mac48Address temp;
 			for (int j = 0; j < size; j++)

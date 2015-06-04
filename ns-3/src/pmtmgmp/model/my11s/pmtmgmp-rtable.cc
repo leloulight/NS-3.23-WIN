@@ -87,6 +87,10 @@ namespace ns3 {
 		{
 			m_MSECPaddress = address;
 		}
+		void PmtmgmpRPpath::SetMetric(uint32_t metric)
+		{
+			m_metric = metric;
+		}
 		Mac48Address PmtmgmpRPpath::GetMTERPaddress() const
 		{
 			return m_MTERPaddress;
@@ -98,6 +102,10 @@ namespace ns3 {
 		std::vector<Mac48Address> PmtmgmpRPpath::GetPartPath() const
 		{
 			return m_partPath;
+		}
+		uint32_t PmtmgmpRPpath::GetMetric() const
+		{
+			return m_metric;
 		}
 		////Ìí¼Ó½Úµã
 		void PmtmgmpRPpath::AddPartPathNode(Mac48Address address)
@@ -131,14 +139,49 @@ namespace ns3 {
 			return m_partPath.size();
 		}
 		/*************************
-		* PmtmgmpRPTree
+		* PmtmgmpRPtree
 		************************/
-		PmtmgmpRPTree::PmtmgmpRPTree()
+		PmtmgmpRPtree::PmtmgmpRPtree()
 		{
 		}
 
-		PmtmgmpRPTree::~PmtmgmpRPTree()
+		PmtmgmpRPtree::~PmtmgmpRPtree()
 		{
+		}
+		void PmtmgmpRPtree::SetMTERPaddress(Mac48Address address)
+		{
+			m_MTERPaddress = address;
+		}
+		Mac48Address PmtmgmpRPtree::GetMTERPaddress() const
+		{
+			return m_MTERPaddress;
+		}
+		Ptr<PmtmgmpRPpath> PmtmgmpRPtree::GetPathByMACaddress(Mac48Address mterp, Mac48Address msecp)
+		{
+			std::vector<Ptr<PmtmgmpRPpath>>::iterator iter = std::find_if(m_partTree.begin(), m_partTree.end(), PmtmgmpRPtree_Finder(mterp, msecp));
+			if (iter == m_partTree.end()) NS_LOG_ERROR("Can not find the path with MTERP is " << mterp << ",MSECP is " << msecp);
+			return *iter;
+		}
+		std::vector<Ptr<PmtmgmpRPpath>> PmtmgmpRPtree::GetBestPath()
+		{
+			if (m_partTree.size() == 0) NS_LOG_ERROR("There is no path in this tree.");
+			std::vector<Ptr<PmtmgmpRPpath>>::iterator bestIter = m_partTree.begin();
+			std::vector<Ptr<PmtmgmpRPpath>> bestPaths;
+			bestPaths.push_back(*bestIter);
+			for (std::vector<Ptr<PmtmgmpRPpath>>::iterator iter = m_partTree.begin(); iter != m_partTree.end(); iter++)
+			{
+				if ((*bestIter)->GetMetric() < (*iter)->GetMetric())
+				{
+					bestPaths.clear();
+					bestPaths.push_back(*iter);
+					bestIter == iter;
+				}
+				else if ((*bestIter)->GetMetric() == (*iter)->GetMetric())
+				{
+					bestPaths.push_back(*iter);
+				}
+			}
+			return bestPaths;
 		}
 #endif
 		/*************************

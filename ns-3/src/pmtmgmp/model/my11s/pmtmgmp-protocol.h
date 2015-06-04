@@ -245,26 +245,26 @@ namespace ns3 {
 				////ÉýÐò
 				bool operator < (const SECREPinformation si) const
 				{
-					return metric * (affiliatedNumber + 1) < si.metric * (si.affiliatedNumber + 1);
+					return m_metric * (m_affiliatedNumber + 1) < si.m_metric * (si.m_affiliatedNumber + 1);
 				}
 				////½µÐò
 				//bool operator > (const SECREPinformation si) const
 				//{
 				//	return metric * (affiliatedNumber + 1) > si.metric * (si.affiliatedNumber + 1);
 				//}
-				Mac48Address address;
-				uint32_t metric;
-				uint8_t affiliatedNumber;
+				Mac48Address m_address;
+				uint32_t m_metric;
+				uint8_t m_affiliatedNumber;
 			};
 			////SECREPinformationËÑË÷Æ÷
 			struct SECREPinformation_Finder
 			{
-				SECREPinformation_Finder(Mac48Address address) :address(address){};
+				SECREPinformation_Finder(Mac48Address address) :m_address(address){};
 				bool operator()(SECREPinformation p)
 				{
-					return address == p.address;
+					return m_address == p.m_address;
 				}
-				Mac48Address address;
+				Mac48Address m_address;
 			};
 			struct MSECPaffiliatedMSECPInformation
 			{

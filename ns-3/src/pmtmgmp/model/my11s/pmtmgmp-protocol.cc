@@ -1357,9 +1357,9 @@ namespace ns3 {
 			if ((secrep.GetPathGenerationSequenceNumber() != m_PathGenerationSeqNumber) || (secrep.GetOriginatorAddress() != m_address)) 
 				return;////过期SECREP将会被丢弃
 			SECREPinformation newInformation;
-			newInformation.address = secrep.GetCandidateMSECPaddress();
-			newInformation.metric = metric;
-			newInformation.affiliatedNumber = secrep.GetAffiliatedMTERPnum();
+			newInformation.m_address = secrep.GetCandidateMSECPaddress();
+			newInformation.m_metric = metric;
+			newInformation.m_affiliatedNumber = secrep.GetAffiliatedMTERPnum();
 			m_SECREPinformation.push_back(newInformation);
 		}
 		////设置和获取当前节点类型
@@ -1397,7 +1397,7 @@ namespace ns3 {
 			m_PathGenerationSeqNumber += 1;
 			for (std::vector<SECREPinformation>::iterator selectIter = m_SECREPinformation.begin(); selectIter != m_SECREPinformation.end(); selectIter++)
 			{
-				std::vector<SECREPinformation>::iterator iter = std::find_if(m_AffiliatedMSECPlist.begin(), m_AffiliatedMSECPlist.end(), SECREPinformation_Finder(selectIter->address));
+				std::vector<SECREPinformation>::iterator iter = std::find_if(m_AffiliatedMSECPlist.begin(), m_AffiliatedMSECPlist.end(), SECREPinformation_Finder(selectIter->m_address));
 				if (iter == m_AffiliatedMSECPlist.end())
 				{
 					m_AffiliatedMSECPlist.push_back(*selectIter);
@@ -1439,7 +1439,7 @@ namespace ns3 {
 			{
 				for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 				{
-					i->second->SendSecack(secack, selectIter->address);
+					i->second->SendSecack(secack, selectIter->m_address);
 				}
 			}
 		}

@@ -76,7 +76,6 @@ namespace ns3 {
 			PmtmgmpProtocol::NodeType m_NodeType;
 			uint8_t  m_hopCount;
 			uint8_t  m_ttl;
-			uint32_t m_metric;
 			Ptr<PmtmgmpRPpath> m_partPath;
 
 			friend bool operator== (const IePgen & a, const IePgen & b);
