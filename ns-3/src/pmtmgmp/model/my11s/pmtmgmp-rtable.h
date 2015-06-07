@@ -25,6 +25,7 @@
 #include "ns3/nstime.h"
 #include "ns3/mac48-address.h"
 #include "ns3/pmtmgmp-protocol.h"
+#include "ns3/traced-value.h"
 namespace ns3 {
 	namespace my11s {
 
@@ -36,18 +37,26 @@ namespace ns3 {
 			PmtmgmpRPpath();
 			~PmtmgmpRPpath(); 
 			static TypeId GetTypeId();
-
-			uint8_t GetPartPathRepeatability(PmtmgmpRPpath compare);
+			std::vector<Mac48Address> GetPartPath() const;
 
 			void SetMTERPaddress(Mac48Address address);
 			void SetMSECPaddress(Mac48Address address);
+			void SetPathGenerationSequenceNumber(uint32_t seq_number);
+			void SetPathUpdateSeqNumber(uint32_t seq_number);
+			void SetNodeType(PmtmgmpProtocol::NodeType nodeType);
+			void SetHopcount(uint8_t hopcount);
 			void SetMetric(uint32_t metric);
 
 			Mac48Address GetMTERPaddress() const;
 			Mac48Address GetMSECPaddress() const;
-			std::vector<Mac48Address> GetPartPath() const;
+			uint32_t GetPathGenerationSequenceNumber() const;
+			uint32_t GetPathUpdateSeqNumber() const;
+			PmtmgmpProtocol::NodeType GetNodeType() const;
+			uint8_t  GetHopCount() const;
 			uint32_t GetMetric() const;
 
+			////获取路径重复度
+			uint8_t GetPartPathRepeatability(PmtmgmpRPpath compare);
 			////添加节点
 			void AddPartPathNode(Mac48Address address);
 			////获取路径结点地址
@@ -57,6 +66,16 @@ namespace ns3 {
 			////获取路径当前结点数量
 			uint8_t GetCurrentNodeListNum();
 		private:
+			////路由路径状态
+			//enum RouteInformationStatus
+			//{
+			//	////数据过期
+			//	Expired,
+			//	////等待确定
+			//	Waited,
+			//	////已经确定
+			//	Confirmed,
+			//};
 			////路由表路径搜索器
 			struct PmtmgmpRPpath_Finder
 			{
@@ -68,27 +87,40 @@ namespace ns3 {
 				Mac48Address m_address;
 			};
 		private:
-			std::vector<Mac48Address>  m_partPath;
 			Mac48Address m_MTERPaddress;
-			Mac48Address m_MSECPaddress; 
+			Mac48Address m_MSECPaddress;
+			uint32_t m_PathGenerationSeqNumber;
+			uint32_t m_PathUpdateSeqNumber;
+			PmtmgmpProtocol::NodeType m_NodeType;
+			uint8_t  m_hopCount;
 			uint32_t m_metric;
+			std::vector<Mac48Address>  m_partPath;
 
 			////最大允许的部分路径长度
 			uint8_t m_PMTMGMPpathNodeListNum;
 		};
+
 		////路由表树
 		class PmtmgmpRPtree : public Object
 		{
 		public:
 			PmtmgmpRPtree();
 			~PmtmgmpRPtree();
+			static TypeId GetTypeId();
+			std::vector<Ptr<PmtmgmpRPpath>> GetPartTree();
 
 			void SetMTERPaddress(Mac48Address address);
 
 			Mac48Address GetMTERPaddress() const;
-
+			
+			////获取MTERP、MSECP对应的Path
 			Ptr<PmtmgmpRPpath> GetPathByMACaddress(Mac48Address mterp, Mac48Address msecp);
+			////获取度量最小的路径
 			std::vector<Ptr<PmtmgmpRPpath>> GetBestPath();
+			////添加新路径
+			void AddNewPath(Ptr<PmtmgmpRPpath> path);
+			////获取当前路径的最大生成顺序号
+			uint32_t GetTreeMaxGenerationSeqNumber();
 		private:
 			////路由表树搜索器
 			struct PmtmgmpRPtree_Finder
@@ -104,18 +136,31 @@ namespace ns3 {
 		private:
 			std::vector<Ptr<PmtmgmpRPpath>>  m_partTree;
 			Mac48Address m_MTERPaddress;
+
+			////终端节点可拥有的辅助节点数量
+			uint8_t m_MSECPnumForMTERP;
 		};
+
 		////路由表
 		class PmtmgmpRPRouteTable : public Object
 		{
 		public:
 			PmtmgmpRPRouteTable();
 			~PmtmgmpRPRouteTable();
+
+			std::vector<Ptr<PmtmgmpRPtree>> GetRouteTable();
+
+			////获取MTERP对应的Tree
+			Ptr<PmtmgmpRPtree> GetTreeByMACaddress(Mac48Address mterp);
+			////获取MTERP、MSECP对应的Path
+			Ptr<PmtmgmpRPpath> GetPathByMACaddress(Mac48Address mterp, Mac48Address msecp);
+			////添加新路径
+			void AddNewPath(Ptr<PmtmgmpRPpath> path);
 		private:
 			////路由表路径搜索器
-			struct PmtmgmpRPtree_Finder
+			struct PmtmgmpRProuteTable_Finder
 			{
-				PmtmgmpRPtree_Finder(Mac48Address address) :m_address(address) {};
+				PmtmgmpRProuteTable_Finder(Mac48Address address) :m_address(address) {};
 				bool operator()(Ptr<PmtmgmpRPtree> p)
 				{
 					return m_address == p->GetMTERPaddress();

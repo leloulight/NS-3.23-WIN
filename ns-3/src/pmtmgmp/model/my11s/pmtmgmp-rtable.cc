@@ -43,7 +43,7 @@ namespace ns3 {
 		* PmtmgmpRPpath
 		************************/
 		PmtmgmpRPpath::PmtmgmpRPpath() :
-			m_PMTMGMPpathNodeListNum(4)
+			m_PMTMGMPpathNodeListNum(2)
 		{
 		}
 
@@ -57,7 +57,7 @@ namespace ns3 {
 				.SetGroupName("Wmn")
 				.AddConstructor<PmtmgmpRPpath>()
 				.AddAttribute("PMTMGMPpgenNodeListNum",
-					"Maximum number of the last part of the path that PGEN have generationed, which is used for computing the repeatability of path.",
+					"Maximum number of the last part of the path that PGEN have generationed, which is used for computing the repeatability of path. t need define the same as \"ns3::my11s::PmtmgmpProtocol::MSECPnumForMTERP\"",
 					UintegerValue(4),
 					MakeUintegerAccessor(
 						&PmtmgmpRPpath::m_PMTMGMPpathNodeListNum),
@@ -66,18 +66,9 @@ namespace ns3 {
 				;
 			return tid;
 		}
-		uint8_t PmtmgmpRPpath::GetPartPathRepeatability(PmtmgmpRPpath compare)
+		std::vector<Mac48Address> PmtmgmpRPpath::GetPartPath() const
 		{
-			uint8_t Repeatability = 0;
-			for (std::vector<Mac48Address>::iterator selectIter = m_partPath.begin(); selectIter != m_partPath.end(); selectIter++)
-			{
-				std::vector<Mac48Address>::iterator iter = std::find_if(compare.GetPartPath().begin(), compare.GetPartPath().end(), PmtmgmpRPpath_Finder(*selectIter)); 
-				if (iter == compare.GetPartPath().end())
-				{
-					Repeatability++;
-				}
-			}
-			return Repeatability;
+			return m_partPath;
 		}
 		void PmtmgmpRPpath::SetMTERPaddress(Mac48Address address)
 		{
@@ -86,6 +77,22 @@ namespace ns3 {
 		void PmtmgmpRPpath::SetMSECPaddress(Mac48Address address)
 		{
 			m_MSECPaddress = address;
+		}
+		void PmtmgmpRPpath::SetPathGenerationSequenceNumber(uint32_t seq_number)
+		{
+			m_PathGenerationSeqNumber = seq_number;
+		}
+		void PmtmgmpRPpath::SetPathUpdateSeqNumber(uint32_t seq_number)
+		{
+			m_PathUpdateSeqNumber = seq_number;
+		}
+		void PmtmgmpRPpath::SetNodeType(PmtmgmpProtocol::NodeType nodeType)
+		{
+			m_NodeType = nodeType;
+		}
+		void PmtmgmpRPpath::SetHopcount(uint8_t hopcount)
+		{
+			m_hopCount = hopcount;
 		}
 		void PmtmgmpRPpath::SetMetric(uint32_t metric)
 		{
@@ -99,13 +106,39 @@ namespace ns3 {
 		{
 			return m_MSECPaddress;
 		}
-		std::vector<Mac48Address> PmtmgmpRPpath::GetPartPath() const
+		uint32_t PmtmgmpRPpath::GetPathGenerationSequenceNumber() const
 		{
-			return m_partPath;
+			return m_PathGenerationSeqNumber;
+		}
+		uint32_t PmtmgmpRPpath::GetPathUpdateSeqNumber() const
+		{
+			return m_PathUpdateSeqNumber;
+		}
+		PmtmgmpProtocol::NodeType PmtmgmpRPpath::GetNodeType() const
+		{
+			return m_NodeType;
+		}
+		uint8_t PmtmgmpRPpath::GetHopCount() const
+		{
+			return m_hopCount;
 		}
 		uint32_t PmtmgmpRPpath::GetMetric() const
 		{
 			return m_metric;
+		}
+		////获取路径重复度
+		uint8_t PmtmgmpRPpath::GetPartPathRepeatability(PmtmgmpRPpath compare)
+		{
+			uint8_t Repeatability = 0;
+			for (std::vector<Mac48Address>::iterator selectIter = m_partPath.begin(); selectIter != m_partPath.end(); selectIter++)
+			{
+				std::vector<Mac48Address>::iterator iter = std::find_if(compare.GetPartPath().begin(), compare.GetPartPath().end(), PmtmgmpRPpath_Finder(*selectIter));
+				if (iter == compare.GetPartPath().end())
+				{
+					Repeatability++;
+				}
+			}
+			return Repeatability;
 		}
 		////添加节点
 		void PmtmgmpRPpath::AddPartPathNode(Mac48Address address)
@@ -125,7 +158,7 @@ namespace ns3 {
 			}
 			else
 			{
-				m_partPath.end();
+				NS_LOG_ERROR("Out of size.");
 			}
 		}
 		////获取路径最大结点数量
@@ -141,12 +174,33 @@ namespace ns3 {
 		/*************************
 		* PmtmgmpRPtree
 		************************/
-		PmtmgmpRPtree::PmtmgmpRPtree()
+		PmtmgmpRPtree::PmtmgmpRPtree() :
+			m_MSECPnumForMTERP(2)
 		{
 		}
 
 		PmtmgmpRPtree::~PmtmgmpRPtree()
 		{
+		}
+		TypeId PmtmgmpRPtree::GetTypeId()
+		{
+			static TypeId tid = TypeId("ns3::my11s::PmtmgmpRPtree")
+				.SetParent<Object>()
+				.SetGroupName("Wmn")
+				.AddConstructor<PmtmgmpRPtree>()
+				.AddAttribute("MSECPnumForMTERP",
+					"The number of MESCP that each MTERP can have.",
+					UintegerValue(2),
+					MakeUintegerAccessor(
+						&PmtmgmpRPtree::m_MSECPnumForMTERP),
+					MakeUintegerChecker<uint8_t>(1)
+					)
+				;
+			return tid;
+		}
+		std::vector<Ptr<PmtmgmpRPpath>> PmtmgmpRPtree::GetPartTree()
+		{
+			return m_partTree;
 		}
 		void PmtmgmpRPtree::SetMTERPaddress(Mac48Address address)
 		{
@@ -156,11 +210,19 @@ namespace ns3 {
 		{
 			return m_MTERPaddress;
 		}
+		////获取MTERP、MSECP对应的Path
 		Ptr<PmtmgmpRPpath> PmtmgmpRPtree::GetPathByMACaddress(Mac48Address mterp, Mac48Address msecp)
 		{
 			std::vector<Ptr<PmtmgmpRPpath>>::iterator iter = std::find_if(m_partTree.begin(), m_partTree.end(), PmtmgmpRPtree_Finder(mterp, msecp));
-			if (iter == m_partTree.end()) NS_LOG_ERROR("Can not find the path with MTERP is " << mterp << ",MSECP is " << msecp);
-			return *iter;
+			if (iter == m_partTree.end())
+			{
+				return 0;
+				//NS_LOG_ERROR("Can not find the path with MTERP is " << mterp << ",MSECP is " << msecp);
+			}
+			else
+			{
+				return *iter;
+			}
 		}
 		std::vector<Ptr<PmtmgmpRPpath>> PmtmgmpRPtree::GetBestPath()
 		{
@@ -182,6 +244,80 @@ namespace ns3 {
 				}
 			}
 			return bestPaths;
+		}
+		////添加新路径
+		void PmtmgmpRPtree::AddNewPath(Ptr<PmtmgmpRPpath> path)
+		{
+			std::vector<Ptr<PmtmgmpRPpath>>::iterator exist = std::find_if(m_partTree.begin(), m_partTree.end(), PmtmgmpRPtree_Finder(path->GetMTERPaddress(), path->GetMSECPaddress()));
+			if (exist == m_partTree.end())
+			{
+				m_partTree.erase(exist);
+			}
+			m_partTree.push_back(path);
+			if (m_partTree.size() > m_MSECPnumForMTERP) NS_LOG_ERROR("Too many path have add to tree");
+		}
+		////获取当前路径的最大生成顺序号
+		uint32_t PmtmgmpRPtree::GetTreeMaxGenerationSeqNumber()
+		{
+			uint32_t seqNum = 0;
+			for (std::vector<Ptr<PmtmgmpRPpath>>::iterator iter = m_partTree.begin(); iter != m_partTree.end(); iter++)
+			{
+				if ((*iter)->GetPathGenerationSequenceNumber() > seqNum)
+				{
+					seqNum = (*iter)->GetPathGenerationSequenceNumber();
+				}
+			}
+			return seqNum;
+		}
+		/*************************
+		* PmtmgmpRPRouteTable
+		************************/
+		PmtmgmpRPRouteTable::PmtmgmpRPRouteTable()
+		{
+		}
+		PmtmgmpRPRouteTable::~PmtmgmpRPRouteTable()
+		{
+		}
+		std::vector<Ptr<PmtmgmpRPtree>> PmtmgmpRPRouteTable::GetRouteTable()
+		{
+			return m_partTable;
+		}
+		////获取MTERP对应的Tree
+		Ptr<PmtmgmpRPtree> PmtmgmpRPRouteTable::GetTreeByMACaddress(Mac48Address mterp)
+		{
+			std::vector<Ptr<PmtmgmpRPtree>>::iterator iter = std::find_if(m_partTable.begin(), m_partTable.end(), PmtmgmpRProuteTable_Finder(mterp));
+			if (iter == m_partTable.end())
+			{
+				return 0;
+				//NS_LOG_ERROR("Can not find the tree with MTERP is " << mterp);
+			}
+			else
+			{
+				return *iter;
+			}
+		}
+		////获取MTERP、MSECP对应的Path
+		Ptr<PmtmgmpRPpath> PmtmgmpRPRouteTable::GetPathByMACaddress(Mac48Address mterp, Mac48Address msecp)
+		{
+			Ptr<PmtmgmpRPtree> pTree = GetTreeByMACaddress(mterp);
+			if (pTree == 0)
+			{
+				////没有找到对应的路由树
+				return 0;
+			}
+			return pTree->GetPathByMACaddress(mterp, msecp);
+		}
+		////添加新路径
+		void PmtmgmpRPRouteTable::AddNewPath(Ptr<PmtmgmpRPpath> path)
+		{
+			Ptr<PmtmgmpRPtree> pTree = GetTreeByMACaddress(path->GetMTERPaddress());
+			if (pTree == 0)
+			{
+				pTree = CreateObject<PmtmgmpRPtree>();
+				m_partTable.push_back(pTree);
+			}
+			
+			pTree->AddNewPath(path);
 		}
 #endif
 		/*************************

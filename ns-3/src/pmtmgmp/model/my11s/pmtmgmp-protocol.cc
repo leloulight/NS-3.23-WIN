@@ -201,7 +201,7 @@ namespace ns3 {
 				MakeUintegerChecker<uint8_t>(1)
 				)
 				.AddAttribute("MSECPnumForMTERP",
-				"The number of MESCP that each MTERP can have.",
+				"The number of MESCP that each MTERP can have. It need define the same as \"ns3::my11s::PmtmgmpRPpath::PMTMGMPpgenNodeListNum\"",
 				UintegerValue(2),
 				MakeUintegerAccessor(
 				&PmtmgmpProtocol::m_MSECPnumForMTERP),
@@ -1385,6 +1385,11 @@ namespace ns3 {
 			}
 			return 1;
 		}
+		////获取设置的MTERP可以附带的MSECP最大数量
+		uint8_t PmtmgmpProtocol::GetMSECPnumForMTERP() const
+		{
+			return m_MSECPnumForMTERP;
+		}
 		////验证协议所属结点是否为终端节点MTERP
 		bool PmtmgmpProtocol::IsMTERP()
 		{
@@ -1481,7 +1486,35 @@ namespace ns3 {
 		////接收PGEN
 		void PmtmgmpProtocol::ReceivePgen(IePgen pgen, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
-			switch (pgen.GetNodeType())
+			////将路由信息加入路由表
+			Ptr<PmtmgmpRPtree> pTree = m_RouteTable->GetTreeByMACaddress(pgen.GetOriginatorAddress());
+			if (pTree == 0)
+			{
+				////当前路由表中不存在来自PGEN源节点的路径
+				m_RouteTable->AddNewPath(pgen.GetPartPath());
+			}
+			else 
+			{
+				uint32_t GenSeqNum = pgen.GetPathGenerationSequenceNumber();
+				if (GenSeqNum > pTree->GetTreeMaxGenerationSeqNumber())
+				{
+					////当前路由表中没有相同生成顺序号的记录，此为到达的第一个PGEN。
+					m_RouteTable->AddNewPath(pgen.GetPartPath());
+				}
+				else if (GenSeqNum > pTree->GetTreeMaxGenerationSeqNumber())
+				{
+					////已有相同当前序号的其他PGEN到达
+					Ptr<PmtmgmpRPpath> pPath = pTree->GetPathByMACaddress(pgen.GetOriginatorAddress(), pgen.GetMSECPaddress());
+
+				}
+				else
+				{
+					////过期PGEN，放弃
+					return;
+				}
+			}
+			////根据当前结点信息做处理
+			switch (m_NodeType)
 			{
 			case Mesh_Access_Point:
 			case Mesh_Portal:

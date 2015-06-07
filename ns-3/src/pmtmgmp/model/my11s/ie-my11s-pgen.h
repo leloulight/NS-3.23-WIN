@@ -58,6 +58,7 @@ namespace ns3 {
 			uint8_t  GetHopCount() const;
 			uint8_t  GetTtl() const;
 			uint32_t GetMetric() const;
+			Ptr<PmtmgmpRPpath> GetPartPath() const;
 
 			/// Handle TTL and Metric:
 			void  DecrementTtl();
@@ -70,11 +71,6 @@ namespace ns3 {
 			virtual uint8_t GetInformationFieldSize() const;
 			virtual void Print(std::ostream& os) const;
 		private:
-			
-			uint32_t m_PathGenerationSeqNumber;
-			uint32_t m_PathUpdateSeqNumber;
-			PmtmgmpProtocol::NodeType m_NodeType;
-			uint8_t  m_hopCount;
 			uint8_t  m_ttl;
 			Ptr<PmtmgmpRPpath> m_partPath;
 

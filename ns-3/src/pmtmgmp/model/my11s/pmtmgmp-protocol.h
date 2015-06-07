@@ -40,6 +40,7 @@ namespace ns3 {
 		class IePreq;
 		class IePrep;
 #ifndef PMTMGMP_UNUSED_MY_CODE
+		class PmtmgmpRPRouteTable;
 		class IeSecreq;
 		class IeSecrep;
 		class IeSecack;
@@ -120,6 +121,8 @@ namespace ns3 {
 			NodeType GetNodeType();
 			////获取AALM技术时采用的m的值
 			uint8_t GetValueMForAALM();
+			////获取设置的MTERP可以附带的MSECP最大数量
+			uint8_t GetMSECPnumForMTERP() const;
 #endif
 
 		private:
@@ -408,6 +411,8 @@ namespace ns3 {
 			double m_PMTMGMPmterpAALMmagnification;
 			////MSECP积累传播时间链接度量倍率
 			double m_PMTMGMPmsecpAALMmagnification;
+			////Pmtmgmp路由表
+			Ptr<PmtmgmpRPRouteTable> m_RouteTable;
 #endif
 		};
 	} // namespace my11s
