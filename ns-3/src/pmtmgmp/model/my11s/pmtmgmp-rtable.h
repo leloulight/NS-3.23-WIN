@@ -45,7 +45,7 @@ namespace ns3 {
 			void SetPathUpdateSeqNumber(uint32_t seq_number);
 			void SetNodeType(PmtmgmpProtocol::NodeType nodeType);
 			void SetHopcount(uint8_t hopcount);
-			void SetMetric(uint32_t metric);
+			void SetMetric(double metric);
 
 			Mac48Address GetMTERPaddress() const;
 			Mac48Address GetMSECPaddress() const;
@@ -53,7 +53,7 @@ namespace ns3 {
 			uint32_t GetPathUpdateSeqNumber() const;
 			PmtmgmpProtocol::NodeType GetNodeType() const;
 			uint8_t  GetHopCount() const;
-			uint32_t GetMetric() const;
+			double GetMetric() const;
 
 			////获取路径重复度
 			uint8_t GetPartPathRepeatability(PmtmgmpRPpath compare);
@@ -65,6 +65,9 @@ namespace ns3 {
 			uint8_t GetMaxNodeListNum();
 			////获取路径当前结点数量
 			uint8_t GetCurrentNodeListNum();
+
+			////复制类
+			Ptr<PmtmgmpRPpath> GetCopy();
 		private:
 			////路由路径状态
 			//enum RouteInformationStatus
@@ -93,7 +96,7 @@ namespace ns3 {
 			uint32_t m_PathUpdateSeqNumber;
 			PmtmgmpProtocol::NodeType m_NodeType;
 			uint8_t  m_hopCount;
-			uint32_t m_metric;
+			double m_metric;
 			std::vector<Mac48Address>  m_partPath;
 
 			////最大允许的部分路径长度

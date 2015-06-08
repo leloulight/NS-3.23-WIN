@@ -72,7 +72,7 @@ namespace ns3 {
 		{
 			m_ttl = ttl;
 		}
-		void IePgen::SetMetric(uint32_t metric)
+		void IePgen::SetMetric(double metric)
 		{
 			m_partPath->SetMetric(metric);
 		}
@@ -104,7 +104,7 @@ namespace ns3 {
 		{
 			return m_ttl;
 		}
-		uint32_t IePgen::GetMetric() const
+		double IePgen::GetMetric() const
 		{
 			return m_partPath->GetMetric();
 		}
@@ -117,12 +117,12 @@ namespace ns3 {
 			m_ttl--;
 			m_partPath->SetHopcount(m_partPath->GetHopCount() + 1);
 		}
-		void IePgen::IncrementMetric(uint32_t metric, double m, uint8_t q)
+		void IePgen::IncrementMetric(double metric, double k)
 		{
 			double lastAALM = m_partPath->GetMetric();
 			double newALM = metric;
 			////按公式积累计算度量，见AALM计算公式
-			m_partPath->SetMetric(std::floor((2 * m * newALM * (q + 1) + (m_partPath->GetHopCount() - 1)) / (m_partPath->GetHopCount() + 1) + 0.5));
+			m_partPath->SetMetric((double)(k * newALM + (m_partPath->GetHopCount() - 1) * metric / sqrt(m_partPath->GetHopCount())) / sqrt(m_partPath->GetHopCount() + 1));
 		}
 		WifiInformationElementId IePgen::ElementId() const
 		{
@@ -199,7 +199,7 @@ namespace ns3 {
 				+ 1 									//NodeType
 				+ 1										//Hopcount
 				+ 1										//TTL
-				+ 4										//metric
+				+ 8										//metric
 				+ 1										//Part Path Node List Size
 				+ m_partPath->GetPartPath().size() * 6;	//Part Path Node List
 			return retval;

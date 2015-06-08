@@ -44,6 +44,7 @@
 #include "ns3/ie-my11s-secrep.h"
 #include "ns3/ie-my11s-secack.h"
 #include "ns3/ie-my11s-pgen.h"
+
 #endif
 
 namespace ns3 {
@@ -1495,6 +1496,27 @@ namespace ns3 {
 			}
 			else 
 			{
+				////PGEN信息更新
+				pgen.DecrementTtl();
+				double magnification;
+				switch (m_NodeType)
+				{
+				case Mesh_Access_Point:
+				case Mesh_Portal:
+					magnification = m_PMTMGMPmterpAALMmagnification;
+					break;
+				case Mesh_Secondary_Point:
+					magnification = m_PMTMGMPmsecpAALMmagnification;
+					break;
+				case Mesh_STA:
+					magnification = 1;
+					break;
+				default:
+					NS_LOG_ERROR("Error node type.");
+				}
+				pgen.IncrementMetric(metric, magnification);
+
+				////路由表更新
 				uint32_t GenSeqNum = pgen.GetPathGenerationSequenceNumber();
 				if (GenSeqNum > pTree->GetTreeMaxGenerationSeqNumber())
 				{
@@ -1505,26 +1527,22 @@ namespace ns3 {
 				{
 					////已有相同当前序号的其他PGEN到达
 					Ptr<PmtmgmpRPpath> pPath = pTree->GetPathByMACaddress(pgen.GetOriginatorAddress(), pgen.GetMSECPaddress());
-
+					if (pPath->GetPathGenerationSequenceNumber() > pgen.GetPathGenerationSequenceNumber())
+					{
+						////PGEN所属路径生成信息未确定
+						m_RouteTable->AddNewPath(pgen.GetPartPath());
+					}
+					else
+					{
+						////PGEN所属路径生成信息已确定
+						return;
+					}
 				}
 				else
 				{
 					////过期PGEN，放弃
 					return;
 				}
-			}
-			////根据当前结点信息做处理
-			switch (m_NodeType)
-			{
-			case Mesh_Access_Point:
-			case Mesh_Portal:
-				break;
-			case Mesh_Secondary_Point:
-				break;
-			case Mesh_STA:
-				break;
-			default:
-				NS_LOG_ERROR("Error node type.");
 			}
 		}
 #endif

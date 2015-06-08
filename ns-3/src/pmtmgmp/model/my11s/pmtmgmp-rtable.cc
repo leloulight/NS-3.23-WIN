@@ -94,7 +94,7 @@ namespace ns3 {
 		{
 			m_hopCount = hopcount;
 		}
-		void PmtmgmpRPpath::SetMetric(uint32_t metric)
+		void PmtmgmpRPpath::SetMetric(double metric)
 		{
 			m_metric = metric;
 		}
@@ -122,7 +122,7 @@ namespace ns3 {
 		{
 			return m_hopCount;
 		}
-		uint32_t PmtmgmpRPpath::GetMetric() const
+		double PmtmgmpRPpath::GetMetric() const
 		{
 			return m_metric;
 		}
@@ -170,6 +170,23 @@ namespace ns3 {
 		uint8_t PmtmgmpRPpath::GetCurrentNodeListNum()
 		{
 			return m_partPath.size();
+		}
+		////复制类
+		Ptr<PmtmgmpRPpath> PmtmgmpRPpath::GetCopy()
+		{
+			Ptr<PmtmgmpRPpath> copy = CreateObject<PmtmgmpRPpath>();
+			copy->SetMTERPaddress(m_MTERPaddress);
+			copy->SetMSECPaddress(m_MTERPaddress);
+			copy->SetPathGenerationSequenceNumber(m_PathGenerationSeqNumber);
+			copy->SetPathUpdateSeqNumber(m_PathUpdateSeqNumber);
+			copy->SetNodeType(m_NodeType);
+			copy->SetHopcount(m_hopCount);
+			copy->SetMetric(m_metric);
+			for (std::vector<Mac48Address>::iterator selectIter = m_partPath.begin(); selectIter != m_partPath.end(); selectIter++)
+			{
+				copy->AddPartPathNode(*selectIter);
+			}
+			return copy;
 		}
 		/*************************
 		* PmtmgmpRPtree
@@ -253,7 +270,7 @@ namespace ns3 {
 			{
 				m_partTree.erase(exist);
 			}
-			m_partTree.push_back(path);
+			m_partTree.push_back(path->GetCopy());
 			if (m_partTree.size() > m_MSECPnumForMTERP) NS_LOG_ERROR("Too many path have add to tree");
 		}
 		////获取当前路径的最大生成顺序号
