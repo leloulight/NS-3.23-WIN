@@ -302,9 +302,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "visualizer", "visualizer\vi
 		{FCAE684C-D6B0-4D31-8836-1D0875A98D65} = {FCAE684C-D6B0-4D31-8836-1D0875A98D65}
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0AC202A1-7078-4253-A8C9-31EA3D735DCA}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "相关说明", "相关说明", "{0AC202A1-7078-4253-A8C9-31EA3D735DCA}"
 	ProjectSection(SolutionItems) = preProject
-		先验多树多网关多路径无线Mesh协议.docx = 先验多树多网关多路径无线Mesh协议.docx
+		相关说明\MSECP筛选.vsdx = 相关说明\MSECP筛选.vsdx
+		相关说明\先验多树多网关多路径无线Mesh协议.docx = 相关说明\先验多树多网关多路径无线Mesh协议.docx
+		相关说明\先验树生成.vsdx = 相关说明\先验树生成.vsdx
 	EndProjectSection
 EndProject
 Global
