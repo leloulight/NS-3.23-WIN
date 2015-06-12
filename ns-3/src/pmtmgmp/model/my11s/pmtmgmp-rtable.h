@@ -73,15 +73,15 @@ namespace ns3 {
 			Ptr<PmtmgmpRPpath> GetCopy();
 		private:
 			////路由路径状态
-			//enum RouteInformationStatus
-			//{
-			//	////数据过期
-			//	Expired,
-			//	////等待确定
-			//	Waited,
-			//	////已经确定
-			//	Confirmed,
-			//};
+			enum RouteInformationStatus
+			{
+				////数据过期
+				Expired,
+				////等待确定
+				Waited,
+				////已经确定
+				Confirmed,
+			};
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			////路由表路径搜索器
 			struct PmtmgmpRPpath_Finder
@@ -108,6 +108,9 @@ namespace ns3 {
 			////最大允许的部分路径长度
 			uint8_t m_PMTMGMPpathNodeListNum;
 #endif
+			////候选路由信息列表
+			std::vector<Ptr<PmtmgmpRPpath>>  m_CandidateRouteInformaiton;
+
 		};
 
 		////路由表树

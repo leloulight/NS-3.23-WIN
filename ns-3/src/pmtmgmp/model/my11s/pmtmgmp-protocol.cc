@@ -1489,6 +1489,26 @@ namespace ns3 {
 		////接收PGEN
 		void PmtmgmpProtocol::ReceivePgen(IePgen pgen, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
+			////PGEN信息更新
+			pgen.DecrementTtl();
+			double magnification;
+			switch (m_NodeType)
+			{
+			case Mesh_Access_Point:
+			case Mesh_Portal:
+				magnification = m_PMTMGMPmterpAALMmagnification;
+				break;
+			case Mesh_Secondary_Point:
+				magnification = m_PMTMGMPmsecpAALMmagnification;
+				break;
+			case Mesh_STA:
+				magnification = 1;
+				break;
+			default:
+				NS_LOG_ERROR("Error node type.");
+			}
+			pgen.IncrementMetric(metric, magnification);
+
 			////将路由信息加入路由表
 			Ptr<PmtmgmpRPtree> pTree = m_RouteTable->GetTreeByMACaddress(pgen.GetOriginatorAddress());
 			if (pTree == 0)
@@ -1498,32 +1518,12 @@ namespace ns3 {
 			}
 			else 
 			{
-				////PGEN信息更新
-				pgen.DecrementTtl();
-				double magnification;
-				switch (m_NodeType)
-				{
-				case Mesh_Access_Point:
-				case Mesh_Portal:
-					magnification = m_PMTMGMPmterpAALMmagnification;
-					break;
-				case Mesh_Secondary_Point:
-					magnification = m_PMTMGMPmsecpAALMmagnification;
-					break;
-				case Mesh_STA:
-					magnification = 1;
-					break;
-				default:
-					NS_LOG_ERROR("Error node type.");
-				}
-				pgen.IncrementMetric(metric, magnification);
-
-				////路由表更新
+				////验证GSN
 				uint32_t GenSeqNum = pgen.GetPathGenerationSequenceNumber();
 				if (GenSeqNum > pTree->GetTreeMaxGenerationSeqNumber())
 				{
 					////当前路由表中没有相同生成顺序号的记录，此为到达的第一个PGEN。
-					m_RouteTable->AddNewPath(pgen.GetPartPath());
+					m_RouteTable->AddNewPath(pgen.GetPartPath()->GetCopy());
 				}
 				else if (GenSeqNum > pTree->GetTreeMaxGenerationSeqNumber())
 				{
@@ -1546,6 +1546,7 @@ namespace ns3 {
 					return;
 				}
 			}
+			if (pgen.GetTtl() > 0);////转发PGEN
 		}
 #endif
 	} // namespace my11s
