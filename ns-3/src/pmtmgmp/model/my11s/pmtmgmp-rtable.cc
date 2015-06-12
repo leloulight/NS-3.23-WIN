@@ -42,8 +42,11 @@ namespace ns3 {
 		/*************************
 		* PmtmgmpRPpath
 		************************/
-		PmtmgmpRPpath::PmtmgmpRPpath() :
+		PmtmgmpRPpath::PmtmgmpRPpath()
+#ifdef ROUTE_USE_PART_PATH ////不使用部分路径
+			:
 			m_PMTMGMPpathNodeListNum(2)
+#endif
 		{
 		}
 
@@ -56,6 +59,7 @@ namespace ns3 {
 				.SetParent<Object>()
 				.SetGroupName("Wmn")
 				.AddConstructor<PmtmgmpRPpath>()
+#ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 				.AddAttribute("PMTMGMPpgenNodeListNum",
 					"Maximum number of the last part of the path that PGEN have generationed, which is used for computing the repeatability of path. t need define the same as \"ns3::my11s::PmtmgmpProtocol::MSECPnumForMTERP\"",
 					UintegerValue(4),
@@ -63,13 +67,16 @@ namespace ns3 {
 						&PmtmgmpRPpath::m_PMTMGMPpathNodeListNum),
 					MakeUintegerChecker<uint8_t>(0)
 					)
+#endif
 				;
 			return tid;
 		}
+#ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 		std::vector<Mac48Address> PmtmgmpRPpath::GetPartPath() const
 		{
 			return m_partPath;
 		}
+#endif
 		void PmtmgmpRPpath::SetMTERPaddress(Mac48Address address)
 		{
 			m_MTERPaddress = address;
@@ -126,6 +133,7 @@ namespace ns3 {
 		{
 			return m_metric;
 		}
+#ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 		////获取路径重复度
 		uint8_t PmtmgmpRPpath::GetPartPathRepeatability(PmtmgmpRPpath compare)
 		{
@@ -171,6 +179,7 @@ namespace ns3 {
 		{
 			return m_partPath.size();
 		}
+#endif
 		////复制类
 		Ptr<PmtmgmpRPpath> PmtmgmpRPpath::GetCopy()
 		{
@@ -182,10 +191,12 @@ namespace ns3 {
 			copy->SetNodeType(m_NodeType);
 			copy->SetHopcount(m_hopCount);
 			copy->SetMetric(m_metric);
+#ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			for (std::vector<Mac48Address>::iterator selectIter = m_partPath.begin(); selectIter != m_partPath.end(); selectIter++)
 			{
 				copy->AddPartPathNode(*selectIter);
 			}
+#endif
 			return copy;
 		}
 		/*************************

@@ -35,9 +35,11 @@ namespace ns3 {
 			IePgen();
 			~IePgen();
 
+#ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			////附带路径相关函数
 			void AddPartPathNode(Mac48Address address);
 			Ptr<PmtmgmpRPpath> GetPartPathNodeList();
+#endif
 			
 			// Setters for fields:
 			void SetOriginatorAddress(Mac48Address originator_address);

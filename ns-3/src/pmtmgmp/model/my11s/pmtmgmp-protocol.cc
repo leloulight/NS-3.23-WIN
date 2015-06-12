@@ -1475,9 +1475,11 @@ namespace ns3 {
 			Pgen.SetHopcount(1);
 			Pgen.SetTTL(1);
 			Pgen.SetMetric(metric);
+#ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			////添加原始默认路径（源节点到当前辅助节点）
 			Pgen.AddPartPathNode(secack.GetOriginatorAddress());
 			Pgen.AddPartPathNode(m_address);
+#endif
 
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
@@ -1492,7 +1494,7 @@ namespace ns3 {
 			if (pTree == 0)
 			{
 				////当前路由表中不存在来自PGEN源节点的路径
-				m_RouteTable->AddNewPath(pgen.GetPartPath());
+				m_RouteTable->AddNewPath(pgen.GetPartPath()->GetCopy());
 			}
 			else 
 			{
