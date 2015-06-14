@@ -38,14 +38,13 @@ namespace ns3 {
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			////附带路径相关函数
 			void AddPartPathNode(Mac48Address address);
-			Ptr<PmtmgmpRPpath> GetPartPathNodeList();
 #endif
+			Ptr<PmtmgmpRPpath> GetPathInfo();
 			
 			// Setters for fields:
 			void SetOriginatorAddress(Mac48Address originator_address);
 			void SetMSECPaddress(Mac48Address mSECP_address);
 			void SetPathGenerationSequenceNumber(uint32_t seq_number);
-			void SetPathUpdateSeqNumber(uint32_t seq_number);
 			void SetNodeType(PmtmgmpProtocol::NodeType nodeType);
 			void SetHopcount(uint8_t hopcount);
 			void SetTTL(uint8_t ttl);
@@ -55,12 +54,11 @@ namespace ns3 {
 			Mac48Address GetOriginatorAddress() const;
 			Mac48Address GetMSECPaddress() const;
 			uint32_t GetPathGenerationSequenceNumber() const;
-			uint32_t GetPathUpdateSeqNumber() const;
 			PmtmgmpProtocol::NodeType GetNodeType() const;
 			uint8_t  GetHopCount() const;
 			uint8_t  GetTtl() const;
 			double GetMetric() const;
-			Ptr<PmtmgmpRPpath> GetPartPath() const;
+			Ptr<PmtmgmpRPpath> GetPathInfo() const;
 
 			/// Handle TTL and Metric:
 			void  DecrementTtl();
@@ -74,7 +72,7 @@ namespace ns3 {
 			virtual void Print(std::ostream& os) const;
 		private:
 			uint8_t  m_ttl;
-			Ptr<PmtmgmpRPpath> m_partPath;
+			Ptr<PmtmgmpRPpath> m_PathInfo;
 
 			friend bool operator== (const IePgen & a, const IePgen & b);
 		};

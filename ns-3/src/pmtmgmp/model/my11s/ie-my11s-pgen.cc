@@ -33,42 +33,38 @@ namespace ns3 {
 		}
 		IePgen::IePgen()
 		{
-			m_partPath = CreateObject<PmtmgmpRPpath>();
+			m_PathInfo = CreateObject<PmtmgmpRPpath>();
 		}
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 		////附带路径相关函数
 		void IePgen::AddPartPathNode(Mac48Address address)
 		{
-			m_partPath->AddPartPathNode(address);
-		}
-		Ptr<PmtmgmpRPpath> IePgen::GetPartPathNodeList()
-		{
-			return m_partPath;
+			m_PathInfo->AddPartPathNode(address);
 		}
 #endif
+		Ptr<PmtmgmpRPpath> IePgen::GetPathInfo()
+		{
+			return m_PathInfo;
+		}
 		void IePgen::SetOriginatorAddress(Mac48Address originator_address)
 		{
-			m_partPath->SetMTERPaddress(originator_address);
+			m_PathInfo->SetMTERPaddress(originator_address);
 		}
 		void IePgen::SetMSECPaddress(Mac48Address mSECP_address)
 		{
-			m_partPath->SetMSECPaddress(mSECP_address);
+			m_PathInfo->SetMSECPaddress(mSECP_address);
 		}
 		void IePgen::SetPathGenerationSequenceNumber(uint32_t seq_number)
 		{
-			m_partPath->SetPathGenerationSequenceNumber(seq_number);
-		}
-		void IePgen::SetPathUpdateSeqNumber(uint32_t seq_number)
-		{
-			m_partPath->SetPathUpdateSeqNumber(seq_number);
+			m_PathInfo->SetPathGenerationSequenceNumber(seq_number);
 		}
 		void IePgen::SetNodeType(PmtmgmpProtocol::NodeType nodeType)
 		{
-			m_partPath->SetNodeType(nodeType);
+			m_PathInfo->SetNodeType(nodeType);
 		}
 		void IePgen::SetHopcount(uint8_t hopcount)
 		{
-			m_partPath->SetHopcount(hopcount);
+			m_PathInfo->SetHopcount(hopcount);
 		}
 		void IePgen::SetTTL(uint8_t ttl)
 		{
@@ -76,31 +72,27 @@ namespace ns3 {
 		}
 		void IePgen::SetMetric(double metric)
 		{
-			m_partPath->SetMetric(metric);
+			m_PathInfo->SetMetric(metric);
 		}
 		Mac48Address IePgen::GetOriginatorAddress() const
 		{
-			return m_partPath->GetMTERPaddress();
+			return m_PathInfo->GetMTERPaddress();
 		}
 		Mac48Address IePgen::GetMSECPaddress() const
 		{
-			return m_partPath->GetMSECPaddress();
+			return m_PathInfo->GetMSECPaddress();
 		}
 		uint32_t IePgen::GetPathGenerationSequenceNumber() const
 		{
-			return m_partPath->GetPathGenerationSequenceNumber();
-		}
-		uint32_t IePgen::GetPathUpdateSeqNumber() const
-		{
-			return m_partPath->GetPathUpdateSeqNumber();
+			return m_PathInfo->GetPathGenerationSequenceNumber();
 		}
 		PmtmgmpProtocol::NodeType IePgen::GetNodeType() const
 		{
-			return m_partPath->GetNodeType();
+			return m_PathInfo->GetNodeType();
 		}
 		uint8_t IePgen::GetHopCount() const
 		{
-			return m_partPath->GetHopCount();
+			return m_PathInfo->GetHopCount();
 		}
 		uint8_t IePgen::GetTtl() const
 		{
@@ -108,23 +100,23 @@ namespace ns3 {
 		}
 		double IePgen::GetMetric() const
 		{
-			return m_partPath->GetMetric();
+			return m_PathInfo->GetMetric();
 		}
-		Ptr<PmtmgmpRPpath> IePgen::GetPartPath() const
+		Ptr<PmtmgmpRPpath> IePgen::GetPathInfo() const
 		{
-			return m_partPath;
+			return m_PathInfo;
 		}
 		void IePgen::DecrementTtl()
 		{
 			m_ttl--;
-			m_partPath->SetHopcount(m_partPath->GetHopCount() + 1);
+			m_PathInfo->SetHopcount(m_PathInfo->GetHopCount() + 1);
 		}
 		void IePgen::IncrementMetric(double metric, double k)
 		{
-			double lastAALM = m_partPath->GetMetric();
+			double lastAALM = m_PathInfo->GetMetric();
 			double newALM = metric;
 			////按公式积累计算度量，见AALM计算公式
-			m_partPath->SetMetric((double)(k * newALM + (m_partPath->GetHopCount() - 1) * metric / sqrt(m_partPath->GetHopCount())) / sqrt(m_partPath->GetHopCount() + 1));
+			m_PathInfo->SetMetric((double)(k * newALM + (m_PathInfo->GetHopCount() - 1) * metric / sqrt(m_PathInfo->GetHopCount())) / sqrt(m_PathInfo->GetHopCount() + 1));
 		}
 		WifiInformationElementId IePgen::ElementId() const
 		{
@@ -133,18 +125,17 @@ namespace ns3 {
 		void IePgen::Print(std::ostream &os) const
 		{
 			os << std::endl << "<information_element id=" << ElementId() << ">" << std::endl;
-			os << " originator address               = " << m_partPath->GetMSECPaddress() << std::endl;
-			os << " MSECP address                    = " << m_partPath->GetMSECPaddress() << std::endl;
-			os << " path generation sequence number  = " << m_partPath->GetPathGenerationSequenceNumber() << std::endl;
-			os << " path update sequence number      = " << m_partPath->GetPathUpdateSeqNumber() << std::endl;
-			os << " node type                        = " << m_partPath->GetNodeType() << std::endl;
+			os << " originator address               = " << m_PathInfo->GetMSECPaddress() << std::endl;
+			os << " MSECP address                    = " << m_PathInfo->GetMSECPaddress() << std::endl;
+			os << " path generation sequence number  = " << m_PathInfo->GetPathGenerationSequenceNumber() << std::endl;
+			os << " node type                        = " << m_PathInfo->GetNodeType() << std::endl;
 			os << " TTL                              = " << (uint16_t)m_ttl << std::endl;
-			os << " hop count                        = " << (uint16_t)m_partPath->GetHopCount() << std::endl;
-			os << " metric                           = " << m_partPath->GetMetric() << std::endl;
+			os << " hop count                        = " << (uint16_t)m_PathInfo->GetHopCount() << std::endl;
+			os << " metric                           = " << m_PathInfo->GetMetric() << std::endl;
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			os << " Part Path Node List are:" << std::endl;
-			for (std::vector<Mac48Address>::const_iterator iter = m_partPath->GetPartPath().begin(); iter
-				!= m_partPath->GetPartPath().end(); iter++)
+			for (std::vector<Mac48Address>::const_iterator iter = m_PathInfo->GetPathInfo().begin(); iter
+				!= m_PathInfo->GetPathInfo().end(); iter++)
 			{
 				os << "    " << *iter << std::endl;
 			}
@@ -153,19 +144,18 @@ namespace ns3 {
 		}
 		void IePgen::SerializeInformationField(Buffer::Iterator i) const
 		{
-			WriteTo(i, m_partPath->GetMSECPaddress());
-			WriteTo(i, m_partPath->GetMSECPaddress());
-			i.WriteHtolsbU32(m_partPath->GetPathGenerationSequenceNumber());
-			i.WriteHtolsbU32(m_partPath->GetPathUpdateSeqNumber());
-			i.WriteU8(m_partPath->GetNodeType());
-			i.WriteU8(m_partPath->GetHopCount());
+			WriteTo(i, m_PathInfo->GetMSECPaddress());
+			WriteTo(i, m_PathInfo->GetMSECPaddress());
+			i.WriteHtolsbU32(m_PathInfo->GetPathGenerationSequenceNumber());
+			i.WriteU8(m_PathInfo->GetNodeType());
+			i.WriteU8(m_PathInfo->GetHopCount());
 			i.WriteU8(m_ttl);
-			i.WriteHtolsbU32(m_partPath->GetMetric());
+			i.WriteHtolsbU32(m_PathInfo->GetMetric());
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
-			i.WriteU8(m_partPath->GetCurrentNodeListNum());
+			i.WriteU8(m_PathInfo->GetCurrentNodeListNum());
 
 			////避免 vector循环报错
-			std::vector<Mac48Address> nodelist = m_partPath->GetPartPath();
+			std::vector<Mac48Address> nodelist = m_PathInfo->GetPathInfo();
 
 			for (std::vector<Mac48Address>::const_iterator iter = nodelist.begin(); iter != nodelist.end(); iter++)
 			{
@@ -178,22 +168,21 @@ namespace ns3 {
 			Buffer::Iterator i = start;
 			Mac48Address address;
 			ReadFrom(i, address);
-			m_partPath->SetMTERPaddress(address);
+			m_PathInfo->SetMTERPaddress(address);
 			ReadFrom(i, address);
-			m_partPath->SetMSECPaddress(address); 
-			m_partPath->SetPathGenerationSequenceNumber(i.ReadLsbtohU32());
-			m_partPath->SetPathUpdateSeqNumber(i.ReadLsbtohU32());
-			m_partPath->SetNodeType((PmtmgmpProtocol::NodeType) i.ReadU8());
-			m_partPath->SetHopcount(i.ReadU8());
+			m_PathInfo->SetMSECPaddress(address); 
+			m_PathInfo->SetPathGenerationSequenceNumber(i.ReadLsbtohU32());
+			m_PathInfo->SetNodeType((PmtmgmpProtocol::NodeType) i.ReadU8());
+			m_PathInfo->SetHopcount(i.ReadU8());
 			m_ttl = i.ReadU8();
-			m_partPath->SetMetric(i.ReadLsbtohU32());
+			m_PathInfo->SetMetric(i.ReadLsbtohU32());
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			uint8_t size = i.ReadU8();
 			Mac48Address temp;
 			for (int j = 0; j < size; j++)
 			{
 				ReadFrom(i, temp);
-				m_partPath->AddPartPathNode(temp);
+				m_PathInfo->AddPartPathNode(temp);
 			}
 #endif
 			return i.GetDistanceFrom(start);
@@ -203,14 +192,13 @@ namespace ns3 {
 			uint8_t retval = 6							//Source address (originator)
 				+ 6										//MSECP address
 				+ 4										//Path Generation Sequence Number
-				+ 4										//Path Update Sequence Number
 				+ 1 									//NodeType
 				+ 1										//Hopcount
 				+ 1										//TTL
 				+ 8										//metric
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 				+ 1										//Part Path Node List Size
-				+ m_partPath->GetPartPath().size() * 6	//Part Path Node List
+				+ m_PathInfo->GetPathInfo().size() * 6	//Part Path Node List
 #endif
 				;
 			return retval;

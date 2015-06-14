@@ -37,24 +37,43 @@ namespace ns3 {
 			PmtmgmpRPpath();
 			~PmtmgmpRPpath(); 
 			static TypeId GetTypeId();
+
+			////路由路径状态
+			enum RouteInformationStatus
+			{
+				////过期
+				Expired,
+				////等待
+				Waited,
+				////确认
+				Confirmed,
+			};
+
+			////候选信息
+			void AddCandidateRouteInformaiton(Ptr<PmtmgmpRPpath> path);
+			void ClearCandidateRouteInformaiton();
+			std::vector<Ptr<PmtmgmpRPpath>> GetCandidateRouteInformaiton();
+
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
-			std::vector<Mac48Address> GetPartPath() const;
+			std::vector<Mac48Address> GetPathInfo() const;
 #endif
 			void SetMTERPaddress(Mac48Address address);
 			void SetMSECPaddress(Mac48Address address);
 			void SetPathGenerationSequenceNumber(uint32_t seq_number);
-			void SetPathUpdateSeqNumber(uint32_t seq_number);
 			void SetNodeType(PmtmgmpProtocol::NodeType nodeType);
 			void SetHopcount(uint8_t hopcount);
 			void SetMetric(double metric);
+			void SetFromNode(Mac48Address address);
+			void SetStatus(RouteInformationStatus status);
 
 			Mac48Address GetMTERPaddress() const;
 			Mac48Address GetMSECPaddress() const;
 			uint32_t GetPathGenerationSequenceNumber() const;
-			uint32_t GetPathUpdateSeqNumber() const;
 			PmtmgmpProtocol::NodeType GetNodeType() const;
 			uint8_t  GetHopCount() const;
 			double GetMetric() const;
+			Mac48Address GetFromNode() const;
+			RouteInformationStatus GetStatus() const;
 
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			////获取路径重复度
@@ -72,16 +91,6 @@ namespace ns3 {
 			////复制类
 			Ptr<PmtmgmpRPpath> GetCopy();
 		private:
-			////路由路径状态
-			enum RouteInformationStatus
-			{
-				////数据过期
-				Expired,
-				////等待确定
-				Waited,
-				////已经确定
-				Confirmed,
-			};
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			////路由表路径搜索器
 			struct PmtmgmpRPpath_Finder
@@ -98,19 +107,25 @@ namespace ns3 {
 			Mac48Address m_MTERPaddress;
 			Mac48Address m_MSECPaddress;
 			uint32_t m_PathGenerationSeqNumber;
-			uint32_t m_PathUpdateSeqNumber;
 			PmtmgmpProtocol::NodeType m_NodeType;
 			uint8_t  m_hopCount;
 			double m_metric;
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
-			std::vector<Mac48Address>  m_partPath;
+			std::vector<Mac48Address>  m_PathInfo;
 
 			////最大允许的部分路径长度
 			uint8_t m_PMTMGMPpathNodeListNum;
 #endif
 			////候选路由信息列表
 			std::vector<Ptr<PmtmgmpRPpath>>  m_CandidateRouteInformaiton;
+			RouteInformationStatus m_InformationStatus;
 
+			////延迟等待接受路径信息事件
+			EventId m_AcceptCandidateRouteInformaitonEvent;
+			Time m_AcceptInformaitonDelay;
+
+			////来源节点MAC
+			Mac48Address m_FormNode;
 		};
 
 		////路由表树
@@ -127,23 +142,32 @@ namespace ns3 {
 			Mac48Address GetMTERPaddress() const;
 			
 			////获取MTERP、MSECP对应的Path
-			Ptr<PmtmgmpRPpath> GetPathByMACaddress(Mac48Address mterp, Mac48Address msecp);
+			Ptr<PmtmgmpRPpath> GetPathByMACaddress(Mac48Address msecp);
 			////获取度量最小的路径
 			std::vector<Ptr<PmtmgmpRPpath>> GetBestPath();
 			////添加新路径
 			void AddNewPath(Ptr<PmtmgmpRPpath> path);
 			////获取当前路径的最大生成顺序号
 			uint32_t GetTreeMaxGenerationSeqNumber();
+			////全部路径置为过期
+			void SetAllStatusExpired();
+			////获取重复度
+			uint8_t GetRepeatability(Mac48Address from);
+			////增加重复度计量
+			void RepeatabilityIncrease(Mac48Address from);
+			////重置全部重复度
+			void RepeatabilityReset();
+			////接受某个候选信息
+			void AcceptCandidateRouteInformaiton(Mac48Address address);
 		private:
 			////路由表树搜索器
 			struct PmtmgmpRPtree_Finder
 			{
-				PmtmgmpRPtree_Finder(Mac48Address mterp, Mac48Address msecp) :m_mterp(mterp), m_msecp(msecp){};
+				PmtmgmpRPtree_Finder(Mac48Address msecp) :m_msecp(msecp){};
 				bool operator()(Ptr<PmtmgmpRPpath> p)
 				{
-					return m_mterp == p->GetMTERPaddress() && m_msecp == p->GetMSECPaddress();
+					return m_msecp == p->GetMSECPaddress();
 				}
-				Mac48Address m_mterp;
 				Mac48Address m_msecp;
 			};
 		private:
@@ -152,6 +176,9 @@ namespace ns3 {
 
 			////终端节点可拥有的辅助节点数量
 			uint8_t m_MSECPnumForMTERP;
+
+			////路径重复度计量
+			std::map<Mac48Address, uint8_t> m_repeatability;
 		};
 
 		////路由表

@@ -1470,7 +1470,6 @@ namespace ns3 {
 			Pgen.SetOriginatorAddress(secack.GetOriginatorAddress());
 			Pgen.SetMSECPaddress(m_address);
 			Pgen.SetPathGenerationSequenceNumber(secack.GetPathGenerationSequenceNumber());
-			Pgen.SetPathUpdateSeqNumber(secack.GetPathUpdateSeqNumber());
 			Pgen.SetNodeType(secack.GetNodeType());
 			Pgen.SetHopcount(1);
 			Pgen.SetTTL(1);
@@ -1489,6 +1488,9 @@ namespace ns3 {
 		////接收PGEN
 		void PmtmgmpProtocol::ReceivePgen(IePgen pgen, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
+			////获取PGEN副本
+			Ptr<PmtmgmpRPpath> pathCopy = pgen.GetPathInfo()->GetCopy();
+
 			////PGEN信息更新
 			pgen.DecrementTtl();
 			double magnification;
@@ -1508,31 +1510,50 @@ namespace ns3 {
 				NS_LOG_ERROR("Error node type.");
 			}
 			pgen.IncrementMetric(metric, magnification);
+			pathCopy->SetFromNode(from);
 
-			////将路由信息加入路由表
+			////路由表是否存在PGEN来源对应路径
 			Ptr<PmtmgmpRPtree> pTree = m_RouteTable->GetTreeByMACaddress(pgen.GetOriginatorAddress());
 			if (pTree == 0)
 			{
 				////当前路由表中不存在来自PGEN源节点的路径
-				m_RouteTable->AddNewPath(pgen.GetPartPath()->GetCopy());
+				pathCopy->SetStatus(PmtmgmpRPpath::Confirmed);
+				pTree->RepeatabilityIncrease(from);
+				pTree->AddNewPath(pathCopy);
 			}
 			else 
 			{
-				////验证GSN
-				uint32_t GenSeqNum = pgen.GetPathGenerationSequenceNumber();
+				////PGEN与全部路径的GSN比较
+				uint32_t GenSeqNum = pathCopy->GetPathGenerationSequenceNumber();
 				if (GenSeqNum > pTree->GetTreeMaxGenerationSeqNumber())
 				{
 					////当前路由表中没有相同生成顺序号的记录，此为到达的第一个PGEN。
-					m_RouteTable->AddNewPath(pgen.GetPartPath()->GetCopy());
+					pTree->SetAllStatusExpired();
+					pathCopy->SetStatus(PmtmgmpRPpath::Confirmed);
+					pTree->RepeatabilityIncrease(from);
+					pTree->AddNewPath(pathCopy);
 				}
 				else if (GenSeqNum > pTree->GetTreeMaxGenerationSeqNumber())
 				{
 					////已有相同当前序号的其他PGEN到达
-					Ptr<PmtmgmpRPpath> pPath = pTree->GetPathByMACaddress(pgen.GetOriginatorAddress(), pgen.GetMSECPaddress());
-					if (pPath->GetPathGenerationSequenceNumber() > pgen.GetPathGenerationSequenceNumber())
+					Ptr<PmtmgmpRPpath> existPath = pTree->GetPathByMACaddress(pathCopy->GetMSECPaddress());
+					if (existPath->GetPathGenerationSequenceNumber() > pathCopy->GetPathGenerationSequenceNumber())
 					{
 						////PGEN所属路径生成信息未确定
-						m_RouteTable->AddNewPath(pgen.GetPartPath());
+						switch (existPath->GetStatus())
+						{
+						case PmtmgmpRPpath::Expired:
+							existPath->AddCandidateRouteInformaiton(pathCopy);
+							pathCopy->SetStatus(PmtmgmpRPpath::Waited);
+							break;
+						case PmtmgmpRPpath::Waited:
+							existPath->AddCandidateRouteInformaiton(pathCopy);
+							pathCopy->SetStatus(PmtmgmpRPpath::Waited);
+							break;
+						case PmtmgmpRPpath::Confirmed:
+							NS_LOG_ERROR("Path is Confirmed ,but GSN is not update");
+							break;
+						}
 					}
 					else
 					{
