@@ -26,6 +26,7 @@
 #ifndef PMTMGMP_UNUSED_MY_CODE
  ////find_if
 #include <algorithm>
+#include "ns3/random-variable-stream.h"
 #endif
 
 #include "pmtmgmp-rtable.h"
@@ -46,8 +47,7 @@ namespace ns3 {
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			m_PMTMGMPpathNodeListNum(2),
 #endif
-			m_InformationStatus(Confirmed),
-			m_AcceptInformaitonDelay(MicroSeconds(1024 * 10))
+			m_InformationStatus(Confirmed)
 		{
 		}
 
@@ -70,13 +70,6 @@ namespace ns3 {
 					MakeUintegerChecker<uint8_t>(0)
 					)
 #endif
-				.AddAttribute("AcceptInformaitonDelay",
-					"Delay for accept information.",
-					TimeValue(MicroSeconds(1024 * 10)),
-					MakeTimeAccessor(
-						&PmtmgmpRPpath::m_AcceptInformaitonDelay),
-					MakeTimeChecker()
-					)
 				;
 			return tid;
 		}
@@ -231,7 +224,8 @@ namespace ns3 {
 		* PmtmgmpRPtree
 		************************/
 		PmtmgmpRPtree::PmtmgmpRPtree() :
-			m_MSECPnumForMTERP(2)
+			m_MSECPnumForMTERP(2),
+			m_AcceptInformaitonDelay(MicroSeconds(1024 * 10))
 		{
 		}
 
@@ -251,6 +245,13 @@ namespace ns3 {
 						&PmtmgmpRPtree::m_MSECPnumForMTERP),
 					MakeUintegerChecker<uint8_t>(1)
 					)
+				.AddAttribute("AcceptInformaitonDelay",
+					"Delay for accept information.",
+					TimeValue(MicroSeconds(1024 * 10)),
+					MakeTimeAccessor(
+						&PmtmgmpRPtree::m_AcceptInformaitonDelay),
+					MakeTimeChecker()
+					)
 				;
 			return tid;
 		}
@@ -262,9 +263,21 @@ namespace ns3 {
 		{
 			m_MTERPaddress = address;
 		}
+		void PmtmgmpRPtree::SetAcceptCandidateRouteInformaitonEvent(EventId id)
+		{
+			m_AcceptCandidateRouteInformaitonEvent = id;
+		}
 		Mac48Address PmtmgmpRPtree::GetMTERPaddress() const
 		{
 			return m_MTERPaddress;
+		}
+		EventId PmtmgmpRPtree::GetAcceptCandidateRouteInformaitonEvent() const
+		{
+			return m_AcceptCandidateRouteInformaitonEvent;
+		}
+		Time PmtmgmpRPtree::GetAcceptInformaitonDelay() const
+		{
+			return m_AcceptInformaitonDelay;
 		}
 		////获取MTERP、MSECP对应的Path
 		Ptr<PmtmgmpRPpath> PmtmgmpRPtree::GetPathByMACaddress(Mac48Address msecp)
@@ -280,13 +293,20 @@ namespace ns3 {
 				return *iter;
 			}
 		}
+		////获取度量最小的路径
 		std::vector<Ptr<PmtmgmpRPpath>> PmtmgmpRPtree::GetBestPath()
 		{
 			if (m_partTree.size() == 0) NS_LOG_ERROR("There is no path in this tree.");
-			std::vector<Ptr<PmtmgmpRPpath>>::iterator bestIter = m_partTree.begin();
+			
+			return GetBestPath(m_partTree);
+		}
+		////获取度量最小的路径
+		std::vector<Ptr<PmtmgmpRPpath>> PmtmgmpRPtree::GetBestPath(std::vector<Ptr<PmtmgmpRPpath>> pathList)
+		{
+			std::vector<Ptr<PmtmgmpRPpath>>::iterator bestIter = pathList.begin();
 			std::vector<Ptr<PmtmgmpRPpath>> bestPaths;
 			bestPaths.push_back(*bestIter);
-			for (std::vector<Ptr<PmtmgmpRPpath>>::iterator iter = m_partTree.begin(); iter != m_partTree.end(); iter++)
+			for (std::vector<Ptr<PmtmgmpRPpath>>::iterator iter = pathList.begin(); iter != pathList.end(); iter++)
 			{
 				if ((*bestIter)->GetMetric() < (*iter)->GetMetric())
 				{
@@ -368,22 +388,51 @@ namespace ns3 {
 		void PmtmgmpRPtree::AcceptCandidateRouteInformaiton(Mac48Address address)
 		{
 			////已经接受信息
-			Ptr<PmtmgmpRPpath> path = GetPathByMACaddress(address);/*
-			if (m_InformationStatus == Confirmed)
+			Ptr<PmtmgmpRPpath> path = GetPathByMACaddress(address);
+			if (path->GetStatus() == PmtmgmpRPpath::Confirmed)
 			{
-				NS_LOG_DEBUG("Path information about MTERP:" << m_MTERPaddress << " MSECP:" << m_MSECPaddress << "has been accept before the timer expired.");
+				NS_LOG_DEBUG("Path information about MTERP:" << path->GetMTERPaddress() << " MSECP:" << path->GetMSECPaddress() << "has been accept before the timer expired.");
 				return;
 			}
 
-			std::vector<Ptr<PmtmgmpRPpath>>::iterator iter = m_CandidateRouteInformaiton.begin();
+			std::vector<Ptr<PmtmgmpRPpath>> infomation = path->GetCandidateRouteInformaiton();
+			std::vector<Ptr<PmtmgmpRPpath>>::iterator iter = infomation.begin();
 			std::vector<Ptr<PmtmgmpRPpath>> bests;
-			uint8_t repeatability = (*iter)->get
+			uint8_t repeatability = GetRepeatability((*iter)->GetFromNode());
 
-				for (std::vector<Ptr<PmtmgmpRPpath>>::iterator selectIter = m_CandidateRouteInformaiton.begin(); selectIter != m_CandidateRouteInformaiton.end(); selectIter++)
+			////获取最小重复度且AALM最小的候选信息
+			for (std::vector<Ptr<PmtmgmpRPpath>>::iterator selectIter = infomation.begin(); selectIter != infomation.end(); selectIter++)
+			{
+				uint8_t temp = GetRepeatability((*selectIter)->GetFromNode());
+				if (temp == repeatability)
 				{
-
+					if ((*selectIter)->GetMetric() < (*iter)->GetMetric())
+					{
+						bests.clear();
+						bests.push_back((*selectIter));
+					}
+					else if ((*selectIter)->GetMetric() == (*iter)->GetMetric())
+					{
+						bests.push_back((*selectIter));
+					}
 				}
-			NS_LOG_DEBUG("Path information about MTERP:" << m_MTERPaddress << " MSECP:" << m_MSECPaddress << " accept" << " as a confirm information with the Metric of ");*/
+				else if (temp < repeatability)
+				{
+					repeatability = temp;
+					bests.clear();
+					bests.push_back((*selectIter));
+				}
+			}
+
+			Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
+			rand->SetAttribute("Min", IntegerValue(0));
+			rand->SetAttribute("Max", IntegerValue(bests.size() - 1));
+
+			Ptr<PmtmgmpRPpath> select = bests[rand->GetValue()];
+
+			NS_LOG_DEBUG("Path information about MTERP:" << path->GetMTERPaddress() << " MSECP:" << path->GetMSECPaddress() << " accept information from  node: " << select->GetFromNode() << " as a confirm information with the Metric of " << select->GetMetric() << ".");
+
+			AddNewPath(select);
 		}
 		/*************************
 		* PmtmgmpRPRouteTable

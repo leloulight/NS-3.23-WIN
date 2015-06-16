@@ -119,11 +119,7 @@ namespace ns3 {
 			////候选路由信息列表
 			std::vector<Ptr<PmtmgmpRPpath>>  m_CandidateRouteInformaiton;
 			RouteInformationStatus m_InformationStatus;
-
-			////延迟等待接受路径信息事件
-			EventId m_AcceptCandidateRouteInformaitonEvent;
-			Time m_AcceptInformaitonDelay;
-
+			
 			////来源节点MAC
 			Mac48Address m_FormNode;
 		};
@@ -138,13 +134,18 @@ namespace ns3 {
 			std::vector<Ptr<PmtmgmpRPpath>> GetPartTree();
 
 			void SetMTERPaddress(Mac48Address address);
+			void SetAcceptCandidateRouteInformaitonEvent(EventId id);
 
 			Mac48Address GetMTERPaddress() const;
+			EventId GetAcceptCandidateRouteInformaitonEvent() const;
+			Time GetAcceptInformaitonDelay() const;
 			
 			////获取MTERP、MSECP对应的Path
 			Ptr<PmtmgmpRPpath> GetPathByMACaddress(Mac48Address msecp);
 			////获取度量最小的路径
 			std::vector<Ptr<PmtmgmpRPpath>> GetBestPath();
+			////获取度量最小的路径
+			std::vector<Ptr<PmtmgmpRPpath>> GetBestPath(std::vector<Ptr<PmtmgmpRPpath>> pathList);
 			////添加新路径
 			void AddNewPath(Ptr<PmtmgmpRPpath> path);
 			////获取当前路径的最大生成顺序号
@@ -179,6 +180,10 @@ namespace ns3 {
 
 			////路径重复度计量
 			std::map<Mac48Address, uint8_t> m_repeatability;
+
+			////延迟等待接受路径信息事件
+			EventId m_AcceptCandidateRouteInformaitonEvent;
+			Time m_AcceptInformaitonDelay;
 		};
 
 		////路由表

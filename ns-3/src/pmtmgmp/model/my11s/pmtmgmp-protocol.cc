@@ -1545,6 +1545,7 @@ namespace ns3 {
 						case PmtmgmpRPpath::Expired:
 							existPath->AddCandidateRouteInformaiton(pathCopy);
 							pathCopy->SetStatus(PmtmgmpRPpath::Waited);
+							pTree->SetAcceptCandidateRouteInformaitonEvent(Simulator::Schedule(pTree->GetAcceptInformaitonDelay(), &PmtmgmpRPtree::AcceptCandidateRouteInformaiton, pathCopy->GetMSECPaddress(), this));
 							break;
 						case PmtmgmpRPpath::Waited:
 							existPath->AddCandidateRouteInformaiton(pathCopy);
