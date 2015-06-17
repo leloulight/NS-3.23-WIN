@@ -124,6 +124,10 @@ namespace ns3 {
 		{
 			m_InformationStatus = status;
 		}
+		void PmtmgmpRPpath::SetAcceptCandidateRouteInformaitonEvent(EventId id)
+		{
+			m_AcceptCandidateRouteInformaitonEvent = id;
+		}
 		Mac48Address PmtmgmpRPpath::GetMTERPaddress() const
 		{
 			return m_MTERPaddress;
@@ -155,6 +159,10 @@ namespace ns3 {
 		PmtmgmpRPpath::RouteInformationStatus PmtmgmpRPpath::GetStatus() const
 		{
 			return m_InformationStatus;
+		}
+		EventId PmtmgmpRPpath::GetAcceptCandidateRouteInformaitonEvent() const
+		{
+			return m_AcceptCandidateRouteInformaitonEvent;
 		}
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 		////获取路径重复度
@@ -265,17 +273,9 @@ namespace ns3 {
 		{
 			m_MTERPaddress = address;
 		}
-		void PmtmgmpRPtree::SetAcceptCandidateRouteInformaitonEvent(EventId id)
-		{
-			m_AcceptCandidateRouteInformaitonEvent = id;
-		}
 		Mac48Address PmtmgmpRPtree::GetMTERPaddress() const
 		{
 			return m_MTERPaddress;
-		}
-		EventId PmtmgmpRPtree::GetAcceptCandidateRouteInformaitonEvent() const
-		{
-			return m_AcceptCandidateRouteInformaitonEvent;
 		}
 		Time PmtmgmpRPtree::GetAcceptInformaitonDelay() const
 		{
@@ -372,8 +372,6 @@ namespace ns3 {
 		////增加重复度计量
 		void PmtmgmpRPtree::RepeatabilityIncrease(Mac48Address from)
 		{
-			std::map<Mac48Address, uint8_t> b;
-			std::map<Mac48Address, uint8_t>::iterator i = b.find(from);
 			std::map<Mac48Address, uint8_t>::iterator iter = m_repeatability.find(from);
 			if (iter == m_repeatability.end())
 			{
@@ -484,14 +482,15 @@ namespace ns3 {
 		////添加新路径
 		void PmtmgmpRPRouteTable::AddNewPath(Ptr<PmtmgmpRPpath> path)
 		{
-			Ptr<PmtmgmpRPtree> pTree = GetTreeByMACaddress(path->GetMTERPaddress());
-			if (pTree == 0)
+			Ptr<PmtmgmpRPtree> routeTree = GetTreeByMACaddress(path->GetMTERPaddress());
+			if (routeTree == 0)
 			{
-				pTree = CreateObject<PmtmgmpRPtree>();
-				m_partTable.push_back(pTree);
+				routeTree = CreateObject<PmtmgmpRPtree>();
+				routeTree->SetMTERPaddress(path->GetMTERPaddress());
+				m_partTable.push_back(routeTree);
 			}
 			
-			pTree->AddNewPath(path);
+			routeTree->AddNewPath(path);
 		}
 #endif
 		/*************************

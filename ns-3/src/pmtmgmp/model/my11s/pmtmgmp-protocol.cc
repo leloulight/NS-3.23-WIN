@@ -1473,7 +1473,7 @@ namespace ns3 {
 			Pgen.SetPathGenerationSequenceNumber(secack.GetPathGenerationSequenceNumber());
 			Pgen.SetNodeType(secack.GetNodeType());
 			Pgen.SetHopcount(1);
-			Pgen.SetTTL(1);
+			Pgen.SetTTL(m_maxTtl);
 			Pgen.SetMetric(metric);
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			////添加原始默认路径（源节点到当前辅助节点）
@@ -1574,7 +1574,7 @@ namespace ns3 {
 								case PmtmgmpRPpath::Expired:
 									existPath->AddCandidateRouteInformaiton(pathCopy);
 									pathCopy->SetStatus(PmtmgmpRPpath::Waited);
-									routeTree->SetAcceptCandidateRouteInformaitonEvent(Simulator::Schedule(routeTree->GetAcceptInformaitonDelay(), &PmtmgmpRPtree::AcceptCandidateRouteInformaiton, routeTree, pathCopy->GetMSECPaddress()));
+									existPath->SetAcceptCandidateRouteInformaitonEvent(Simulator::Schedule(routeTree->GetAcceptInformaitonDelay(), &PmtmgmpRPtree::AcceptCandidateRouteInformaiton, routeTree, pathCopy->GetMSECPaddress()));
 									break;
 								case PmtmgmpRPpath::Waited:
 									existPath->AddCandidateRouteInformaiton(pathCopy);

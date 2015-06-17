@@ -65,6 +65,7 @@ namespace ns3 {
 			void SetMetric(double metric);
 			void SetFromNode(Mac48Address address);
 			void SetStatus(RouteInformationStatus status);
+			void SetAcceptCandidateRouteInformaitonEvent(EventId id);
 
 			Mac48Address GetMTERPaddress() const;
 			Mac48Address GetMSECPaddress() const;
@@ -74,6 +75,7 @@ namespace ns3 {
 			double GetMetric() const;
 			Mac48Address GetFromNode() const;
 			RouteInformationStatus GetStatus() const;
+			EventId GetAcceptCandidateRouteInformaitonEvent() const;
 
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			////获取路径重复度
@@ -122,6 +124,9 @@ namespace ns3 {
 			
 			////来源节点MAC
 			Mac48Address m_FormNode;
+
+			////延迟等待接受路径信息事件
+			EventId m_AcceptCandidateRouteInformaitonEvent;
 		};
 
 		////路由表树
@@ -134,10 +139,8 @@ namespace ns3 {
 			std::vector<Ptr<PmtmgmpRPpath>> GetPartTree();
 
 			void SetMTERPaddress(Mac48Address address);
-			void SetAcceptCandidateRouteInformaitonEvent(EventId id);
 
 			Mac48Address GetMTERPaddress() const;
-			EventId GetAcceptCandidateRouteInformaitonEvent() const;
 			Time GetAcceptInformaitonDelay() const;
 			
 			////获取MTERP、MSECP对应的Path
@@ -181,8 +184,7 @@ namespace ns3 {
 			////路径重复度计量
 			std::map<Mac48Address, uint8_t> m_repeatability;
 
-			////延迟等待接受路径信息事件
-			EventId m_AcceptCandidateRouteInformaitonEvent;
+			////延迟时间
 			Time m_AcceptInformaitonDelay;
 		};
 
