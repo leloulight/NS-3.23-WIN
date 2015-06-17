@@ -432,6 +432,8 @@ namespace ns3 {
 
 			NS_LOG_DEBUG("Path information about MTERP:" << path->GetMTERPaddress() << " MSECP:" << path->GetMSECPaddress() << " accept information from  node: " << select->GetFromNode() << " as a confirm information with the Metric of " << select->GetMetric() << ".");
 
+			select->SetStatus(PmtmgmpRPpath::Confirmed);
+			RepeatabilityIncrease(select->GetFromNode());
 			AddNewPath(select);
 		}
 		/*************************

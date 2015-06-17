@@ -1462,10 +1462,10 @@ namespace ns3 {
 			m_AffiliatedMTERPlist.push_back(newInformation);
 			SendFirstPgen(secack, metric);
 		}
-		////MSECP发送PGEN
+		////发送初始PGEN
 		void PmtmgmpProtocol::SendFirstPgen(IeSecack secack, uint32_t metric)
 		{
-			NS_LOG_DEBUG("Send PGEN");
+			NS_LOG_DEBUG("Send First PGEN");
 			IePgen Pgen;
 			Pgen.SetOriginatorAddress(secack.GetOriginatorAddress());
 			Pgen.SetMSECPaddress(m_address);
@@ -1483,6 +1483,15 @@ namespace ns3 {
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
 				i->second->SendPgen(Pgen);
+			}
+		}
+		////转发Pgen
+		void PmtmgmpProtocol::sendPgen(IePgen pgen)
+		{
+			NS_LOG_DEBUG("Send First PGEN");
+			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
+			{
+				i->second->SendPgen(pgen);
 			}
 		}
 		////接收PGEN
@@ -1539,21 +1548,30 @@ namespace ns3 {
 					Ptr<PmtmgmpRPpath> existPath = pTree->GetPathByMACaddress(pathCopy->GetMSECPaddress());
 					if (existPath->GetPathGenerationSequenceNumber() > pathCopy->GetPathGenerationSequenceNumber())
 					{
-						////PGEN所属路径生成信息未确定
-						switch (existPath->GetStatus())
+						////路径不重复效验
+						if (pTree->GetRepeatability(from) == 0)
 						{
-						case PmtmgmpRPpath::Expired:
-							existPath->AddCandidateRouteInformaiton(pathCopy);
-							pathCopy->SetStatus(PmtmgmpRPpath::Waited);
-							pTree->SetAcceptCandidateRouteInformaitonEvent(Simulator::Schedule(pTree->GetAcceptInformaitonDelay(), &PmtmgmpRPtree::AcceptCandidateRouteInformaiton, pathCopy->GetMSECPaddress(), this));
-							break;
-						case PmtmgmpRPpath::Waited:
-							existPath->AddCandidateRouteInformaiton(pathCopy);
-							pathCopy->SetStatus(PmtmgmpRPpath::Waited);
-							break;
-						case PmtmgmpRPpath::Confirmed:
-							NS_LOG_ERROR("Path is Confirmed ,but GSN is not update");
-							break;
+							pathCopy->SetStatus(PmtmgmpRPpath::Confirmed);
+							pTree->RepeatabilityIncrease(from);
+							pTree->AddNewPath(pathCopy);
+						}
+						else
+						{
+							////PGEN所属路径生成信息未确定
+							switch (existPath->GetStatus())
+							{
+							case PmtmgmpRPpath::Expired:
+								existPath->AddCandidateRouteInformaiton(pathCopy);
+								pathCopy->SetStatus(PmtmgmpRPpath::Waited);
+								pTree->SetAcceptCandidateRouteInformaitonEvent(Simulator::Schedule(pTree->GetAcceptInformaitonDelay(), &PmtmgmpRPtree::AcceptCandidateRouteInformaiton, pTree, pathCopy->GetMSECPaddress()));
+								break;
+							case PmtmgmpRPpath::Waited:
+								existPath->AddCandidateRouteInformaiton(pathCopy);
+								return;
+							case PmtmgmpRPpath::Confirmed:
+								NS_LOG_ERROR("Path is Confirmed ,but GSN is not update");
+								return;
+							}
 						}
 					}
 					else
@@ -1568,7 +1586,7 @@ namespace ns3 {
 					return;
 				}
 			}
-			if (pgen.GetTtl() > 0);////转发PGEN
+			if (pgen.GetTtl() > 0) sendPgen(pgen);////转发PGEN
 		}
 #endif
 	} // namespace my11s

@@ -306,8 +306,10 @@ namespace ns3 {
 			void SendSecack();
 			////接收SECACK
 			void ReceiveSecack(IeSecack secack, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
-			////发送PGEN
+			////发送初始PGEN
 			void SendFirstPgen(IeSecack secack, uint32_t metric);
+			////转发Pgen
+			void sendPgen(IePgen pgen);
 			////接收PGEN
 			void ReceivePgen(IePgen pgen, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
 #endif
