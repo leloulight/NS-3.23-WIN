@@ -47,7 +47,8 @@ namespace ns3 {
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			m_PMTMGMPpathNodeListNum(2),
 #endif
-			m_InformationStatus(Confirmed)
+			m_InformationStatus(Confirmed),
+			m_CandidateRouteInformaiton(std::vector<Ptr<PmtmgmpRPpath>>())
 		{
 		}
 
@@ -225,7 +226,8 @@ namespace ns3 {
 		************************/
 		PmtmgmpRPtree::PmtmgmpRPtree() :
 			m_MSECPnumForMTERP(2),
-			m_AcceptInformaitonDelay(MicroSeconds(1024 * 10))
+			m_AcceptInformaitonDelay(MicroSeconds(1024 * 10)),
+			m_partTree(std::vector<Ptr<PmtmgmpRPpath>>())
 		{
 		}
 
@@ -282,6 +284,7 @@ namespace ns3 {
 		////获取MTERP、MSECP对应的Path
 		Ptr<PmtmgmpRPpath> PmtmgmpRPtree::GetPathByMACaddress(Mac48Address msecp)
 		{
+			if (m_partTree.size() == 0) return 0;
 			std::vector<Ptr<PmtmgmpRPpath>>::iterator iter = std::find_if(m_partTree.begin(), m_partTree.end(), PmtmgmpRPtree_Finder(msecp));
 			if (iter == m_partTree.end())
 			{
@@ -369,6 +372,8 @@ namespace ns3 {
 		////增加重复度计量
 		void PmtmgmpRPtree::RepeatabilityIncrease(Mac48Address from)
 		{
+			std::map<Mac48Address, uint8_t> b;
+			std::map<Mac48Address, uint8_t>::iterator i = b.find(from);
 			std::map<Mac48Address, uint8_t>::iterator iter = m_repeatability.find(from);
 			if (iter == m_repeatability.end())
 			{
@@ -439,7 +444,8 @@ namespace ns3 {
 		/*************************
 		* PmtmgmpRPRouteTable
 		************************/
-		PmtmgmpRPRouteTable::PmtmgmpRPRouteTable()
+		PmtmgmpRPRouteTable::PmtmgmpRPRouteTable():
+			m_partTable(std::vector<Ptr<PmtmgmpRPtree>>())
 		{
 		}
 		PmtmgmpRPRouteTable::~PmtmgmpRPRouteTable()
@@ -452,6 +458,7 @@ namespace ns3 {
 		////获取MTERP对应的Tree
 		Ptr<PmtmgmpRPtree> PmtmgmpRPRouteTable::GetTreeByMACaddress(Mac48Address mterp)
 		{
+			if (m_partTable.size() == 0) return 0;
 			std::vector<Ptr<PmtmgmpRPtree>>::iterator iter = std::find_if(m_partTable.begin(), m_partTable.end(), PmtmgmpRProuteTable_Finder(mterp));
 			if (iter == m_partTable.end())
 			{

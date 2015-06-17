@@ -258,7 +258,8 @@ namespace ns3 {
 			m_PathUpdateSeqNumber(0),
 			m_MSECPnumForMTERP(2),
 			m_PMTMGMPmterpAALMmagnification(3),
-			m_PMTMGMPmsecpAALMmagnification(2)
+			m_PMTMGMPmsecpAALMmagnification(2),
+			m_RouteTable(CreateObject<PmtmgmpRPRouteTable>())
 #endif
 		{
 			NS_LOG_FUNCTION_NOARGS();
@@ -1522,62 +1523,73 @@ namespace ns3 {
 			pathCopy->SetFromNode(from);
 
 			////路由表是否存在PGEN来源对应路径
-			Ptr<PmtmgmpRPtree> pTree = m_RouteTable->GetTreeByMACaddress(pgen.GetOriginatorAddress());
-			if (pTree == 0)
+			Ptr<PmtmgmpRPtree> routeTree = m_RouteTable->GetTreeByMACaddress(pgen.GetOriginatorAddress());
+			if (routeTree == 0)
 			{
 				////当前路由表中不存在来自PGEN源节点的路径
 				pathCopy->SetStatus(PmtmgmpRPpath::Confirmed);
-				pTree->RepeatabilityIncrease(from);
-				pTree->AddNewPath(pathCopy);
+				m_RouteTable->AddNewPath(pathCopy); 
+				routeTree = m_RouteTable->GetTreeByMACaddress(pgen.GetOriginatorAddress());
+				routeTree->RepeatabilityIncrease(from);
 			}
 			else 
 			{
 				////PGEN与全部路径的GSN比较
 				uint32_t GenSeqNum = pathCopy->GetPathGenerationSequenceNumber();
-				if (GenSeqNum > pTree->GetTreeMaxGenerationSeqNumber())
+				if (GenSeqNum > routeTree->GetTreeMaxGenerationSeqNumber())
 				{
 					////当前路由表中没有相同生成顺序号的记录，此为到达的第一个PGEN。
-					pTree->SetAllStatusExpired();
+					routeTree->SetAllStatusExpired();
 					pathCopy->SetStatus(PmtmgmpRPpath::Confirmed);
-					pTree->RepeatabilityIncrease(from);
-					pTree->AddNewPath(pathCopy);
+					routeTree->AddNewPath(pathCopy);
+					routeTree->RepeatabilityIncrease(from);
 				}
-				else if (GenSeqNum > pTree->GetTreeMaxGenerationSeqNumber())
+				else if (GenSeqNum == routeTree->GetTreeMaxGenerationSeqNumber())
 				{
 					////已有相同当前序号的其他PGEN到达
-					Ptr<PmtmgmpRPpath> existPath = pTree->GetPathByMACaddress(pathCopy->GetMSECPaddress());
-					if (existPath->GetPathGenerationSequenceNumber() > pathCopy->GetPathGenerationSequenceNumber())
+					Ptr<PmtmgmpRPpath> existPath = routeTree->GetPathByMACaddress(pathCopy->GetMSECPaddress());
+					if (existPath == 0)
 					{
-						////路径不重复效验
-						if (pTree->GetRepeatability(from) == 0)
-						{
-							pathCopy->SetStatus(PmtmgmpRPpath::Confirmed);
-							pTree->RepeatabilityIncrease(from);
-							pTree->AddNewPath(pathCopy);
-						}
-						else
-						{
-							////PGEN所属路径生成信息未确定
-							switch (existPath->GetStatus())
-							{
-							case PmtmgmpRPpath::Expired:
-								existPath->AddCandidateRouteInformaiton(pathCopy);
-								pathCopy->SetStatus(PmtmgmpRPpath::Waited);
-								pTree->SetAcceptCandidateRouteInformaitonEvent(Simulator::Schedule(pTree->GetAcceptInformaitonDelay(), &PmtmgmpRPtree::AcceptCandidateRouteInformaiton, pTree, pathCopy->GetMSECPaddress()));
-								break;
-							case PmtmgmpRPpath::Waited:
-								existPath->AddCandidateRouteInformaiton(pathCopy);
-								return;
-							case PmtmgmpRPpath::Confirmed:
-								NS_LOG_ERROR("Path is Confirmed ,but GSN is not update");
-								return;
-							}
-						}
+						////当前路由表中不存在辅助节点对应的路径
+						pathCopy->SetStatus(PmtmgmpRPpath::Confirmed);
+						routeTree->AddNewPath(pathCopy);
+						routeTree->RepeatabilityIncrease(from);
 					}
 					else
 					{
-						////PGEN所属路径生成信息已确定
-						return;
+						if (existPath->GetPathGenerationSequenceNumber() > pathCopy->GetPathGenerationSequenceNumber())
+						{
+							////路径不重复效验
+							if (routeTree->GetRepeatability(from) == 0)
+							{
+								pathCopy->SetStatus(PmtmgmpRPpath::Confirmed);
+								routeTree->RepeatabilityIncrease(from);
+								routeTree->AddNewPath(pathCopy);
+							}
+							else
+							{
+								////PGEN所属路径生成信息未确定
+								switch (existPath->GetStatus())
+								{
+								case PmtmgmpRPpath::Expired:
+									existPath->AddCandidateRouteInformaiton(pathCopy);
+									pathCopy->SetStatus(PmtmgmpRPpath::Waited);
+									routeTree->SetAcceptCandidateRouteInformaitonEvent(Simulator::Schedule(routeTree->GetAcceptInformaitonDelay(), &PmtmgmpRPtree::AcceptCandidateRouteInformaiton, routeTree, pathCopy->GetMSECPaddress()));
+									break;
+								case PmtmgmpRPpath::Waited:
+									existPath->AddCandidateRouteInformaiton(pathCopy);
+									return;
+								case PmtmgmpRPpath::Confirmed:
+									NS_LOG_ERROR("Path is Confirmed ,but GSN is not update");
+									return;
+								}
+							}
+						}
+						else
+						{
+							////PGEN所属路径生成信息已确定
+							return;
+						}
 					}
 				}
 				else
@@ -1586,7 +1598,11 @@ namespace ns3 {
 					return;
 				}
 			}
-			if (pgen.GetTtl() > 0) sendPgen(pgen);////转发PGEN
+			if (pgen.GetTtl() > 0)
+			{
+				////转发PGEN
+				sendPgen(pgen);
+			}
 		}
 #endif
 	} // namespace my11s
