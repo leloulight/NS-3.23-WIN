@@ -388,7 +388,8 @@ namespace ns3 {
 			Ptr<UniformRandomVariable> m_coefficient;
 			Callback <std::vector<Mac48Address>, uint32_t> m_neighboursCallback;
 #ifndef PMTMGMP_UNUSED_MY_CODE
-			EventId m_SECREQTimer;
+			EventId m_MSECPSearchTimer;
+			EventId m_MSECPSearchInterval;
 			EventId m_MSECPSetTimer;
 			uint8_t m_UnicastSecreqThreshold;
 			////节点类型属性
@@ -399,6 +400,8 @@ namespace ns3 {
 			std::vector<MSECPaffiliatedMSECPInformation> m_AffiliatedMTERPlist;
 			////MSECP搜索初始延迟
 			Time m_My11WmnPMTMGMPsecStartDelayTime;
+			////MSECP搜索间隔
+			Time m_My11WmnPMTMGMPsecInterval;
 			////SECREQ设置延迟
 			Time m_My11WmnPMTMGMPsecSetTime;
 			////SECREP接收信息记录

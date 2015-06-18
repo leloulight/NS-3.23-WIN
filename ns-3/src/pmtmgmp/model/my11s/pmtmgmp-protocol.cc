@@ -187,6 +187,13 @@ namespace ns3 {
 				&PmtmgmpProtocol::m_My11WmnPMTMGMPsecStartDelayTime),
 				MakeTimeChecker()
 				)
+				.AddAttribute("My11WmnPMTMGMPsecInterval",
+				"Interval MSECP search, it also the interval of path Generation",
+				TimeValue(MicroSeconds(1024 * 50000)),
+				MakeTimeAccessor(
+				&PmtmgmpProtocol::m_My11WmnPMTMGMPsecInterval),
+				MakeTimeChecker()
+				)
 				.AddAttribute("My11WmnPMTMGMPsecSetTime",
 				"Delay time of waiting for accept SECREP",
 				TimeValue(MicroSeconds(1024 * 2000)),
@@ -251,6 +258,7 @@ namespace ns3 {
 			m_rfFlag(false),
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			//m_My11WmnPMTMGMPsecStartDelayTime(MicroSeconds(1024 * 2000)),
+			//m_My11WmnPMTMGMPsecInterval(MicroSeconds(1024 * 2000)),
 			//m_My11WmnPMTMGMPsecSetTime(MicroSeconds(1024 * 2000)),
 			//m_UnicastSecreqThreshold(10),
 			m_NodeType(Mesh_STA),
@@ -267,6 +275,7 @@ namespace ns3 {
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			//默认初值设置方式编译出错
 			m_My11WmnPMTMGMPsecStartDelayTime = MicroSeconds(1024 * 50000);
+			m_My11WmnPMTMGMPsecInterval = MicroSeconds(1024 * 50000);
 			m_My11WmnPMTMGMPsecSetTime = MicroSeconds(1024 * 2000);
 			m_UnicastSecreqThreshold = 10;
 #endif
@@ -280,12 +289,14 @@ namespace ns3 {
 		void
 			PmtmgmpProtocol::DoInitialize()
 		{
+#ifdef PMTMGMP_UNUSED_MY_CODE
 			m_coefficient->SetAttribute("Max", DoubleValue(m_randomStart.GetSeconds()));
 			if (m_isRoot)
 			{
 				Time randomStart = Seconds(m_coefficient->GetValue());
 				m_proactivePreqTimer = Simulator::Schedule(randomStart, &PmtmgmpProtocol::SendProactivePreq, this);
 			}
+#endif
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			if (IsMTERP())
 			{
@@ -310,6 +321,10 @@ namespace ns3 {
 			m_rqueue.clear();
 			m_rtable = 0;
 			m_mp = 0;
+
+#ifndef PMTMGMP_UNUSED_MY_CODE
+			m_RouteTable = 0;
+#endif
 		}
 
 		bool
@@ -1283,7 +1298,8 @@ namespace ns3 {
 			NS_LOG_DEBUG("MSECP Search start");
 			m_PathGenerationSeqNumber += 1;
 			m_SECREPinformation.clear();
-			m_SECREQTimer = Simulator::Schedule(m_My11WmnPMTMGMPsecStartDelayTime, &PmtmgmpProtocol::SendSecreq, this);
+			m_MSECPSearchTimer = Simulator::Schedule(m_My11WmnPMTMGMPsecStartDelayTime, &PmtmgmpProtocol::SendSecreq, this);
+			m_MSECPSearchInterval = Simulator::Schedule(m_My11WmnPMTMGMPsecInterval, &PmtmgmpProtocol::MSECPSearch, this);
 		}
 		////发送SECREQ
 		void PmtmgmpProtocol::SendSecreq()

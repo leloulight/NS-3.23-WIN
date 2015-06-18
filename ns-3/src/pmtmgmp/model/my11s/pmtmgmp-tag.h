@@ -59,6 +59,10 @@ public:
   void  SetSeqno (uint32_t seqno);
   uint32_t GetSeqno ();
   void  DecrementTtl ();
+#ifndef PMTMGMP_UNUSED_MY_CODE
+  void SetMSECP(Mac48Address msecp);
+  Mac48Address GetMSECP();
+#endif
 
   static  TypeId  GetTypeId ();
   virtual TypeId  GetInstanceTypeId () const;
@@ -71,6 +75,9 @@ private:
   uint8_t  m_ttl;
   uint32_t m_metric;
   uint32_t m_seqno;
+#ifndef PMTMGMP_UNUSED_MY_CODE
+  Mac48Address m_MSECP;
+#endif
 };
 } // namespace my11s
 } // namespace ns3

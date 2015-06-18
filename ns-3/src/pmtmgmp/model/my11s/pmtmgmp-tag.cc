@@ -102,7 +102,12 @@ PmtmgmpTag::GetSerializedSize () const
   return 6 //address
          + 1 //ttl
          + 4 //metric
+#ifndef PMTMGMP_UNUSED_MY_CODE
+		 + 4 //seqno
+         + 6; //MSECP
+#else
          + 4; //seqno
+#endif
 }
 
 void
@@ -118,6 +123,13 @@ PmtmgmpTag::Serialize (TagBuffer i) const
     {
       i.WriteU8 (address[j]);
     }
+#ifndef PMTMGMP_UNUSED_MY_CODE
+  m_MSECP.CopyTo(address);
+  for (j = 0; j < 6; j++)
+  {
+	  i.WriteU8(address[j]);
+  }
+#endif
 }
 
 void
@@ -133,6 +145,13 @@ PmtmgmpTag::Deserialize (TagBuffer i)
       address[j] = i.ReadU8 ();
     }
   m_address.CopyFrom (address);
+#ifndef PMTMGMP_UNUSED_MY_CODE
+  for (j = 0; j < 6; j++)
+  {
+	  address[j] = i.ReadU8();
+  }
+  m_MSECP.CopyFrom(address);
+#endif
 }
 
 void
@@ -141,12 +160,25 @@ PmtmgmpTag::Print (std::ostream &os) const
   os << "address=" << m_address;
   os << "ttl=" << m_ttl;
   os << "metrc=" << m_metric;
-  os << "seqno=" << m_seqno;
+  os << "seqno=" << m_seqno;  
+#ifndef PMTMGMP_UNUSED_MY_CODE
+  os << "MSECP=" << m_MSECP;
+#endif
 }
 void
 PmtmgmpTag::DecrementTtl ()
 {
   m_ttl--;
 }
+#ifndef PMTMGMP_UNUSED_MY_CODE
+void PmtmgmpTag::SetMSECP(Mac48Address msecp)
+{
+	m_MSECP = msecp;
+}
+Mac48Address PmtmgmpTag::GetMSECP()
+{
+	return m_MSECP;
+}
+#endif
 } // namespace my11s
 } // namespace ns3
