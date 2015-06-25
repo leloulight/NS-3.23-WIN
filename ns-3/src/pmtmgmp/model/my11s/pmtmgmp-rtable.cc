@@ -44,11 +44,11 @@ namespace ns3 {
 		* PmtmgmpRPpath
 		************************/
 		PmtmgmpRPpath::PmtmgmpRPpath():
+			m_CandidateRouteInformaiton(std::vector<Ptr<PmtmgmpRPpath> >()),
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			m_PMTMGMPpathNodeListNum(2),
 #endif
-			m_InformationStatus(Confirmed),
-			m_CandidateRouteInformaiton(std::vector<Ptr<PmtmgmpRPpath> >())
+			m_InformationStatus(Confirmed)
 		{
 		}
 
@@ -233,9 +233,9 @@ namespace ns3 {
 		* PmtmgmpRPtree
 		************************/
 		PmtmgmpRPtree::PmtmgmpRPtree() :
+			m_partTree(std::vector<Ptr<PmtmgmpRPpath> >()),
 			m_MSECPnumForMTERP(2),
-			m_AcceptInformaitonDelay(MicroSeconds(1024 * 10)),
-			m_partTree(std::vector<Ptr<PmtmgmpRPpath> >())
+			m_AcceptInformaitonDelay(MicroSeconds(1024 * 10))
 		{
 		}
 
