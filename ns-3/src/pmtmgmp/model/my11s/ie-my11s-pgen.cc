@@ -114,9 +114,9 @@ namespace ns3 {
 		void IePgen::IncrementMetric(double metric, double k)
 		{
 			double lastAALM = m_PathInfo->GetMetric();
-			double newALM = metric;
+			double i = m_PathInfo->GetHopCount();
 			////按公式积累计算度量，见AALM计算公式
-			m_PathInfo->SetMetric((double)(k * newALM + (m_PathInfo->GetHopCount() - 1) * metric / sqrt(m_PathInfo->GetHopCount())) / sqrt(m_PathInfo->GetHopCount() + 1));
+			m_PathInfo->SetMetric((sqrt(i) * k * metric + (i - 1) * lastAALM ) / sqrt(i * (i + 1)));
 		}
 		WifiInformationElementId IePgen::ElementId() const
 		{
