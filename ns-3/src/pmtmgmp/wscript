@@ -17,8 +17,12 @@ def build(bld):
         'model/my11s/ie-my11s-prep.cc',
         'model/my11s/ie-my11s-perr.cc',
         'model/my11s/ie-my11s-rann.cc',
+		## MY_PMTMGMP_CODE
         'model/my11s/ie-my11s-secreq.cc',
         'model/my11s/ie-my11s-secrep.cc',
+        'model/my11s/ie-my11s-secack.cc',
+        'model/my11s/ie-my11s-pgen.cc',
+		## MY_PMTMGMP_CODE
         'model/my11s/ie-my11s-peering-protocol.cc',
         'model/my11s/ie-my11s-metric-report.cc',
         'model/my11s/my11s-mac-header.cc',
@@ -73,8 +77,12 @@ def build(bld):
         'model/my11s/ie-my11s-prep.h',
         'model/my11s/ie-my11s-preq.h',
         'model/my11s/ie-my11s-rann.h',
+		## MY_PMTMGMP_CODE
         'model/my11s/ie-my11s-secrep.h',
         'model/my11s/ie-my11s-secreq.h',
+        'model/my11s/ie-my11s-secack.h',
+        'model/my11s/ie-my11s-pgen.h',
+		## MY_PMTMGMP_CODE
         'helper/wmn-helper.h',
         'helper/wmn-stack-installer.h',
         'helper/my11s/my11s-installer.h',

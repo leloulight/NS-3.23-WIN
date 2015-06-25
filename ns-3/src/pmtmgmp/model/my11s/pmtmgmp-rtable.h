@@ -52,7 +52,7 @@ namespace ns3 {
 			////候选信息
 			void AddCandidateRouteInformaiton(Ptr<PmtmgmpRPpath> path);
 			void ClearCandidateRouteInformaiton();
-			std::vector<Ptr<PmtmgmpRPpath>> GetCandidateRouteInformaiton();
+			std::vector<Ptr<PmtmgmpRPpath> > GetCandidateRouteInformaiton() const;
 
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			std::vector<Mac48Address> GetPathInfo() const;
@@ -119,7 +119,7 @@ namespace ns3 {
 			uint8_t m_PMTMGMPpathNodeListNum;
 #endif
 			////候选路由信息列表
-			std::vector<Ptr<PmtmgmpRPpath>>  m_CandidateRouteInformaiton;
+			std::vector<Ptr<PmtmgmpRPpath> >  m_CandidateRouteInformaiton;
 			RouteInformationStatus m_InformationStatus;
 			
 			////来源节点MAC
@@ -136,7 +136,7 @@ namespace ns3 {
 			PmtmgmpRPtree();
 			~PmtmgmpRPtree();
 			static TypeId GetTypeId();
-			std::vector<Ptr<PmtmgmpRPpath>> GetPartTree();
+			std::vector<Ptr<PmtmgmpRPpath> > GetPartTree();
 
 			void SetMTERPaddress(Mac48Address address);
 
@@ -146,9 +146,9 @@ namespace ns3 {
 			////获取MTERP、MSECP对应的Path
 			Ptr<PmtmgmpRPpath> GetPathByMACaddress(Mac48Address msecp);
 			////获取度量最小的路径
-			std::vector<Ptr<PmtmgmpRPpath>> GetBestPath();
+			std::vector<Ptr<PmtmgmpRPpath> > GetBestPath();
 			////获取度量最小的路径
-			std::vector<Ptr<PmtmgmpRPpath>> GetBestPath(std::vector<Ptr<PmtmgmpRPpath>> pathList);
+			std::vector<Ptr<PmtmgmpRPpath> > GetBestPath(std::vector<Ptr<PmtmgmpRPpath> > pathList);
 			////添加新路径
 			void AddNewPath(Ptr<PmtmgmpRPpath> path);
 			////获取当前路径的最大生成顺序号
@@ -175,7 +175,7 @@ namespace ns3 {
 				Mac48Address m_msecp;
 			};
 		private:
-			std::vector<Ptr<PmtmgmpRPpath>>  m_partTree;
+			std::vector<Ptr<PmtmgmpRPpath> >  m_partTree;
 			Mac48Address m_MTERPaddress;
 
 			////终端节点可拥有的辅助节点数量
@@ -195,7 +195,7 @@ namespace ns3 {
 			PmtmgmpRPRouteTable();
 			~PmtmgmpRPRouteTable();
 
-			std::vector<Ptr<PmtmgmpRPtree>> GetRouteTable();
+			std::vector<Ptr<PmtmgmpRPtree> > GetRouteTable();
 
 			////获取MTERP对应的Tree
 			Ptr<PmtmgmpRPtree> GetTreeByMACaddress(Mac48Address mterp);
@@ -215,7 +215,7 @@ namespace ns3 {
 				Mac48Address m_address;
 			};
 		private:
-			std::vector<Ptr<PmtmgmpRPtree>>  m_partTable;
+			std::vector<Ptr<PmtmgmpRPtree> >  m_partTable;
 		};
 #endif
 		/**

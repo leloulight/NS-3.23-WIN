@@ -48,7 +48,7 @@ namespace ns3 {
 			m_PMTMGMPpathNodeListNum(2),
 #endif
 			m_InformationStatus(Confirmed),
-			m_CandidateRouteInformaiton(std::vector<Ptr<PmtmgmpRPpath>>())
+			m_CandidateRouteInformaiton(std::vector<Ptr<PmtmgmpRPpath> >())
 		{
 		}
 
@@ -82,7 +82,7 @@ namespace ns3 {
 		{
 			m_CandidateRouteInformaiton.clear();
 		}
-		std::vector<Ptr<PmtmgmpRPpath>> PmtmgmpRPpath::GetCandidateRouteInformaiton()
+		std::vector<Ptr<PmtmgmpRPpath> > PmtmgmpRPpath::GetCandidateRouteInformaiton() const
 		{
 			return m_CandidateRouteInformaiton;
 		}
@@ -235,7 +235,7 @@ namespace ns3 {
 		PmtmgmpRPtree::PmtmgmpRPtree() :
 			m_MSECPnumForMTERP(2),
 			m_AcceptInformaitonDelay(MicroSeconds(1024 * 10)),
-			m_partTree(std::vector<Ptr<PmtmgmpRPpath>>())
+			m_partTree(std::vector<Ptr<PmtmgmpRPpath> >())
 		{
 		}
 
@@ -265,7 +265,7 @@ namespace ns3 {
 				;
 			return tid;
 		}
-		std::vector<Ptr<PmtmgmpRPpath>> PmtmgmpRPtree::GetPartTree()
+		std::vector<Ptr<PmtmgmpRPpath> > PmtmgmpRPtree::GetPartTree()
 		{
 			return m_partTree;
 		}
@@ -285,7 +285,7 @@ namespace ns3 {
 		Ptr<PmtmgmpRPpath> PmtmgmpRPtree::GetPathByMACaddress(Mac48Address msecp)
 		{
 			if (m_partTree.size() == 0) return 0;
-			std::vector<Ptr<PmtmgmpRPpath>>::iterator iter = std::find_if(m_partTree.begin(), m_partTree.end(), PmtmgmpRPtree_Finder(msecp));
+			std::vector<Ptr<PmtmgmpRPpath> >::iterator iter = std::find_if(m_partTree.begin(), m_partTree.end(), PmtmgmpRPtree_Finder(msecp));
 			if (iter == m_partTree.end())
 			{
 				return 0;
@@ -297,19 +297,19 @@ namespace ns3 {
 			}
 		}
 		////获取度量最小的路径
-		std::vector<Ptr<PmtmgmpRPpath>> PmtmgmpRPtree::GetBestPath()
+		std::vector<Ptr<PmtmgmpRPpath> > PmtmgmpRPtree::GetBestPath()
 		{
 			if (m_partTree.size() == 0) NS_LOG_ERROR("There is no path in this tree.");
 			
 			return GetBestPath(m_partTree);
 		}
 		////获取度量最小的路径
-		std::vector<Ptr<PmtmgmpRPpath>> PmtmgmpRPtree::GetBestPath(std::vector<Ptr<PmtmgmpRPpath>> pathList)
+		std::vector<Ptr<PmtmgmpRPpath> > PmtmgmpRPtree::GetBestPath(std::vector<Ptr<PmtmgmpRPpath> > pathList)
 		{
-			std::vector<Ptr<PmtmgmpRPpath>>::iterator bestIter = pathList.begin();
-			std::vector<Ptr<PmtmgmpRPpath>> bestPaths;
+			std::vector<Ptr<PmtmgmpRPpath> >::iterator bestIter = pathList.begin();
+			std::vector<Ptr<PmtmgmpRPpath> > bestPaths;
 			bestPaths.push_back(*bestIter);
-			for (std::vector<Ptr<PmtmgmpRPpath>>::iterator iter = pathList.begin(); iter != pathList.end(); iter++)
+			for (std::vector<Ptr<PmtmgmpRPpath> >::iterator iter = pathList.begin(); iter != pathList.end(); iter++)
 			{
 				if ((*bestIter)->GetMetric() < (*iter)->GetMetric())
 				{
@@ -327,7 +327,7 @@ namespace ns3 {
 		////添加新路径
 		void PmtmgmpRPtree::AddNewPath(Ptr<PmtmgmpRPpath> path)
 		{
-			std::vector<Ptr<PmtmgmpRPpath>>::iterator exist = std::find_if(m_partTree.begin(), m_partTree.end(), PmtmgmpRPtree_Finder(path->GetMSECPaddress()));
+			std::vector<Ptr<PmtmgmpRPpath> >::iterator exist = std::find_if(m_partTree.begin(), m_partTree.end(), PmtmgmpRPtree_Finder(path->GetMSECPaddress()));
 			if (exist != m_partTree.end())
 			{
 				m_partTree.erase(exist);
@@ -339,7 +339,7 @@ namespace ns3 {
 		uint32_t PmtmgmpRPtree::GetTreeMaxGenerationSeqNumber()
 		{
 			uint32_t seqNum = 0;
-			for (std::vector<Ptr<PmtmgmpRPpath>>::iterator iter = m_partTree.begin(); iter != m_partTree.end(); iter++)
+			for (std::vector<Ptr<PmtmgmpRPpath> >::iterator iter = m_partTree.begin(); iter != m_partTree.end(); iter++)
 			{
 				if ((*iter)->GetPathGenerationSequenceNumber() > seqNum)
 				{
@@ -351,7 +351,7 @@ namespace ns3 {
 		////全部路径置为过期
 		void PmtmgmpRPtree::SetAllStatusExpired()
 		{
-			for (std::vector<Ptr<PmtmgmpRPpath>>::iterator iter = m_partTree.begin(); iter != m_partTree.end(); iter++)
+			for (std::vector<Ptr<PmtmgmpRPpath> >::iterator iter = m_partTree.begin(); iter != m_partTree.end(); iter++)
 			{
 				(*iter)->SetStatus(PmtmgmpRPpath::Expired);
 			}
@@ -398,13 +398,13 @@ namespace ns3 {
 				return;
 			}
 
-			std::vector<Ptr<PmtmgmpRPpath>> infomation = path->GetCandidateRouteInformaiton();
-			std::vector<Ptr<PmtmgmpRPpath>>::iterator iter = infomation.begin();
-			std::vector<Ptr<PmtmgmpRPpath>> bests;
+			std::vector<Ptr<PmtmgmpRPpath> > infomation = path->GetCandidateRouteInformaiton();
+			std::vector<Ptr<PmtmgmpRPpath> >::iterator iter = infomation.begin();
+			std::vector<Ptr<PmtmgmpRPpath> > bests;
 			uint8_t repeatability = GetRepeatability((*iter)->GetFromNode());
 
 			////获取最小重复度且AALM最小的候选信息
-			for (std::vector<Ptr<PmtmgmpRPpath>>::iterator selectIter = infomation.begin(); selectIter != infomation.end(); selectIter++)
+			for (std::vector<Ptr<PmtmgmpRPpath> >::iterator selectIter = infomation.begin(); selectIter != infomation.end(); selectIter++)
 			{
 				uint8_t temp = GetRepeatability((*selectIter)->GetFromNode());
 				if (temp == repeatability)
@@ -443,13 +443,13 @@ namespace ns3 {
 		* PmtmgmpRPRouteTable
 		************************/
 		PmtmgmpRPRouteTable::PmtmgmpRPRouteTable():
-			m_partTable(std::vector<Ptr<PmtmgmpRPtree>>())
+			m_partTable(std::vector<Ptr<PmtmgmpRPtree> >())
 		{
 		}
 		PmtmgmpRPRouteTable::~PmtmgmpRPRouteTable()
 		{
 		}
-		std::vector<Ptr<PmtmgmpRPtree>> PmtmgmpRPRouteTable::GetRouteTable()
+		std::vector<Ptr<PmtmgmpRPtree> > PmtmgmpRPRouteTable::GetRouteTable()
 		{
 			return m_partTable;
 		}
@@ -457,7 +457,7 @@ namespace ns3 {
 		Ptr<PmtmgmpRPtree> PmtmgmpRPRouteTable::GetTreeByMACaddress(Mac48Address mterp)
 		{
 			if (m_partTable.size() == 0) return 0;
-			std::vector<Ptr<PmtmgmpRPtree>>::iterator iter = std::find_if(m_partTable.begin(), m_partTable.end(), PmtmgmpRProuteTable_Finder(mterp));
+			std::vector<Ptr<PmtmgmpRPtree> >::iterator iter = std::find_if(m_partTable.begin(), m_partTable.end(), PmtmgmpRProuteTable_Finder(mterp));
 			if (iter == m_partTable.end())
 			{
 				return 0;
