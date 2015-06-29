@@ -25,6 +25,18 @@
     <None Include="..\ns-3\src\visualizer\visualizer\svgitem.py" />
     <None Include="..\ns-3\src\visualizer\visualizer\__init__.py" />
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ns-3\src\visualizer\model\dummy-file-for-static-builds.cc" />
+    <ClCompile Include="..\ns-3\src\visualizer\model\pyviz.cc" />
+    <ClCompile Include="..\ns-3\src\visualizer\model\visual-simulator-impl.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\ns-3\src\visualizer\model\pyviz.h" />
+    <ClInclude Include="..\ns-3\src\visualizer\model\visual-simulator-impl.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\ns-3\src\visualizer\model\visualizer-ideas.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{24608AD7-10E4-4E5F-BEE2-115AB6F2D65E}</ProjectGuid>
     <RootNamespace>visualizer</RootNamespace>

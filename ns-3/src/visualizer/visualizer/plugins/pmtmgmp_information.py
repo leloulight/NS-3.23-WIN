@@ -86,15 +86,16 @@ class ShowPmtmgmpInforamtion(InformationWindow):
     
     def update(self):
         node = ns.network.NodeList.GetNode(self.node_index)
-        pmtmgmp = None
+        WmnDevice = None
         for devI in range(node.GetNDevices()):
             dev = node.GetDevice(devI)
             name = ns.core.Names.FindName(dev)
-            if dev.GetInstanceTypeId().GetName() == "ns3::PmtmgmpPointDevice":
-                pmtmgmp = dev
-        if pmtmgmp is None:
+            if dev.GetInstanceTypeId().GetName() == "ns3::WmnPointDevice":
+                WmnDevice = dev
+        if WmnDevice is None:
             return
-        rtable = pmtmgmp.GetRoutingProtocol().GetPmtmgmpRtable().LookupProactive();
+        
+        pmtmgmp = WmnDevice.GetRoutingProtocol()
         self.table_model.clear()
         
         # Mesh Point Type.
@@ -110,24 +111,24 @@ class ShowPmtmgmpInforamtion(InformationWindow):
         if index == 3:
             typestr = "Mesh_Secondary_Point"
             
-        self.table_model.set(tree_iter,
-                                 self.COLUMN_MESH_POINT_TYPE, typestr,
-                                 self.COLUMN_RT_RETRANSMITTER, rtable.retransmitter,
-                                 self.COLUMN_RT_INTERFACE, rtable.ifIndex,
-                                 self.COLUMN_RT_METRIC, rtable.metric,
-                                 self.COLUMN_RT_SEQUENCENUMBER, rtable.seqnum,
-                                 self.COLUMN_RT_LIFETIME, rtable.lifetime.GetSeconds(),
-                                 self.COLUMN_RT_VALID, rtable.IsValid())
+        #self.table_model.set(tree_iter,
+                                 #self.COLUMN_MESH_POINT_TYPE, typestr,
+                                 #self.COLUMN_RT_RETRANSMITTER, rtable.retransmitter,
+                                 #self.COLUMN_RT_INTERFACE, rtable.ifIndex,
+                                 #self.COLUMN_RT_METRIC, rtable.metric,
+                                 #self.COLUMN_RT_SEQUENCENUMBER, rtable.seqnum,
+                                 #self.COLUMN_RT_LIFETIME, rtable.lifetime.GetSeconds(),
+                                 #self.COLUMN_RT_VALID, rtable.IsValid())
 
 def populate_node_menu(viz, node, menu):    
     ns3_node = ns.network.NodeList.GetNode(node.node_index)
-    pmtmgmp = None
+    WmnDevice = None
     for devI in range(ns3_node.GetNDevices()):
         dev = ns3_node.GetDevice(devI)
         name = ns.core.Names.FindName(dev)
-        if dev.GetInstanceTypeId().GetName() == "ns3::PmtmgmpPointDevice":
-            pmtmgmp = dev
-    if pmtmgmp is None:
+        if dev.GetInstanceTypeId().GetName() == "ns3::WmnPointDevice":
+            WmnDevice = dev
+    if WmnDevice is None:
         print "No PMTMGMP"
         return
 
