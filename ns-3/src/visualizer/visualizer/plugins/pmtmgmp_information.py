@@ -20,7 +20,7 @@ class ShowPmtmgmpInforamtion(InformationWindow):
         COLUMN_RT_VALID
         ) = range(7)
         
-    def __init__(self, visualizer, node_index):
+    def __init__(self, visualizer, node_index ,device):
         InformationWindow.__init__(self)
         self.win = gtk.Dialog(parent=visualizer.window,
                               flags=gtk.DIALOG_DESTROY_WITH_PARENT|gtk.DIALOG_NO_SEPARATOR,
@@ -30,8 +30,22 @@ class ShowPmtmgmpInforamtion(InformationWindow):
         self.win.set_title("PMTMGMP information for node %i" % node_index) 
         self.visualizer = visualizer
         self.node_index = node_index
-                
         self.table_model = gtk.ListStore(str, str, int, int, int, float, bool)
+
+        self.pmtmgmp = device.GetRoutingProtocol()
+        type_index = pmtmgmp.GetNodeType()
+        type_str = ""
+
+        if type_index == 0:
+            type_str = "Mesh_STA"
+        if type_index == 1:
+            type_str = "Mesh_Access_Point"
+        if type_index == 2:
+            type_str = "Mesh_Portal"
+        if type_index == 3:
+            type_str = "Mesh_Secondary_Point"
+        lable = gtk.Label("Node[" + bytes(self.node_index) + "]:" + type_str)
+
 
         treeview = gtk.TreeView(self.table_model)
         treeview.show()
@@ -136,7 +150,7 @@ def populate_node_menu(viz, node, menu):
     menu_item.show()
     
     def _show_pmtmgmp_information(dummy_menu_item):
-        ShowPmtmgmpInforamtion(viz, node.node_index)
+        ShowPmtmgmpInforamtion(viz, node.node_index, WmnDevice)
 
 
     menu_item.connect("activate", _show_pmtmgmp_information)
