@@ -105,7 +105,7 @@ namespace ns3 {
 
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			////获取协议的路由表
-			PmtmgmpRtable GetPmtmgmpRtable();
+			Ptr<PmtmgmpRPRouteTable> GetPmtmgmpRPRouteTable();
 			////终端节点发动 
 			void MSECPSearch();
 			////PMTMGMP协议中节点的类型枚举

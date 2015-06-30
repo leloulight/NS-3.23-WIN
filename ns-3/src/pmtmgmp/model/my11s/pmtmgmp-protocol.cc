@@ -1288,9 +1288,9 @@ namespace ns3 {
 		}
 #ifndef PMTMGMP_UNUSED_MY_CODE
 		////获取协议的路由表
-		PmtmgmpRtable PmtmgmpProtocol::GetPmtmgmpRtable()
+		Ptr<PmtmgmpRPRouteTable> PmtmgmpProtocol::GetPmtmgmpRPRouteTable()
 		{
-			return *m_rtable;
+			return m_RouteTable;
 		}
 		////终端节点发动 
 		void PmtmgmpProtocol::MSECPSearch()
