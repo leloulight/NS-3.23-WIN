@@ -9,7 +9,7 @@ from visualizer.base import InformationWindow
 from zmq.backend.cython.constants import NULL
 
 
-class ShowPmtmgmpInforamtion(InformationWindow)
+class ShowPmtmgmpInforamtion(InformationWindow):
     def __init__(self, visualizer, node_index ,device):
         InformationWindow.__init__(self)
         self.win = gtk.Dialog(parent=visualizer.window,
