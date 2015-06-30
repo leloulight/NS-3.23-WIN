@@ -36,6 +36,7 @@ class ShowPmtmgmpInforamtion(InformationWindow):
         type_index = pmtmgmp.GetNodeType()
         type_str = ""
 
+		#Information label of Node
         if type_index == 0:
             type_str = "Mesh_STA"
         if type_index == 1:
@@ -44,52 +45,20 @@ class ShowPmtmgmpInforamtion(InformationWindow):
             type_str = "Mesh_Portal"
         if type_index == 3:
             type_str = "Mesh_Secondary_Point"
-        lable = gtk.Label("Node[" + bytes(self.node_index) + "]:" + type_str)
+        lable = gtk.Label("Information For Node[" + bytes(self.node_index) + "]:" + type_str)
+		label.show()
+		
+		vbox = gtk.VBox()
+		hbox = gtk.HBox()
+		hbox.pack_start(label, False, False, 3)
+		hbox.show()
+		vbox.pack_start(hbox, False, True, 0)h_eparator = gtk.HSeparator()
+		h_eparator.show()
+		vbox.pack_start(h_eparator, False, True, 3)
 
-
-        treeview = gtk.TreeView(self.table_model)
-        treeview.show()
-        sw = gtk.ScrolledWindow()
-        sw.set_properties(hscrollbar_policy=gtk.POLICY_AUTOMATIC,
-                          vscrollbar_policy=gtk.POLICY_AUTOMATIC)
-        sw.show()
-        sw.add(treeview)
-        self.win.vbox.add(sw)
-        
-        # Mesh Point Type.
-        column = gtk.TreeViewColumn('Mesh Point Type', gtk.CellRendererText(),
-                                    text=self.COLUMN_MESH_POINT_TYPE)
-        treeview.append_column(column)
-
-        # Route Table Retransmitter.
-        column = gtk.TreeViewColumn('Route Table Retransmitter', gtk.CellRendererText(),
-                                    text=self.COLUMN_RT_RETRANSMITTER)
-        treeview.append_column(column)
-
-        # Route Table Interface.
-        column = gtk.TreeViewColumn('Route Table Interface', gtk.CellRendererText(),
-                                    text=self.COLUMN_RT_INTERFACE)
-        treeview.append_column(column)
-
-        # Route Table METRIC.
-        column = gtk.TreeViewColumn('Route Table METRIC', gtk.CellRendererText(),
-                                    text=self.COLUMN_RT_METRIC)
-        treeview.append_column(column)
-
-        # Route Table Sequence Number.
-        column = gtk.TreeViewColumn('Route Table Sequence Number', gtk.CellRendererText(),
-                                    text=self.COLUMN_RT_SEQUENCENUMBER)
-        treeview.append_column(column)
-        
-        # Route Table Life Time.
-        column = gtk.TreeViewColumn('Route Table Life Time', gtk.CellRendererText(),
-                                    text=self.COLUMN_RT_LIFETIME)
-        treeview.append_column(column)
-        
-        # Route Table Valid.
-        column = gtk.TreeViewColumn('Route Table Valid', gtk.CellRendererText(),
-                                    text=self.COLUMN_RT_VALID)
-        treeview.append_column(column)
+		#NoteBook
+		self.notebook = gtk.Notebook()
+		self.notebook.show()		
 
         self.visualizer.add_information_window(self)
         self.win.show()
