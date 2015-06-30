@@ -522,12 +522,16 @@ def register_types_ns3_my11s(module):
     module.add_class('IePeeringProtocol', parent=root_module['ns3::WifiInformationElement'])
     ## ie-my11s-perr.h (module 'pmtmgmp'): ns3::my11s::IePerr [class]
     module.add_class('IePerr', parent=root_module['ns3::WifiInformationElement'])
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): ns3::my11s::IePgen [class]
+    module.add_class('IePgen', parent=root_module['ns3::WifiInformationElement'])
     ## ie-my11s-prep.h (module 'pmtmgmp'): ns3::my11s::IePrep [class]
     module.add_class('IePrep', parent=root_module['ns3::WifiInformationElement'])
     ## ie-my11s-preq.h (module 'pmtmgmp'): ns3::my11s::IePreq [class]
     module.add_class('IePreq', parent=root_module['ns3::WifiInformationElement'])
     ## ie-my11s-rann.h (module 'pmtmgmp'): ns3::my11s::IeRann [class]
     module.add_class('IeRann', parent=root_module['ns3::WifiInformationElement'])
+    ## ie-my11s-secack.h (module 'pmtmgmp'): ns3::my11s::IeSecack [class]
+    module.add_class('IeSecack', parent=root_module['ns3::WifiInformationElement'])
     ## ie-my11s-secrep.h (module 'pmtmgmp'): ns3::my11s::IeSecrep [class]
     module.add_class('IeSecrep', parent=root_module['ns3::WifiInformationElement'])
     ## ie-my11s-secreq.h (module 'pmtmgmp'): ns3::my11s::IeSecreq [class]
@@ -556,6 +560,14 @@ def register_types_ns3_my11s(module):
     module.add_enum('NodeType', ['Mesh_STA', 'Mesh_Access_Point', 'Mesh_Portal', 'Mesh_Secondary_Point'], outer_class=root_module['ns3::my11s::PmtmgmpProtocol'])
     ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpProtocol::FailedDestination [struct]
     module.add_class('FailedDestination', outer_class=root_module['ns3::my11s::PmtmgmpProtocol'])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRPRouteTable [class]
+    module.add_class('PmtmgmpRPRouteTable', parent=root_module['ns3::Object'])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRPpath [class]
+    module.add_class('PmtmgmpRPpath', parent=root_module['ns3::Object'])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRPpath::RouteInformationStatus [enumeration]
+    module.add_enum('RouteInformationStatus', ['Expired', 'Waited', 'Confirmed'], outer_class=root_module['ns3::my11s::PmtmgmpRPpath'])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRPtree [class]
+    module.add_class('PmtmgmpRPtree', parent=root_module['ns3::Object'])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRtable [class]
     module.add_class('PmtmgmpRtable', parent=root_module['ns3::Object'])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRtable::LookupResult [struct]
@@ -567,6 +579,8 @@ def register_types_ns3_my11s(module):
     module.add_container('std::vector< ns3::Ptr< ns3::my11s::DestinationAddressUnit > >', 'ns3::Ptr< ns3::my11s::DestinationAddressUnit >', container_type=u'vector')
     module.add_container('std::vector< ns3::Ptr< ns3::my11s::PmtmgmpPeerLink > >', 'ns3::Ptr< ns3::my11s::PmtmgmpPeerLink >', container_type=u'vector')
     module.add_container('std::vector< ns3::Mac48Address >', 'ns3::Mac48Address', container_type=u'vector')
+    module.add_container('std::vector< ns3::Ptr< ns3::my11s::PmtmgmpRPtree > >', 'ns3::Ptr< ns3::my11s::PmtmgmpRPtree >', container_type=u'vector')
+    module.add_container('std::vector< ns3::Ptr< ns3::my11s::PmtmgmpRPpath > >', 'ns3::Ptr< ns3::my11s::PmtmgmpRPpath >', container_type=u'vector')
     module.add_container('std::vector< std::pair< unsigned int, ns3::Mac48Address > >', 'std::pair< unsigned int, ns3::Mac48Address >', container_type=u'vector')
 
 def register_methods(root_module):
@@ -746,9 +760,11 @@ def register_methods(root_module):
     register_Ns3My11sIePeerManagement_methods(root_module, root_module['ns3::my11s::IePeerManagement'])
     register_Ns3My11sIePeeringProtocol_methods(root_module, root_module['ns3::my11s::IePeeringProtocol'])
     register_Ns3My11sIePerr_methods(root_module, root_module['ns3::my11s::IePerr'])
+    register_Ns3My11sIePgen_methods(root_module, root_module['ns3::my11s::IePgen'])
     register_Ns3My11sIePrep_methods(root_module, root_module['ns3::my11s::IePrep'])
     register_Ns3My11sIePreq_methods(root_module, root_module['ns3::my11s::IePreq'])
     register_Ns3My11sIeRann_methods(root_module, root_module['ns3::my11s::IeRann'])
+    register_Ns3My11sIeSecack_methods(root_module, root_module['ns3::my11s::IeSecack'])
     register_Ns3My11sIeSecrep_methods(root_module, root_module['ns3::my11s::IeSecrep'])
     register_Ns3My11sIeSecreq_methods(root_module, root_module['ns3::my11s::IeSecreq'])
     register_Ns3My11sIeWmnId_methods(root_module, root_module['ns3::my11s::IeWmnId'])
@@ -761,6 +777,9 @@ def register_methods(root_module):
     register_Ns3My11sPmtmgmpPeerManagementProtocol_methods(root_module, root_module['ns3::my11s::PmtmgmpPeerManagementProtocol'])
     register_Ns3My11sPmtmgmpProtocol_methods(root_module, root_module['ns3::my11s::PmtmgmpProtocol'])
     register_Ns3My11sPmtmgmpProtocolFailedDestination_methods(root_module, root_module['ns3::my11s::PmtmgmpProtocol::FailedDestination'])
+    register_Ns3My11sPmtmgmpRPRouteTable_methods(root_module, root_module['ns3::my11s::PmtmgmpRPRouteTable'])
+    register_Ns3My11sPmtmgmpRPpath_methods(root_module, root_module['ns3::my11s::PmtmgmpRPpath'])
+    register_Ns3My11sPmtmgmpRPtree_methods(root_module, root_module['ns3::my11s::PmtmgmpRPtree'])
     register_Ns3My11sPmtmgmpRtable_methods(root_module, root_module['ns3::my11s::PmtmgmpRtable'])
     register_Ns3My11sPmtmgmpRtableLookupResult_methods(root_module, root_module['ns3::my11s::PmtmgmpRtable::LookupResult'])
     register_Ns3My11sWmnHeader_methods(root_module, root_module['ns3::my11s::WmnHeader'])
@@ -10514,6 +10533,120 @@ def register_Ns3My11sIePerr_methods(root_module, cls):
                    is_const=True, is_virtual=True)
     return
 
+def register_Ns3My11sIePgen_methods(root_module, cls):
+    cls.add_output_stream_operator()
+    cls.add_binary_comparison_operator('==')
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): ns3::my11s::IePgen::IePgen(ns3::my11s::IePgen const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::my11s::IePgen const &', 'arg0')])
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): ns3::my11s::IePgen::IePgen() [constructor]
+    cls.add_constructor([])
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): void ns3::my11s::IePgen::DecrementTtl() [member function]
+    cls.add_method('DecrementTtl', 
+                   'void', 
+                   [])
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePgen::DeserializeInformationField(ns3::Buffer::Iterator i, uint8_t length) [member function]
+    cls.add_method('DeserializeInformationField', 
+                   'uint8_t', 
+                   [param('ns3::Buffer::Iterator', 'i'), param('uint8_t', 'length')], 
+                   is_virtual=True)
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): ns3::WifiInformationElementId ns3::my11s::IePgen::ElementId() const [member function]
+    cls.add_method('ElementId', 
+                   'ns3::WifiInformationElementId', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePgen::GetHopCount() const [member function]
+    cls.add_method('GetHopCount', 
+                   'uint8_t', 
+                   [], 
+                   is_const=True)
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePgen::GetInformationFieldSize() const [member function]
+    cls.add_method('GetInformationFieldSize', 
+                   'uint8_t', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::IePgen::GetMSECPaddress() const [member function]
+    cls.add_method('GetMSECPaddress', 
+                   'ns3::Mac48Address', 
+                   [], 
+                   is_const=True)
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): double ns3::my11s::IePgen::GetMetric() const [member function]
+    cls.add_method('GetMetric', 
+                   'double', 
+                   [], 
+                   is_const=True)
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpProtocol::NodeType ns3::my11s::IePgen::GetNodeType() const [member function]
+    cls.add_method('GetNodeType', 
+                   'ns3::my11s::PmtmgmpProtocol::NodeType', 
+                   [], 
+                   is_const=True)
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::IePgen::GetOriginatorAddress() const [member function]
+    cls.add_method('GetOriginatorAddress', 
+                   'ns3::Mac48Address', 
+                   [], 
+                   is_const=True)
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): uint32_t ns3::my11s::IePgen::GetPathGenerationSequenceNumber() const [member function]
+    cls.add_method('GetPathGenerationSequenceNumber', 
+                   'uint32_t', 
+                   [], 
+                   is_const=True)
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): ns3::Ptr<ns3::my11s::PmtmgmpRPpath> ns3::my11s::IePgen::GetPathInfo() [member function]
+    cls.add_method('GetPathInfo', 
+                   'ns3::Ptr< ns3::my11s::PmtmgmpRPpath >', 
+                   [])
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): ns3::Ptr<ns3::my11s::PmtmgmpRPpath> ns3::my11s::IePgen::GetPathInfo() const [member function]
+    cls.add_method('GetPathInfo', 
+                   'ns3::Ptr< ns3::my11s::PmtmgmpRPpath >', 
+                   [], 
+                   is_const=True)
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePgen::GetTtl() const [member function]
+    cls.add_method('GetTtl', 
+                   'uint8_t', 
+                   [], 
+                   is_const=True)
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): void ns3::my11s::IePgen::IncrementMetric(double metric, double k) [member function]
+    cls.add_method('IncrementMetric', 
+                   'void', 
+                   [param('double', 'metric'), param('double', 'k')])
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): void ns3::my11s::IePgen::Print(std::ostream & os) const [member function]
+    cls.add_method('Print', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): void ns3::my11s::IePgen::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
+    cls.add_method('SerializeInformationField', 
+                   'void', 
+                   [param('ns3::Buffer::Iterator', 'i')], 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): void ns3::my11s::IePgen::SetHopcount(uint8_t hopcount) [member function]
+    cls.add_method('SetHopcount', 
+                   'void', 
+                   [param('uint8_t', 'hopcount')])
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): void ns3::my11s::IePgen::SetMSECPaddress(ns3::Mac48Address mSECP_address) [member function]
+    cls.add_method('SetMSECPaddress', 
+                   'void', 
+                   [param('ns3::Mac48Address', 'mSECP_address')])
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): void ns3::my11s::IePgen::SetMetric(double metric) [member function]
+    cls.add_method('SetMetric', 
+                   'void', 
+                   [param('double', 'metric')])
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): void ns3::my11s::IePgen::SetNodeType(ns3::my11s::PmtmgmpProtocol::NodeType nodeType) [member function]
+    cls.add_method('SetNodeType', 
+                   'void', 
+                   [param('ns3::my11s::PmtmgmpProtocol::NodeType', 'nodeType')])
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): void ns3::my11s::IePgen::SetOriginatorAddress(ns3::Mac48Address originator_address) [member function]
+    cls.add_method('SetOriginatorAddress', 
+                   'void', 
+                   [param('ns3::Mac48Address', 'originator_address')])
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): void ns3::my11s::IePgen::SetPathGenerationSequenceNumber(uint32_t seq_number) [member function]
+    cls.add_method('SetPathGenerationSequenceNumber', 
+                   'void', 
+                   [param('uint32_t', 'seq_number')])
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): void ns3::my11s::IePgen::SetTTL(uint8_t ttl) [member function]
+    cls.add_method('SetTTL', 
+                   'void', 
+                   [param('uint8_t', 'ttl')])
+    return
+
 def register_Ns3My11sIePrep_methods(root_module, cls):
     cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('==')
@@ -10884,6 +11017,76 @@ def register_Ns3My11sIeRann_methods(root_module, cls):
                    [param('uint8_t', 'ttl')])
     return
 
+def register_Ns3My11sIeSecack_methods(root_module, cls):
+    cls.add_output_stream_operator()
+    cls.add_binary_comparison_operator('==')
+    ## ie-my11s-secack.h (module 'pmtmgmp'): ns3::my11s::IeSecack::IeSecack(ns3::my11s::IeSecack const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::my11s::IeSecack const &', 'arg0')])
+    ## ie-my11s-secack.h (module 'pmtmgmp'): ns3::my11s::IeSecack::IeSecack() [constructor]
+    cls.add_constructor([])
+    ## ie-my11s-secack.h (module 'pmtmgmp'): uint8_t ns3::my11s::IeSecack::DeserializeInformationField(ns3::Buffer::Iterator i, uint8_t length) [member function]
+    cls.add_method('DeserializeInformationField', 
+                   'uint8_t', 
+                   [param('ns3::Buffer::Iterator', 'i'), param('uint8_t', 'length')], 
+                   is_virtual=True)
+    ## ie-my11s-secack.h (module 'pmtmgmp'): ns3::WifiInformationElementId ns3::my11s::IeSecack::ElementId() const [member function]
+    cls.add_method('ElementId', 
+                   'ns3::WifiInformationElementId', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-secack.h (module 'pmtmgmp'): uint8_t ns3::my11s::IeSecack::GetInformationFieldSize() const [member function]
+    cls.add_method('GetInformationFieldSize', 
+                   'uint8_t', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-secack.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpProtocol::NodeType ns3::my11s::IeSecack::GetNodeType() const [member function]
+    cls.add_method('GetNodeType', 
+                   'ns3::my11s::PmtmgmpProtocol::NodeType', 
+                   [], 
+                   is_const=True)
+    ## ie-my11s-secack.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::IeSecack::GetOriginatorAddress() const [member function]
+    cls.add_method('GetOriginatorAddress', 
+                   'ns3::Mac48Address', 
+                   [], 
+                   is_const=True)
+    ## ie-my11s-secack.h (module 'pmtmgmp'): uint32_t ns3::my11s::IeSecack::GetPathGenerationSequenceNumber() const [member function]
+    cls.add_method('GetPathGenerationSequenceNumber', 
+                   'uint32_t', 
+                   [], 
+                   is_const=True)
+    ## ie-my11s-secack.h (module 'pmtmgmp'): uint32_t ns3::my11s::IeSecack::GetPathUpdateSeqNumber() const [member function]
+    cls.add_method('GetPathUpdateSeqNumber', 
+                   'uint32_t', 
+                   [], 
+                   is_const=True)
+    ## ie-my11s-secack.h (module 'pmtmgmp'): void ns3::my11s::IeSecack::Print(std::ostream & os) const [member function]
+    cls.add_method('Print', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-secack.h (module 'pmtmgmp'): void ns3::my11s::IeSecack::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
+    cls.add_method('SerializeInformationField', 
+                   'void', 
+                   [param('ns3::Buffer::Iterator', 'i')], 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-secack.h (module 'pmtmgmp'): void ns3::my11s::IeSecack::SetNodeType(ns3::my11s::PmtmgmpProtocol::NodeType nodeType) [member function]
+    cls.add_method('SetNodeType', 
+                   'void', 
+                   [param('ns3::my11s::PmtmgmpProtocol::NodeType', 'nodeType')])
+    ## ie-my11s-secack.h (module 'pmtmgmp'): void ns3::my11s::IeSecack::SetOriginatorAddress(ns3::Mac48Address originator_address) [member function]
+    cls.add_method('SetOriginatorAddress', 
+                   'void', 
+                   [param('ns3::Mac48Address', 'originator_address')])
+    ## ie-my11s-secack.h (module 'pmtmgmp'): void ns3::my11s::IeSecack::SetPathGenerationSequenceNumber(uint32_t seq_number) [member function]
+    cls.add_method('SetPathGenerationSequenceNumber', 
+                   'void', 
+                   [param('uint32_t', 'seq_number')])
+    ## ie-my11s-secack.h (module 'pmtmgmp'): void ns3::my11s::IeSecack::SetPathUpdateSeqNumber(uint32_t seq_number) [member function]
+    cls.add_method('SetPathUpdateSeqNumber', 
+                   'void', 
+                   [param('uint32_t', 'seq_number')])
+    return
+
 def register_Ns3My11sIeSecrep_methods(root_module, cls):
     cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('==')
@@ -10916,14 +11119,14 @@ def register_Ns3My11sIeSecrep_methods(root_module, cls):
                    'uint8_t', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-secrep.h (module 'pmtmgmp'): uint32_t ns3::my11s::IeSecrep::GetMSECPSelectIndex() const [member function]
-    cls.add_method('GetMSECPSelectIndex', 
-                   'uint32_t', 
-                   [], 
-                   is_const=True)
     ## ie-my11s-secrep.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::IeSecrep::GetOriginatorAddress() const [member function]
     cls.add_method('GetOriginatorAddress', 
                    'ns3::Mac48Address', 
+                   [], 
+                   is_const=True)
+    ## ie-my11s-secrep.h (module 'pmtmgmp'): uint32_t ns3::my11s::IeSecrep::GetPathGenerationSequenceNumber() const [member function]
+    cls.add_method('GetPathGenerationSequenceNumber', 
+                   'uint32_t', 
                    [], 
                    is_const=True)
     ## ie-my11s-secrep.h (module 'pmtmgmp'): void ns3::my11s::IeSecrep::Print(std::ostream & os) const [member function]
@@ -10944,14 +11147,14 @@ def register_Ns3My11sIeSecrep_methods(root_module, cls):
     cls.add_method('SetCandidateMSECPaddress', 
                    'void', 
                    [param('ns3::Mac48Address', 'candidateMSECP_address')])
-    ## ie-my11s-secrep.h (module 'pmtmgmp'): void ns3::my11s::IeSecrep::SetMSECPSelectIndex(uint32_t index) [member function]
-    cls.add_method('SetMSECPSelectIndex', 
-                   'void', 
-                   [param('uint32_t', 'index')])
     ## ie-my11s-secrep.h (module 'pmtmgmp'): void ns3::my11s::IeSecrep::SetOriginatorAddress(ns3::Mac48Address originator_address) [member function]
     cls.add_method('SetOriginatorAddress', 
                    'void', 
                    [param('ns3::Mac48Address', 'originator_address')])
+    ## ie-my11s-secrep.h (module 'pmtmgmp'): void ns3::my11s::IeSecrep::SetPathGenerationSequenceNumber(uint32_t seq_number) [member function]
+    cls.add_method('SetPathGenerationSequenceNumber', 
+                   'void', 
+                   [param('uint32_t', 'seq_number')])
     return
 
 def register_Ns3My11sIeSecreq_methods(root_module, cls):
@@ -10976,14 +11179,19 @@ def register_Ns3My11sIeSecreq_methods(root_module, cls):
                    'uint8_t', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-secreq.h (module 'pmtmgmp'): uint32_t ns3::my11s::IeSecreq::GetMSECPSelectIndex() const [member function]
-    cls.add_method('GetMSECPSelectIndex', 
-                   'uint32_t', 
+    ## ie-my11s-secreq.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpProtocol::NodeType ns3::my11s::IeSecreq::GetNodeType() const [member function]
+    cls.add_method('GetNodeType', 
+                   'ns3::my11s::PmtmgmpProtocol::NodeType', 
                    [], 
                    is_const=True)
     ## ie-my11s-secreq.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::IeSecreq::GetOriginatorAddress() const [member function]
     cls.add_method('GetOriginatorAddress', 
                    'ns3::Mac48Address', 
+                   [], 
+                   is_const=True)
+    ## ie-my11s-secreq.h (module 'pmtmgmp'): uint32_t ns3::my11s::IeSecreq::GetPathGenerationSequenceNumber() const [member function]
+    cls.add_method('GetPathGenerationSequenceNumber', 
+                   'uint32_t', 
                    [], 
                    is_const=True)
     ## ie-my11s-secreq.h (module 'pmtmgmp'): void ns3::my11s::IeSecreq::Print(std::ostream & os) const [member function]
@@ -10996,14 +11204,18 @@ def register_Ns3My11sIeSecreq_methods(root_module, cls):
                    'void', 
                    [param('ns3::Buffer::Iterator', 'i')], 
                    is_const=True, is_virtual=True)
-    ## ie-my11s-secreq.h (module 'pmtmgmp'): void ns3::my11s::IeSecreq::SetMSECPSelectIndex(uint32_t index) [member function]
-    cls.add_method('SetMSECPSelectIndex', 
+    ## ie-my11s-secreq.h (module 'pmtmgmp'): void ns3::my11s::IeSecreq::SetNodeType(ns3::my11s::PmtmgmpProtocol::NodeType nodeType) [member function]
+    cls.add_method('SetNodeType', 
                    'void', 
-                   [param('uint32_t', 'index')])
+                   [param('ns3::my11s::PmtmgmpProtocol::NodeType', 'nodeType')])
     ## ie-my11s-secreq.h (module 'pmtmgmp'): void ns3::my11s::IeSecreq::SetOriginatorAddress(ns3::Mac48Address originator_address) [member function]
     cls.add_method('SetOriginatorAddress', 
                    'void', 
                    [param('ns3::Mac48Address', 'originator_address')])
+    ## ie-my11s-secreq.h (module 'pmtmgmp'): void ns3::my11s::IeSecreq::SetPathGenerationSequenceNumber(uint32_t seq_number) [member function]
+    cls.add_method('SetPathGenerationSequenceNumber', 
+                   'void', 
+                   [param('uint32_t', 'seq_number')])
     return
 
 def register_Ns3My11sIeWmnId_methods(root_module, cls):
@@ -11446,19 +11658,28 @@ def register_Ns3My11sPmtmgmpProtocol_methods(root_module, cls):
                    'void', 
                    [], 
                    is_virtual=True)
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): uint8_t ns3::my11s::PmtmgmpProtocol::GetMSECPnumForMTERP() const [member function]
+    cls.add_method('GetMSECPnumForMTERP', 
+                   'uint8_t', 
+                   [], 
+                   is_const=True)
     ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpProtocol::NodeType ns3::my11s::PmtmgmpProtocol::GetNodeType() [member function]
     cls.add_method('GetNodeType', 
                    'ns3::my11s::PmtmgmpProtocol::NodeType', 
                    [])
-    ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRtable ns3::my11s::PmtmgmpProtocol::GetPmtmgmpRtable() [member function]
-    cls.add_method('GetPmtmgmpRtable', 
-                   'ns3::my11s::PmtmgmpRtable', 
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::Ptr<ns3::my11s::PmtmgmpRPRouteTable> ns3::my11s::PmtmgmpProtocol::GetPmtmgmpRPRouteTable() [member function]
+    cls.add_method('GetPmtmgmpRPRouteTable', 
+                   'ns3::Ptr< ns3::my11s::PmtmgmpRPRouteTable >', 
                    [])
     ## pmtmgmp-protocol.h (module 'pmtmgmp'): static ns3::TypeId ns3::my11s::PmtmgmpProtocol::GetTypeId() [member function]
     cls.add_method('GetTypeId', 
                    'ns3::TypeId', 
                    [], 
                    is_static=True)
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): uint8_t ns3::my11s::PmtmgmpProtocol::GetValueMForAALM() [member function]
+    cls.add_method('GetValueMForAALM', 
+                   'uint8_t', 
+                   [])
     ## pmtmgmp-protocol.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpProtocol::Install(ns3::Ptr<ns3::WmnPointDevice> arg0) [member function]
     cls.add_method('Install', 
                    'bool', 
@@ -11522,6 +11743,209 @@ def register_Ns3My11sPmtmgmpProtocolFailedDestination_methods(root_module, cls):
     cls.add_instance_attribute('destination', 'ns3::Mac48Address', is_const=False)
     ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpProtocol::FailedDestination::seqnum [variable]
     cls.add_instance_attribute('seqnum', 'uint32_t', is_const=False)
+    return
+
+def register_Ns3My11sPmtmgmpRPRouteTable_methods(root_module, cls):
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRPRouteTable::PmtmgmpRPRouteTable(ns3::my11s::PmtmgmpRPRouteTable const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::my11s::PmtmgmpRPRouteTable const &', 'arg0')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRPRouteTable::PmtmgmpRPRouteTable() [constructor]
+    cls.add_constructor([])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRPRouteTable::AddNewPath(ns3::Ptr<ns3::my11s::PmtmgmpRPpath> path) [member function]
+    cls.add_method('AddNewPath', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::my11s::PmtmgmpRPpath >', 'path')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::Ptr<ns3::my11s::PmtmgmpRPpath> ns3::my11s::PmtmgmpRPRouteTable::GetPathByMACaddress(ns3::Mac48Address mterp, ns3::Mac48Address msecp) [member function]
+    cls.add_method('GetPathByMACaddress', 
+                   'ns3::Ptr< ns3::my11s::PmtmgmpRPpath >', 
+                   [param('ns3::Mac48Address', 'mterp'), param('ns3::Mac48Address', 'msecp')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): std::vector<ns3::Ptr<ns3::my11s::PmtmgmpRPtree>, std::allocator<ns3::Ptr<ns3::my11s::PmtmgmpRPtree> > > ns3::my11s::PmtmgmpRPRouteTable::GetRouteTable() [member function]
+    cls.add_method('GetRouteTable', 
+                   'std::vector< ns3::Ptr< ns3::my11s::PmtmgmpRPtree > >', 
+                   [])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::Ptr<ns3::my11s::PmtmgmpRPtree> ns3::my11s::PmtmgmpRPRouteTable::GetTreeByMACaddress(ns3::Mac48Address mterp) [member function]
+    cls.add_method('GetTreeByMACaddress', 
+                   'ns3::Ptr< ns3::my11s::PmtmgmpRPtree >', 
+                   [param('ns3::Mac48Address', 'mterp')])
+    return
+
+def register_Ns3My11sPmtmgmpRPpath_methods(root_module, cls):
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRPpath::PmtmgmpRPpath(ns3::my11s::PmtmgmpRPpath const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::my11s::PmtmgmpRPpath const &', 'arg0')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRPpath::PmtmgmpRPpath() [constructor]
+    cls.add_constructor([])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRPpath::AddCandidateRouteInformaiton(ns3::Ptr<ns3::my11s::PmtmgmpRPpath> path) [member function]
+    cls.add_method('AddCandidateRouteInformaiton', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::my11s::PmtmgmpRPpath >', 'path')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRPpath::ClearCandidateRouteInformaiton() [member function]
+    cls.add_method('ClearCandidateRouteInformaiton', 
+                   'void', 
+                   [])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::EventId ns3::my11s::PmtmgmpRPpath::GetAcceptCandidateRouteInformaitonEvent() const [member function]
+    cls.add_method('GetAcceptCandidateRouteInformaitonEvent', 
+                   'ns3::EventId', 
+                   [], 
+                   is_const=True)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): std::vector<ns3::Ptr<ns3::my11s::PmtmgmpRPpath>, std::allocator<ns3::Ptr<ns3::my11s::PmtmgmpRPpath> > > ns3::my11s::PmtmgmpRPpath::GetCandidateRouteInformaiton() const [member function]
+    cls.add_method('GetCandidateRouteInformaiton', 
+                   'std::vector< ns3::Ptr< ns3::my11s::PmtmgmpRPpath > >', 
+                   [], 
+                   is_const=True)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::Ptr<ns3::my11s::PmtmgmpRPpath> ns3::my11s::PmtmgmpRPpath::GetCopy() [member function]
+    cls.add_method('GetCopy', 
+                   'ns3::Ptr< ns3::my11s::PmtmgmpRPpath >', 
+                   [])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::PmtmgmpRPpath::GetFromNode() const [member function]
+    cls.add_method('GetFromNode', 
+                   'ns3::Mac48Address', 
+                   [], 
+                   is_const=True)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): uint8_t ns3::my11s::PmtmgmpRPpath::GetHopCount() const [member function]
+    cls.add_method('GetHopCount', 
+                   'uint8_t', 
+                   [], 
+                   is_const=True)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::PmtmgmpRPpath::GetMSECPaddress() const [member function]
+    cls.add_method('GetMSECPaddress', 
+                   'ns3::Mac48Address', 
+                   [], 
+                   is_const=True)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::PmtmgmpRPpath::GetMTERPaddress() const [member function]
+    cls.add_method('GetMTERPaddress', 
+                   'ns3::Mac48Address', 
+                   [], 
+                   is_const=True)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): double ns3::my11s::PmtmgmpRPpath::GetMetric() const [member function]
+    cls.add_method('GetMetric', 
+                   'double', 
+                   [], 
+                   is_const=True)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpProtocol::NodeType ns3::my11s::PmtmgmpRPpath::GetNodeType() const [member function]
+    cls.add_method('GetNodeType', 
+                   'ns3::my11s::PmtmgmpProtocol::NodeType', 
+                   [], 
+                   is_const=True)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): uint32_t ns3::my11s::PmtmgmpRPpath::GetPathGenerationSequenceNumber() const [member function]
+    cls.add_method('GetPathGenerationSequenceNumber', 
+                   'uint32_t', 
+                   [], 
+                   is_const=True)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRPpath::RouteInformationStatus ns3::my11s::PmtmgmpRPpath::GetStatus() const [member function]
+    cls.add_method('GetStatus', 
+                   'ns3::my11s::PmtmgmpRPpath::RouteInformationStatus', 
+                   [], 
+                   is_const=True)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): static ns3::TypeId ns3::my11s::PmtmgmpRPpath::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_static=True)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRPpath::SetAcceptCandidateRouteInformaitonEvent(ns3::EventId id) [member function]
+    cls.add_method('SetAcceptCandidateRouteInformaitonEvent', 
+                   'void', 
+                   [param('ns3::EventId', 'id')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRPpath::SetFromNode(ns3::Mac48Address address) [member function]
+    cls.add_method('SetFromNode', 
+                   'void', 
+                   [param('ns3::Mac48Address', 'address')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRPpath::SetHopcount(uint8_t hopcount) [member function]
+    cls.add_method('SetHopcount', 
+                   'void', 
+                   [param('uint8_t', 'hopcount')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRPpath::SetMSECPaddress(ns3::Mac48Address address) [member function]
+    cls.add_method('SetMSECPaddress', 
+                   'void', 
+                   [param('ns3::Mac48Address', 'address')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRPpath::SetMTERPaddress(ns3::Mac48Address address) [member function]
+    cls.add_method('SetMTERPaddress', 
+                   'void', 
+                   [param('ns3::Mac48Address', 'address')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRPpath::SetMetric(double metric) [member function]
+    cls.add_method('SetMetric', 
+                   'void', 
+                   [param('double', 'metric')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRPpath::SetNodeType(ns3::my11s::PmtmgmpProtocol::NodeType nodeType) [member function]
+    cls.add_method('SetNodeType', 
+                   'void', 
+                   [param('ns3::my11s::PmtmgmpProtocol::NodeType', 'nodeType')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRPpath::SetPathGenerationSequenceNumber(uint32_t seq_number) [member function]
+    cls.add_method('SetPathGenerationSequenceNumber', 
+                   'void', 
+                   [param('uint32_t', 'seq_number')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRPpath::SetStatus(ns3::my11s::PmtmgmpRPpath::RouteInformationStatus status) [member function]
+    cls.add_method('SetStatus', 
+                   'void', 
+                   [param('ns3::my11s::PmtmgmpRPpath::RouteInformationStatus', 'status')])
+    return
+
+def register_Ns3My11sPmtmgmpRPtree_methods(root_module, cls):
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRPtree::PmtmgmpRPtree(ns3::my11s::PmtmgmpRPtree const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::my11s::PmtmgmpRPtree const &', 'arg0')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRPtree::PmtmgmpRPtree() [constructor]
+    cls.add_constructor([])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRPtree::AcceptCandidateRouteInformaiton(ns3::Mac48Address address) [member function]
+    cls.add_method('AcceptCandidateRouteInformaiton', 
+                   'void', 
+                   [param('ns3::Mac48Address', 'address')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRPtree::AddNewPath(ns3::Ptr<ns3::my11s::PmtmgmpRPpath> path) [member function]
+    cls.add_method('AddNewPath', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::my11s::PmtmgmpRPpath >', 'path')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::Time ns3::my11s::PmtmgmpRPtree::GetAcceptInformaitonDelay() const [member function]
+    cls.add_method('GetAcceptInformaitonDelay', 
+                   'ns3::Time', 
+                   [], 
+                   is_const=True)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): std::vector<ns3::Ptr<ns3::my11s::PmtmgmpRPpath>, std::allocator<ns3::Ptr<ns3::my11s::PmtmgmpRPpath> > > ns3::my11s::PmtmgmpRPtree::GetBestPath() [member function]
+    cls.add_method('GetBestPath', 
+                   'std::vector< ns3::Ptr< ns3::my11s::PmtmgmpRPpath > >', 
+                   [])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): std::vector<ns3::Ptr<ns3::my11s::PmtmgmpRPpath>, std::allocator<ns3::Ptr<ns3::my11s::PmtmgmpRPpath> > > ns3::my11s::PmtmgmpRPtree::GetBestPath(std::vector<ns3::Ptr<ns3::my11s::PmtmgmpRPpath>, std::allocator<ns3::Ptr<ns3::my11s::PmtmgmpRPpath> > > pathList) [member function]
+    cls.add_method('GetBestPath', 
+                   'std::vector< ns3::Ptr< ns3::my11s::PmtmgmpRPpath > >', 
+                   [param('std::vector< ns3::Ptr< ns3::my11s::PmtmgmpRPpath > >', 'pathList')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::PmtmgmpRPtree::GetMTERPaddress() const [member function]
+    cls.add_method('GetMTERPaddress', 
+                   'ns3::Mac48Address', 
+                   [], 
+                   is_const=True)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): std::vector<ns3::Ptr<ns3::my11s::PmtmgmpRPpath>, std::allocator<ns3::Ptr<ns3::my11s::PmtmgmpRPpath> > > ns3::my11s::PmtmgmpRPtree::GetPartTree() [member function]
+    cls.add_method('GetPartTree', 
+                   'std::vector< ns3::Ptr< ns3::my11s::PmtmgmpRPpath > >', 
+                   [])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::Ptr<ns3::my11s::PmtmgmpRPpath> ns3::my11s::PmtmgmpRPtree::GetPathByMACaddress(ns3::Mac48Address msecp) [member function]
+    cls.add_method('GetPathByMACaddress', 
+                   'ns3::Ptr< ns3::my11s::PmtmgmpRPpath >', 
+                   [param('ns3::Mac48Address', 'msecp')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): uint8_t ns3::my11s::PmtmgmpRPtree::GetRepeatability(ns3::Mac48Address from) [member function]
+    cls.add_method('GetRepeatability', 
+                   'uint8_t', 
+                   [param('ns3::Mac48Address', 'from')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): uint32_t ns3::my11s::PmtmgmpRPtree::GetTreeMaxGenerationSeqNumber() [member function]
+    cls.add_method('GetTreeMaxGenerationSeqNumber', 
+                   'uint32_t', 
+                   [])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): static ns3::TypeId ns3::my11s::PmtmgmpRPtree::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_static=True)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRPtree::RepeatabilityIncrease(ns3::Mac48Address from) [member function]
+    cls.add_method('RepeatabilityIncrease', 
+                   'void', 
+                   [param('ns3::Mac48Address', 'from')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRPtree::RepeatabilityReset() [member function]
+    cls.add_method('RepeatabilityReset', 
+                   'void', 
+                   [])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRPtree::SetAllStatusExpired() [member function]
+    cls.add_method('SetAllStatusExpired', 
+                   'void', 
+                   [])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRPtree::SetMTERPaddress(ns3::Mac48Address address) [member function]
+    cls.add_method('SetMTERPaddress', 
+                   'void', 
+                   [param('ns3::Mac48Address', 'address')])
     return
 
 def register_Ns3My11sPmtmgmpRtable_methods(root_module, cls):
