@@ -52,28 +52,4 @@
       <Filter>visualizer\plugins</Filter>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\ns-3\src\visualizer\model\dummy-file-for-static-builds.cc">
-      <Filter>model</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\visualizer\model\pyviz.cc">
-      <Filter>model</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ns-3\src\visualizer\model\visual-simulator-impl.cc">
-      <Filter>model</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\ns-3\src\visualizer\model\pyviz.h">
-      <Filter>model</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ns-3\src\visualizer\model\visual-simulator-impl.h">
-      <Filter>model</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\ns-3\src\visualizer\model\visualizer-ideas.txt">
-      <Filter>model</Filter>
-    </Text>
-  </ItemGroup>
 </Project>

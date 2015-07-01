@@ -40,7 +40,7 @@ namespace ns3 {
 		class IePreq;
 		class IePrep;
 #ifndef PMTMGMP_UNUSED_MY_CODE
-		class PmtmgmpRPRouteTable;
+		class PmtmgmpRouteTable;
 		class IeSecreq;
 		class IeSecrep;
 		class IeSecack;
@@ -105,7 +105,7 @@ namespace ns3 {
 
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			////获取协议的路由表
-			Ptr<PmtmgmpRPRouteTable> GetPmtmgmpRPRouteTable();
+			Ptr<PmtmgmpRouteTable> GetPmtmgmpRPRouteTable();
 			////终端节点发动 
 			void MSECPSearch();
 			////PMTMGMP协议中节点的类型枚举
@@ -417,7 +417,7 @@ namespace ns3 {
 			////MSECP积累传播时间链接度量倍率
 			double m_PMTMGMPmsecpAALMmagnification;
 			////Pmtmgmp路由表
-			Ptr<PmtmgmpRPRouteTable> m_RouteTable;
+			Ptr<PmtmgmpRouteTable> m_RouteTable;
 #endif
 		};
 	} // namespace my11s

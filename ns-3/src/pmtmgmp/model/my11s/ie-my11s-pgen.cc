@@ -33,7 +33,7 @@ namespace ns3 {
 		}
 		IePgen::IePgen()
 		{
-			m_PathInfo = CreateObject<PmtmgmpRPpath>();
+			m_PathInfo = CreateObject<PmtmgmpRoutePath>();
 		}
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 		////附带路径相关函数
@@ -42,7 +42,7 @@ namespace ns3 {
 			m_PathInfo->AddPartPathNode(address);
 		}
 #endif
-		Ptr<PmtmgmpRPpath> IePgen::GetPathInfo()
+		Ptr<PmtmgmpRoutePath> IePgen::GetPathInfo()
 		{
 			return m_PathInfo;
 		}
@@ -102,7 +102,7 @@ namespace ns3 {
 		{
 			return m_PathInfo->GetMetric();
 		}
-		Ptr<PmtmgmpRPpath> IePgen::GetPathInfo() const
+		Ptr<PmtmgmpRoutePath> IePgen::GetPathInfo() const
 		{
 			return m_PathInfo;
 		}

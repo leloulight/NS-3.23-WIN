@@ -31,11 +31,11 @@ namespace ns3 {
 
 #ifndef PMTMGMP_UNUSED_MY_CODE
 		////路由表路径
-		class PmtmgmpRPpath : public Object
+		class PmtmgmpRoutePath : public Object
 		{
 		public:
-			PmtmgmpRPpath();
-			~PmtmgmpRPpath(); 
+			PmtmgmpRoutePath();
+			~PmtmgmpRoutePath(); 
 			static TypeId GetTypeId();
 
 			////路由路径状态
@@ -50,9 +50,9 @@ namespace ns3 {
 			};
 
 			////候选信息
-			void AddCandidateRouteInformaiton(Ptr<PmtmgmpRPpath> path);
+			void AddCandidateRouteInformaiton(Ptr<PmtmgmpRoutePath> path);
 			void ClearCandidateRouteInformaiton();
-			std::vector<Ptr<PmtmgmpRPpath> > GetCandidateRouteInformaiton() const;
+			std::vector<Ptr<PmtmgmpRoutePath> > GetCandidateRouteInformaiton() const;
 
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			std::vector<Mac48Address> GetPathInfo() const;
@@ -77,9 +77,13 @@ namespace ns3 {
 			RouteInformationStatus GetStatus() const;
 			EventId GetAcceptCandidateRouteInformaitonEvent() const;
 
+			////Python调用函数
+			uint8_t GetCandidateRouteInformaitonSize() const;
+			Ptr<PmtmgmpRoutePath> GetCandidateRouteInformaitonItem(uint8_t index) const;
+
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			////获取路径重复度
-			uint8_t GetPartPathRepeatability(PmtmgmpRPpath compare);
+			uint8_t GetPartPathRepeatability(PmtmgmpRoutePath compare);
 			////添加节点
 			void AddPartPathNode(Mac48Address address);
 			////获取路径结点地址
@@ -91,7 +95,7 @@ namespace ns3 {
 #endif
 
 			////复制类
-			Ptr<PmtmgmpRPpath> GetCopy();
+			Ptr<PmtmgmpRoutePath> GetCopy();
 		private:
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			////路由表路径搜索器
@@ -119,7 +123,7 @@ namespace ns3 {
 			uint8_t m_PMTMGMPpathNodeListNum;
 #endif
 			////候选路由信息列表
-			std::vector<Ptr<PmtmgmpRPpath> >  m_CandidateRouteInformaiton;
+			std::vector<Ptr<PmtmgmpRoutePath> >  m_CandidateRouteInformaiton;
 			RouteInformationStatus m_InformationStatus;
 			
 			////来源节点MAC
@@ -130,13 +134,13 @@ namespace ns3 {
 		};
 
 		////路由表树
-		class PmtmgmpRPtree : public Object
+		class PmtmgmpRouteTree : public Object
 		{
 		public:
-			PmtmgmpRPtree();
-			~PmtmgmpRPtree();
+			PmtmgmpRouteTree();
+			~PmtmgmpRouteTree();
 			static TypeId GetTypeId();
-			std::vector<Ptr<PmtmgmpRPpath> > GetPartTree();
+			std::vector<Ptr<PmtmgmpRoutePath> > GetPartTree();
 
 			void SetMTERPaddress(Mac48Address address);
 
@@ -144,13 +148,13 @@ namespace ns3 {
 			Time GetAcceptInformaitonDelay() const;
 			
 			////获取MTERP、MSECP对应的Path
-			Ptr<PmtmgmpRPpath> GetPathByMACaddress(Mac48Address msecp);
+			Ptr<PmtmgmpRoutePath> GetPathByMACaddress(Mac48Address msecp);
 			////获取度量最小的路径
-			std::vector<Ptr<PmtmgmpRPpath> > GetBestPath();
+			std::vector<Ptr<PmtmgmpRoutePath> > GetBestPath();
 			////获取度量最小的路径
-			std::vector<Ptr<PmtmgmpRPpath> > GetBestPath(std::vector<Ptr<PmtmgmpRPpath> > pathList);
+			std::vector<Ptr<PmtmgmpRoutePath> > GetBestPath(std::vector<Ptr<PmtmgmpRoutePath> > pathList);
 			////添加新路径
-			void AddNewPath(Ptr<PmtmgmpRPpath> path);
+			void AddNewPath(Ptr<PmtmgmpRoutePath> path);
 			////获取当前路径的最大生成顺序号
 			uint32_t GetTreeMaxGenerationSeqNumber();
 			////全部路径置为过期
@@ -163,19 +167,25 @@ namespace ns3 {
 			void RepeatabilityReset();
 			////接受某个候选信息
 			void AcceptCandidateRouteInformaiton(Mac48Address address);
+
+			////Python调用函数
+			uint8_t GetTreeSize() const;
+			Ptr<PmtmgmpRoutePath> GetTreeItem(uint8_t index) const;
+			uint8_t GetRepeatabilitySize() const;
+			uint8_t GetRepeatabilityItem(uint8_t index) const;
 		private:
 			////路由表树搜索器
 			struct PmtmgmpRPtree_Finder
 			{
 				PmtmgmpRPtree_Finder(Mac48Address msecp) :m_msecp(msecp){};
-				bool operator()(Ptr<PmtmgmpRPpath> p)
+				bool operator()(Ptr<PmtmgmpRoutePath> p)
 				{
 					return m_msecp == p->GetMSECPaddress();
 				}
 				Mac48Address m_msecp;
 			};
 		private:
-			std::vector<Ptr<PmtmgmpRPpath> >  m_partTree;
+			std::vector<Ptr<PmtmgmpRoutePath> >  m_tree;
 			Mac48Address m_MTERPaddress;
 
 			////终端节点可拥有的辅助节点数量
@@ -189,33 +199,37 @@ namespace ns3 {
 		};
 
 		////路由表
-		class PmtmgmpRPRouteTable : public Object
+		class PmtmgmpRouteTable : public Object
 		{
 		public:
-			PmtmgmpRPRouteTable();
-			~PmtmgmpRPRouteTable();
+			PmtmgmpRouteTable();
+			~PmtmgmpRouteTable();
 
-			std::vector<Ptr<PmtmgmpRPtree> > GetRouteTable();
+			std::vector<Ptr<PmtmgmpRouteTree> > GetRouteTable();
 
 			////获取MTERP对应的Tree
-			Ptr<PmtmgmpRPtree> GetTreeByMACaddress(Mac48Address mterp);
+			Ptr<PmtmgmpRouteTree> GetTreeByMACaddress(Mac48Address mterp);
 			////获取MTERP、MSECP对应的Path
-			Ptr<PmtmgmpRPpath> GetPathByMACaddress(Mac48Address mterp, Mac48Address msecp);
+			Ptr<PmtmgmpRoutePath> GetPathByMACaddress(Mac48Address mterp, Mac48Address msecp);
 			////添加新路径
-			void AddNewPath(Ptr<PmtmgmpRPpath> path);
+			void AddNewPath(Ptr<PmtmgmpRoutePath> path);
+
+			////Python调用函数
+			uint8_t GetTableSize() const;
+			Ptr<PmtmgmpRouteTree> GetTableItem(uint8_t index) const;
 		private:
 			////路由表路径搜索器
 			struct PmtmgmpRProuteTable_Finder
 			{
 				PmtmgmpRProuteTable_Finder(Mac48Address address) :m_address(address) {};
-				bool operator()(Ptr<PmtmgmpRPtree> p)
+				bool operator()(Ptr<PmtmgmpRouteTree> p)
 				{
 					return m_address == p->GetMTERPaddress();
 				}
 				Mac48Address m_address;
 			};
 		private:
-			std::vector<Ptr<PmtmgmpRPtree> >  m_partTable;
+			std::vector<Ptr<PmtmgmpRouteTree> >  m_table;
 		};
 #endif
 		/**

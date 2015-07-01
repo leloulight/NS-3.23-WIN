@@ -39,7 +39,7 @@ namespace ns3 {
 			////附带路径相关函数
 			void AddPartPathNode(Mac48Address address);
 #endif
-			Ptr<PmtmgmpRPpath> GetPathInfo();
+			Ptr<PmtmgmpRoutePath> GetPathInfo();
 			
 			// Setters for fields:
 			void SetOriginatorAddress(Mac48Address originator_address);
@@ -58,7 +58,7 @@ namespace ns3 {
 			uint8_t  GetHopCount() const;
 			uint8_t  GetTtl() const;
 			double GetMetric() const;
-			Ptr<PmtmgmpRPpath> GetPathInfo() const;
+			Ptr<PmtmgmpRoutePath> GetPathInfo() const;
 
 			/// Handle TTL and Metric:
 			void  DecrementTtl();
@@ -72,7 +72,7 @@ namespace ns3 {
 			virtual void Print(std::ostream& os) const;
 		private:
 			uint8_t  m_ttl;
-			Ptr<PmtmgmpRPpath> m_PathInfo;
+			Ptr<PmtmgmpRoutePath> m_PathInfo;
 
 			friend bool operator== (const IePgen & a, const IePgen & b);
 		};

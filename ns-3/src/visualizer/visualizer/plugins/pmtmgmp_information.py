@@ -23,10 +23,10 @@ class ShowPmtmgmpInforamtion(InformationWindow):
         self.table_model = gtk.ListStore(str, str, int, int, int, float, bool)
 
         self.pmtmgmp = device.GetRoutingProtocol()
-        type_index = self.pmtmgmp.GetNodeType()
-        type_str = ""
 
 		#Information label of Node
+        type_index = self.pmtmgmp.GetNodeType()
+        type_str = ""
         if type_index == 0:
             type_str = "Mesh_STA"
         if type_index == 1:
@@ -35,13 +35,14 @@ class ShowPmtmgmpInforamtion(InformationWindow):
             type_str = "Mesh_Portal"
         if type_index == 3:
             type_str = "Mesh_Secondary_Point"
-        label = gtk.Label("Information For Node[" + bytes(self.node_index) + "]:" + type_str)
-        label.show()
+        self.label = gtk.Label("Information For Node[" + bytes(self.node_index) + "]:" + type_str)
+        self.label.show()
 
         vbox = gtk.VBox()
         hbox = gtk.HBox()
-        hbox.pack_start(label, False, False, 3)
+        hbox.pack_start(self.label, False, False, 3)
         hbox.show()
+        vbox.show()
         vbox.pack_start(hbox, False, True, 0)
         h_eparator = gtk.HSeparator()
         h_eparator.show()
@@ -50,6 +51,15 @@ class ShowPmtmgmpInforamtion(InformationWindow):
         #NoteBook
         self.notebook = gtk.Notebook()
         self.notebook.show()
+        vbox.add(self.notebook)
+
+        #ScrolledWindow
+        sw = gtk.ScrolledWindow()
+        sw.set_properties(hscrollbar_policy=gtk.POLICY_AUTOMATIC,
+                          vscrollbar_policy=gtk.POLICY_AUTOMATIC)
+        sw.show()
+        sw.add_with_viewport(vbox)
+        self.win.vbox.add(sw)
 
         self.visualizer.add_information_window(self)
         self.win.show()
@@ -59,7 +69,25 @@ class ShowPmtmgmpInforamtion(InformationWindow):
         self.visualizer.remove_information_window(self)
     
     def update(self):
+		#Information label of Node
+        type_index = self.pmtmgmp.GetNodeType()
+        type_str = ""
+        if type_index == 0:
+            type_str = "Mesh_STA"
+        if type_index == 1:
+            type_str = "Mesh_Access_Point"
+        if type_index == 2:
+            type_str = "Mesh_Portal"
+        if type_index == 3:
+            type_str = "Mesh_Secondary_Point"
+        self.label = gtk.Label("Information For Node[" + bytes(self.node_index) + "]:" + type_str)
+        self.label.show()
+
+        #Shouw Route Table
         route_table = self.pmtmgmp.GetPmtmgmpRPRouteTable()
+        tree_list = route_table.GetRouteTable()
+        if (tree_list.size() == 0):
+            self.notebook.append_page(gtk.Label("No Path", "No Path"))
 
 def populate_node_menu(viz, node, menu):    
     ns3_node = ns.network.NodeList.GetNode(node.node_index)
