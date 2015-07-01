@@ -17,14 +17,14 @@ class ShowPmtmgmpInforamtion(InformationWindow):
                               buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
         self.win.set_default_size(gtk.gdk.screen_width()/2, gtk.gdk.screen_height()/2)
         self.win.connect("response", self._response_cb)
-        self.win.set_title("PMTMGMP information for node %i" % node_index) 
+        self.win.set_title("PMTMGMP information for node %i" % node_index)
         self.visualizer = visualizer
         self.node_index = node_index
         self.table_model = gtk.ListStore(str, str, int, int, int, float, bool)
 
         self.pmtmgmp = device.GetRoutingProtocol()
 
-		#Information label of Node
+        #Information label of Node
         type_index = self.pmtmgmp.GetNodeType()
         type_str = ""
         if type_index == 0:
@@ -63,13 +63,13 @@ class ShowPmtmgmpInforamtion(InformationWindow):
 
         self.visualizer.add_information_window(self)
         self.win.show()
-        
+
     def _response_cb(self, win, response):
         self.win.destroy()
         self.visualizer.remove_information_window(self)
-    
+
     def update(self):
-		#Information label of Node
+        #Information label of Node
         type_index = self.pmtmgmp.GetNodeType()
         type_str = ""
         if type_index == 0:
@@ -85,11 +85,20 @@ class ShowPmtmgmpInforamtion(InformationWindow):
 
         #Shouw Route Table
         route_table = self.pmtmgmp.GetPmtmgmpRPRouteTable()
-        tree_list = route_table.GetRouteTable()
-        if (tree_list.size() == 0):
-            self.notebook.append_page(gtk.Label("No Path", "No Path"))
+        for i in range(0, self.notebook.get_n_pages() - 1, 1):
+            self.notebook.remove_page(i)
+        if (route_table.GetTableSize() == 0):
+            lable_page = gtk.Label("No Path")
+            lable_page.show()
+            lable_title = gtk.Label("No Path")
+            lable_title.show()
+            self.notebook.append_page(lable_page, gtk.Label("No Path"))
+        else:
+            for i in range(0, route_table.GetTableSize()):
+                page_vbox = gtk.VBox()
+                page_label_
 
-def populate_node_menu(viz, node, menu):    
+def populate_node_menu(viz, node, menu):
     ns3_node = ns.network.NodeList.GetNode(node.node_index)
     WmnDevice = None
     for devI in range(ns3_node.GetNDevices()):
@@ -103,7 +112,7 @@ def populate_node_menu(viz, node, menu):
 
     menu_item = gtk.MenuItem("Show Pmtmgmp Information")
     menu_item.show()
-    
+
     def _show_pmtmgmp_information(dummy_menu_item):
         ShowPmtmgmpInforamtion(viz, node.node_index, WmnDevice)
 

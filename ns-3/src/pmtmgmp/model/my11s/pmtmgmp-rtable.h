@@ -30,6 +30,9 @@ namespace ns3 {
 	namespace my11s {
 
 #ifndef PMTMGMP_UNUSED_MY_CODE
+		/*************************
+		* PmtmgmpRoutePath
+		************************/
 		////路由表路径
 		class PmtmgmpRoutePath : public Object
 		{
@@ -133,6 +136,9 @@ namespace ns3 {
 			EventId m_AcceptCandidateRouteInformaitonEvent;
 		};
 
+		/*************************
+		* PmtmgmpRouteTree
+		************************/
 		////路由表树
 		class PmtmgmpRouteTree : public Object
 		{
@@ -198,6 +204,9 @@ namespace ns3 {
 			Time m_AcceptInformaitonDelay;
 		};
 
+		/*************************
+		* PmtmgmpRouteTable
+		************************/
 		////路由表
 		class PmtmgmpRouteTable : public Object
 		{
@@ -232,6 +241,9 @@ namespace ns3 {
 			std::vector<Ptr<PmtmgmpRouteTree> >  m_table;
 		};
 #endif
+		/*************************
+		* PmtmgmpRtable
+		************************/
 		/**
 		 * \ingroup my11s
 		 *
