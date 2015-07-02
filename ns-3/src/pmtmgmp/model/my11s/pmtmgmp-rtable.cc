@@ -48,7 +48,8 @@ namespace ns3 {
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			m_PMTMGMPpathNodeListNum(2),
 #endif
-			m_InformationStatus(Confirmed)
+			m_InformationStatus(Confirmed),
+			m_MaxCandidateNum(4)
 		{
 		}
 
@@ -71,6 +72,13 @@ namespace ns3 {
 					MakeUintegerChecker<uint8_t>(0)
 					)
 #endif
+				.AddAttribute("MaxCandidateNum",
+					"Max number of Candidate Information",
+					UintegerValue(4),
+					MakeUintegerAccessor(
+						&PmtmgmpRoutePath::m_MaxCandidateNum),
+					MakeUintegerChecker<uint8_t>(0)
+					)
 				;
 			return tid;
 		}

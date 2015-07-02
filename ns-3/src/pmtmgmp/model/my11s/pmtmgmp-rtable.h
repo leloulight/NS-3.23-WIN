@@ -128,6 +128,7 @@ namespace ns3 {
 			////候选路由信息列表
 			std::vector<Ptr<PmtmgmpRoutePath> >  m_CandidateRouteInformaiton;
 			RouteInformationStatus m_InformationStatus;
+			uint8_t m_MaxCandidateNum;
 			
 			////来源节点MAC
 			Mac48Address m_FormNode;

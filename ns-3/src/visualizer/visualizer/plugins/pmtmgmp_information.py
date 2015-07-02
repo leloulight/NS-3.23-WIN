@@ -68,6 +68,35 @@ class ShowPmtmgmpInforamtion(InformationWindow):
         self.win.destroy()
         self.visualizer.remove_information_window(self)
 
+    def new_notebook_page(self):
+        page_vbox = gtk.VBox()
+        page_vbox.show()
+        page_treeview_model = gtk.ListStore(int, str, str)
+        page_treeview = gtk.TreeView(page_treeview_model)
+        page_treeview.show()
+        page_vbox.add(page_treeview)
+        page_treeviewcolum = gtk.TreeViewColumn('Index', gtk.CellRendererText(), text=0)
+        page_treeview.append_column(page_treeviewcolum)
+        page_treeviewcolum = gtk.TreeViewColumn('MTERP', gtk.CellRendererText(), text=1)
+        page_treeview.append_column(page_treeviewcolum)
+        page_treeviewcolum = gtk.TreeViewColumn('MSECP', gtk.CellRendererText(), text=2)
+        page_treeview.append_column(page_treeviewcolum)
+        page_treeviewcolum = gtk.TreeViewColumn('GSN', gtk.CellRendererText(), text=3)
+        page_treeview.append_column(page_treeviewcolum)
+        page_treeviewcolum = gtk.TreeViewColumn('HopCount', gtk.CellRendererText(), text=4)
+        page_treeview.append_column(page_treeviewcolum)
+        page_treeviewcolum = gtk.TreeViewColumn('Metric', gtk.CellRendererText(), text=4)
+        page_treeview.append_column(page_treeviewcolum)
+        page_treeviewcolum = gtk.TreeViewColumn('FromNode', gtk.CellRendererText(), text=4)
+        page_treeview.append_column(page_treeviewcolum)
+        page_treeviewcolum = gtk.TreeViewColumn('Status', gtk.CellRendererText(), text=4)
+        page_treeview.append_column(page_treeviewcolum)
+
+        page_treeview_iter = page_treeview_model.append()
+        page_treeview_model.set(page_treeview_iter, 0, 'test', 1, 'int')
+        page_treeview_iter = page_treeview_model.append()
+        page_treeview_model.set(page_treeview_iter, 0, 'test1', 1, 'int1')
+
     def update(self):
         #Information label of Node
         type_index = self.pmtmgmp.GetNodeType()
@@ -85,7 +114,7 @@ class ShowPmtmgmpInforamtion(InformationWindow):
 
         #Shouw Route Table
         route_table = self.pmtmgmp.GetPmtmgmpRPRouteTable()
-        for i in range(0, self.notebook.get_n_pages() - 1, 1):
+        for i in range(0, self.notebook.get_n_pages()):
             self.notebook.remove_page(i)
         if (route_table.GetTableSize() == 0):
             lable_page = gtk.Label("No Path")
@@ -96,7 +125,20 @@ class ShowPmtmgmpInforamtion(InformationWindow):
         else:
             for i in range(0, route_table.GetTableSize()):
                 page_vbox = gtk.VBox()
-                page_label_
+                page_vbox.show()
+                page_treeview_model = gtk.ListStore(int, str, str)
+                page_treeview = gtk.TreeView(page_treeview_model)
+                page_treeview.show()
+                page_vbox.add(page_treeview)
+                page_treeviewcolum = gtk.TreeViewColumn('Index', gtk.CellRendererText(), text=0)
+                page_treeview.append_column(page_treeviewcolum)
+                page_treeviewcolum = gtk.TreeViewColumn('MTERP Address', gtk.CellRendererText(), text=1)
+                page_treeview.append_column(page_treeviewcolum)
+                page_treeview_iter = page_treeview_model.append()
+                page_treeview_model.set(page_treeview_iter, 0, 'test', 1, 'int')
+                page_treeview_iter = page_treeview_model.append()
+                page_treeview_model.set(page_treeview_iter, 0, 'test1', 1, 'int1')
+                notebook.append_page(page_vbox, gtk.Label("Node 1"))
 
 def populate_node_menu(viz, node, menu):
     ns3_node = ns.network.NodeList.GetNode(node.node_index)
