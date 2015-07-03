@@ -54,8 +54,11 @@ public:
   Mac48Address GetAddress ();
   void  SetTtl (uint8_t ttl);
   uint8_t GetTtl ();
+#ifdef PMTMGMP_UNUSED_MY_CODE
+  //不需要使用度量
   void  SetMetric (uint32_t metric);
   uint32_t GetMetric ();
+#endif
   void  SetSeqno (uint32_t seqno);
   uint32_t GetSeqno ();
   void  DecrementTtl ();
@@ -73,7 +76,10 @@ public:
 private:
   Mac48Address m_address;
   uint8_t  m_ttl;
+#ifdef PMTMGMP_UNUSED_MY_CODE
+  //不需要使用度量
   uint32_t m_metric;
+#endif
   uint32_t m_seqno;
 #ifndef PMTMGMP_UNUSED_MY_CODE
   Mac48Address m_MSECP;

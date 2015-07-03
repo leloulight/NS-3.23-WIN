@@ -56,6 +56,7 @@ namespace ns3 {
 			void AddCandidateRouteInformaiton(Ptr<PmtmgmpRoutePath> path);
 			void ClearCandidateRouteInformaiton();
 			std::vector<Ptr<PmtmgmpRoutePath> > GetCandidateRouteInformaiton() const;
+			uint8_t GetMaxCandidateNum() const;
 
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			std::vector<Mac48Address> GetPathInfo() const;

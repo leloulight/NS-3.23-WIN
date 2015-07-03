@@ -84,7 +84,14 @@ namespace ns3 {
 		}
 		void PmtmgmpRoutePath::AddCandidateRouteInformaiton(Ptr<PmtmgmpRoutePath> path)
 		{
-			m_CandidateRouteInformaiton.push_back(path);
+			if (m_CandidateRouteInformaiton.size() <= m_MaxCandidateNum)
+			{
+				m_CandidateRouteInformaiton.push_back(path);
+			}
+			else
+			{
+				NS_LOG_DEBUG("Receive more candidate route informaiton .");
+			}
 		}
 		void PmtmgmpRoutePath::ClearCandidateRouteInformaiton()
 		{
@@ -93,6 +100,10 @@ namespace ns3 {
 		std::vector<Ptr<PmtmgmpRoutePath> > PmtmgmpRoutePath::GetCandidateRouteInformaiton() const
 		{
 			return m_CandidateRouteInformaiton;
+		}
+		uint8_t PmtmgmpRoutePath::GetMaxCandidateNum() const
+		{
+			return m_MaxCandidateNum;
 		}
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 		std::vector<Mac48Address> PmtmgmpRoutePath::GetPathInfo() const
