@@ -35,6 +35,8 @@
 #include <ctime>
 
 //#define OUT_TO_FILE 
+#define NO_APPLICATION
+
 
 //角度转换
 #define DEGREES_TO_RADIANS(__ANGLE__) ((__ANGLE__) * 0.01745329252f) // PI / 180
@@ -606,8 +608,20 @@ int MeshRouteClass::Run()
 	LocateNodes();
 	// 安装网络协议栈
 	InstallInternetStack();
+#ifndef NO_APPLICATION
 	// 安装应用层
 	InstallApplicationRandom();
+#else
+	if (m_SourceNum < 0 || m_SourceNum >= l_NodeNum) m_SourceNum = 0;
+	if (m_DestinationNum < 0 || m_DestinationNum >= l_NodeNum || m_DestinationNum == m_SourceNum) m_DestinationNum = l_NodeNum - 1;
+	m_SourceNum = m_Size + 1;
+	m_DestinationNum = m_Size * (m_Size - 1) - 2;
+	if (m_ProtocolType == MY11S_PMTMGMP)
+	{
+		DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(m_SourceNum)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Access_Point);
+		DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(m_DestinationNum)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Portal);
+	}
+#endif
 	// 数据统计模块配置
 	void StatsDataSet();
 
