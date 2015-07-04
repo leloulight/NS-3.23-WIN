@@ -27,13 +27,13 @@ class ShowPmtmgmpInforamtion(InformationWindow):
         #Information label of Node
         type_index = self.pmtmgmp.GetNodeType()
         type_str = ""
-        if type_index == 0:
-            type_str = "Mesh_STA"
         if type_index == 1:
-            type_str = "Mesh_Access_Point"
+            type_str = "Mesh_STA"
         if type_index == 2:
+            type_str = "Mesh_Access_Point"
+        if type_index == 4:
             type_str = "Mesh_Portal"
-        if type_index == 3:
+        if type_index == 8:
             type_str = "Mesh_Secondary_Point"
         self.label = gtk.Label("Information For Node[" + bytes(self.node_index) + "]:" + type_str)
         self.label.show()
