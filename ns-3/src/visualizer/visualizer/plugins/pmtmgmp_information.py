@@ -68,16 +68,39 @@ class ShowPmtmgmpInforamtion(InformationWindow):
         self.win.destroy()
         self.visualizer.remove_information_window(self)
 
+    def get_node_type(self, type_index):
+        type_str = ""
+        if type_index == 1:
+            type_str = "Mesh_STA"
+        if type_index == 2:
+            type_str = "Mesh_Access_Point"
+        if type_index == 4:
+            type_str = "Mesh_Portal"
+        if type_index == 8:
+            type_str = "Mesh_Secondary_Point"
+        return type_str
+
+    def get_infor_status(self, type_index):
+        type_str = ""
+        if type_index == 0:
+            type_str = "Expired"
+        if type_index == 1:
+            type_str = "Waited"
+        if type_index == 2:
+            type_str = "Confirmed"
+        return type_str
+
     def update(self):
         class New_Notebook_Page():
             def __init__(self):
                 self.page_vbox = gtk.VBox()
                 self.page_vbox.show()
                 list_type = []
-                self.page_column_num = 0
-                for self.page_column_num in range(0, ns.pmtmgmp.my11s.PmtmgmpRoutePath().GetMaxCandidateNum()):
+                self.page_column_num = ns.pmtmgmp.my11s.PmtmgmpRoutePath().GetMaxCandidateNum()
+                for i in range(0, self.page_column_num):
                     list_type.append(str)
-                self.page_treeview_model = gtk.ListStore(int, str, str, int, int, float, str, str, *list_type)
+                    list_type.append(float)
+                self.page_treeview_model = gtk.ListStore(int, str, str, int, str, int, float, str, str, *list_type)
                 self.page_treeview = gtk.TreeView(self.page_treeview_model)
                 self.page_treeview.show()
                 self.page_vbox.add(self.page_treeview)
@@ -89,30 +112,24 @@ class ShowPmtmgmpInforamtion(InformationWindow):
                 self.page_treeview.append_column(page_treeviewcolum)
                 page_treeviewcolum = gtk.TreeViewColumn(' GSN ', gtk.CellRendererText(), text = 3)
                 self.page_treeview.append_column(page_treeviewcolum)
-                page_treeviewcolum = gtk.TreeViewColumn(' HopCount ', gtk.CellRendererText(), text = 4)
+                page_treeviewcolum = gtk.TreeViewColumn(' NodeType ', gtk.CellRendererText(), text = 4)
                 self.page_treeview.append_column(page_treeviewcolum)
-                page_treeviewcolum = gtk.TreeViewColumn(' Metric ', gtk.CellRendererText(), text = 5)
+                page_treeviewcolum = gtk.TreeViewColumn(' HopCount ', gtk.CellRendererText(), text = 5)
                 self.page_treeview.append_column(page_treeviewcolum)
-                page_treeviewcolum = gtk.TreeViewColumn(' FromNode ', gtk.CellRendererText(), text = 6)
+                page_treeviewcolum = gtk.TreeViewColumn(' Metric ', gtk.CellRendererText(), text = 6)
                 self.page_treeview.append_column(page_treeviewcolum)
-                page_treeviewcolum = gtk.TreeViewColumn(' Status ', gtk.CellRendererText(), text = 7)
+                page_treeviewcolum = gtk.TreeViewColumn(' FromNode ', gtk.CellRendererText(), text = 7)
                 self.page_treeview.append_column(page_treeviewcolum)
-                for self.page_column_num in range(0, ns.pmtmgmp.my11s.PmtmgmpRoutePath().GetMaxCandidateNum()):
-                    page_treeviewcolum = gtk.TreeViewColumn(' Candidate_ ' +  bytes(self.page_column_num) + ' ', gtk.CellRendererText(), text= self.page_column_num + 8)
+                page_treeviewcolum = gtk.TreeViewColumn(' Status ', gtk.CellRendererText(), text = 8)
+                self.page_treeview.append_column(page_treeviewcolum)
+                for i in range(0, self.page_column_num, 2):
+                    page_treeviewcolum = gtk.TreeViewColumn(' Candidate' +  bytes(self.page_column_num) + '_From ', gtk.CellRendererText(), text= i + 9)
+                    self.page_treeview.append_column(page_treeviewcolum)
+                    page_treeviewcolum = gtk.TreeViewColumn(' Candidate_ ' +  bytes(self.page_column_num) + '_Metric ', gtk.CellRendererText(), text= i + 10)
                     self.page_treeview.append_column(page_treeviewcolum)
 
         #Information label of Node
-        type_index = self.pmtmgmp.GetNodeType()
-        type_str = ""
-        if type_index == 0:
-            type_str = "Mesh_STA"
-        if type_index == 1:
-            type_str = "Mesh_Access_Point"
-        if type_index == 2:
-            type_str = "Mesh_Portal"
-        if type_index == 3:
-            type_str = "Mesh_Secondary_Point"
-        self.label = gtk.Label("Information For Node[" + bytes(self.node_index) + "]:" + type_str)
+        self.label = gtk.Label("Information For Node[" + bytes(self.node_index) + "]:" + self.get_node_type(self.pmtmgmp.GetNodeType()))
         self.label.show()
 
         #Shouw Route Table
@@ -127,8 +144,35 @@ class ShowPmtmgmpInforamtion(InformationWindow):
             self.notebook.append_page(lable_page, gtk.Label("No Path"))
         else:
             for i in range(0, route_table.GetTableSize()):
+                route_tree = route_table.GetTableItem(i)
                 page =  New_Notebook_Page()
-                page_treeview_iter = page.page_treeview_model.append()
+                index = 0
+                for j in range(0, route_tree.GetTreeSize()):
+                    route_path = route_tree.GetTreeItem(j)
+                    page_treeview_iter = page.page_treeview_model.append()
+                    data = []
+                    for k in range(0, route_path.GetCandidateRouteInformaitonSize()):
+                        candidate_infor = route_path.GetCandidateRouteInformaitonItem(k)
+                        data.append(k + 9)
+                        data.append(str(candidate_infor.GetFromNode()))
+                        data.append(k + 10)
+                        data.append(candidate_infor.GetMetric())
+
+                    page.page_treeview_model.set(
+                        page_treeview_iter,
+                        0, index,
+                        1, str(route_path.GetMTERPaddress()),
+                        2, str(route_path.GetMSECPaddress()),
+                        3, route_path.GetPathGenerationSequenceNumber(),
+                        4, self.get_node_type(route_path.GetNodeType()),
+                        5, route_path.GetHopCount(),
+                        6, route_path.GetMetric(),
+                        7, str(route_path.GetFromNode()),
+                        8, self.get_infor_status(route_path.GetStatus()),
+                        *data)
+
+                    index = index + 1
+
                 self.notebook.append_page(page.page_vbox, gtk.Label("Node 1" + bytes(i)))
 
 def populate_node_menu(viz, node, menu):
