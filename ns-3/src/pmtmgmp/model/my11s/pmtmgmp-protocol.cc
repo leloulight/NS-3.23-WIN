@@ -1595,9 +1595,10 @@ namespace ns3 {
 									break;
 								case PmtmgmpRoutePath::Waited:
 									existPath->AddCandidateRouteInformaiton(pathCopy);
-									return;
+									return; 
+									NS_LOG_DEBUG("Pgen form " << from << " waits for Confirme at node " << m_address);
 								case PmtmgmpRoutePath::Confirmed:
-									NS_LOG_ERROR("Path is Confirmed ,but GSN is not update");
+									NS_LOG_ERROR("Pgen form " << from << " :Path is Confirmed ,but GSN is not update at node " << m_address);
 									return;
 								}
 							}
@@ -1605,6 +1606,7 @@ namespace ns3 {
 						else
 						{
 							////PGEN所属路径生成信息已确定
+							NS_LOG_DEBUG("Pgen form " << from << "Node " << m_address << " has been Confirmed");
 							return;
 						}
 					}
@@ -1612,12 +1614,14 @@ namespace ns3 {
 				else
 				{
 					////过期PGEN，放弃
+					NS_LOG_DEBUG("Pgen form " << from << "Node " << m_address << " has been Expired");
 					return;
 				}
 			}
 			if (pgen.GetTtl() > 0)
 			{
 				////转发PGEN
+				NS_LOG_DEBUG("Pgen form " << from << "Node " << m_address << " has been Transmit");
 				sendPgen(pgen);
 			}
 		}

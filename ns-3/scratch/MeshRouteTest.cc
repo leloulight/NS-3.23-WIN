@@ -34,7 +34,7 @@
 #include <fstream>
 #include <ctime>
 
-//#define OUT_TO_FILE 
+#define OUT_TO_FILE 
 #define NO_APPLICATION
 
 
