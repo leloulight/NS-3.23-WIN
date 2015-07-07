@@ -73,7 +73,11 @@ class ShowPmtmgmpInforamtion(InformationWindow):
             def __init__(self):
                 self.page_vbox = gtk.VBox()
                 self.page_vbox.show()
-                self.page_treeview_model = gtk.ListStore(int, str, str, int, int, float, str, str)
+                list_type = []
+                self.page_column_num = 0
+                for self.page_column_num in range(0, ns.pmtmgmp.my11s.PmtmgmpRoutePath().GetMaxCandidateNum()):
+                    list_type.append(str)
+                self.page_treeview_model = gtk.ListStore(int, str, str, int, int, float, str, str, *list_type)
                 self.page_treeview = gtk.TreeView(self.page_treeview_model)
                 self.page_treeview.show()
                 self.page_vbox.add(self.page_treeview)
@@ -93,8 +97,6 @@ class ShowPmtmgmpInforamtion(InformationWindow):
                 self.page_treeview.append_column(page_treeviewcolum)
                 page_treeviewcolum = gtk.TreeViewColumn(' Status ', gtk.CellRendererText(), text = 7)
                 self.page_treeview.append_column(page_treeviewcolum)
-
-                self.page_column_num = 0
                 for self.page_column_num in range(0, ns.pmtmgmp.my11s.PmtmgmpRoutePath().GetMaxCandidateNum()):
                     page_treeviewcolum = gtk.TreeViewColumn(' Candidate_ ' +  bytes(self.page_column_num) + ' ', gtk.CellRendererText(), text= self.page_column_num + 8)
                     self.page_treeview.append_column(page_treeviewcolum)
