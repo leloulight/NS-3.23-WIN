@@ -144,7 +144,7 @@ namespace ns3 {
 		}
 		void IePgen::SerializeInformationField(Buffer::Iterator i) const
 		{
-			WriteTo(i, m_PathInfo->GetMSECPaddress());
+			WriteTo(i, m_PathInfo->GetMTERPaddress());
 			WriteTo(i, m_PathInfo->GetMSECPaddress());
 			i.WriteHtolsbU32(m_PathInfo->GetPathGenerationSequenceNumber());
 			i.WriteU8(m_PathInfo->GetNodeType());

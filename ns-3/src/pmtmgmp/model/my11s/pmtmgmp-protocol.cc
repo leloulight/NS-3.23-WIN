@@ -1483,26 +1483,26 @@ namespace ns3 {
 		void PmtmgmpProtocol::SendFirstPgen(IeSecack secack, uint32_t metric)
 		{
 			NS_LOG_DEBUG("Send first PGEN" << " at node " << m_address << " while metric is " << metric <<", origination is " << secack.GetOriginatorAddress() << ", GSN is "<< secack.GetPathGenerationSequenceNumber());
-			IePgen Pgen;
-			Pgen.SetOriginatorAddress(secack.GetOriginatorAddress());
-			Pgen.SetMSECPaddress(m_address);
-			Pgen.SetPathGenerationSequenceNumber(secack.GetPathGenerationSequenceNumber());
-			Pgen.SetNodeType(secack.GetNodeType());
-			Pgen.SetHopcount(1);
-			Pgen.SetTTL(m_maxTtl);
-			Pgen.SetMetric(metric);
+			IePgen pgen;
+			pgen.SetOriginatorAddress(secack.GetOriginatorAddress());
+			pgen.SetMSECPaddress(m_address);
+			pgen.SetPathGenerationSequenceNumber(secack.GetPathGenerationSequenceNumber());
+			pgen.SetNodeType(secack.GetNodeType());
+			pgen.SetHopcount(1);
+			pgen.SetTTL(m_maxTtl);
+			pgen.SetMetric(metric);
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			////添加原始默认路径（源节点到当前辅助节点）
-			Pgen.AddPartPathNode(secack.GetOriginatorAddress());
-			Pgen.AddPartPathNode(m_address);
+			pgen.AddPartPathNode(secack.GetOriginatorAddress());
+			pgen.AddPartPathNode(m_address);
 #endif
 
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
-				i->second->SendPgen(Pgen);
+				i->second->SendPgen(pgen);
 			}
 		}
-		////转发Pgen
+		////转发pgen
 		void PmtmgmpProtocol::sendPgen(IePgen pgen)
 		{
 			NS_LOG_DEBUG("Send PGEN " << " at node " << m_address << " while metric is " << pgen.GetMetric() << ", origination is " << pgen.GetOriginatorAddress() << ", GSN is " << pgen.GetPathGenerationSequenceNumber());
@@ -1574,7 +1574,7 @@ namespace ns3 {
 					}
 					else
 					{
-						if (existPath->GetPathGenerationSequenceNumber() > pathCopy->GetPathGenerationSequenceNumber())
+						if (existPath->GetPathGenerationSequenceNumber() > GenSeqNum)
 						{
 							////路径不重复效验
 							if (routeTree->GetRepeatability(from) == 0)

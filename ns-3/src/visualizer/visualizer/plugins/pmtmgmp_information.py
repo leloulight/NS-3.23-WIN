@@ -15,12 +15,11 @@ class ShowPmtmgmpInforamtion(InformationWindow):
         self.win = gtk.Dialog(parent=visualizer.window,
                               flags=gtk.DIALOG_DESTROY_WITH_PARENT|gtk.DIALOG_NO_SEPARATOR,
                               buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
-        self.win.set_default_size(gtk.gdk.screen_width()/2, gtk.gdk.screen_height()/2)
+        self.win.set_default_size(gtk.gdk.screen_width()*3/4, gtk.gdk.screen_height()/2)
         self.win.connect("response", self._response_cb)
         self.win.set_title("PMTMGMP information for node %i" % node_index)
         self.visualizer = visualizer
         self.node_index = node_index
-        self.table_model = gtk.ListStore(str, str, int, int, int, float, bool)
 
         self.pmtmgmp = device.GetRoutingProtocol()
 
@@ -35,7 +34,7 @@ class ShowPmtmgmpInforamtion(InformationWindow):
             type_str = "Mesh_Portal"
         if type_index == 8:
             type_str = "Mesh_Secondary_Point"
-        self.label = gtk.Label("Information For Node[" + bytes(self.node_index) + "]:" + type_str)
+        self.label = gtk.Label("Information For Node[" + bytes(self.node_index) + "]:" + type_str + "(" + str(device.GetAddress()))
         self.label.show()
 
         vbox = gtk.VBox()
