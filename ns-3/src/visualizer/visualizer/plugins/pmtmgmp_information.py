@@ -172,7 +172,7 @@ class ShowPmtmgmpInforamtion(InformationWindow):
 
                     index = index + 1
 
-                self.notebook.append_page(page.page_vbox, gtk.Label("Node 1" + bytes(i)))
+                self.notebook.append_page(page.page_vbox, gtk.Label("Node " + bytes(i)))
 
 def populate_node_menu(viz, node, menu):
     ns3_node = ns.network.NodeList.GetNode(node.node_index)

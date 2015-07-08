@@ -1416,7 +1416,7 @@ namespace ns3 {
 		////延迟整理SECREP信息，选取可接受的MSECP
 		void PmtmgmpProtocol::SelectMSECP()
 		{
-			NS_LOG_DEBUG("Receive SECREP:" << m_SECREPinformation.size() << " at " << m_address);
+			NS_LOG_DEBUG("Receive SECREP " << m_SECREPinformation.size() << " at " << m_address);
 			m_PathGenerationSeqNumber += 1;
 			for (std::vector<SECREPinformation>::iterator selectIter = m_SECREPinformation.begin(); selectIter != m_SECREPinformation.end(); selectIter++)
 			{
@@ -1462,6 +1462,7 @@ namespace ns3 {
 			{
 				for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 				{
+					NS_LOG_DEBUG("Send SECACK at " << m_address << " to " << selectIter->m_address);
 					i->second->SendSecack(secack, selectIter->m_address);
 				}
 			}
@@ -1469,11 +1470,11 @@ namespace ns3 {
 		////接收SECACK
 		void PmtmgmpProtocol::ReceiveSecack(IeSecack secack, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
-			NS_LOG_DEBUG("Receive SECACK from " << from << " at interface " << interface << " while metric is " << metric);
+			NS_LOG_DEBUG("Receive SECACK from " << from << " at interface " << interface << " while metric is " << metric << " at " << m_address);
 			
 			MSECPaffiliatedMSECPInformation newInformation;
 			newInformation.address = secack.GetOriginatorAddress();
-			newInformation.metric = metric;
+			newInformation.metric = metric * m_PMTMGMPmsecpAALMmagnification / sqrt(2);
 			newInformation.nodeType = secack.GetNodeType();
 			newInformation.selectIndex = secack.GetPathGenerationSequenceNumber();
 			m_AffiliatedMTERPlist.push_back(newInformation);
@@ -1482,7 +1483,7 @@ namespace ns3 {
 		////发送初始PGEN
 		void PmtmgmpProtocol::SendFirstPgen(IeSecack secack, uint32_t metric)
 		{
-			NS_LOG_DEBUG("Send first PGEN" << " at node " << m_address << " while metric is " << metric <<", origination is " << secack.GetOriginatorAddress() << ", GSN is "<< secack.GetPathGenerationSequenceNumber());
+			NS_LOG_DEBUG("Send first PGEN " << " at node " << m_address << " while metric is " << metric <<", origination is " << secack.GetOriginatorAddress() << ", GSN is "<< secack.GetPathGenerationSequenceNumber());
 			IePgen pgen;
 			pgen.SetOriginatorAddress(secack.GetOriginatorAddress());
 			pgen.SetMSECPaddress(m_address);
@@ -1490,7 +1491,7 @@ namespace ns3 {
 			pgen.SetNodeType(secack.GetNodeType());
 			pgen.SetHopcount(1);
 			pgen.SetTTL(m_maxTtl);
-			pgen.SetMetric(metric);
+			pgen.SetMetric(metric * m_PMTMGMPmsecpAALMmagnification / sqrt(2));
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			////添加原始默认路径（源节点到当前辅助节点）
 			pgen.AddPartPathNode(secack.GetOriginatorAddress());
@@ -1501,6 +1502,11 @@ namespace ns3 {
 			{
 				i->second->SendPgen(pgen);
 			}
+
+			////路由表存储
+			Ptr<PmtmgmpRoutePath> tempPath = pgen.GetPathInfo()->GetCopy();
+			tempPath->SetFromNode(secack.GetOriginatorAddress());
+			m_RouteTable->AddNewPath(tempPath);
 		}
 		////转发pgen
 		void PmtmgmpProtocol::sendPgen(IePgen pgen)
@@ -1514,7 +1520,20 @@ namespace ns3 {
 		////接收PGEN
 		void PmtmgmpProtocol::ReceivePgen(IePgen pgen, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
-			NS_LOG_DEBUG("Receive PGEN from" << from << " at node " << m_address << " at interface " << interface <<" while metric is " << metric << ", GSN is " << pgen.GetPathGenerationSequenceNumber());
+			////返回起始节点
+			if (pgen.GetOriginatorAddress() == m_address)
+			{
+				NS_LOG_DEBUG("Receive PGEN from " << from << " at node " << m_address << " , this is the MTERP, return.");
+				return;
+			}
+			if (pgen.GetMSECPaddress() == m_address)
+			{
+				NS_LOG_DEBUG("Receive PGEN from " << from << " at node " << m_address << " , this is the MSECP, return.");
+				return;
+			}
+
+			NS_LOG_DEBUG("Receive PGEN from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", GSN is " << pgen.GetPathGenerationSequenceNumber());
+			
 			////获取PGEN副本
 			Ptr<PmtmgmpRoutePath> pathCopy = pgen.GetPathInfo()->GetCopy();
 
@@ -1606,7 +1625,7 @@ namespace ns3 {
 						else
 						{
 							////PGEN所属路径生成信息已确定
-							NS_LOG_DEBUG("Pgen form " << from << "Node " << m_address << " has been Confirmed");
+							NS_LOG_DEBUG("Pgen form " << from << " at node " << m_address << " has been Confirmed");
 							return;
 						}
 					}
@@ -1614,14 +1633,14 @@ namespace ns3 {
 				else
 				{
 					////过期PGEN，放弃
-					NS_LOG_DEBUG("Pgen form " << from << "Node " << m_address << " has been Expired");
+					NS_LOG_DEBUG("Pgen form " << from << " at node " << m_address << " has been Expired");
 					return;
 				}
 			}
 			if (pgen.GetTtl() > 0)
 			{
 				////转发PGEN
-				NS_LOG_DEBUG("Pgen form " << from << "Node " << m_address << " has been Transmit");
+				NS_LOG_DEBUG("Pgen form " << from << " at node " << m_address << " has been Transmit");
 				sendPgen(pgen);
 			}
 		}
