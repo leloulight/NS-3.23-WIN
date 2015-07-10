@@ -244,7 +244,7 @@ namespace ns3 {
 		{
 			Ptr<PmtmgmpRoutePath> copy = CreateObject<PmtmgmpRoutePath>();
 			copy->SetMTERPaddress(m_MTERPaddress);
-			copy->SetMSECPaddress(m_MTERPaddress);
+			copy->SetMSECPaddress(m_MSECPaddress);
 			copy->SetPathGenerationSequenceNumber(m_PathGenerationSeqNumber);
 			copy->SetNodeType(m_NodeType);
 			copy->SetHopcount(m_hopCount);
