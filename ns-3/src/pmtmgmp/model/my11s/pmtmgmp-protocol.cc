@@ -1357,7 +1357,7 @@ namespace ns3 {
 		////·¢ËÍSECREP
 		void PmtmgmpProtocol::SendSecrep(Mac48Address receiver, uint32_t index, NodeType type)
 		{
-			NS_LOG_DEBUG("Send SECREP to " << receiver << "at " << m_address);
+			NS_LOG_DEBUG("Send SECREP to " << receiver << " at " << m_address);
 			IeSecrep secrep;
 			secrep.SetOriginatorAddress(receiver);
 			secrep.SetCandidateMSECPaddress(GetAddress());

@@ -134,7 +134,7 @@ class ShowPmtmgmpInforamtion(InformationWindow):
         #Shouw Route Table
         route_table = self.pmtmgmp.GetPmtmgmpRPRouteTable()
         for i in range(0, self.notebook.get_n_pages()):
-            self.notebook.remove_page(i)
+            self.notebook.remove_page(0)
         if (route_table.GetTableSize() == 0):
             lable_page = gtk.Label("No Path")
             lable_page.show()
