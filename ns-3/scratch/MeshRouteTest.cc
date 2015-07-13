@@ -40,7 +40,7 @@
 
 //角度转换
 #define DEGREES_TO_RADIANS(__ANGLE__) ((__ANGLE__) * 0.01745329252f) // PI / 180
-#define MIN_APPLICATION_TIME 50 // 仿真前路由生成时间
+#define MIN_APPLICATION_TIME 120 // 仿真前路由生成时间
 #define END_APPLICATION_TIME 15 // 仿真后等待时间
 
 using namespace ns3;
@@ -221,9 +221,9 @@ void MeshRouteClass::SimulatorSetting()
 	}
 
 	// 配置Peer Link参数
-	Config::SetDefault(l_AttributePath_PeerLink + "MaxBeaconLoss", UintegerValue(20));
-	Config::SetDefault(l_AttributePath_PeerLink + "MaxRetries", UintegerValue(4));
-	Config::SetDefault(l_AttributePath_PeerLink + "MaxPacketFailure", UintegerValue(5));
+	Config::SetDefault(l_AttributePath_PeerLink + "MaxBeaconLoss", UintegerValue(32));
+	Config::SetDefault(l_AttributePath_PeerLink + "MaxRetries", UintegerValue(8));
+	Config::SetDefault(l_AttributePath_PeerLink + "MaxPacketFailure", UintegerValue(8));
 
 	// 配置Peer Management Protocol参数
 	Config::SetDefault(l_AttributePath_PeerManagementProtocol + "EnableBeaconCollisionAvoidance", BooleanValue(false));

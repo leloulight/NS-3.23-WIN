@@ -182,14 +182,14 @@ namespace ns3 {
 #ifndef PMTMGMP_UNUSED_MY_CODE
 				.AddAttribute("My11WmnPMTMGMPsecStartDelayTime",
 				"Delay time of start MSECP search",
-				TimeValue(MicroSeconds(1024 * 50000)),
+				TimeValue(MicroSeconds(1024 * 120000)),
 				MakeTimeAccessor(
 				&PmtmgmpProtocol::m_My11WmnPMTMGMPsecStartDelayTime),
 				MakeTimeChecker()
 				)
 				.AddAttribute("My11WmnPMTMGMPsecInterval",
 				"Interval MSECP search, it also the interval of path Generation",
-				TimeValue(MicroSeconds(1024 * 50000)),
+				TimeValue(MicroSeconds(1024 * 60000)),
 				MakeTimeAccessor(
 				&PmtmgmpProtocol::m_My11WmnPMTMGMPsecInterval),
 				MakeTimeChecker()
@@ -274,8 +274,8 @@ namespace ns3 {
 			m_coefficient = CreateObject<UniformRandomVariable>();
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			//默认初值设置方式编译出错
-			m_My11WmnPMTMGMPsecStartDelayTime = MicroSeconds(1024 * 50000);
-			m_My11WmnPMTMGMPsecInterval = MicroSeconds(1024 * 50000);
+			m_My11WmnPMTMGMPsecStartDelayTime = MicroSeconds(1024 * 120000);
+			m_My11WmnPMTMGMPsecInterval = MicroSeconds(1024 * 60000);
 			m_My11WmnPMTMGMPsecSetTime = MicroSeconds(1024 * 4000);
 			m_UnicastSecreqThreshold = 10;
 #endif
@@ -1511,7 +1511,7 @@ namespace ns3 {
 		////转发pgen
 		void PmtmgmpProtocol::sendPgen(IePgen pgen)
 		{
-			NS_LOG_DEBUG("Send PGEN " << " at node " << m_address << " while metric is " << pgen.GetMetric() << ", origination is " << pgen.GetOriginatorAddress() << ", GSN is " << pgen.GetPathGenerationSequenceNumber());
+			NS_LOG_DEBUG("Send PGEN " << " at node " << m_address << " while metric is " << pgen.GetMetric() << ", origination is " << pgen.GetMTERPAddress() << ", GSN is " << pgen.GetPathGenerationSequenceNumber());
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
 				i->second->SendPgen(pgen);
@@ -1521,7 +1521,7 @@ namespace ns3 {
 		void PmtmgmpProtocol::ReceivePgen(IePgen pgen, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
 			////返回起始节点
-			if (pgen.GetOriginatorAddress() == m_address)
+			if (pgen.GetMTERPAddress() == m_address)
 			{
 				NS_LOG_DEBUG("Receive PGEN from " << from << " at node " << m_address << " , this is the MTERP, return.");
 				return;
@@ -1531,8 +1531,6 @@ namespace ns3 {
 				NS_LOG_DEBUG("Receive PGEN from " << from << " at node " << m_address << " , this is the MSECP, return.");
 				return;
 			}
-
-			NS_LOG_DEBUG("Receive PGEN from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", GSN is " << pgen.GetPathGenerationSequenceNumber());
 			
 			////获取PGEN副本
 			Ptr<PmtmgmpRoutePath> pathCopy = pgen.GetPathInfo()->GetCopy();
@@ -1559,13 +1557,13 @@ namespace ns3 {
 			pathCopy->SetFromNode(from);
 
 			////路由表是否存在PGEN来源对应路径
-			Ptr<PmtmgmpRouteTree> routeTree = m_RouteTable->GetTreeByMACaddress(pgen.GetOriginatorAddress());
+			Ptr<PmtmgmpRouteTree> routeTree = m_RouteTable->GetTreeByMACaddress(pgen.GetMTERPAddress());
 			if (routeTree == 0)
 			{
 				////当前路由表中不存在来自PGEN源节点的路径
 				pathCopy->SetStatus(PmtmgmpRoutePath::Confirmed);
 				m_RouteTable->AddNewPath(pathCopy); 
-				routeTree = m_RouteTable->GetTreeByMACaddress(pgen.GetOriginatorAddress());
+				routeTree = m_RouteTable->GetTreeByMACaddress(pgen.GetMTERPAddress());
 				routeTree->RepeatabilityIncrease(from);
 			}
 			else 
@@ -1613,9 +1611,9 @@ namespace ns3 {
 									existPath->SetAcceptCandidateRouteInformaitonEvent(Simulator::Schedule(routeTree->GetAcceptInformaitonDelay(), &PmtmgmpRouteTree::AcceptCandidateRouteInformaiton, routeTree, pathCopy->GetMSECPaddress()));
 									break;
 								case PmtmgmpRoutePath::Waited:
-									existPath->AddCandidateRouteInformaiton(pathCopy);
+									existPath->AddCandidateRouteInformaiton(pathCopy); 
+									NS_LOG_DEBUG("Receive PGEN (MTERP:" << pgen.GetMTERPAddress() << " MSECP:" << pgen.GetMSECPaddress() << ") from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", GSN is " << pgen.GetPathGenerationSequenceNumber() << " waits for Confirm");
 									return; 
-									NS_LOG_DEBUG("Pgen form " << from << " waits for Confirme at node " << m_address);
 								case PmtmgmpRoutePath::Confirmed:
 									NS_LOG_ERROR("Pgen form " << from << " :Path is Confirmed ,but GSN is not update at node " << m_address);
 									return;
@@ -1625,7 +1623,7 @@ namespace ns3 {
 						else
 						{
 							////PGEN所属路径生成信息已确定
-							NS_LOG_DEBUG("Pgen form " << from << " at node " << m_address << " has been Confirmed");
+							NS_LOG_DEBUG("Receive PGEN (MTERP:" << pgen.GetMTERPAddress() << " MSECP:" << pgen.GetMSECPaddress() << ") from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", GSN is " << pgen.GetPathGenerationSequenceNumber() << " has been Confirmed");
 							return;
 						}
 					}
@@ -1633,14 +1631,14 @@ namespace ns3 {
 				else
 				{
 					////过期PGEN，放弃
-					NS_LOG_DEBUG("Pgen form " << from << " at node " << m_address << " has been Expired");
+					NS_LOG_DEBUG("Receive PGEN (MTERP:" << pgen.GetMTERPAddress() << " MSECP:" << pgen.GetMSECPaddress() << ") from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", GSN is " << pgen.GetPathGenerationSequenceNumber() << " has been Expired");
 					return;
 				}
 			}
 			if (pgen.GetTtl() > 0)
 			{
 				////转发PGEN
-				NS_LOG_DEBUG("Pgen form " << from << " at node " << m_address << " has been Transmit");
+				NS_LOG_DEBUG("Receive PGEN (MTERP:" << pgen.GetMTERPAddress() << " MSECP:" << pgen.GetMSECPaddress() << ") from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", GSN is " << pgen.GetPathGenerationSequenceNumber() << " has been Transmit");
 				sendPgen(pgen);
 			}
 		}

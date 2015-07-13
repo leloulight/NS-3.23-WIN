@@ -74,7 +74,7 @@ namespace ns3 {
 		{
 			m_PathInfo->SetMetric(metric);
 		}
-		Mac48Address IePgen::GetOriginatorAddress() const
+		Mac48Address IePgen::GetMTERPAddress() const
 		{
 			return m_PathInfo->GetMTERPaddress();
 		}

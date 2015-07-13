@@ -51,7 +51,7 @@ namespace ns3 {
 			void SetMetric(double metric);
 
 			// Getters for fields:
-			Mac48Address GetOriginatorAddress() const;
+			Mac48Address GetMTERPAddress() const;
 			Mac48Address GetMSECPaddress() const;
 			uint32_t GetPathGenerationSequenceNumber() const;
 			PmtmgmpProtocol::NodeType GetNodeType() const;
