@@ -38,6 +38,7 @@
 #include "ns3/ie-my11s-secreq.h"
 #include "ns3/ie-my11s-secrep.h"
 #include "ns3/ie-my11s-secack.h"
+#include "ns3/ie-my11s-pger.h"
 #include "ns3/ie-my11s-pgen.h"
 #endif
 
@@ -88,6 +89,9 @@ namespace ns3 {
 			break;
 		case IE11S_SECACK:
 			newElement = Create<my11s::IeSecack>();
+			break;
+		case IE11S_PGER:
+			newElement = Create<my11s::IePger>();
 			break;
 		case IE11S_PGEN:
 			newElement = Create<my11s::IePgen>();

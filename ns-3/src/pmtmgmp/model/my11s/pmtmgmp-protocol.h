@@ -45,6 +45,7 @@ namespace ns3 {
 		class IeSecrep;
 		class IeSecack;
 		class IePgen;
+		class IePger;
 #endif
 		/**
 		 * \ingroup my11s
@@ -250,14 +251,10 @@ namespace ns3 {
 				{
 					return m_metric * (m_affiliatedNumber + 1) < si.m_metric * (si.m_affiliatedNumber + 1);
 				}
-				////降序
-				//bool operator > (const SECREPinformation si) const
-				//{
-				//	return metric * (affiliatedNumber + 1) > si.metric * (si.affiliatedNumber + 1);
-				//}
 				Mac48Address m_address;
 				uint32_t m_metric;
 				uint8_t m_affiliatedNumber;
+				bool m_generationPath;
 			};
 			////SECREPinformation搜索器
 			struct SECREPinformation_Finder
@@ -304,6 +301,12 @@ namespace ns3 {
 			void SendSecack();
 			////接收SECACK
 			void ReceiveSecack(IeSecack secack, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
+			////发送PGER
+			void SendPger(uint32_t gsn, Mac48Address address);
+			////定时处理PGER
+			void WaitForRecivePGER();
+			////接收PGEr
+			void ReceivePger(IePger pger, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
 			////发送初始PGEN
 			void SendFirstPgen(IeSecack secack, uint32_t metric);
 			////转发Pgen
@@ -389,6 +392,7 @@ namespace ns3 {
 			EventId m_MSECPSearchTimer;
 			EventId m_MSECPSearchInterval;
 			EventId m_MSECPSetTimer;
+			EventId m_PgerWaitTimer;
 			uint8_t m_UnicastSecreqThreshold;
 			////节点类型属性
 			NodeType m_NodeType;
@@ -402,6 +406,8 @@ namespace ns3 {
 			Time m_My11WmnPMTMGMPsecInterval;
 			////SECREQ设置延迟
 			Time m_My11WmnPMTMGMPsecSetTime;
+			////PGER等待时间
+			Time m_My11WmnPMTMGMPpgerWaitTime;
 			////SECREP接收信息记录
 			std::vector<SECREPinformation> m_SECREPinformation;
 			////MSECP选择序号（从零开始，奇数开启，偶数关闭。）

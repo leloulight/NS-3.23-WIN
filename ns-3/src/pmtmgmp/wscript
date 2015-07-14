@@ -22,6 +22,7 @@ def build(bld):
         'model/my11s/ie-my11s-secrep.cc',
         'model/my11s/ie-my11s-secack.cc',
         'model/my11s/ie-my11s-pgen.cc',
+        'model/my11s/ie-my11s-pger.cc',
 		## MY_PMTMGMP_CODE
         'model/my11s/ie-my11s-peering-protocol.cc',
         'model/my11s/ie-my11s-metric-report.cc',
@@ -82,6 +83,7 @@ def build(bld):
         'model/my11s/ie-my11s-secreq.h',
         'model/my11s/ie-my11s-secack.h',
         'model/my11s/ie-my11s-pgen.h',
+        'model/my11s/ie-my11s-pger.h',
 		## MY_PMTMGMP_CODE
         'helper/wmn-helper.h',
         'helper/wmn-stack-installer.h',

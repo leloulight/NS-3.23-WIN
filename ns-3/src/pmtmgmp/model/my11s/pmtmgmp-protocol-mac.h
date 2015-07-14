@@ -40,6 +40,7 @@ namespace ns3 {
 		class IeSecrep;
 		class IeSecack;
 		class IePgen;
+		class IePger;
 #endif
 
 		/**
@@ -105,6 +106,9 @@ namespace ns3 {
 			////·¢ËÍSECACK
 			void SendSecack(IeSecack secack, Mac48Address receiver);
 			void SendSecack(std::vector<IeSecack> secack, Mac48Address receiver);
+			////·¢ËÍPGER
+			void SendPger(IePger pger, Mac48Address receiver);
+			void SendPger(std::vector<IePger> pger, Mac48Address receiver);
 			////·¢ËÍPGEN
 			void SendPgen(IePgen Pgen);
 			void SendPgen(std::vector<IePgen> Pgen);
@@ -144,6 +148,8 @@ namespace ns3 {
 				uint16_t rxSecrep;
 				uint16_t txSecack;
 				uint16_t rxSecack;
+				uint16_t txPger;
+				uint16_t rxPger;
 				uint16_t txPgen;
 				uint16_t rxPgen;
 #endif

@@ -37,6 +37,7 @@
 #include "ie-my11s-secrep.h"
 #include "ie-my11s-secack.h"
 #include "ie-my11s-pgen.h"
+#include "ie-my11s-pger.h"
 #endif
 
 ////多播和广播选择
@@ -189,6 +190,13 @@ namespace ns3 {
 					NS_ASSERT(secack != 0);
 					m_stats.rxSecack++;
 					m_protocol->ReceiveSecack(*secack, header.GetAddr2(), m_ifIndex, header.GetAddr3(), m_parent->GetLinkMetric(header.GetAddr2()));
+				}
+				if ((*i)->ElementId() == IE11S_PGER)
+				{
+					Ptr<IePger> pger = DynamicCast<IePger>(*i);
+					NS_ASSERT(pger != 0);
+					m_stats.rxPger++;
+					m_protocol->ReceivePger(*pger, header.GetAddr2(), m_ifIndex, header.GetAddr3(), m_parent->GetLinkMetric(header.GetAddr2()));
 				}
 				if ((*i)->ElementId() == IE11S_PGEN)
 				{
@@ -487,6 +495,9 @@ namespace ns3 {
 		PmtmgmpProtocolMac::Statistics::Statistics() :
 			txPreq(0), rxPreq(0), txPrep(0), rxPrep(0), txPerr(0), rxPerr(0), txMgt(0), txMgtBytes(0),
 			rxMgt(0), rxMgtBytes(0), txData(0), txDataBytes(0), rxData(0), rxDataBytes(0)
+#ifndef PMTMGMP_UNUSED_MY_CODE
+			,txSecreq(0), rxSecreq(0), txSecrep(0), rxSecrep(0), txSecack(0), rxSecack(0), txPger(0), rxPger(0), txPgen(0), rxPgen(0)
+#endif
 		{
 		}
 		void
@@ -500,6 +511,7 @@ namespace ns3 {
 				"txSecreq=\"" << txSecreq << "\"" << std::endl <<
 				"txSecrep=\"" << txSecrep << "\"" << std::endl <<
 				"txSecack=\"" << txSecack << "\"" << std::endl <<
+				"txPger=\"" << txPger << "\"" << std::endl <<
 				"txPgen=\"" << txPgen << "\"" << std::endl <<
 #endif
 				"rxPreq=\"" << rxPreq << "\"" << std::endl <<
@@ -509,6 +521,7 @@ namespace ns3 {
 				"rxSecreq=\"" << rxSecreq << "\"" << std::endl <<
 				"rxSecrep=\"" << rxSecrep << "\"" << std::endl <<
 				"rxSecack=\"" << rxSecack << "\"" << std::endl <<
+				"rxPger=\"" << rxPger << "\"" << std::endl <<
 				"rxPgen=\"" << rxPgen << "\"" << std::endl <<
 #endif
 				"txMgt=\"" << txMgt << "\"" << std::endl <<
@@ -646,6 +659,38 @@ namespace ns3 {
 			//Send Management frame
 			hdr.SetAddr1(receiver);
 			m_stats.txSecack++;
+			m_stats.txMgt++;
+			m_stats.txMgtBytes += packet->GetSize();
+			m_parent->SendManagementFrame(packet, hdr);
+		}
+		////发送PGER
+		void PmtmgmpProtocolMac::SendPger(IePger pger, Mac48Address receiver)
+		{
+			NS_LOG_FUNCTION_NOARGS();
+			std::vector<IePger> pger_vector;
+			pger_vector.push_back(pger);
+			SendPger(pger_vector, receiver);
+		}
+		void PmtmgmpProtocolMac::SendPger(std::vector<IePger> pger, Mac48Address receiver)
+		{
+			Ptr<Packet> packet = Create<Packet>();
+			WmnInformationElementVector elements;
+			for (std::vector<IePger>::iterator i = pger.begin(); i != pger.end(); i++)
+			{
+				elements.AddInformationElement(Ptr<IePger>(&(*i)));
+			}
+			packet->AddHeader(elements);
+			packet->AddHeader(GetWifiActionHeader());
+			//create 802.11 header:
+			WifiMacHeader hdr;
+			hdr.SetAction();
+			hdr.SetDsNotFrom();
+			hdr.SetDsNotTo();
+			hdr.SetAddr2(m_parent->GetAddress());
+			hdr.SetAddr3(m_protocol->GetAddress());
+			//Send Management frame
+			hdr.SetAddr1(receiver);
+			m_stats.txPger++;
 			m_stats.txMgt++;
 			m_stats.txMgtBytes += packet->GetSize();
 			m_parent->SendManagementFrame(packet, hdr);

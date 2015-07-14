@@ -37,12 +37,13 @@
 #include "ie-my11s-perr.h"
 
 #ifndef PMTMGMP_UNUSED_MY_CODE
-////find_if
+ ////find_if
 #include <algorithm>
 
 #include "ns3/ie-my11s-secreq.h"
 #include "ns3/ie-my11s-secrep.h"
 #include "ns3/ie-my11s-secack.h"
+#include "ns3/ie-my11s-pger.h"
 #include "ns3/ie-my11s-pgen.h"
 
 #endif
@@ -63,172 +64,179 @@ namespace ns3 {
 				.SetGroupName("Wmn")
 				.AddConstructor<PmtmgmpProtocol>()
 				.AddAttribute("RandomStart",
-				"Random delay at first proactive PREQ",
-				TimeValue(Seconds(0.1)),
-				MakeTimeAccessor(
-				&PmtmgmpProtocol::m_randomStart),
-				MakeTimeChecker()
-				)
+					"Random delay at first proactive PREQ",
+					TimeValue(Seconds(0.1)),
+					MakeTimeAccessor(
+						&PmtmgmpProtocol::m_randomStart),
+					MakeTimeChecker()
+					)
 				.AddAttribute("MaxQueueSize",
-				"Maximum number of packets we can store when resolving route",
-				UintegerValue(255),
-				MakeUintegerAccessor(
-				&PmtmgmpProtocol::m_maxQueueSize),
-				MakeUintegerChecker<uint16_t>(1)
-				)
+					"Maximum number of packets we can store when resolving route",
+					UintegerValue(255),
+					MakeUintegerAccessor(
+						&PmtmgmpProtocol::m_maxQueueSize),
+					MakeUintegerChecker<uint16_t>(1)
+					)
 				.AddAttribute("My11WmnPMTMGMPmaxPREQretries",
-				"Maximum number of retries before we suppose the destination to be unreachable",
-				UintegerValue(3),
-				MakeUintegerAccessor(
-				&PmtmgmpProtocol::m_My11WmnPMTMGMPmaxPREQretries),
-				MakeUintegerChecker<uint8_t>(1)
-				)
+					"Maximum number of retries before we suppose the destination to be unreachable",
+					UintegerValue(3),
+					MakeUintegerAccessor(
+						&PmtmgmpProtocol::m_My11WmnPMTMGMPmaxPREQretries),
+					MakeUintegerChecker<uint8_t>(1)
+					)
 				.AddAttribute("My11WmnPMTMGMPnetDiameterTraversalTime",
-				"Time we suppose the packet to go from one edge of the network to another",
-				TimeValue(MicroSeconds(1024 * 100)),
-				MakeTimeAccessor(
-				&PmtmgmpProtocol::m_My11WmnPMTMGMPnetDiameterTraversalTime),
-				MakeTimeChecker()
-				)
+					"Time we suppose the packet to go from one edge of the network to another",
+					TimeValue(MicroSeconds(1024 * 100)),
+					MakeTimeAccessor(
+						&PmtmgmpProtocol::m_My11WmnPMTMGMPnetDiameterTraversalTime),
+					MakeTimeChecker()
+					)
 				.AddAttribute("My11WmnPMTMGMPpreqMinInterval",
-				"Minimal interval between to successive PREQs",
-				TimeValue(MicroSeconds(1024 * 100)),
-				MakeTimeAccessor(
-				&PmtmgmpProtocol::m_My11WmnPMTMGMPpreqMinInterval),
-				MakeTimeChecker()
-				)
+					"Minimal interval between to successive PREQs",
+					TimeValue(MicroSeconds(1024 * 100)),
+					MakeTimeAccessor(
+						&PmtmgmpProtocol::m_My11WmnPMTMGMPpreqMinInterval),
+					MakeTimeChecker()
+					)
 				.AddAttribute("My11WmnPMTMGMPperrMinInterval",
-				"Minimal interval between to successive PREQs",
-				TimeValue(MicroSeconds(1024 * 100)),
-				MakeTimeAccessor(&PmtmgmpProtocol::m_My11WmnPMTMGMPperrMinInterval),
-				MakeTimeChecker()
-				)
+					"Minimal interval between to successive PREQs",
+					TimeValue(MicroSeconds(1024 * 100)),
+					MakeTimeAccessor(&PmtmgmpProtocol::m_My11WmnPMTMGMPperrMinInterval),
+					MakeTimeChecker()
+					)
 				.AddAttribute("My11WmnPMTMGMPactiveRootTimeout",
-				"Lifetime of poractive routing information",
-				TimeValue(MicroSeconds(1024 * 5000)),
-				MakeTimeAccessor(
-				&PmtmgmpProtocol::m_My11WmnPMTMGMPactiveRootTimeout),
-				MakeTimeChecker()
-				)
+					"Lifetime of poractive routing information",
+					TimeValue(MicroSeconds(1024 * 5000)),
+					MakeTimeAccessor(
+						&PmtmgmpProtocol::m_My11WmnPMTMGMPactiveRootTimeout),
+					MakeTimeChecker()
+					)
 				.AddAttribute("My11WmnPMTMGMPactivePathTimeout",
-				"Lifetime of reactive routing information",
-				TimeValue(MicroSeconds(1024 * 5000)),
-				MakeTimeAccessor(
-				&PmtmgmpProtocol::m_My11WmnPMTMGMPactivePathTimeout),
-				MakeTimeChecker()
-				)
+					"Lifetime of reactive routing information",
+					TimeValue(MicroSeconds(1024 * 5000)),
+					MakeTimeAccessor(
+						&PmtmgmpProtocol::m_My11WmnPMTMGMPactivePathTimeout),
+					MakeTimeChecker()
+					)
 				.AddAttribute("My11WmnPMTMGMPpathToRootInterval",
-				"Interval between two successive proactive PREQs",
-				TimeValue(MicroSeconds(1024 * 2000)),
-				MakeTimeAccessor(
-				&PmtmgmpProtocol::m_My11WmnPMTMGMPpathToRootInterval),
-				MakeTimeChecker()
-				)
+					"Interval between two successive proactive PREQs",
+					TimeValue(MicroSeconds(1024 * 2000)),
+					MakeTimeAccessor(
+						&PmtmgmpProtocol::m_My11WmnPMTMGMPpathToRootInterval),
+					MakeTimeChecker()
+					)
 				.AddAttribute("My11WmnPMTMGMPrannInterval",
-				"Lifetime of poractive routing information",
-				TimeValue(MicroSeconds(1024 * 5000)),
-				MakeTimeAccessor(
-				&PmtmgmpProtocol::m_My11WmnPMTMGMPrannInterval),
-				MakeTimeChecker()
-				)
+					"Lifetime of poractive routing information",
+					TimeValue(MicroSeconds(1024 * 5000)),
+					MakeTimeAccessor(
+						&PmtmgmpProtocol::m_My11WmnPMTMGMPrannInterval),
+					MakeTimeChecker()
+					)
 				.AddAttribute("MaxTtl",
-				"Initial value of Time To Live field",
-				UintegerValue(32),
-				MakeUintegerAccessor(
-				&PmtmgmpProtocol::m_maxTtl),
-				MakeUintegerChecker<uint8_t>(2)
-				)
+					"Initial value of Time To Live field",
+					UintegerValue(32),
+					MakeUintegerAccessor(
+						&PmtmgmpProtocol::m_maxTtl),
+					MakeUintegerChecker<uint8_t>(2)
+					)
 				.AddAttribute("UnicastPerrThreshold",
-				"Maximum number of PERR receivers, when we send a PERR as a chain of unicasts",
-				UintegerValue(32),
-				MakeUintegerAccessor(
-				&PmtmgmpProtocol::m_unicastPerrThreshold),
-				MakeUintegerChecker<uint8_t>(1)
-				)
+					"Maximum number of PERR receivers, when we send a PERR as a chain of unicasts",
+					UintegerValue(32),
+					MakeUintegerAccessor(
+						&PmtmgmpProtocol::m_unicastPerrThreshold),
+					MakeUintegerChecker<uint8_t>(1)
+					)
 				.AddAttribute("UnicastPreqThreshold",
-				"Maximum number of PREQ receivers, when we send a PREQ as a chain of unicasts",
-				UintegerValue(1),
-				MakeUintegerAccessor(
-				&PmtmgmpProtocol::m_unicastPreqThreshold),
-				MakeUintegerChecker<uint8_t>(1)
-				)
+					"Maximum number of PREQ receivers, when we send a PREQ as a chain of unicasts",
+					UintegerValue(1),
+					MakeUintegerAccessor(
+						&PmtmgmpProtocol::m_unicastPreqThreshold),
+					MakeUintegerChecker<uint8_t>(1)
+					)
 				.AddAttribute("UnicastDataThreshold",
-				"Maximum number ofbroadcast receivers, when we send a broadcast as a chain of unicasts",
-				UintegerValue(1),
-				MakeUintegerAccessor(
-				&PmtmgmpProtocol::m_unicastDataThreshold),
-				MakeUintegerChecker<uint8_t>(1)
-				)
+					"Maximum number ofbroadcast receivers, when we send a broadcast as a chain of unicasts",
+					UintegerValue(1),
+					MakeUintegerAccessor(
+						&PmtmgmpProtocol::m_unicastDataThreshold),
+					MakeUintegerChecker<uint8_t>(1)
+					)
 				.AddAttribute("DoFlag",
-				"Destination only PMTMGMP flag",
-				BooleanValue(false),
-				MakeBooleanAccessor(
-				&PmtmgmpProtocol::m_doFlag),
-				MakeBooleanChecker()
-				)
+					"Destination only PMTMGMP flag",
+					BooleanValue(false),
+					MakeBooleanAccessor(
+						&PmtmgmpProtocol::m_doFlag),
+					MakeBooleanChecker()
+					)
 				.AddAttribute("RfFlag",
-				"Reply and forward flag",
-				BooleanValue(true),
-				MakeBooleanAccessor(
-				&PmtmgmpProtocol::m_rfFlag),
-				MakeBooleanChecker()
-				)
+					"Reply and forward flag",
+					BooleanValue(true),
+					MakeBooleanAccessor(
+						&PmtmgmpProtocol::m_rfFlag),
+					MakeBooleanChecker()
+					)
 				.AddTraceSource("RouteDiscoveryTime",
-				"The time of route discovery procedure",
-				MakeTraceSourceAccessor(
-				&PmtmgmpProtocol::m_routeDiscoveryTimeCallback),
-				"ns3::Time::TracedCallback"
-				)
+					"The time of route discovery procedure",
+					MakeTraceSourceAccessor(
+						&PmtmgmpProtocol::m_routeDiscoveryTimeCallback),
+					"ns3::Time::TracedCallback"
+					)
 #ifndef PMTMGMP_UNUSED_MY_CODE
 				.AddAttribute("My11WmnPMTMGMPsecStartDelayTime",
-				"Delay time of start MSECP search",
-				TimeValue(MicroSeconds(1024 * 120000)),
-				MakeTimeAccessor(
-				&PmtmgmpProtocol::m_My11WmnPMTMGMPsecStartDelayTime),
-				MakeTimeChecker()
-				)
+					"Delay time of start MSECP search",
+					TimeValue(MicroSeconds(1024 * 120000)),
+					MakeTimeAccessor(
+						&PmtmgmpProtocol::m_My11WmnPMTMGMPsecStartDelayTime),
+					MakeTimeChecker()
+					)
 				.AddAttribute("My11WmnPMTMGMPsecInterval",
-				"Interval MSECP search, it also the interval of path Generation",
-				TimeValue(MicroSeconds(1024 * 60000)),
-				MakeTimeAccessor(
-				&PmtmgmpProtocol::m_My11WmnPMTMGMPsecInterval),
-				MakeTimeChecker()
-				)
+					"Interval MSECP search, it also the interval of path Generation",
+					TimeValue(MicroSeconds(1024 * 60000)),
+					MakeTimeAccessor(
+						&PmtmgmpProtocol::m_My11WmnPMTMGMPsecInterval),
+					MakeTimeChecker()
+					)
 				.AddAttribute("My11WmnPMTMGMPsecSetTime",
-				"Delay time of waiting for accept SECREP",
-				TimeValue(MicroSeconds(1024 * 4000)),
-				MakeTimeAccessor(
-				&PmtmgmpProtocol::m_My11WmnPMTMGMPsecSetTime),
-				MakeTimeChecker()
-				)
+					"Delay time of waiting for accept SECREP",
+					TimeValue(MicroSeconds(1024 * 4000)),
+					MakeTimeAccessor(
+						&PmtmgmpProtocol::m_My11WmnPMTMGMPsecSetTime),
+					MakeTimeChecker()
+					)
+				.AddAttribute("My11WmnPMTGMGMPpgerWaitTime",
+					"Delay time of waiting for receive PGER",
+					TimeValue(MicroSeconds(1024 * 4000)),
+					MakeTimeAccessor(
+						&PmtmgmpProtocol::m_My11WmnPMTMGMPpgerWaitTime),
+					MakeTimeChecker()
+					)
 				.AddAttribute("UnicastSecreqThreshold",
-				"Maximum number of SecREQ receivers, when we send a SECREQ as a chain of unicasts",
-				UintegerValue(10),
-				MakeUintegerAccessor(
-				&PmtmgmpProtocol::m_UnicastSecreqThreshold),
-				MakeUintegerChecker<uint8_t>(1)
-				)
+					"Maximum number of SecREQ receivers, when we send a SECREQ as a chain of unicasts",
+					UintegerValue(10),
+					MakeUintegerAccessor(
+						&PmtmgmpProtocol::m_UnicastSecreqThreshold),
+					MakeUintegerChecker<uint8_t>(1)
+					)
 				.AddAttribute("MSECPnumForMTERP",
-				"The number of MESCP that each MTERP can have. It need define the same as \"ns3::my11s::PmtmgmpRoutePath::PMTMGMPpgenNodeListNum\"",
-				UintegerValue(2),
-				MakeUintegerAccessor(
-				&PmtmgmpProtocol::m_MSECPnumForMTERP),
-				MakeUintegerChecker<uint8_t>(1)
-				)
+					"The number of MESCP that each MTERP can have. It need define the same as \"ns3::my11s::PmtmgmpRoutePath::PMTMGMPpgenNodeListNum\"",
+					UintegerValue(2),
+					MakeUintegerAccessor(
+						&PmtmgmpProtocol::m_MSECPnumForMTERP),
+					MakeUintegerChecker<uint8_t>(1)
+					)
 				.AddAttribute("PMTMGMPmterpAALMmagnification",
-				"The magnification of the value as M in MTERP node when Compute AALM.",
-				DoubleValue(3),
-				MakeDoubleAccessor(
-				&PmtmgmpProtocol::m_PMTMGMPmterpAALMmagnification),
-				MakeDoubleChecker<double>(1)
-				)
+					"The magnification of the value as M in MTERP node when Compute AALM.",
+					DoubleValue(3),
+					MakeDoubleAccessor(
+						&PmtmgmpProtocol::m_PMTMGMPmterpAALMmagnification),
+					MakeDoubleChecker<double>(1)
+					)
 				.AddAttribute("PMTMGMPmsecpAALMmagnification",
-				"The magnification of the value as M in MSECP node when Compute AALM.",
-				DoubleValue(2),
-				MakeDoubleAccessor(
-				&PmtmgmpProtocol::m_PMTMGMPmsecpAALMmagnification),
-				MakeDoubleChecker<double>(1)
-				)
+					"The magnification of the value as M in MSECP node when Compute AALM.",
+					DoubleValue(2),
+					MakeDoubleAccessor(
+						&PmtmgmpProtocol::m_PMTMGMPmsecpAALMmagnification),
+					MakeDoubleChecker<double>(1)
+					)
 #endif
 				;
 			return tid;
@@ -260,6 +268,7 @@ namespace ns3 {
 			//m_My11WmnPMTMGMPsecStartDelayTime(MicroSeconds(1024 * 2000)),
 			//m_My11WmnPMTMGMPsecInterval(MicroSeconds(1024 * 2000)),
 			//m_My11WmnPMTMGMPsecSetTime(MicroSeconds(1024 * 2000)),
+			//m_My11WmnPMTMGMPpgerWaitTime(MicroSeconds(1024 * 2000)),
 			//m_UnicastSecreqThreshold(10),
 			m_NodeType(Mesh_STA),
 			m_PathGenerationSeqNumber(0),
@@ -277,6 +286,7 @@ namespace ns3 {
 			m_My11WmnPMTMGMPsecStartDelayTime = MicroSeconds(1024 * 120000);
 			m_My11WmnPMTMGMPsecInterval = MicroSeconds(1024 * 60000);
 			m_My11WmnPMTMGMPsecSetTime = MicroSeconds(1024 * 4000);
+			m_My11WmnPMTMGMPpgerWaitTime = MicroSeconds(1024 * 4000);
 			m_UnicastSecreqThreshold = 10;
 #endif
 		}
@@ -329,13 +339,13 @@ namespace ns3 {
 
 		bool
 			PmtmgmpProtocol::RequestRoute(
-			uint32_t sourceIface,
-			const Mac48Address source,
-			const Mac48Address destination,
-			Ptr<const Packet> constPacket,
-			uint16_t protocolType, //ethrnet 'Protocol' field
-			WmnL2RoutingProtocol::RouteReplyCallback routeReply
-			)
+				uint32_t sourceIface,
+				const Mac48Address source,
+				const Mac48Address destination,
+				Ptr<const Packet> constPacket,
+				uint16_t protocolType, //ethrnet 'Protocol' field
+				WmnL2RoutingProtocol::RouteReplyCallback routeReply
+				)
 		{
 			Ptr <Packet> packet = constPacket->Copy();
 			PmtmgmpTag tag;
@@ -410,7 +420,7 @@ namespace ns3 {
 		}
 		bool
 			PmtmgmpProtocol::RemoveRoutingStuff(uint32_t fromIface, const Mac48Address source,
-			const Mac48Address destination, Ptr<Packet>  packet, uint16_t&  protocolType)
+				const Mac48Address destination, Ptr<Packet>  packet, uint16_t&  protocolType)
 		{
 			PmtmgmpTag tag;
 			if (!packet->RemovePacketTag(tag))
@@ -421,7 +431,7 @@ namespace ns3 {
 		}
 		bool
 			PmtmgmpProtocol::ForwardUnicast(uint32_t  sourceIface, const Mac48Address source, const Mac48Address destination,
-			Ptr<Packet>  packet, uint16_t  protocolType, RouteReplyCallback  routeReply, uint32_t ttl)
+				Ptr<Packet>  packet, uint16_t  protocolType, RouteReplyCallback  routeReply, uint32_t ttl)
 		{
 			NS_ASSERT(destination != Mac48Address::GetBroadcast());
 			PmtmgmpRtable::LookupResult result = m_rtable->LookupReactive(destination);
@@ -530,9 +540,9 @@ namespace ns3 {
 			if (
 				(freshInfo) ||
 				(
-				(m_rtable->LookupReactive(preq.GetOriginatorAddress()).retransmitter == Mac48Address::GetBroadcast()) ||
-				(m_rtable->LookupReactive(preq.GetOriginatorAddress()).metric > preq.GetMetric())
-				)
+					(m_rtable->LookupReactive(preq.GetOriginatorAddress()).retransmitter == Mac48Address::GetBroadcast()) ||
+					(m_rtable->LookupReactive(preq.GetOriginatorAddress()).metric > preq.GetMetric())
+					)
 				)
 			{
 				m_rtable->AddReactivePath(
@@ -692,9 +702,9 @@ namespace ns3 {
 			if (
 				(freshInfo) ||
 				(
-				((m_rtable->LookupReactive(prep.GetOriginatorAddress())).retransmitter == Mac48Address::GetBroadcast()) ||
-				((m_rtable->LookupReactive(prep.GetOriginatorAddress())).metric > prep.GetMetric())
-				)
+					((m_rtable->LookupReactive(prep.GetOriginatorAddress())).retransmitter == Mac48Address::GetBroadcast()) ||
+					((m_rtable->LookupReactive(prep.GetOriginatorAddress())).metric > prep.GetMetric())
+					)
 				)
 			{
 				m_rtable->AddReactivePath(
@@ -768,14 +778,14 @@ namespace ns3 {
 		}
 		void
 			PmtmgmpProtocol::SendPrep(
-			Mac48Address src,
-			Mac48Address dst,
-			Mac48Address retransmitter,
-			uint32_t initMetric,
-			uint32_t originatorDsn,
-			uint32_t destinationSN,
-			uint32_t lifetime,
-			uint32_t interface)
+				Mac48Address src,
+				Mac48Address dst,
+				Mac48Address retransmitter,
+				uint32_t initMetric,
+				uint32_t originatorDsn,
+				uint32_t destinationSN,
+				uint32_t lifetime,
+				uint32_t interface)
 		{
 			IePrep prep;
 			prep.SetHopcount(0);
@@ -1321,7 +1331,7 @@ namespace ns3 {
 		{
 			NS_LOG_DEBUG("Receive SECREQ from " << from << " at interface " << interface << " while metric is " << metric << " at " << m_address);
 			////终端节点不会作为其他的终端节点的辅助节点
-			if (! IsMTERP())
+			if (!IsMTERP())
 			{
 				std::vector<MSECPaffiliatedMSECPInformation>::iterator iter = std::find_if(m_AffiliatedMTERPlist.begin(), m_AffiliatedMTERPlist.end(), MSECPaffiliatedMSECPInformation_Finder(secreq.GetOriginatorAddress()));
 				if (iter != m_AffiliatedMTERPlist.end()) m_AffiliatedMTERPlist.erase(iter);
@@ -1357,12 +1367,13 @@ namespace ns3 {
 		void PmtmgmpProtocol::ReceiveSecrep(IeSecrep secrep, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
 			NS_LOG_DEBUG("Receive SECREP from " << from << " at interface " << interface << " while metric is " << metric << " at " << m_address);
-			if ((secrep.GetPathGenerationSequenceNumber() != m_PathGenerationSeqNumber) || (secrep.GetOriginatorAddress() != m_address)) 
+			if ((secrep.GetPathGenerationSequenceNumber() != m_PathGenerationSeqNumber) || (secrep.GetOriginatorAddress() != m_address))
 				return;////过期SECREP将会被丢弃
 			SECREPinformation newInformation;
 			newInformation.m_address = secrep.GetCandidateMSECPaddress();
 			newInformation.m_metric = metric;
 			newInformation.m_affiliatedNumber = secrep.GetAffiliatedMTERPnum();
+			newInformation.m_generationPath = false;
 			m_SECREPinformation.push_back(newInformation);
 		}
 		////设置和获取当前节点类型
@@ -1401,22 +1412,15 @@ namespace ns3 {
 		////延迟整理SECREP信息，选取可接受的MSECP
 		void PmtmgmpProtocol::SelectMSECP()
 		{
-			NS_LOG_DEBUG("Receive SECREP " << m_SECREPinformation.size() << " at " << m_address);
+			NS_LOG_DEBUG("Select MSECP: receive SECREP " << m_SECREPinformation.size() << " at " << m_address);
 			m_PathGenerationSeqNumber += 1;
-			for (std::vector<SECREPinformation>::iterator selectIter = m_SECREPinformation.begin(); selectIter != m_SECREPinformation.end(); selectIter++)
+			m_AffiliatedMSECPlist.clear();
+			for (std::vector<SECREPinformation>::iterator iter = m_SECREPinformation.begin(); iter != m_SECREPinformation.end(); iter++)
 			{
-				std::vector<SECREPinformation>::iterator iter = std::find_if(m_AffiliatedMSECPlist.begin(), m_AffiliatedMSECPlist.end(), SECREPinformation_Finder(selectIter->m_address));
-				if (iter == m_AffiliatedMSECPlist.end())
-				{
-					m_AffiliatedMSECPlist.push_back(*selectIter);
-				}
-				else
-				{
-					iter = selectIter;
-				}
+				m_AffiliatedMSECPlist.push_back(*iter);
 			}
 			std::sort(m_AffiliatedMSECPlist.begin(), m_AffiliatedMSECPlist.end());
-			
+
 			////丢弃Metric过大的结果。
 			if (m_AffiliatedMSECPlist.size() > m_MSECPnumForMTERP)
 			{
@@ -1425,14 +1429,16 @@ namespace ns3 {
 					m_AffiliatedMSECPlist.pop_back();
 				}
 			}
-			
+
 			///为筛选出的结果发送SECACK
 			SendSecack();
+
+			////延迟等待接收PGER
+			m_PgerWaitTimer = Simulator::Schedule(m_My11WmnPMTMGMPpgerWaitTime, &PmtmgmpProtocol::WaitForRecivePGER, this);
 		}
 		////发送SECACK
 		void PmtmgmpProtocol::SendSecack()
 		{
-			NS_LOG_DEBUG("Send SECACK at " << m_address);
 			IeSecack secack;
 			secack.SetOriginatorAddress(GetAddress());
 			secack.SetPathGenerationSequenceNumber(m_PathGenerationSeqNumber);
@@ -1445,10 +1451,13 @@ namespace ns3 {
 			secack.SetNodeType(m_NodeType);
 			for (std::vector<SECREPinformation>::iterator selectIter = m_AffiliatedMSECPlist.begin(); selectIter != m_AffiliatedMSECPlist.end(); selectIter++)
 			{
-				for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
+				if (selectIter->m_generationPath == false)
 				{
-					NS_LOG_DEBUG("Send SECACK at " << m_address << " to " << selectIter->m_address);
-					i->second->SendSecack(secack, selectIter->m_address);
+					for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
+					{
+						NS_LOG_DEBUG("Send SECACK at " << m_address << " to " << selectIter->m_address);
+						i->second->SendSecack(secack, selectIter->m_address);
+					}
 				}
 			}
 		}
@@ -1456,19 +1465,76 @@ namespace ns3 {
 		void PmtmgmpProtocol::ReceiveSecack(IeSecack secack, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
 			NS_LOG_DEBUG("Receive SECACK from " << from << " at interface " << interface << " while metric is " << metric << " at " << m_address);
-			
+
 			MSECPaffiliatedMSECPInformation newInformation;
 			newInformation.address = secack.GetOriginatorAddress();
 			newInformation.metric = metric * m_PMTMGMPmsecpAALMmagnification / sqrt(2);
 			newInformation.nodeType = secack.GetNodeType();
 			newInformation.selectIndex = secack.GetPathGenerationSequenceNumber();
 			m_AffiliatedMTERPlist.push_back(newInformation);
+
+			SendPger(newInformation.selectIndex, secack.GetOriginatorAddress());
 			SendFirstPgen(secack, metric);
+		}
+		////发送PGER
+		void PmtmgmpProtocol::SendPger(uint32_t gsn, Mac48Address address)
+		{
+			IePger pger;
+			pger.SetPathGenerationSequenceNumber(gsn);
+
+			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
+			{
+				NS_LOG_DEBUG("Send PGER at " << m_address << " to " << address);
+				i->second->SendPger(pger, address);
+			}
+		}
+		////定时处理PGER
+		void PmtmgmpProtocol::WaitForRecivePGER()
+		{
+			std::vector<SECREPinformation> unreceived = std::vector<SECREPinformation>();
+			////搜索未接收到PGER的辅助节点
+			for (std::vector<SECREPinformation>::iterator iter = m_AffiliatedMSECPlist.begin(); iter != m_AffiliatedMSECPlist.end(); iter++)
+			{
+				if (iter->m_generationPath == false) unreceived.push_back(*iter);
+			}
+
+			if (unreceived.size() == 0)
+			{
+				NS_LOG_DEBUG("Unreceived MSECP's number " << unreceived.size() << " at " << m_address);
+				return;
+			}
+			else
+			{
+				SendSecack();
+				////再次延迟等待接收PGER
+				m_PgerWaitTimer = Simulator::Schedule(m_My11WmnPMTMGMPpgerWaitTime, &PmtmgmpProtocol::WaitForRecivePGER, this);
+			}
+		}
+		////接收PGER
+		void PmtmgmpProtocol::ReceivePger(IePger pger, Mac48Address from, uint32_t, Mac48Address fromMp, uint32_t metric)
+		{
+			std::vector<SECREPinformation>::iterator iter = std::find_if(m_AffiliatedMSECPlist.begin(), m_AffiliatedMSECPlist.end(), SECREPinformation_Finder(from));
+			if (pger.GetPathGenerationSequenceNumber() == m_PathGenerationSeqNumber)
+			{
+				if (iter != m_AffiliatedMSECPlist.end())
+				{
+					iter->m_generationPath = true;
+					NS_LOG_DEBUG("Receive PGER from at " << m_address << " from " << from);
+				}
+				else
+				{
+					NS_LOG_ERROR("PGER from wrong node at " << m_address << " from " << from);
+				}
+			}
+			else
+			{
+				NS_LOG_DEBUG("PGER have expired at " << m_address << " while GSN of this MTERP node is " << m_PathGenerationSeqNumber << " and the GSN of PGER is " << pger.GetPathGenerationSequenceNumber());
+			}
 		}
 		////发送初始PGEN
 		void PmtmgmpProtocol::SendFirstPgen(IeSecack secack, uint32_t metric)
 		{
-			NS_LOG_DEBUG("Send first PGEN " << " at node " << m_address << " while metric is " << metric <<", origination is " << secack.GetOriginatorAddress() << ", GSN is "<< secack.GetPathGenerationSequenceNumber());
+			NS_LOG_DEBUG("Send first PGEN " << " at node " << m_address << " while metric is " << metric << ", origination is " << secack.GetOriginatorAddress() << ", GSN is " << secack.GetPathGenerationSequenceNumber());
 			IePgen pgen;
 			pgen.SetOriginatorAddress(secack.GetOriginatorAddress());
 			pgen.SetMSECPaddress(m_address);
@@ -1516,7 +1582,7 @@ namespace ns3 {
 				NS_LOG_DEBUG("Receive PGEN from " << from << " at node " << m_address << " , this is the MSECP, return.");
 				return;
 			}
-			
+
 			////获取PGEN副本
 			Ptr<PmtmgmpRoutePath> pathCopy = pgen.GetPathInfo()->GetCopy();
 
@@ -1547,11 +1613,11 @@ namespace ns3 {
 			{
 				////当前路由表中不存在来自PGEN源节点的路径
 				pathCopy->SetStatus(PmtmgmpRoutePath::Confirmed);
-				m_RouteTable->AddNewPath(pathCopy); 
+				m_RouteTable->AddNewPath(pathCopy);
 				routeTree = m_RouteTable->GetTreeByMACaddress(pgen.GetMTERPAddress());
 				routeTree->RepeatabilityIncrease(from);
 			}
-			else 
+			else
 			{
 				////PGEN与全部路径的GSN比较
 				uint32_t GenSeqNum = pathCopy->GetPathGenerationSequenceNumber();
@@ -1596,9 +1662,9 @@ namespace ns3 {
 									existPath->SetAcceptCandidateRouteInformaitonEvent(Simulator::Schedule(routeTree->GetAcceptInformaitonDelay(), &PmtmgmpRouteTree::AcceptCandidateRouteInformaiton, routeTree, pathCopy->GetMSECPaddress()));
 									break;
 								case PmtmgmpRoutePath::Waited:
-									existPath->AddCandidateRouteInformaiton(pathCopy); 
+									existPath->AddCandidateRouteInformaiton(pathCopy);
 									NS_LOG_DEBUG("Receive PGEN (MTERP:" << pgen.GetMTERPAddress() << " MSECP:" << pgen.GetMSECPaddress() << ") from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", GSN is " << pgen.GetPathGenerationSequenceNumber() << " waits for Confirm");
-									return; 
+									return;
 								case PmtmgmpRoutePath::Confirmed:
 									NS_LOG_ERROR("Pgen form " << from << " :Path is Confirmed ,but GSN is not update at node " << m_address);
 									return;
