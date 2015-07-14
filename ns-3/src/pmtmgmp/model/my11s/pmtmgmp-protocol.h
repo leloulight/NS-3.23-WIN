@@ -288,8 +288,6 @@ namespace ns3 {
 			};
 			////发送SECREQ
 			void SendSecreq();
-			////列出SECREQ的发送地址
-			std::vector<Mac48Address> GetSecreqReceivers(uint32_t interface);
 			////接收SECREQ
 			void ReceiveSecreq(IeSecreq secreq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
 			////获取非同类（MAP，MPP）终端节点数量

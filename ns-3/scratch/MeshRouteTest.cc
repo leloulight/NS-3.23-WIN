@@ -34,8 +34,12 @@
 #include <fstream>
 #include <ctime>
 
+//输出到文件
 #define OUT_TO_FILE 
+//无应用层模式
 #define NO_APPLICATION
+//测试模式
+#define TEST_LOCATION
 
 
 //角度转换
@@ -605,11 +609,29 @@ int MeshRouteClass::Run()
 	// 创建节点及相关协议设置
 	CreateNodes();
 	// 节点位置设置
+#ifndef TEST_LOCATION
 	LocateNodes();
+#else
+	MobilityHelper mobility;
+
+	Ptr<ListPositionAllocator> initialAlloc = CreateObject<ListPositionAllocator>();
+	initialAlloc->Add(Vector(0, 0, 0));
+	mobility.SetPositionAllocator(initialAlloc);
+	initialAlloc->Add(Vector(70, 70, 0.));
+	mobility.SetPositionAllocator(initialAlloc);
+	initialAlloc->Add(Vector(70, -70, 0.));
+	mobility.SetPositionAllocator(initialAlloc);
+	for (int i = 3; i < l_NodeNum; i++)
+	{
+		initialAlloc->Add(Vector(100 * (i - 3) + 140, 0, 0.));
+		mobility.SetPositionAllocator(initialAlloc);
+	}
+	mobility.Install(l_Nodes);
+#endif
 	// 安装网络协议栈
 	InstallInternetStack();
-#ifndef NO_APPLICATION
 	// 安装应用层
+#ifndef NO_APPLICATION
 	InstallApplicationRandom();
 #else
 	if (m_SourceNum < 0 || m_SourceNum >= l_NodeNum) m_SourceNum = 0;
@@ -618,7 +640,8 @@ int MeshRouteClass::Run()
 	m_DestinationNum = m_Size * (m_Size - 1) - 2;
 	if (m_ProtocolType == MY11S_PMTMGMP)
 	{
-		DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(m_SourceNum)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Access_Point);
+		/*DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(m_SourceNum)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Access_Point);*/
+		DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(0)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Access_Point);
 		/*DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(m_DestinationNum)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Portal);*/
 	}
 #endif
@@ -687,8 +710,10 @@ void MeshRouteClass::Report()
 int main(int argc, char *argv[])
 {
 #ifdef OUT_TO_FILE
+#ifdef WIN32
 	ofstream logfile("E:\\Ns-3.23-log.log");
 	std::clog.rdbuf(logfile.rdbuf());
+#endif
 #endif
 
 	//LogComponentEnableAll((LogLevel)(LOG_LEVEL_INFO | LOG_PREFIX_ALL));

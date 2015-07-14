@@ -39,6 +39,13 @@
 #include "ie-my11s-pgen.h"
 #endif
 
+////多播和广播选择
+#ifndef PMTMGMP_UNUSED_MY_CODE
+#ifndef PMTMGMP_USE_MULTICAST
+#define PMTMGMP_USE_MULTICAST
+#endif
+#endif
+
 namespace ns3 {
 
 	NS_LOG_COMPONENT_DEFINE("PmtmgmpProtocolMac");
@@ -562,7 +569,7 @@ namespace ns3 {
 			//Send Management frame
 #ifdef PMTMGMP_USE_MULTICAST
 			////注释为多播，使用为广播
-			std::vector<Mac48Address> receivers = m_protocol->GetSecreqReceivers(m_ifIndex);
+			std::vector<Mac48Address> receivers = m_protocol->GetBroadcastReceivers(m_ifIndex);
 			for (std::vector<Mac48Address>::const_iterator i = receivers.begin(); i != receivers.end(); i++)
 			{
 				hdr.SetAddr1(*i);
@@ -671,7 +678,7 @@ namespace ns3 {
 			//Send Management frame
 #ifdef PMTMGMP_USE_MULTICAST
 			////注释为多播，使用为广播
-			std::vector<Mac48Address> receivers = m_protocol->GetPgenReceivers(m_ifIndex);
+			std::vector<Mac48Address> receivers = m_protocol->GetBroadcastReceivers(m_ifIndex);
 			for (std::vector<Mac48Address>::const_iterator i = receivers.begin(); i != receivers.end(); i++)
 			{
 				hdr.SetAddr1(*i);

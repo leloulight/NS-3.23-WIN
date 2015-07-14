@@ -1304,7 +1304,7 @@ namespace ns3 {
 		////发送SECREQ
 		void PmtmgmpProtocol::SendSecreq()
 		{
-			NS_LOG_DEBUG("Send SECREP at " << m_address);
+			NS_LOG_DEBUG("Send SECREQ at " << m_address);
 			IeSecreq secreq;
 			secreq.SetOriginatorAddress(GetAddress());
 			secreq.SetPathGenerationSequenceNumber(m_PathGenerationSeqNumber);
@@ -1315,21 +1315,6 @@ namespace ns3 {
 			}
 			////延迟等待处理选择MSECP
 			m_MSECPSetTimer = Simulator::Schedule(m_My11WmnPMTMGMPsecSetTime, &PmtmgmpProtocol::SelectMSECP, this);
-		}
-		////列出SECREQ的发送地址
-		std::vector<Mac48Address> PmtmgmpProtocol::GetSecreqReceivers(uint32_t interface)
-		{
-			std::vector<Mac48Address> retval;
-			if (!m_neighboursCallback.IsNull())
-			{
-				retval = m_neighboursCallback(interface);
-			}
-			if ((retval.size() >= m_UnicastSecreqThreshold) || (retval.size() == 0))
-			{
-				retval.clear();
-				retval.push_back(Mac48Address::GetBroadcast());
-			}
-			return retval;
 		}
 		////接收SECREQ
 		void PmtmgmpProtocol::ReceiveSecreq(IeSecreq secreq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
