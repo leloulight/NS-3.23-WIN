@@ -37,6 +37,11 @@ namespace ns3 {
 
 	namespace my11s {
 
+#ifndef PMTMGMP_UNUSED_MY_CODE
+		NS_OBJECT_ENSURE_REGISTERED(PmtmgmpRoutePath);
+		NS_OBJECT_ENSURE_REGISTERED(PmtmgmpRouteTree);
+		NS_OBJECT_ENSURE_REGISTERED(PmtmgmpRouteTable);
+#endif
 		NS_OBJECT_ENSURE_REGISTERED(PmtmgmpRtable);
 
 #ifndef PMTMGMP_UNUSED_MY_CODE
@@ -456,12 +461,12 @@ namespace ns3 {
 			}
 
 			Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
-			rand->SetAttribute("Min", IntegerValue(0));
-			rand->SetAttribute("Max", IntegerValue(bests.size() - 1));
+			rand->SetAttribute("Min", DoubleValue(0));
+			rand->SetAttribute("Max", DoubleValue(bests.size() - 1));
 
 			Ptr<PmtmgmpRoutePath> select = bests[rand->GetValue()];
 
-			NS_LOG_DEBUG("Path information about MTERP:" << path->GetMTERPaddress() << " MSECP:" << path->GetMSECPaddress() << " accept information from  node: " << select->GetFromNode() << " as a confirm information with the Metric of " << select->GetMetric() << ".");
+			NS_LOG_DEBUG("Path information (MTERP:" << path->GetMTERPaddress() << " MSECP:" << path->GetMSECPaddress() << ") accept information from  node: " << select->GetFromNode() << " as a confirm information with the Metric of " << select->GetMetric() << ".");
 
 			select->SetStatus(PmtmgmpRoutePath::Confirmed);
 			RepeatabilityIncrease(select->GetFromNode());

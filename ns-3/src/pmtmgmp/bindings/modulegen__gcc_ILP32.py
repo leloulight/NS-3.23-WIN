@@ -524,6 +524,8 @@ def register_types_ns3_my11s(module):
     module.add_class('IePerr', parent=root_module['ns3::WifiInformationElement'])
     ## ie-my11s-pgen.h (module 'pmtmgmp'): ns3::my11s::IePgen [class]
     module.add_class('IePgen', parent=root_module['ns3::WifiInformationElement'])
+    ## ie-my11s-pger.h (module 'pmtmgmp'): ns3::my11s::IePger [class]
+    module.add_class('IePger', parent=root_module['ns3::WifiInformationElement'])
     ## ie-my11s-prep.h (module 'pmtmgmp'): ns3::my11s::IePrep [class]
     module.add_class('IePrep', parent=root_module['ns3::WifiInformationElement'])
     ## ie-my11s-preq.h (module 'pmtmgmp'): ns3::my11s::IePreq [class]
@@ -761,6 +763,7 @@ def register_methods(root_module):
     register_Ns3My11sIePeeringProtocol_methods(root_module, root_module['ns3::my11s::IePeeringProtocol'])
     register_Ns3My11sIePerr_methods(root_module, root_module['ns3::my11s::IePerr'])
     register_Ns3My11sIePgen_methods(root_module, root_module['ns3::my11s::IePgen'])
+    register_Ns3My11sIePger_methods(root_module, root_module['ns3::my11s::IePger'])
     register_Ns3My11sIePrep_methods(root_module, root_module['ns3::my11s::IePrep'])
     register_Ns3My11sIePreq_methods(root_module, root_module['ns3::my11s::IePreq'])
     register_Ns3My11sIeRann_methods(root_module, root_module['ns3::my11s::IeRann'])
@@ -10569,6 +10572,11 @@ def register_Ns3My11sIePgen_methods(root_module, cls):
                    'ns3::Mac48Address', 
                    [], 
                    is_const=True)
+    ## ie-my11s-pgen.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::IePgen::GetMTERPAddress() const [member function]
+    cls.add_method('GetMTERPAddress', 
+                   'ns3::Mac48Address', 
+                   [], 
+                   is_const=True)
     ## ie-my11s-pgen.h (module 'pmtmgmp'): double ns3::my11s::IePgen::GetMetric() const [member function]
     cls.add_method('GetMetric', 
                    'double', 
@@ -10577,11 +10585,6 @@ def register_Ns3My11sIePgen_methods(root_module, cls):
     ## ie-my11s-pgen.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpProtocol::NodeType ns3::my11s::IePgen::GetNodeType() const [member function]
     cls.add_method('GetNodeType', 
                    'ns3::my11s::PmtmgmpProtocol::NodeType', 
-                   [], 
-                   is_const=True)
-    ## ie-my11s-pgen.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::IePgen::GetOriginatorAddress() const [member function]
-    cls.add_method('GetOriginatorAddress', 
-                   'ns3::Mac48Address', 
                    [], 
                    is_const=True)
     ## ie-my11s-pgen.h (module 'pmtmgmp'): uint32_t ns3::my11s::IePgen::GetPathGenerationSequenceNumber() const [member function]
@@ -10645,6 +10648,49 @@ def register_Ns3My11sIePgen_methods(root_module, cls):
     cls.add_method('SetTTL', 
                    'void', 
                    [param('uint8_t', 'ttl')])
+    return
+
+def register_Ns3My11sIePger_methods(root_module, cls):
+    cls.add_output_stream_operator()
+    cls.add_binary_comparison_operator('==')
+    ## ie-my11s-pger.h (module 'pmtmgmp'): ns3::my11s::IePger::IePger(ns3::my11s::IePger const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::my11s::IePger const &', 'arg0')])
+    ## ie-my11s-pger.h (module 'pmtmgmp'): ns3::my11s::IePger::IePger() [constructor]
+    cls.add_constructor([])
+    ## ie-my11s-pger.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePger::DeserializeInformationField(ns3::Buffer::Iterator i, uint8_t length) [member function]
+    cls.add_method('DeserializeInformationField', 
+                   'uint8_t', 
+                   [param('ns3::Buffer::Iterator', 'i'), param('uint8_t', 'length')], 
+                   is_virtual=True)
+    ## ie-my11s-pger.h (module 'pmtmgmp'): ns3::WifiInformationElementId ns3::my11s::IePger::ElementId() const [member function]
+    cls.add_method('ElementId', 
+                   'ns3::WifiInformationElementId', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-pger.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePger::GetInformationFieldSize() const [member function]
+    cls.add_method('GetInformationFieldSize', 
+                   'uint8_t', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-pger.h (module 'pmtmgmp'): uint32_t ns3::my11s::IePger::GetPathGenerationSequenceNumber() const [member function]
+    cls.add_method('GetPathGenerationSequenceNumber', 
+                   'uint32_t', 
+                   [], 
+                   is_const=True)
+    ## ie-my11s-pger.h (module 'pmtmgmp'): void ns3::my11s::IePger::Print(std::ostream & os) const [member function]
+    cls.add_method('Print', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-pger.h (module 'pmtmgmp'): void ns3::my11s::IePger::SerializeInformationField(ns3::Buffer::Iterator i) const [member function]
+    cls.add_method('SerializeInformationField', 
+                   'void', 
+                   [param('ns3::Buffer::Iterator', 'i')], 
+                   is_const=True, is_virtual=True)
+    ## ie-my11s-pger.h (module 'pmtmgmp'): void ns3::my11s::IePger::SetPathGenerationSequenceNumber(uint32_t seq_number) [member function]
+    cls.add_method('SetPathGenerationSequenceNumber', 
+                   'void', 
+                   [param('uint32_t', 'seq_number')])
     return
 
 def register_Ns3My11sIePrep_methods(root_module, cls):

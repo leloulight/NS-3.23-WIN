@@ -617,13 +617,13 @@ int MeshRouteClass::Run()
 	Ptr<ListPositionAllocator> initialAlloc = CreateObject<ListPositionAllocator>();
 	initialAlloc->Add(Vector(0, 0, 0));
 	mobility.SetPositionAllocator(initialAlloc);
-	initialAlloc->Add(Vector(70, 70, 0.));
+	initialAlloc->Add(Vector(84, 84, 0.));
 	mobility.SetPositionAllocator(initialAlloc);
-	initialAlloc->Add(Vector(70, -70, 0.));
+	initialAlloc->Add(Vector(84, -84, 0.));
 	mobility.SetPositionAllocator(initialAlloc);
 	for (int i = 3; i < l_NodeNum; i++)
 	{
-		initialAlloc->Add(Vector(100 * (i - 3) + 140, 0, 0.));
+		initialAlloc->Add(Vector(120 * (i - 3) + 168, 0, 0.));
 		mobility.SetPositionAllocator(initialAlloc);
 	}
 	mobility.Install(l_Nodes);
