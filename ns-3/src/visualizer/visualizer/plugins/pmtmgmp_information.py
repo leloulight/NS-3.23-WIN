@@ -6,8 +6,6 @@ import ns.visualizer
 import ns.pmtmgmp
 
 from visualizer.base import InformationWindow
-from zmq.backend.cython.constants import NULL
-
 
 class ShowPmtmgmpInforamtion(InformationWindow):
     def __init__(self, visualizer, node_index ,device):
