@@ -177,8 +177,7 @@ def populate_node_menu(viz, node, menu):
     WmnDevice = None
     for devI in range(ns3_node.GetNDevices()):
         dev = ns3_node.GetDevice(devI)
-        name = ns.core.Names.FindName(dev)
-        if dev.GetInstanceTypeId().GetName() == "ns3::WmnPointDevice":
+        if isinstance(dev, ns.pmtmgmp.WmnPointDevice):
             WmnDevice = dev
     if WmnDevice is None:
         print "No PMTMGMP"

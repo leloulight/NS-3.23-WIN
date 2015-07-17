@@ -71,6 +71,7 @@ class Route_Link(Link):
 
 class Pmtmgmp_Route(object):
     def __init__(self, dummy_viz):
+        self.pmtmgmp = None
         self.access_points = {} # bssid -> node
         self.stations = [] # list of (sta_netdevice, viz_node, wifi_link)
 
@@ -85,15 +86,19 @@ class Pmtmgmp_Route(object):
             ns3_node = ns.network.NodeList.GetNode(node.node_index)
             for devI in range(ns3_node.GetNDevices()):
                 dev = ns3_node.GetDevice(devI)
-                if not isinstance(dev, ns.wifi.WifiNetDevice):
+                if isinstance(dev, ns.pmtmgmp.WmnPointDevice):
+                    WmnDevice = dev
+                else:
                     continue
-                wifi_mac = dev.GetMac()
-                if isinstance(wifi_mac, ns.wifi.StaWifiMac):
-                    wifi_link = Route_Link(viz.links_group, node, dev)
-                    self.stations.append((dev, node, wifi_link))
-                elif isinstance(wifi_mac, ns.wifi.ApWifiMac):
-                    bssid = ns.network.Mac48Address.ConvertFrom(dev.GetAddress())
-                    self.access_points[str(bssid)] = node
+                # if not isinstance(dev, ns.wifi.WifiNetDevice):
+                #     continue
+                # wifi_mac = dev.GetMac()
+                # if isinstance(wifi_mac, ns.wifi.StaWifiMac):
+                #     wifi_link = Route_Link(viz.links_group, node, dev)
+                #     self.stations.append((dev, node, wifi_link))
+                # elif isinstance(wifi_mac, ns.wifi.ApWifiMac):
+                #     bssid = ns.network.Mac48Address.ConvertFrom(dev.GetAddress())
+                #     self.access_points[str(bssid)] = node
         #print "APs: ", self.access_points
         #print "STAs: ", self.stations
 
@@ -114,8 +119,33 @@ class Pmtmgmp_Route(object):
             if wifi_link is not None:
                 wifi_link.update_points()
 
+    def populate_node_menu(self, viz, node, menu):
+        ns3_node = ns.network.NodeList.GetNode(node.node_index)
+        WmnDevice = None
+        for devI in range(ns3_node.GetNDevices()):
+            dev = ns3_node.GetDevice(devI)
+            if isinstance(dev, ns.pmtmgmp.WmnPointDevice):
+                WmnDevice = dev
+        if WmnDevice is None:
+            print "No PMTMGMP"
+            return
+        self.pmtmgmp = WmnDevice.GetRoutingProtocol()
+        if self.pmtmgmp.GetNodeType() & 0x06 == 0:
+            print "Not MTERP"
+            return
+
+        menu_item = gtk.MenuItem("Show Pmtmgmp Tree As Root")
+        menu_item.show()
+        menu_menu = gtk.Menu()
+        menu_menu.show()
+        menu_item.set_submenu(menu_menu)
+        menu.add(menu_item)
+
+        route_table = self.pmtmgmp.GetPmtmgmpRPRouteTable()
+
 def register(viz):
     pmtmgmp_route = Pmtmgmp_Route(viz)
+    viz.connect("populate-node-menu", pmtmgmp_route.populate_node_menu)
     viz.connect("simulation-periodic-update", pmtmgmp_route.simulation_periodic_update)
     viz.connect("update-view", pmtmgmp_route.update_view)
     viz.connect("topology-scanned", pmtmgmp_route.scan_nodes)

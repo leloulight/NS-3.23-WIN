@@ -48,11 +48,15 @@ namespace ns3 {
 		/*************************
 		* PmtmgmpRoutePath
 		************************/
-		PmtmgmpRoutePath::PmtmgmpRoutePath():
-			m_CandidateRouteInformaiton(std::vector<Ptr<PmtmgmpRoutePath> >()),
+		PmtmgmpRoutePath::PmtmgmpRoutePath() :
+			m_PathGenerationSeqNumber(0),
+			m_NodeType(PmtmgmpProtocol::Mesh_STA),
+			m_hopCount(0),
+			m_metric(0),
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			m_PMTMGMPpathNodeListNum(2),
 #endif
+			m_CandidateRouteInformaiton(std::vector<Ptr<PmtmgmpRoutePath> >()),
 			m_InformationStatus(Confirmed),
 			m_MaxCandidateNum(4)
 		{

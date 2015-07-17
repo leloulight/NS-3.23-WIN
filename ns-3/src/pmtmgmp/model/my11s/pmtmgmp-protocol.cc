@@ -1510,7 +1510,17 @@ namespace ns3 {
 			{
 				if (iter != m_AffiliatedMSECPlist.end())
 				{
+					////更改PGER接收记录
 					iter->m_generationPath = true;
+
+					////添加新的路径信息
+					Ptr<PmtmgmpRoutePath> tempPath = CreateObject<PmtmgmpRoutePath>();
+					tempPath->SetMTERPaddress(m_address);
+					tempPath->SetMSECPaddress(from);
+					tempPath->SetPathGenerationSequenceNumber(pger.GetPathGenerationSequenceNumber());
+					tempPath->SetNodeType(m_NodeType);
+					tempPath->SetFromNode(from);
+					m_RouteTable->AddNewPath(tempPath);
 					NS_LOG_DEBUG("Receive PGER from at " << m_address << " from " << from);
 				}
 				else
