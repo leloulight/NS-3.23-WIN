@@ -1289,6 +1289,11 @@ namespace ns3 {
 		{
 		}
 #ifndef PMTMGMP_UNUSED_MY_CODE
+		////获取MAC
+		Mac48Address PmtmgmpProtocol::GetMacAddress()
+		{
+			return m_address;
+		}
 		////获取协议的路由表
 		Ptr<PmtmgmpRouteTable> PmtmgmpProtocol::GetPmtmgmpRPRouteTable()
 		{

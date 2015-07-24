@@ -155,7 +155,7 @@ namespace ns3 {
 			Mac48Address GetMTERPaddress() const;
 			Time GetAcceptInformaitonDelay() const;
 			
-			////获取MTERP、MSECP对应的Path
+			////获取MTERP、MSECP对应的Path，找不到则返回0
 			Ptr<PmtmgmpRoutePath> GetPathByMACaddress(Mac48Address msecp);
 			////获取度量最小的路径
 			std::vector<Ptr<PmtmgmpRoutePath> > GetBestPath();
@@ -218,9 +218,9 @@ namespace ns3 {
 
 			std::vector<Ptr<PmtmgmpRouteTree> > GetRouteTable();
 
-			////获取MTERP对应的Tree
+			////获取MTERP对应的Tree，找不到则返回0
 			Ptr<PmtmgmpRouteTree> GetTreeByMACaddress(Mac48Address mterp);
-			////获取MTERP、MSECP对应的Path
+			////获取MTERP、MSECP对应的Path，找不到则返回0
 			Ptr<PmtmgmpRoutePath> GetPathByMACaddress(Mac48Address mterp, Mac48Address msecp);
 			////添加新路径
 			void AddNewPath(Ptr<PmtmgmpRoutePath> path);

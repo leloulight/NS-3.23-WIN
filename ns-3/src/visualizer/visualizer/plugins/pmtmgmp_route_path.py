@@ -7,81 +7,148 @@ import ns.visualizer
 import ns.pmtmgmp
 
 from visualizer.base import Link, transform_distance_canvas_to_simulation
-
-class Route_Link(Link):
-    def __init__(self, parent_canvas_item, sta, dev):
-        self.node1 = sta
-        self.dev = dev
-        self.node2 = None # ap
+SHOW_LOG = True
+class Pmtmgmp_Path_Link(Link):
+    def __init__(self, base_node, link_node, base_route_table, mterp, msecp, parent_canvas_item):
+        self.base_node = base_node
+        self.link_node = link_node
+        self.base_route_table = base_route_table
+        self.mterp = mterp
+        self.msecp = msecp
         self.canvas_item = goocanvas.Group(parent=parent_canvas_item)
-        self.invisible_line = goocanvas.Polyline(parent=self.canvas_item,
-                                                 line_width=25.0,
-                                                 visibility=goocanvas.ITEM_HIDDEN)
-        self.visible_line = goocanvas.Polyline(parent=self.canvas_item,
-                                              line_width=1.0,
-                                              stroke_color_rgba=0xC00000FF,
-                                              line_dash=goocanvas.LineDash([2.0, 2.0 ]))
-        self.invisible_line.props.pointer_events = (goocanvas.EVENTS_STROKE_MASK
-                                                    |goocanvas.EVENTS_FILL_MASK
-                                                    |goocanvas.EVENTS_PAINTED_MASK)
+        self.line = goocanvas.Polyline(parent=self.canvas_item, line_width=1.0, stroke_color_rgba=0xC00000FF, start_arrow=True, arrow_length=10,arrow_width=8)
         self.canvas_item.set_data("pyviz-object", self)
         self.canvas_item.lower(None)
-        self.set_ap(None)
-
-    def set_ap(self, ap):
-        if ap is self.node2:
-            return
-        if self.node2 is not None:
-            self.node2.remove_link(self)
-        self.node2 = ap
-        if self.node2 is None:
-            self.canvas_item.set_property("visibility", goocanvas.ITEM_HIDDEN)
-        else:
-            self.node2.add_link(self)
-            self.canvas_item.set_property("visibility", goocanvas.ITEM_VISIBLE)
-        self.update_points()
 
     def update_points(self):
-        if self.node2 is None:
-            return
-        pos1_x, pos1_y = self.node1.get_position()
-        pos2_x, pos2_y = self.node2.get_position()
-        points = goocanvas.Points([(pos1_x, pos1_y), (pos2_x, pos2_y)])
-        self.visible_line.set_property("points", points)
-        self.invisible_line.set_property("points", points)
+        if self.base_route_table.GetPathByMACaddress(self.mterp, self.msecp) is None:
+            self.destroy()
+        else:
+            pos1_x, pos1_y = self.base_node.viz_node.get_position()
+            pos2_x, pos2_y = self.link_node.viz_node.get_position()
+            points = goocanvas.Points([(pos1_x, pos1_y), (pos2_x, pos2_y)])
+            self.line.set_property("points", points)
 
     def destroy(self):
-        self.canvas_item.destroy()
-        self.node1 = None
-        self.node2 = None
+        self.line.remove()
+        self.canvas_item.remove()
+        self.ns_node = None
+        self.pmtmgmp_node = None
+        del(self)
 
-    def tooltip_query(self, tooltip):
-        pos1_x, pos1_y = self.node1.get_position()
-        pos2_x, pos2_y = self.node2.get_position()
-        dx = pos2_x - pos1_x
-        dy = pos2_y - pos1_y
-        d = transform_distance_canvas_to_simulation(math.sqrt(dx*dx + dy*dy))
-        mac = self.dev.GetMac()
-        tooltip.set_text(("WiFi link between STA Node %i and AP Node %i; distance=%.2f m.\n"
-                          "SSID: %s\n"
-                          "BSSID: %s")
-                         % (self.node1.node_index, self.node2.node_index, d,
-                            mac.GetSsid(), mac.GetBssid()))
+class Pmtmgmp_Node(object):
+    def __init__(self, node_index, viz_node, pmtmgmp):
+        self.node_index = node_index
+        self.viz_node = viz_node
+        self.base_mac = pmtmgmp.GetMacAddress()
+        self.base_route_table = pmtmgmp.GetPmtmgmpRPRouteTable()
+        self.pmtmgmp = pmtmgmp
+        self.link_list = {}
 
+    def clean_link_list(self):
+        for (key,link) in self.link_list.items():
+            link.destroy()
+            del(self.link_list[key])
+        self.link_list = {}
+
+    def update_link_list(self):
+        for (key,link) in self.link_list.items():
+            link.update_points()
+
+    def crearte_route_path(self, mac_node_list, mterp, msecp, parent_canvas_item):
+        # if SHOW_LOG:
+        #     print self
+        self.update_link_list()
+        route_table = self.pmtmgmp.GetPmtmgmpRPRouteTable()
+        route_path = route_table.GetPathByMACaddress(mterp,msecp)
+        if route_path is None:
+             return
+        if self.link_list.has_key(str(mterp) + "," + str(msecp)):
+            self.link_list[str(mterp) + "," + str(msecp)].update_points()
+            self.link_list[str(mterp) + "," + str(msecp)] = self.link_list[str(mterp) + "," + str(msecp)]
+            return
+        else:
+            route_link = Pmtmgmp_Path_Link(self, mac_node_list[str(route_path.GetFromNode())], route_table, mterp, msecp, parent_canvas_item)
+            self.link_list[str(mterp) + "," + str(msecp)] = route_link
+        if SHOW_LOG:
+            print "Pmtmgmp_Node::crearte_route_path() " + str(self.pmtmgmp.GetMacAddress()) + "ink to " + str(route_path.GetFromNode())
+
+    def create_part_route_path_start(self, mac_node_list, mterp, msecp, parent_canvas_item):
+        self.update_link_list()
+        route_table = self.pmtmgmp.GetPmtmgmpRPRouteTable()
+        route_tree = route_table.GetTreeByMACaddress(self.pmtmgmp.GetMacAddress())
+        if route_tree is None:
+            return
+        for i in range(0, route_tree.GetTreeSize()):
+            route_path = route_tree.GetTreeItem(i)
+            if self.link_list.has_key(str(mterp) + "," + str(msecp)):
+                self.link_list[str(mterp) + "," + str(msecp)].update_points()
+                self.link_list[str(mterp) + "," + str(msecp)] = self.link_list[str(mterp) + "," + str(msecp)]
+                return
+            else:
+                route_link = Pmtmgmp_Path_Link(self, mac_node_list[str(route_path.GetFromNode())], route_table, mterp, msecp, parent_canvas_item)
+                self.link_list[str(mterp) + "," + str(msecp)] = route_link
+            next_hop = mac_node_list[str(route_path.GetFromNode())]
+            next_hop.crearte_route_path(mac_node_list, mterp, route_path.GetMSECPaddress(), parent_canvas_item)
+
+    def destory(self):
+        self.node_index  = None
+        self.viz_node  = None
+        self.pmtmgmp  = None
+        self.base_mac = None
+        self.base_route_table = None
+        self.clean_link_list()
 
 class Pmtmgmp_Route(object):
     def __init__(self, dummy_viz):
+        self.viz = dummy_viz
         self.pmtmgmp = None
-        self.access_points = {} # bssid -> node
-        self.stations = [] # list of (sta_netdevice, viz_node, wifi_link)
+        self.show_msecp_mac = None
+        self.show_mterp_mac = None
+        self.node_list = []
+        self.mac_to_node = {} #(str(Mac48Address), Pmtmgmp_Route)
+
+    def route_path_clean(self):
+        if SHOW_LOG:
+            print "Clean node list"
+        self.mac_to_node = {}
+        for node in self.node_list:
+            node.destory()
+            self.node_list.remove(node)
+
+    def route_path_link_full(self, msecp):
+        if SHOW_LOG:
+            print "Pmtmgmp_Route::route_path_link_full() Node list:" + str(len(self.node_list))
+        for node in self.node_list:
+            # if SHOW_LOG:
+            #     print node
+            node.crearte_route_path(self.mac_to_node, self.pmtmgmp.GetMacAddress(), msecp, self.viz.links_group)
+            if SHOW_LOG:
+                print "Pmtmgmp_Route::route_path_link_full()" + str(node.base_mac)
+
+    def route_path_link_part(self, mterp):
+        if SHOW_LOG:
+            print "Pmtmgmp_Route::route_path_link_part()"
+        self.node_list[str(self.pmtmgmp.GetMacAddress())].create_part_route_path_start(self.node_list, mterp, self.viz.links_group)
+
+    def route_path_link(self):
+        if (self.show_msecp_mac is None and self.show_mterp_mac is None):
+            if SHOW_LOG:
+                print "Pmtmgmp_Route::route_path_link().route_path_clean"
+            self. route_path_clean()
+        elif self.show_msecp_mac is None:
+            if SHOW_LOG:
+                print "Pmtmgmp_Route::route_path_link().route_path_link_part"
+            self.route_path_link_part(self.show_mterp_mac)
+        elif self.show_mterp_mac is None:
+            if SHOW_LOG:
+                print "Pmtmgmp_Route::route_path_link().route_path_link_full"
+            self.route_path_link_full(self.show_msecp_mac)
 
     def scan_nodes(self, viz):
-        for (sta_netdevice, viz_node, wifi_link) in self.stations:
-            wifi_link.destroy()
-
-        self.access_points = {}
-        self.stations = []
-
+        if SHOW_LOG:
+            print "scan_nodes"
+        self. route_path_clean()
         for node in viz.nodes.itervalues():
             ns3_node = ns.network.NodeList.GetNode(node.node_index)
             for devI in range(ns3_node.GetNDevices()):
@@ -90,34 +157,23 @@ class Pmtmgmp_Route(object):
                     WmnDevice = dev
                 else:
                     continue
-                # if not isinstance(dev, ns.wifi.WifiNetDevice):
-                #     continue
-                # wifi_mac = dev.GetMac()
-                # if isinstance(wifi_mac, ns.wifi.StaWifiMac):
-                #     wifi_link = Route_Link(viz.links_group, node, dev)
-                #     self.stations.append((dev, node, wifi_link))
-                # elif isinstance(wifi_mac, ns.wifi.ApWifiMac):
-                #     bssid = ns.network.Mac48Address.ConvertFrom(dev.GetAddress())
-                #     self.access_points[str(bssid)] = node
-        #print "APs: ", self.access_points
-        #print "STAs: ", self.stations
+                new_node = Pmtmgmp_Node(node.node_index, node, WmnDevice.GetRoutingProtocol())
+                # if SHOW_LOG:
+                #     print new_node
+                self.node_list.append(new_node)
+                self.mac_to_node[str(new_node.base_mac)] = new_node
+        self.route_path_link()
 
     def simulation_periodic_update(self, viz):
-        for (sta_netdevice, viz_node, wifi_link) in self.stations:
-            if not sta_netdevice.IsLinkUp():
-                wifi_link.set_ap(None)
-                continue
-            bssid = str(sta_netdevice.GetMac().GetBssid())
-            if bssid == '00:00:00:00:00:00':
-                wifi_link.set_ap(None)
-                continue
-            ap = self.access_points[bssid]
-            wifi_link.set_ap(ap)
+        if SHOW_LOG:
+            print "simulation_periodic_update"
+        self.route_path_link()
 
     def update_view(self, viz):
-        for (dummy_sta_netdevice, dummy_viz_node, wifi_link) in self.stations:
-            if wifi_link is not None:
-                wifi_link.update_points()
+        if SHOW_LOG:
+            print "update_view"
+        for node in self.node_list:
+            node.update_link_list()
 
     def populate_node_menu(self, viz, node, menu):
         ns3_node = ns.network.NodeList.GetNode(node.node_index)
@@ -130,18 +186,98 @@ class Pmtmgmp_Route(object):
             print "No PMTMGMP"
             return
         self.pmtmgmp = WmnDevice.GetRoutingProtocol()
-        if self.pmtmgmp.GetNodeType() & 0x06 == 0:
-            print "Not MTERP"
-            return
 
-        menu_item = gtk.MenuItem("Show Pmtmgmp Tree As Root")
-        menu_item.show()
-        menu_menu = gtk.Menu()
-        menu_menu.show()
-        menu_item.set_submenu(menu_menu)
-        menu.add(menu_item)
-
+        route = self
         route_table = self.pmtmgmp.GetPmtmgmpRPRouteTable()
+
+        menu_item_main = gtk.MenuItem("Show Route")
+        menu_item_main.show()
+        menu_route = gtk.Menu()
+        menu_route.show()
+        menu_item_main.set_submenu(menu_route)
+        add_menu = False
+
+        def _clean_pmtmgmp_path(dummy_menu_item):
+            route.show_msecp_mac = None
+            route.show_mterp_mac = None
+            self.scan_nodes(viz)
+            if SHOW_LOG:
+                print "Clean Path"
+
+        menu_item = gtk.MenuItem("Clean")
+        menu_item.show()
+        menu_route.add(menu_item)
+        menu_item.connect("activate", _clean_pmtmgmp_path)
+
+        #As a STA
+        route_table_size = route_table.GetTableSize()
+        if route_table_size == 0 or (route_table_size == 1 and route_table.GetTableItem(0).GetMTERPaddress() == self.pmtmgmp.GetMacAddress()):
+            if SHOW_LOG:
+                print "There is no part path start at this node"
+        else:
+            add_menu = True
+            if SHOW_LOG:
+                print "Find " + str(route_table_size) + " MTERP"
+
+            menu_item = gtk.MenuItem("Show Pmtmgmp Route To Root")
+            menu_item.show()
+            menu_menu = gtk.Menu()
+            menu_menu.show()
+            menu_item.set_submenu(menu_menu)
+            menu_route.add(menu_item)
+
+            for i in range(0, route_table.GetTableSize()):
+                route_tree = route_table.GetTableItem(i)
+
+                def _show_pmtmgmp_part_path(dummy_menu_item, i):
+                    route.show_msecp_mac = None
+                    route.show_mterp_mac = route_table.GetTableItem(i).GetMTERPaddress()
+                    self.scan_nodes(viz)
+                    if SHOW_LOG:
+                        print "Show part path as MTERP is " + str(self.show_mterp_mac)
+
+                menu_item_temp = gtk.MenuItem (str(route_tree.GetMTERPaddress()))
+                menu_item_temp.show()
+                menu_menu.add(menu_item_temp)
+                menu_item_temp.connect("activate", _show_pmtmgmp_part_path, i)
+        # if SHOW_LOG:
+        #     print add_menu
+
+        #As a MTERP
+        route_tree = route_table.GetTreeByMACaddress(self.pmtmgmp.GetMacAddress())
+        if route_tree is None:
+            if SHOW_LOG:
+                print "There is no full path start at this node while the MSECP is " + str(self.pmtmgmp.GetMacAddress())
+        elif self.pmtmgmp.GetNodeType() & 0x06 == 0:
+            if SHOW_LOG:
+                print "This node is not MTERP"
+        else:
+            add_menu = True
+            menu_item = gtk.MenuItem("Show Pmtmgmp Tree As Root")
+            menu_item.show()
+            menu_menu = gtk.Menu()
+            menu_menu.show()
+            menu_item.set_submenu(menu_menu)
+            menu_route.add(menu_item)
+
+            for i in range(0, route_tree.GetTreeSize()):
+
+                def _show_pmtmgmp_full_path(dummy_menu_item, i):
+                    route.show_mterp_mac = None
+                    route.show_msecp_mac = route_tree.GetTreeItem(i).GetMSECPaddress()
+                    self.scan_nodes(viz)
+                    print "Show full path as MSECP is " + str(self.show_msecp_mac)
+
+                route_path = route_tree.GetTreeItem(i)
+                menu_item_temp = gtk.MenuItem (str(route_path.GetMSECPaddress()))
+                menu_item_temp.show()
+                menu_menu.add(menu_item_temp)
+                menu_item_temp.connect("activate", _show_pmtmgmp_full_path, i)
+        # if SHOW_LOG:
+        #     print add_menu
+
+        if add_menu:
+            menu.add(menu_item_main)
 
 def register(viz):
     pmtmgmp_route = Pmtmgmp_Route(viz)

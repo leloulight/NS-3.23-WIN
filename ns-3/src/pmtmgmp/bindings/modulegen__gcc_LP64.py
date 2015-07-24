@@ -11709,6 +11709,10 @@ def register_Ns3My11sPmtmgmpProtocol_methods(root_module, cls):
                    'uint8_t', 
                    [], 
                    is_const=True)
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::PmtmgmpProtocol::GetMacAddress() [member function]
+    cls.add_method('GetMacAddress', 
+                   'ns3::Mac48Address', 
+                   [])
     ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpProtocol::NodeType ns3::my11s::PmtmgmpProtocol::GetNodeType() [member function]
     cls.add_method('GetNodeType', 
                    'ns3::my11s::PmtmgmpProtocol::NodeType', 

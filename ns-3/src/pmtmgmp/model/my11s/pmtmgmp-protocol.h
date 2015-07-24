@@ -105,6 +105,8 @@ namespace ns3 {
 			int64_t AssignStreams(int64_t stream);
 
 #ifndef PMTMGMP_UNUSED_MY_CODE
+			////获取MAC
+			Mac48Address GetMacAddress();
 			////获取协议的路由表
 			Ptr<PmtmgmpRouteTable> GetPmtmgmpRPRouteTable();
 			////终端节点发动 
