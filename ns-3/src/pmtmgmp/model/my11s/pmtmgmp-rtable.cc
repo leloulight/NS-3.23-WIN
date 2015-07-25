@@ -58,8 +58,10 @@ namespace ns3 {
 #endif
 			m_CandidateRouteInformaiton(std::vector<Ptr<PmtmgmpRoutePath> >()),
 			m_InformationStatus(Confirmed),
-			m_MaxCandidateNum(4)
+			m_MaxCandidateNum(4),
+			m_PMTGMGMProutePathInforLife(MicroSeconds(1024 * 5000))
 		{
+			RoutePathInforLifeUpdate();
 		}
 
 		PmtmgmpRoutePath::~PmtmgmpRoutePath()
@@ -87,6 +89,13 @@ namespace ns3 {
 					MakeUintegerAccessor(
 						&PmtmgmpRoutePath::m_MaxCandidateNum),
 					MakeUintegerChecker<uint8_t>(0)
+					)
+				.AddAttribute("PMTGMGMProutePathInforLife",
+					"Life of route path information.",
+					TimeValue(MicroSeconds(1024 * 5000)),
+					MakeTimeAccessor(
+						&PmtmgmpRoutePath::m_PMTGMGMProutePathInforLife),
+					MakeTimeChecker()
 					)
 				;
 			return tid;
@@ -201,6 +210,16 @@ namespace ns3 {
 		{
 			return m_CandidateRouteInformaiton[index];
 		}
+		////路径信息更新自检
+		bool PmtmgmpRoutePath::RoutePathInforLifeCheck()
+		{
+			return Simulator::Now() - m_PMTGMGMProutePathInforUpdateTime > m_PMTGMGMProutePathInforLife;
+		}
+		////路径信息更新
+		void PmtmgmpRoutePath::RoutePathInforLifeUpdate()
+		{
+			m_PMTGMGMProutePathInforUpdateTime = Simulator::Now();
+		}
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 		////获取路径重复度
 		uint8_t PmtmgmpRoutePath::GetPartPathRepeatability(PmtmgmpRoutePath compare)
@@ -208,7 +227,7 @@ namespace ns3 {
 			uint8_t Repeatability = 0;
 			for (std::vector<Mac48Address>::iterator selectIter = m_PathInfo.begin(); selectIter != m_PathInfo.end(); selectIter++)
 			{
-				std::vector<Mac48Address>::iterator iter = std::find_if(compare.GetPathInfo().begin(), compare.GetPathInfo().end(), PmtmgmpRPpath_Finder(*selectIter));
+				std::vector<Mac48Address>::iterator iter = std::find_if(compare.GetPathInfo().begin(), compare.GetPathInfo().end(), PmtmgmpRoutePath_Finder(*selectIter));
 				if (iter == compare.GetPathInfo().end())
 				{
 					Repeatability++;
@@ -272,7 +291,7 @@ namespace ns3 {
 		PmtmgmpRouteTree::PmtmgmpRouteTree() :
 			m_tree(std::vector<Ptr<PmtmgmpRoutePath> >()),
 			m_MSECPnumForMTERP(2),
-			m_AcceptInformaitonDelay(MicroSeconds(1024 * 10))
+			m_AcceptInformaitonDelay(MicroSeconds(1024 * 1000))
 		{
 		}
 
@@ -294,7 +313,7 @@ namespace ns3 {
 					)
 				.AddAttribute("AcceptInformaitonDelay",
 					"Delay for accept information.",
-					TimeValue(MicroSeconds(1024 * 10)),
+					TimeValue(MicroSeconds(1024 * 1000)),
 					MakeTimeAccessor(
 						&PmtmgmpRouteTree::m_AcceptInformaitonDelay),
 					MakeTimeChecker()
@@ -322,7 +341,7 @@ namespace ns3 {
 		Ptr<PmtmgmpRoutePath> PmtmgmpRouteTree::GetPathByMACaddress(Mac48Address msecp)
 		{
 			if (m_tree.size() == 0) return 0;
-			std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = std::find_if(m_tree.begin(), m_tree.end(), PmtmgmpRPtree_Finder(msecp));
+			std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = std::find_if(m_tree.begin(), m_tree.end(), PmtmgmpRouteTree_Finder(msecp));
 			if (iter == m_tree.end())
 			{
 				return 0;
@@ -364,7 +383,7 @@ namespace ns3 {
 		////添加新路径
 		void PmtmgmpRouteTree::AddNewPath(Ptr<PmtmgmpRoutePath> path)
 		{
-			std::vector<Ptr<PmtmgmpRoutePath> >::iterator exist = std::find_if(m_tree.begin(), m_tree.end(), PmtmgmpRPtree_Finder(path->GetMSECPaddress()));
+			std::vector<Ptr<PmtmgmpRoutePath> >::iterator exist = std::find_if(m_tree.begin(), m_tree.end(), PmtmgmpRouteTree_Finder(path->GetMSECPaddress()));
 			if (exist != m_tree.end())
 			{
 				m_tree.erase(exist);
@@ -495,15 +514,39 @@ namespace ns3 {
 			for (int i = 1; i < index; i++) ++iter;
 			return iter->second;
 		}
+		////路由树信息寿命检测
+		bool PmtmgmpRouteTree::RouteTreeInforLifeCheck()
+		{
+			m_tree.erase(std::remove_if(m_tree.begin(), m_tree.end(), PmtmgmpRouteTree_PathLifeChecker()), m_tree.end());
+			return m_tree.size() == 0;
+		}
 		/*************************
 		* PmtmgmpRouteTable
 		************************/
 		PmtmgmpRouteTable::PmtmgmpRouteTable():
-			m_table(std::vector<Ptr<PmtmgmpRouteTree> >())
+			m_table(std::vector<Ptr<PmtmgmpRouteTree> >()),
+			m_PMTGMGMProuteInforCheckPeriod(MicroSeconds(1024 * 1000))
 		{
+			PMTGMGMProuteInforCheckEvent = Simulator::Schedule(m_PMTGMGMProuteInforCheckPeriod, &PmtmgmpRouteTable::RouteTableInforLifeCheck, this);
 		}
 		PmtmgmpRouteTable::~PmtmgmpRouteTable()
 		{
+		}
+		TypeId PmtmgmpRouteTable::GetTypeId()
+		{
+			static TypeId tid = TypeId("ns3::my11s::PmtmgmpRouteTable")
+				.SetParent<Object>()
+				.SetGroupName("Wmn")
+				.AddConstructor<PmtmgmpRouteTable>()
+				.AddAttribute("PMTGMGMProutePathInforCheckPeriod",
+					"Life of route information.",
+					TimeValue(MicroSeconds(1024 * 1000)),
+					MakeTimeAccessor(
+						&PmtmgmpRouteTable::m_PMTGMGMProuteInforCheckPeriod),
+					MakeTimeChecker()
+					)
+				;
+			return tid;
 		}
 		std::vector<Ptr<PmtmgmpRouteTree> > PmtmgmpRouteTable::GetRouteTable()
 		{
@@ -513,7 +556,7 @@ namespace ns3 {
 		Ptr<PmtmgmpRouteTree> PmtmgmpRouteTable::GetTreeByMACaddress(Mac48Address mterp)
 		{
 			if (m_table.size() == 0) return 0;
-			std::vector<Ptr<PmtmgmpRouteTree> >::iterator iter = std::find_if(m_table.begin(), m_table.end(), PmtmgmpRProuteTable_Finder(mterp));
+			std::vector<Ptr<PmtmgmpRouteTree> >::iterator iter = std::find_if(m_table.begin(), m_table.end(), PmtmgmpRouteTable_Finder(mterp));
 			if (iter == m_table.end())
 			{
 				return 0;
@@ -556,6 +599,12 @@ namespace ns3 {
 		Ptr<PmtmgmpRouteTree> PmtmgmpRouteTable::GetTableItem(uint8_t index) const
 		{
 			return m_table[index];
+		}
+		////路由表信息寿命检测
+		void PmtmgmpRouteTable::RouteTableInforLifeCheck()
+		{
+			m_table.erase(std::remove_if(m_table.begin(), m_table.end(), PmtmgmpRouteTable_PathLifeChecker()), m_table.end());
+			PMTGMGMProuteInforCheckEvent = Simulator::Schedule(m_PMTGMGMProuteInforCheckPeriod, &PmtmgmpRouteTable::RouteTableInforLifeCheck, this);
 		}
 #endif
 		/*************************

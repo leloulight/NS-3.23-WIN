@@ -85,6 +85,11 @@ namespace ns3 {
 			uint8_t GetCandidateRouteInformaitonSize() const;
 			Ptr<PmtmgmpRoutePath> GetCandidateRouteInformaitonItem(uint8_t index) const;
 
+			////路径信息更新自检
+			bool RoutePathInforLifeCheck();
+			////路径信息更新
+			void RoutePathInforLifeUpdate();
+
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			////获取路径重复度
 			uint8_t GetPartPathRepeatability(PmtmgmpRoutePath compare);
@@ -103,9 +108,9 @@ namespace ns3 {
 		private:
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			////路由表路径搜索器
-			struct PmtmgmpRPpath_Finder
+			struct PmtmgmpRoutePath_Finder
 			{
-				PmtmgmpRPpath_Finder(Mac48Address address) :m_address(address) {};
+				PmtmgmpRoutePath_Finder(Mac48Address address) :m_address(address) {};
 				bool operator()(Mac48Address p)
 				{
 					return m_address == p;
@@ -136,6 +141,12 @@ namespace ns3 {
 
 			////延迟等待接受路径信息事件
 			EventId m_AcceptCandidateRouteInformaitonEvent;
+
+			////路由表路径寿命
+			Time m_PMTGMGMProutePathInforLife;
+
+			////路由表路径刷新时刻
+			Time m_PMTGMGMProutePathInforUpdateTime;
 		};
 
 		/*************************
@@ -148,6 +159,7 @@ namespace ns3 {
 			PmtmgmpRouteTree();
 			~PmtmgmpRouteTree();
 			static TypeId GetTypeId();
+
 			std::vector<Ptr<PmtmgmpRoutePath> > GetPartTree();
 
 			void SetMTERPaddress(Mac48Address address);
@@ -181,16 +193,29 @@ namespace ns3 {
 			Ptr<PmtmgmpRoutePath> GetTreeItem(uint8_t index) const;
 			uint8_t GetRepeatabilitySize() const;
 			uint8_t GetRepeatabilityItem(uint8_t index) const;
+
+			////路由树信息寿命检测
+			bool RouteTreeInforLifeCheck();
+
 		private:
 			////路由表树搜索器
-			struct PmtmgmpRPtree_Finder
+			struct PmtmgmpRouteTree_Finder
 			{
-				PmtmgmpRPtree_Finder(Mac48Address msecp) :m_msecp(msecp){};
+				PmtmgmpRouteTree_Finder(Mac48Address msecp) :m_msecp(msecp){};
 				bool operator()(Ptr<PmtmgmpRoutePath> p)
 				{
 					return m_msecp == p->GetMSECPaddress();
 				}
 				Mac48Address m_msecp;
+			};
+			////路由表树路径寿命检测器
+			struct PmtmgmpRouteTree_PathLifeChecker
+			{
+				PmtmgmpRouteTree_PathLifeChecker() {};
+				bool operator()(Ptr<PmtmgmpRoutePath> p)
+				{
+					return p->RoutePathInforLifeCheck();
+				}
 			};
 		private:
 			std::vector<Ptr<PmtmgmpRoutePath> >  m_tree;
@@ -216,6 +241,8 @@ namespace ns3 {
 			PmtmgmpRouteTable();
 			~PmtmgmpRouteTable();
 
+			static TypeId GetTypeId();
+
 			std::vector<Ptr<PmtmgmpRouteTree> > GetRouteTable();
 
 			////获取MTERP对应的Tree，找不到则返回0
@@ -228,19 +255,37 @@ namespace ns3 {
 			////Python调用函数
 			uint8_t GetTableSize() const;
 			Ptr<PmtmgmpRouteTree> GetTableItem(uint8_t index) const;
+
+			////路由表信息寿命检测
+			void RouteTableInforLifeCheck();
 		private:
 			////路由表路径搜索器
-			struct PmtmgmpRProuteTable_Finder
+			struct PmtmgmpRouteTable_Finder
 			{
-				PmtmgmpRProuteTable_Finder(Mac48Address address) :m_address(address) {};
+				PmtmgmpRouteTable_Finder(Mac48Address address) :m_address(address) {};
 				bool operator()(Ptr<PmtmgmpRouteTree> p)
 				{
 					return m_address == p->GetMTERPaddress();
 				}
 				Mac48Address m_address;
 			};
+			////路由表寿命检测器
+			struct PmtmgmpRouteTable_PathLifeChecker
+			{
+				PmtmgmpRouteTable_PathLifeChecker() {};
+				bool operator()(Ptr<PmtmgmpRouteTree> p)
+				{
+					return p->RouteTreeInforLifeCheck();
+				}
+			};
 		private:
 			std::vector<Ptr<PmtmgmpRouteTree> >  m_table;
+
+			////路由表检测间隔
+			Time m_PMTGMGMProuteInforCheckPeriod;
+
+			////路由表检测事件
+			EventId PMTGMGMProuteInforCheckEvent;
 		};
 #endif
 		/*************************
