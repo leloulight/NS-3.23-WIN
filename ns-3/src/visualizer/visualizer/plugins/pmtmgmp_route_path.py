@@ -16,12 +16,16 @@ class Pmtmgmp_Path_Link(Link):
         self.mterp = mterp
         self.msecp = msecp
         self.canvas_item = goocanvas.Group(parent=parent_canvas_item)
-        self.line = goocanvas.Polyline(parent=self.canvas_item, line_width=1.0, stroke_color_rgba=0xC00000FF, start_arrow=True, arrow_length=10,arrow_width=8)
+        # self.line = goocanvas.Polyline(parent=self.canvas_item, line_width=1.0, stroke_color_rgba=0xC00000FF, start_arrow=True, arrow_length=10,arrow_width=8)
+        self.line = goocanvas.Polyline(parent=self.canvas_item, line_width=2.0, stroke_color_rgba=0x00C000C0, start_arrow=True, close_path=False, end_arrow=False, arrow_length=15, arrow_width=15)
+        self.line.raise_(None)
         self.canvas_item.set_data("pyviz-object", self)
         self.canvas_item.lower(None)
 
     def update_points(self):
         if self.base_route_table.GetPathByMACaddress(self.mterp, self.msecp) is None:
+            self.destroy()
+        elif (self.base_node is None) or (self.link_node is None):
             self.destroy()
         else:
             pos1_x, pos1_y = self.base_node.viz_node.get_position()
@@ -73,7 +77,7 @@ class Pmtmgmp_Node(object):
         if SHOW_LOG:
             print "Pmtmgmp_Node::crearte_route_path() " + str(self.pmtmgmp.GetMacAddress()) + "ink to " + str(route_path.GetFromNode())
 
-    def create_part_route_path_start(self, mac_node_list, mterp, msecp, parent_canvas_item):
+    def create_part_route_path_start(self, mac_node_list, mterp, parent_canvas_item):
         self.update_link_list()
         route_table = self.pmtmgmp.GetPmtmgmpRPRouteTable()
         route_tree = route_table.GetTreeByMACaddress(self.pmtmgmp.GetMacAddress())
@@ -81,7 +85,8 @@ class Pmtmgmp_Node(object):
             return
         for i in range(0, route_tree.GetTreeSize()):
             route_path = route_tree.GetTreeItem(i)
-            if self.link_list.has_key(str(mterp) + "," + str(msecp)):
+            msecp = route_path.GetMSECPaddress()
+            if self.link_list.has_key(str(mterp) + "," + str(mterp)):
                 self.link_list[str(mterp) + "," + str(msecp)].update_points()
                 self.link_list[str(mterp) + "," + str(msecp)] = self.link_list[str(mterp) + "," + str(msecp)]
                 return
@@ -90,6 +95,8 @@ class Pmtmgmp_Node(object):
                 self.link_list[str(mterp) + "," + str(msecp)] = route_link
             next_hop = mac_node_list[str(route_path.GetFromNode())]
             next_hop.crearte_route_path(mac_node_list, mterp, route_path.GetMSECPaddress(), parent_canvas_item)
+            if SHOW_LOG:
+                print "Pmtmgmp_Node::create_part_route_path_start() " + str(self.pmtmgmp.GetMacAddress()) + "ink to " + str(route_path.GetFromNode())
 
     def destory(self):
         self.node_index  = None
@@ -109,12 +116,12 @@ class Pmtmgmp_Route(object):
         self.mac_to_node = {} #(str(Mac48Address), Pmtmgmp_Route)
 
     def route_path_clean(self):
-        if SHOW_LOG:
-            print "Clean node list"
-        self.mac_to_node = {}
+        self.mac_to_node.clear()
         for node in self.node_list:
             node.destory()
-            self.node_list.remove(node)
+        del self.node_list[:]
+        if SHOW_LOG:
+            print "Clean node list " + str(len(self.node_list))
 
     def route_path_link_full(self, msecp):
         if SHOW_LOG:
@@ -129,7 +136,7 @@ class Pmtmgmp_Route(object):
     def route_path_link_part(self, mterp):
         if SHOW_LOG:
             print "Pmtmgmp_Route::route_path_link_part()"
-        self.node_list[str(self.pmtmgmp.GetMacAddress())].create_part_route_path_start(self.node_list, mterp, self.viz.links_group)
+        self.mac_to_node[str(self.pmtmgmp.GetMacAddress())].create_part_route_path_start(self.node_list, mterp, self.viz.links_group)
 
     def route_path_link(self):
         if (self.show_msecp_mac is None and self.show_mterp_mac is None):
@@ -146,8 +153,6 @@ class Pmtmgmp_Route(object):
             self.route_path_link_full(self.show_msecp_mac)
 
     def scan_nodes(self, viz):
-        if SHOW_LOG:
-            print "scan_nodes"
         self. route_path_clean()
         for node in viz.nodes.itervalues():
             ns3_node = ns.network.NodeList.GetNode(node.node_index)
@@ -163,17 +168,13 @@ class Pmtmgmp_Route(object):
                 self.node_list.append(new_node)
                 self.mac_to_node[str(new_node.base_mac)] = new_node
         self.route_path_link()
+        if SHOW_LOG:
+            print "scan_nodes " + str(len(self.node_list))
 
     def simulation_periodic_update(self, viz):
         if SHOW_LOG:
             print "simulation_periodic_update"
         self.route_path_link()
-
-    def update_view(self, viz):
-        if SHOW_LOG:
-            print "update_view"
-        for node in self.node_list:
-            node.update_link_list()
 
     def populate_node_menu(self, viz, node, menu):
         ns3_node = ns.network.NodeList.GetNode(node.node_index)
@@ -283,5 +284,5 @@ def register(viz):
     pmtmgmp_route = Pmtmgmp_Route(viz)
     viz.connect("populate-node-menu", pmtmgmp_route.populate_node_menu)
     viz.connect("simulation-periodic-update", pmtmgmp_route.simulation_periodic_update)
-    viz.connect("update-view", pmtmgmp_route.update_view)
+    viz.connect("update-view", pmtmgmp_route.simulation_periodic_update)
     viz.connect("topology-scanned", pmtmgmp_route.scan_nodes)

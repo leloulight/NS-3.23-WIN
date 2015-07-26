@@ -11882,6 +11882,14 @@ def register_Ns3My11sPmtmgmpRoutePath_methods(root_module, cls):
                    'ns3::TypeId', 
                    [], 
                    is_static=True)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpRoutePath::RoutePathInforLifeCheck() [member function]
+    cls.add_method('RoutePathInforLifeCheck', 
+                   'bool', 
+                   [])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRoutePath::RoutePathInforLifeUpdate() [member function]
+    cls.add_method('RoutePathInforLifeUpdate', 
+                   'void', 
+                   [])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRoutePath::SetAcceptCandidateRouteInformaitonEvent(ns3::EventId id) [member function]
     cls.add_method('SetAcceptCandidateRouteInformaitonEvent', 
                    'void', 
@@ -11951,6 +11959,15 @@ def register_Ns3My11sPmtmgmpRouteTable_methods(root_module, cls):
     cls.add_method('GetTreeByMACaddress', 
                    'ns3::Ptr< ns3::my11s::PmtmgmpRouteTree >', 
                    [param('ns3::Mac48Address', 'mterp')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): static ns3::TypeId ns3::my11s::PmtmgmpRouteTable::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_static=True)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRouteTable::RouteTableInforLifeCheck() [member function]
+    cls.add_method('RouteTableInforLifeCheck', 
+                   'void', 
+                   [])
     return
 
 def register_Ns3My11sPmtmgmpRouteTree_methods(root_module, cls):
@@ -12032,6 +12049,10 @@ def register_Ns3My11sPmtmgmpRouteTree_methods(root_module, cls):
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRouteTree::RepeatabilityReset() [member function]
     cls.add_method('RepeatabilityReset', 
                    'void', 
+                   [])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpRouteTree::RouteTreeInforLifeCheck() [member function]
+    cls.add_method('RouteTreeInforLifeCheck', 
+                   'bool', 
                    [])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRouteTree::SetAllStatusExpired() [member function]
     cls.add_method('SetAllStatusExpired', 

@@ -35,7 +35,7 @@
 #include <ctime>
 
 //输出到文件
-#define OUT_TO_FILE 
+//#define OUT_TO_FILE 
 //无应用层模式
 #define NO_APPLICATION
 //测试模式
@@ -142,7 +142,7 @@ m_Size(4),
 m_RandomStart(0.1),
 m_NumIface(1),
 m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
-m_Step(100),
+m_Step(70),
 m_ApplicationNum(0),
 m_MaxBytes(0),
 m_SourceNum(0),
