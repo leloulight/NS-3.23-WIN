@@ -34,13 +34,13 @@ namespace ns3 {
 			~IeSecrep();
 
 			// Setters for fields:
-			void SetOriginatorAddress(Mac48Address originator_address);
+			void SetMTERPaddress(Mac48Address originator_address);
 			void SetCandidateMSECPaddress(Mac48Address candidateMSECP_address);
 			void SetAffiliatedMTERPnum(uint8_t mTERP_number);
 			void SetPathGenerationSequenceNumber(uint32_t seq_number);
 
 			// Getters for fields:
-			Mac48Address GetOriginatorAddress() const;
+			Mac48Address GetMTERPaddress() const;
 			Mac48Address GetCandidateMSECPaddress() const;
 			uint8_t GetAffiliatedMTERPnum() const;
 			uint32_t GetPathGenerationSequenceNumber() const;
@@ -52,7 +52,7 @@ namespace ns3 {
 			virtual uint8_t GetInformationFieldSize() const;
 			virtual void Print(std::ostream& os) const;
 		private:
-			Mac48Address m_originatorAddress;
+			Mac48Address m_MTERPaddress;
 			Mac48Address m_candidateMSECPaddress;
 			uint8_t m_affiliatedMTERPnum;
 			uint32_t m_PathGenerationSeqNumber;

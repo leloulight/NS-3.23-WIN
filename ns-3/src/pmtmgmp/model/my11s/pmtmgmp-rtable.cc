@@ -49,6 +49,7 @@ namespace ns3 {
 		* PmtmgmpRoutePath
 		************************/
 		PmtmgmpRoutePath::PmtmgmpRoutePath() :
+			m_MSECPindex(0),
 			m_PathGenerationSeqNumber(0),
 			m_NodeType(PmtmgmpProtocol::Mesh_STA),
 			m_hopCount(0),
@@ -137,6 +138,10 @@ namespace ns3 {
 		{
 			m_MSECPaddress = address;
 		}
+		void PmtmgmpRoutePath::SetMSECPindex(uint8_t index)
+		{
+			m_MSECPindex = index;
+		}
 		void PmtmgmpRoutePath::SetPathGenerationSequenceNumber(uint32_t seq_number)
 		{
 			m_PathGenerationSeqNumber = seq_number;
@@ -172,6 +177,10 @@ namespace ns3 {
 		Mac48Address PmtmgmpRoutePath::GetMSECPaddress() const
 		{
 			return m_MSECPaddress;
+		}
+		uint8_t PmtmgmpRoutePath::GetMSECPindex() const
+		{
+			return m_MSECPindex;
 		}
 		uint32_t PmtmgmpRoutePath::GetPathGenerationSequenceNumber() const
 		{
@@ -273,6 +282,7 @@ namespace ns3 {
 			Ptr<PmtmgmpRoutePath> copy = CreateObject<PmtmgmpRoutePath>();
 			copy->SetMTERPaddress(m_MTERPaddress);
 			copy->SetMSECPaddress(m_MSECPaddress);
+			copy->SetMSECPindex(m_MSECPindex);
 			copy->SetPathGenerationSequenceNumber(m_PathGenerationSeqNumber);
 			copy->SetNodeType(m_NodeType);
 			copy->SetHopcount(m_hopCount);

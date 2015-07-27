@@ -51,5 +51,8 @@
     <None Include="..\ns-3\src\visualizer\visualizer\plugins\pmtmgmp_information.py">
       <Filter>visualizer\plugins</Filter>
     </None>
+    <None Include="..\ns-3\src\visualizer\visualizer\plugins\pmtmgmp_route_path.py">
+      <Filter>visualizer\plugins</Filter>
+    </None>
   </ItemGroup>
 </Project>

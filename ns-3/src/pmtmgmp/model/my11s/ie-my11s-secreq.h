@@ -35,12 +35,12 @@ namespace ns3 {
 			~IeSecreq();
 
 			// Setters for fields:
-			void SetOriginatorAddress(Mac48Address originator_address);
+			void SetMTERPaddress(Mac48Address originator_address);
 			void SetPathGenerationSequenceNumber(uint32_t seq_number);
 			void SetNodeType(PmtmgmpProtocol::NodeType nodeType);
 
 			// Getters for fields:
-			Mac48Address GetOriginatorAddress() const;
+			Mac48Address GetMTERPaddress() const;
 			uint32_t GetPathGenerationSequenceNumber() const;
 			PmtmgmpProtocol::NodeType GetNodeType() const;
 
@@ -51,7 +51,7 @@ namespace ns3 {
 			virtual uint8_t GetInformationFieldSize() const;
 			virtual void Print(std::ostream& os) const;
 		private:
-			Mac48Address m_originatorAddress;
+			Mac48Address m_MTERPaddress;
 			uint32_t m_PathGenerationSeqNumber;
 			PmtmgmpProtocol::NodeType m_NodeType;
 

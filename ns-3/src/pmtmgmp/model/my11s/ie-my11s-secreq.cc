@@ -34,9 +34,9 @@ namespace ns3 {
 		{
 
 		}
-		void IeSecreq::SetOriginatorAddress(Mac48Address originator_address)
+		void IeSecreq::SetMTERPaddress(Mac48Address originator_address)
 		{
-			m_originatorAddress = originator_address;
+			m_MTERPaddress = originator_address;
 		}
 		void IeSecreq::SetPathGenerationSequenceNumber(uint32_t seq_number)
 		{
@@ -46,9 +46,9 @@ namespace ns3 {
 		{
 			m_NodeType = nodeType;
 		}
-		Mac48Address IeSecreq::GetOriginatorAddress() const
+		Mac48Address IeSecreq::GetMTERPaddress() const
 		{
-			return m_originatorAddress;
+			return m_MTERPaddress;
 		}
 		uint32_t IeSecreq::GetPathGenerationSequenceNumber() const
 		{
@@ -65,21 +65,21 @@ namespace ns3 {
 		void IeSecreq::Print(std::ostream &os) const
 		{
 			os << std::endl << "<information_element id=" << ElementId() << ">" << std::endl;
-			os << " originator address               = " << m_originatorAddress << std::endl; 
+			os << " originator address               = " << m_MTERPaddress << std::endl; 
 			os << " path generation sequence number  = " << m_PathGenerationSeqNumber << std::endl; 
 			os << " node type                        = " << m_NodeType << std::endl;
 			os << "</information_element>" << std::endl;
 		}
 		void IeSecreq::SerializeInformationField(Buffer::Iterator i) const
 		{
-			WriteTo(i, m_originatorAddress);
+			WriteTo(i, m_MTERPaddress);
 			i.WriteHtolsbU32(m_PathGenerationSeqNumber);
 			i.WriteU8(m_NodeType);
 		}
 		uint8_t IeSecreq::DeserializeInformationField(Buffer::Iterator start, uint8_t length)
 		{
 			Buffer::Iterator i = start;
-			ReadFrom(i, m_originatorAddress);
+			ReadFrom(i, m_MTERPaddress);
 			m_PathGenerationSeqNumber = i.ReadLsbtohU32();
 			m_NodeType = (PmtmgmpProtocol::NodeType) i.ReadU8();
 			return i.GetDistanceFrom(start);

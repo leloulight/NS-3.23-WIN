@@ -35,16 +35,18 @@ namespace ns3 {
 			~IeSecack();
 
 			// Setters for fields:
-			void SetOriginatorAddress(Mac48Address originator_address);
+			void SetMTERPaddress(Mac48Address originator_address);
 			void SetPathGenerationSequenceNumber(uint32_t seq_number);
 			void SetPathUpdateSeqNumber(uint32_t seq_number);
 			void SetNodeType(PmtmgmpProtocol::NodeType nodeType);
+			void SetMSECPindex(uint8_t index);
 
 			// Getters for fields:
-			Mac48Address GetOriginatorAddress() const;
+			Mac48Address GetMTERPaddress() const;
 			uint32_t GetPathGenerationSequenceNumber() const;
 			uint32_t GetPathUpdateSeqNumber() const;
 			PmtmgmpProtocol::NodeType GetNodeType() const;
+			uint8_t GetMSECPindex() const;
 
 			// Inherited from WifiInformationElement
 			virtual WifiInformationElementId ElementId() const;
@@ -53,10 +55,11 @@ namespace ns3 {
 			virtual uint8_t GetInformationFieldSize() const;
 			virtual void Print(std::ostream& os) const;
 		private:
-			Mac48Address m_originatorAddress;
+			Mac48Address m_MTERPaddress;
 			uint32_t m_PathGenerationSeqNumber;
 			uint32_t m_PathUpdateSeqNumber;
 			PmtmgmpProtocol::NodeType m_NodeType;
+			uint8_t m_MSECPindex;
 
 			friend bool operator== (const IeSecack & a, const IeSecack & b);
 

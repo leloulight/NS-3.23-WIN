@@ -34,9 +34,9 @@ namespace ns3 {
 		{
 
 		}
-		void IeSecack::SetOriginatorAddress(Mac48Address originator_address)
+		void IeSecack::SetMTERPaddress(Mac48Address originator_address)
 		{
-			m_originatorAddress = originator_address;
+			m_MTERPaddress = originator_address;
 		}
 		void IeSecack::SetPathGenerationSequenceNumber(uint32_t seq_number)
 		{
@@ -50,9 +50,13 @@ namespace ns3 {
 		{
 			m_NodeType = nodeType;
 		}
-		Mac48Address IeSecack::GetOriginatorAddress() const
+		void IeSecack::SetMSECPindex(uint8_t index)
 		{
-			return m_originatorAddress;
+			m_MSECPindex = index;
+		}
+		Mac48Address IeSecack::GetMTERPaddress() const
+		{
+			return m_MTERPaddress;
 		}
 		uint32_t IeSecack::GetPathGenerationSequenceNumber() const
 		{
@@ -66,6 +70,10 @@ namespace ns3 {
 		{
 			return m_NodeType;
 		}
+		uint8_t IeSecack::GetMSECPindex() const
+		{
+			return m_MSECPindex;
+		}
 		WifiInformationElementId IeSecack::ElementId() const
 		{
 			return IE11S_SECACK;
@@ -73,26 +81,29 @@ namespace ns3 {
 		void IeSecack::Print(std::ostream &os) const
 		{
 			os << std::endl << "<information_element id=" << ElementId() << ">" << std::endl;
-			os << " originator address               = " << m_originatorAddress << std::endl; 
+			os << " MTERP address               = " << m_MTERPaddress << std::endl; 
 			os << " path generation sequence number  = " << m_PathGenerationSeqNumber << std::endl;
 			os << " path update sequence number      = " << m_PathUpdateSeqNumber << std::endl;
 			os << " node type                        = " << m_NodeType << std::endl;
+			os << " MSECP Index                        = " << m_MSECPindex << std::endl;
 			os << "</information_element>" << std::endl;
 		}
 		void IeSecack::SerializeInformationField(Buffer::Iterator i) const
 		{
-			WriteTo(i, m_originatorAddress);
+			WriteTo(i, m_MTERPaddress);
 			i.WriteHtolsbU32(m_PathGenerationSeqNumber);
 			i.WriteHtolsbU32(m_PathUpdateSeqNumber);
 			i.WriteU8(m_NodeType);
+			i.WriteU8(m_MSECPindex);
 		}
 		uint8_t IeSecack::DeserializeInformationField(Buffer::Iterator start, uint8_t length)
 		{
 			Buffer::Iterator i = start;
-			ReadFrom(i, m_originatorAddress);
+			ReadFrom(i, m_MTERPaddress);
 			m_PathGenerationSeqNumber = i.ReadLsbtohU32();
 			m_PathUpdateSeqNumber = i.ReadLsbtohU32();
 			m_NodeType = (PmtmgmpProtocol::NodeType) i.ReadU8();
+			m_MSECPindex = i.ReadU8();
 			return i.GetDistanceFrom(start);
 		}
 		uint8_t IeSecack::GetInformationFieldSize() const
@@ -100,7 +111,8 @@ namespace ns3 {
 			uint8_t retval = 6	//Source address (originator)
 				+ 4 			//Path Generation Sequence Number
 				+ 4				//Path Update Sequence Number
-				+ 1;			//NodeType
+				+ 1 			//NodeType
+				+ 1;			//MSECP Index
 			return retval;
 		}
 		bool operator== (const IeSecack & a, const IeSecack & b)

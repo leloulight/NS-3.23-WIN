@@ -1,4 +1,4 @@
-import gtk
+﻿import gtk
 
 import ns.core
 import ns.network
@@ -97,7 +97,7 @@ class ShowPmtmgmpInforamtion(InformationWindow):
                 for i in range(0, self.page_column_num):
                     list_type.append(str)
                     list_type.append(float)
-                self.page_treeview_model = gtk.ListStore(int, str, str, int, str, int, float, str, str, *list_type)
+                self.page_treeview_model = gtk.ListStore(int, str, str, int, int, str, int, float, str, str, *list_type)
                 self.page_treeview = gtk.TreeView(self.page_treeview_model)
                 self.page_treeview.show()
                 self.page_vbox.add(self.page_treeview)
@@ -107,22 +107,24 @@ class ShowPmtmgmpInforamtion(InformationWindow):
                 self.page_treeview.append_column(page_treeviewcolum)
                 page_treeviewcolum = gtk.TreeViewColumn(' MSECP ', gtk.CellRendererText(), text = 2)
                 self.page_treeview.append_column(page_treeviewcolum)
-                page_treeviewcolum = gtk.TreeViewColumn(' GSN ', gtk.CellRendererText(), text = 3)
+                page_treeviewcolum = gtk.TreeViewColumn(' MSECP Index ', gtk.CellRendererText(), text = 3)
                 self.page_treeview.append_column(page_treeviewcolum)
-                page_treeviewcolum = gtk.TreeViewColumn(' NodeType ', gtk.CellRendererText(), text = 4)
+                page_treeviewcolum = gtk.TreeViewColumn(' GSN ', gtk.CellRendererText(), text = 4)
                 self.page_treeview.append_column(page_treeviewcolum)
-                page_treeviewcolum = gtk.TreeViewColumn(' HopCount ', gtk.CellRendererText(), text = 5)
+                page_treeviewcolum = gtk.TreeViewColumn(' NodeType ', gtk.CellRendererText(), text = 5)
                 self.page_treeview.append_column(page_treeviewcolum)
-                page_treeviewcolum = gtk.TreeViewColumn(' Metric ', gtk.CellRendererText(), text = 6)
+                page_treeviewcolum = gtk.TreeViewColumn(' HopCount ', gtk.CellRendererText(), text = 6)
                 self.page_treeview.append_column(page_treeviewcolum)
-                page_treeviewcolum = gtk.TreeViewColumn(' FromNode ', gtk.CellRendererText(), text = 7)
+                page_treeviewcolum = gtk.TreeViewColumn(' Metric ', gtk.CellRendererText(), text = 7)
                 self.page_treeview.append_column(page_treeviewcolum)
-                page_treeviewcolum = gtk.TreeViewColumn(' Status ', gtk.CellRendererText(), text = 8)
+                page_treeviewcolum = gtk.TreeViewColumn(' FromNode ', gtk.CellRendererText(), text = 8)
+                self.page_treeview.append_column(page_treeviewcolum)
+                page_treeviewcolum = gtk.TreeViewColumn(' Status ', gtk.CellRendererText(), text = 9)
                 self.page_treeview.append_column(page_treeviewcolum)
                 for i in range(0, self.page_column_num, 2):
-                    page_treeviewcolum = gtk.TreeViewColumn(' Candidate' +  bytes(self.page_column_num) + '_From ', gtk.CellRendererText(), text= i + 9)
+                    page_treeviewcolum = gtk.TreeViewColumn(' Candidate' +  bytes(self.page_column_num) + '_From ', gtk.CellRendererText(), text= i + 10)
                     self.page_treeview.append_column(page_treeviewcolum)
-                    page_treeviewcolum = gtk.TreeViewColumn(' Candidate_ ' +  bytes(self.page_column_num) + '_Metric ', gtk.CellRendererText(), text= i + 10)
+                    page_treeviewcolum = gtk.TreeViewColumn(' Candidate_ ' +  bytes(self.page_column_num) + '_Metric ', gtk.CellRendererText(), text= i + 111)
                     self.page_treeview.append_column(page_treeviewcolum)
 
         #Information label of Node
@@ -150,9 +152,9 @@ class ShowPmtmgmpInforamtion(InformationWindow):
                     data = []
                     for k in range(0, route_path.GetCandidateRouteInformaitonSize()):
                         candidate_infor = route_path.GetCandidateRouteInformaitonItem(k)
-                        data.append(k + 9)
-                        data.append(str(candidate_infor.GetFromNode()))
                         data.append(k + 10)
+                        data.append(str(candidate_infor.GetFromNode()))
+                        data.append(k + 11)
                         data.append(candidate_infor.GetMetric())
 
                     page.page_treeview_model.set(
@@ -160,12 +162,13 @@ class ShowPmtmgmpInforamtion(InformationWindow):
                         0, index,
                         1, str(route_path.GetMTERPaddress()),
                         2, str(route_path.GetMSECPaddress()),
-                        3, route_path.GetPathGenerationSequenceNumber(),
-                        4, self.get_node_type(route_path.GetNodeType()),
-                        5, route_path.GetHopCount(),
-                        6, route_path.GetMetric(),
-                        7, str(route_path.GetFromNode()),
-                        8, self.get_infor_status(route_path.GetStatus()),
+                        3, route_path.GetMSECPindex(),
+                        4, route_path.GetPathGenerationSequenceNumber(),
+                        5, self.get_node_type(route_path.GetNodeType()),
+                        6, route_path.GetHopCount(),
+                        7, route_path.GetMetric(),
+                        8, str(route_path.GetFromNode()),
+                        9, self.get_infor_status(route_path.GetStatus()),
                         *data)
 
                     index = index + 1

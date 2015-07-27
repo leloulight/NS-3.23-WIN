@@ -46,13 +46,17 @@ namespace ns3 {
 		{
 			return m_PathInfo;
 		}
-		void IePgen::SetOriginatorAddress(Mac48Address originator_address)
+		void IePgen::SetMTERPaddress(Mac48Address originator_address)
 		{
 			m_PathInfo->SetMTERPaddress(originator_address);
 		}
 		void IePgen::SetMSECPaddress(Mac48Address mSECP_address)
 		{
 			m_PathInfo->SetMSECPaddress(mSECP_address);
+		}
+		void IePgen::SetMSECPindex(uint8_t index)
+		{
+			m_PathInfo->SetMSECPindex(index);
 		}
 		void IePgen::SetPathGenerationSequenceNumber(uint32_t seq_number)
 		{
@@ -81,6 +85,10 @@ namespace ns3 {
 		Mac48Address IePgen::GetMSECPaddress() const
 		{
 			return m_PathInfo->GetMSECPaddress();
+		}
+		uint8_t IePgen::GetMSECPindex() const
+		{
+			return m_PathInfo->GetMSECPindex();
 		}
 		uint32_t IePgen::GetPathGenerationSequenceNumber() const
 		{
@@ -125,8 +133,9 @@ namespace ns3 {
 		void IePgen::Print(std::ostream &os) const
 		{
 			os << std::endl << "<information_element id=" << ElementId() << ">" << std::endl;
-			os << " originator address               = " << m_PathInfo->GetMSECPaddress() << std::endl;
+			os << " MTERP address               = " << m_PathInfo->GetMTERPaddress() << std::endl;
 			os << " MSECP address                    = " << m_PathInfo->GetMSECPaddress() << std::endl;
+			os << " MSECP index                    = " << m_PathInfo->GetMSECPindex() << std::endl;
 			os << " path generation sequence number  = " << m_PathInfo->GetPathGenerationSequenceNumber() << std::endl;
 			os << " node type                        = " << m_PathInfo->GetNodeType() << std::endl;
 			os << " TTL                              = " << (uint16_t)m_ttl << std::endl;
@@ -146,6 +155,7 @@ namespace ns3 {
 		{
 			WriteTo(i, m_PathInfo->GetMTERPaddress());
 			WriteTo(i, m_PathInfo->GetMSECPaddress());
+			i.WriteU8(m_PathInfo->GetMSECPindex());
 			i.WriteHtolsbU32(m_PathInfo->GetPathGenerationSequenceNumber());
 			i.WriteU8(m_PathInfo->GetNodeType());
 			i.WriteU8(m_PathInfo->GetHopCount());
@@ -170,7 +180,8 @@ namespace ns3 {
 			ReadFrom(i, address);
 			m_PathInfo->SetMTERPaddress(address);
 			ReadFrom(i, address);
-			m_PathInfo->SetMSECPaddress(address); 
+			m_PathInfo->SetMSECPaddress(address);
+			m_PathInfo->SetMSECPindex(i.ReadU8());
 			m_PathInfo->SetPathGenerationSequenceNumber(i.ReadLsbtohU32());
 			m_PathInfo->SetNodeType((PmtmgmpProtocol::NodeType) i.ReadU8());
 			m_PathInfo->SetHopcount(i.ReadU8());
@@ -189,8 +200,9 @@ namespace ns3 {
 		}
 		uint8_t IePgen::GetInformationFieldSize() const
 		{
-			uint8_t retval = 6							//Source address (originator)
+			uint8_t retval = 6							//MTERP address (originator)
 				+ 6										//MSECP address
+				+ 1										//MSECP Index
 				+ 4										//Path Generation Sequence Number
 				+ 1 									//NodeType
 				+ 1										//Hopcount

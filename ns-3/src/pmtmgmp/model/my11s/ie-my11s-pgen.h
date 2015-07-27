@@ -42,8 +42,9 @@ namespace ns3 {
 			Ptr<PmtmgmpRoutePath> GetPathInfo();
 			
 			// Setters for fields:
-			void SetOriginatorAddress(Mac48Address originator_address);
+			void SetMTERPaddress(Mac48Address originator_address);
 			void SetMSECPaddress(Mac48Address mSECP_address);
+			void SetMSECPindex(uint8_t index);
 			void SetPathGenerationSequenceNumber(uint32_t seq_number);
 			void SetNodeType(PmtmgmpProtocol::NodeType nodeType);
 			void SetHopcount(uint8_t hopcount);
@@ -53,6 +54,7 @@ namespace ns3 {
 			// Getters for fields:
 			Mac48Address GetMTERPAddress() const;
 			Mac48Address GetMSECPaddress() const;
+			uint8_t GetMSECPindex() const;
 			uint32_t GetPathGenerationSequenceNumber() const;
 			PmtmgmpProtocol::NodeType GetNodeType() const;
 			uint8_t  GetHopCount() const;

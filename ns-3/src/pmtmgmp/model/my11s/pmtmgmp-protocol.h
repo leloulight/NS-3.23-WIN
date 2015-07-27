@@ -257,6 +257,7 @@ namespace ns3 {
 				uint32_t m_metric;
 				uint8_t m_affiliatedNumber;
 				bool m_generationPath;
+				uint8_t m_MSECPindex;
 			};
 			////SECREPinformationËÑË÷Æ÷
 			struct SECREPinformation_Finder

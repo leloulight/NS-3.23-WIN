@@ -63,6 +63,7 @@ namespace ns3 {
 #endif
 			void SetMTERPaddress(Mac48Address address);
 			void SetMSECPaddress(Mac48Address address);
+			void SetMSECPindex(uint8_t index);
 			void SetPathGenerationSequenceNumber(uint32_t seq_number);
 			void SetNodeType(PmtmgmpProtocol::NodeType nodeType);
 			void SetHopcount(uint8_t hopcount);
@@ -73,6 +74,7 @@ namespace ns3 {
 
 			Mac48Address GetMTERPaddress() const;
 			Mac48Address GetMSECPaddress() const;
+			uint8_t GetMSECPindex() const;
 			uint32_t GetPathGenerationSequenceNumber() const;
 			PmtmgmpProtocol::NodeType GetNodeType() const;
 			uint8_t  GetHopCount() const;
@@ -121,6 +123,7 @@ namespace ns3 {
 		private:
 			Mac48Address m_MTERPaddress;
 			Mac48Address m_MSECPaddress;
+			uint8_t m_MSECPindex;
 			uint32_t m_PathGenerationSeqNumber;
 			PmtmgmpProtocol::NodeType m_NodeType;
 			uint8_t  m_hopCount;

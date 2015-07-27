@@ -1313,7 +1313,7 @@ namespace ns3 {
 		{
 			NS_LOG_DEBUG("Send SECREQ at " << m_address);
 			IeSecreq secreq;
-			secreq.SetOriginatorAddress(GetAddress());
+			secreq.SetMTERPaddress(GetAddress());
 			secreq.SetPathGenerationSequenceNumber(m_PathGenerationSeqNumber);
 			secreq.SetNodeType(m_NodeType);
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
@@ -1330,10 +1330,10 @@ namespace ns3 {
 			////终端节点不会作为其他的终端节点的辅助节点
 			if (!IsMTERP())
 			{
-				std::vector<MSECPaffiliatedMSECPInformation>::iterator iter = std::find_if(m_AffiliatedMTERPlist.begin(), m_AffiliatedMTERPlist.end(), MSECPaffiliatedMSECPInformation_Finder(secreq.GetOriginatorAddress()));
+				std::vector<MSECPaffiliatedMSECPInformation>::iterator iter = std::find_if(m_AffiliatedMTERPlist.begin(), m_AffiliatedMTERPlist.end(), MSECPaffiliatedMSECPInformation_Finder(secreq.GetMTERPaddress()));
 				if (iter != m_AffiliatedMTERPlist.end()) m_AffiliatedMTERPlist.erase(iter);
 				if (m_AffiliatedMTERPlist.size() == 0) m_NodeType = Mesh_STA;
-				SendSecrep(secreq.GetOriginatorAddress(), secreq.GetPathGenerationSequenceNumber(), secreq.GetNodeType());
+				SendSecrep(secreq.GetMTERPaddress(), secreq.GetPathGenerationSequenceNumber(), secreq.GetNodeType());
 			}
 		}
 		////获取非同类（MAP，MPP）终端节点数量
@@ -1351,7 +1351,7 @@ namespace ns3 {
 		{
 			NS_LOG_DEBUG("Send SECREP to " << receiver << " at " << m_address);
 			IeSecrep secrep;
-			secrep.SetOriginatorAddress(receiver);
+			secrep.SetMTERPaddress(receiver);
 			secrep.SetCandidateMSECPaddress(GetAddress());
 			secrep.SetAffiliatedMTERPnum(GetDifferentTypeMTERPnum(type, receiver));
 			secrep.SetPathGenerationSequenceNumber(index);
@@ -1364,7 +1364,7 @@ namespace ns3 {
 		void PmtmgmpProtocol::ReceiveSecrep(IeSecrep secrep, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
 			NS_LOG_DEBUG("Receive SECREP from " << from << " at interface " << interface << " while metric is " << metric << " at " << m_address);
-			if ((secrep.GetPathGenerationSequenceNumber() != m_PathGenerationSeqNumber) || (secrep.GetOriginatorAddress() != m_address))
+			if ((secrep.GetPathGenerationSequenceNumber() != m_PathGenerationSeqNumber) || (secrep.GetMTERPaddress() != m_address))
 				return;////过期SECREP将会被丢弃
 			SECREPinformation newInformation;
 			newInformation.m_address = secrep.GetCandidateMSECPaddress();
@@ -1426,6 +1426,12 @@ namespace ns3 {
 					m_AffiliatedMSECPlist.pop_back();
 				}
 			}
+			int index = 1;
+			for (std::vector<SECREPinformation>::iterator iter = m_AffiliatedMSECPlist.begin(); iter != m_AffiliatedMSECPlist.end(); iter++)
+			{
+				iter->m_MSECPindex = index;
+				index++;
+			}
 
 			///为筛选出的结果发送SECACK
 			SendSecack();
@@ -1437,7 +1443,7 @@ namespace ns3 {
 		void PmtmgmpProtocol::SendSecack()
 		{
 			IeSecack secack;
-			secack.SetOriginatorAddress(GetAddress());
+			secack.SetMTERPaddress(GetAddress());
 			secack.SetPathGenerationSequenceNumber(m_PathGenerationSeqNumber);
 
 			////终端节点递增度量信息更新帧顺序号
@@ -1446,14 +1452,15 @@ namespace ns3 {
 			secack.SetPathUpdateSeqNumber(m_PathUpdateSeqNumber);
 
 			secack.SetNodeType(m_NodeType);
-			for (std::vector<SECREPinformation>::iterator selectIter = m_AffiliatedMSECPlist.begin(); selectIter != m_AffiliatedMSECPlist.end(); selectIter++)
+			for (std::vector<SECREPinformation>::iterator iter = m_AffiliatedMSECPlist.begin(); iter != m_AffiliatedMSECPlist.end(); iter++)
 			{
-				if (selectIter->m_generationPath == false)
+				secack.SetMSECPindex(iter->m_MSECPindex);
+				if (iter->m_generationPath == false)
 				{
 					for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 					{
-						NS_LOG_DEBUG("Send SECACK at " << m_address << " to " << selectIter->m_address);
-						i->second->SendSecack(secack, selectIter->m_address);
+						NS_LOG_DEBUG("Send SECACK at " << m_address << " to " << iter->m_address);
+						i->second->SendSecack(secack, iter->m_address);
 					}
 				}
 			}
@@ -1464,13 +1471,13 @@ namespace ns3 {
 			NS_LOG_DEBUG("Receive SECACK from " << from << " at interface " << interface << " while metric is " << metric << " at " << m_address);
 
 			MSECPaffiliatedMSECPInformation newInformation;
-			newInformation.address = secack.GetOriginatorAddress();
+			newInformation.address = secack.GetMTERPaddress();
 			newInformation.metric = metric * m_PMTMGMPmsecpAALMmagnification / sqrt(2);
 			newInformation.nodeType = secack.GetNodeType();
 			newInformation.selectIndex = secack.GetPathGenerationSequenceNumber();
 			m_AffiliatedMTERPlist.push_back(newInformation);
 
-			SendPger(newInformation.selectIndex, secack.GetOriginatorAddress());
+			SendPger(newInformation.selectIndex, secack.GetMTERPaddress());
 			SendFirstPgen(secack, metric);
 		}
 		////发送PGER
@@ -1541,10 +1548,11 @@ namespace ns3 {
 		////发送初始PGEN
 		void PmtmgmpProtocol::SendFirstPgen(IeSecack secack, uint32_t metric)
 		{
-			NS_LOG_DEBUG("Send first PGEN " << " at node " << m_address << " while metric is " << metric << ", origination is " << secack.GetOriginatorAddress() << ", GSN is " << secack.GetPathGenerationSequenceNumber());
+			NS_LOG_DEBUG("Send first PGEN " << " at node " << m_address << " while metric is " << metric << ", origination is " << secack.GetMTERPaddress() << ", GSN is " << secack.GetPathGenerationSequenceNumber());
 			IePgen pgen;
-			pgen.SetOriginatorAddress(secack.GetOriginatorAddress());
+			pgen.SetMTERPaddress(secack.GetMTERPaddress());
 			pgen.SetMSECPaddress(m_address);
+			pgen.SetMSECPindex(secack.GetMSECPindex());
 			pgen.SetPathGenerationSequenceNumber(secack.GetPathGenerationSequenceNumber());
 			pgen.SetNodeType(secack.GetNodeType());
 			pgen.SetHopcount(1);
@@ -1552,7 +1560,7 @@ namespace ns3 {
 			pgen.SetMetric(metric * m_PMTMGMPmsecpAALMmagnification / sqrt(2));
 #ifdef ROUTE_USE_PART_PATH ////不使用部分路径
 			////添加原始默认路径（源节点到当前辅助节点）
-			pgen.AddPartPathNode(secack.GetOriginatorAddress());
+			pgen.AddPartPathNode(secack.GetMTERPaddress());
 			pgen.AddPartPathNode(m_address);
 #endif
 
@@ -1563,7 +1571,7 @@ namespace ns3 {
 
 			////路由表存储
 			Ptr<PmtmgmpRoutePath> tempPath = pgen.GetPathInfo()->GetCopy();
-			tempPath->SetFromNode(secack.GetOriginatorAddress());
+			tempPath->SetFromNode(secack.GetMTERPaddress());
 			m_RouteTable->AddNewPath(tempPath);
 		}
 		////转发pgen
