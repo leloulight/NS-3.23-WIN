@@ -58,9 +58,6 @@ namespace ns3 {
 			std::vector<Ptr<PmtmgmpRoutePath> > GetCandidateRouteInformaiton() const;
 			uint8_t GetMaxCandidateNum() const;
 
-#ifdef ROUTE_USE_PART_PATH ////不使用部分路径
-			std::vector<Mac48Address> GetPathInfo() const;
-#endif
 			void SetMTERPaddress(Mac48Address address);
 			void SetMSECPaddress(Mac48Address address);
 			void SetMSECPindex(uint8_t index);
@@ -91,35 +88,9 @@ namespace ns3 {
 			bool RoutePathInforLifeCheck();
 			////路径信息更新
 			void RoutePathInforLifeUpdate();
-
-#ifdef ROUTE_USE_PART_PATH ////不使用部分路径
-			////获取路径重复度
-			uint8_t GetPartPathRepeatability(PmtmgmpRoutePath compare);
-			////添加节点
-			void AddPartPathNode(Mac48Address address);
-			////获取路径结点地址
-			Mac48Address GetNodeMac(int8_t index);
-			////获取路径最大结点数量
-			uint8_t GetMaxNodeListNum();
-			////获取路径当前结点数量
-			uint8_t GetCurrentNodeListNum();
-#endif
-
+			
 			////复制类
 			Ptr<PmtmgmpRoutePath> GetCopy();
-		private:
-#ifdef ROUTE_USE_PART_PATH ////不使用部分路径
-			////路由表路径搜索器
-			struct PmtmgmpRoutePath_Finder
-			{
-				PmtmgmpRoutePath_Finder(Mac48Address address) :m_address(address) {};
-				bool operator()(Mac48Address p)
-				{
-					return m_address == p;
-				}
-				Mac48Address m_address;
-			};
-#endif
 		private:
 			Mac48Address m_MTERPaddress;
 			Mac48Address m_MSECPaddress;
@@ -128,12 +99,7 @@ namespace ns3 {
 			PmtmgmpProtocol::NodeType m_NodeType;
 			uint8_t  m_hopCount;
 			double m_metric;
-#ifdef ROUTE_USE_PART_PATH ////不使用部分路径
-			std::vector<Mac48Address>  m_PathInfo;
 
-			////最大允许的部分路径长度
-			uint8_t m_PMTMGMPpathNodeListNum;
-#endif
 			////候选路由信息列表
 			std::vector<Ptr<PmtmgmpRoutePath> >  m_CandidateRouteInformaiton;
 			RouteInformationStatus m_InformationStatus;

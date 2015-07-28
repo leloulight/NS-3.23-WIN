@@ -1558,11 +1558,6 @@ namespace ns3 {
 			pgen.SetHopcount(1);
 			pgen.SetTTL(m_maxTtl);
 			pgen.SetMetric(metric * m_PMTMGMPmsecpAALMmagnification / sqrt(2));
-#ifdef ROUTE_USE_PART_PATH ////不使用部分路径
-			////添加原始默认路径（源节点到当前辅助节点）
-			pgen.AddPartPathNode(secack.GetMTERPaddress());
-			pgen.AddPartPathNode(m_address);
-#endif
 
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{

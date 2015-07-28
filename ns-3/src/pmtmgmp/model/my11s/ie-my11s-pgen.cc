@@ -35,13 +35,6 @@ namespace ns3 {
 		{
 			m_PathInfo = CreateObject<PmtmgmpRoutePath>();
 		}
-#ifdef ROUTE_USE_PART_PATH ////不使用部分路径
-		////附带路径相关函数
-		void IePgen::AddPartPathNode(Mac48Address address)
-		{
-			m_PathInfo->AddPartPathNode(address);
-		}
-#endif
 		Ptr<PmtmgmpRoutePath> IePgen::GetPathInfo()
 		{
 			return m_PathInfo;
@@ -141,14 +134,6 @@ namespace ns3 {
 			os << " TTL                              = " << (uint16_t)m_ttl << std::endl;
 			os << " hop count                        = " << (uint16_t)m_PathInfo->GetHopCount() << std::endl;
 			os << " metric                           = " << m_PathInfo->GetMetric() << std::endl;
-#ifdef ROUTE_USE_PART_PATH ////不使用部分路径
-			os << " Part Path Node List are:" << std::endl;
-			for (std::vector<Mac48Address>::const_iterator iter = m_PathInfo->GetPathInfo().begin(); iter
-				!= m_PathInfo->GetPathInfo().end(); iter++)
-			{
-				os << "    " << *iter << std::endl;
-			}
-#endif
 			os << "</information_element>" << std::endl;
 		}
 		void IePgen::SerializeInformationField(Buffer::Iterator i) const
@@ -161,17 +146,6 @@ namespace ns3 {
 			i.WriteU8(m_PathInfo->GetHopCount());
 			i.WriteU8(m_ttl);
 			i.WriteHtolsbU32(m_PathInfo->GetMetric());
-#ifdef ROUTE_USE_PART_PATH ////不使用部分路径
-			i.WriteU8(m_PathInfo->GetCurrentNodeListNum());
-
-			////避免 vector循环报错
-			std::vector<Mac48Address> nodelist = m_PathInfo->GetPathInfo();
-
-			for (std::vector<Mac48Address>::const_iterator iter = nodelist.begin(); iter != nodelist.end(); iter++)
-			{
-				WriteTo(i, *iter);
-			}
-#endif
 		}
 		uint8_t IePgen::DeserializeInformationField(Buffer::Iterator start, uint8_t length)
 		{
@@ -187,15 +161,6 @@ namespace ns3 {
 			m_PathInfo->SetHopcount(i.ReadU8());
 			m_ttl = i.ReadU8();
 			m_PathInfo->SetMetric(i.ReadLsbtohU32());
-#ifdef ROUTE_USE_PART_PATH ////不使用部分路径
-			uint8_t size = i.ReadU8();
-			Mac48Address temp;
-			for (int j = 0; j < size; j++)
-			{
-				ReadFrom(i, temp);
-				m_PathInfo->AddPartPathNode(temp);
-			}
-#endif
 			return i.GetDistanceFrom(start);
 		}
 		uint8_t IePgen::GetInformationFieldSize() const
@@ -208,10 +173,6 @@ namespace ns3 {
 				+ 1										//Hopcount
 				+ 1										//TTL
 				+ 8										//metric
-#ifdef ROUTE_USE_PART_PATH ////不使用部分路径
-				+ 1										//Part Path Node List Size
-				+ m_PathInfo->GetPathInfo().size() * 6	//Part Path Node List
-#endif
 				;
 			return retval;
 		}

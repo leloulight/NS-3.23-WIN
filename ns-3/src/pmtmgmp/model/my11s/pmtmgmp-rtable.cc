@@ -54,9 +54,6 @@ namespace ns3 {
 			m_NodeType(PmtmgmpProtocol::Mesh_STA),
 			m_hopCount(0),
 			m_metric(0),
-#ifdef ROUTE_USE_PART_PATH ////不使用部分路径
-			m_PMTMGMPpathNodeListNum(2),
-#endif
 			m_CandidateRouteInformaiton(std::vector<Ptr<PmtmgmpRoutePath> >()),
 			m_InformationStatus(Confirmed),
 			m_MaxCandidateNum(4),
@@ -75,15 +72,6 @@ namespace ns3 {
 				.SetParent<Object>()
 				.SetGroupName("Wmn")
 				.AddConstructor<PmtmgmpRoutePath>()
-#ifdef ROUTE_USE_PART_PATH ////不使用部分路径
-				.AddAttribute("PMTMGMPpathNodeListNum",
-					"Maximum number of the last part of the path that PGEN have generationed, which is used for computing the repeatability of path. t need define the same as \"ns3::my11s::PmtmgmpProtocol::MSECPnumForMTERP\"",
-					UintegerValue(4),
-					MakeUintegerAccessor(
-						&PmtmgmpRoutePath::m_PMTMGMPpathNodeListNum),
-					MakeUintegerChecker<uint8_t>(0)
-					)
-#endif
 				.AddAttribute("MaxCandidateNum",
 					"Max number of Candidate Information",
 					UintegerValue(4),
@@ -124,12 +112,6 @@ namespace ns3 {
 		{
 			return m_MaxCandidateNum;
 		}
-#ifdef ROUTE_USE_PART_PATH ////不使用部分路径
-		std::vector<Mac48Address> PmtmgmpRoutePath::GetPathInfo() const
-		{
-			return m_PathInfo;
-		}
-#endif
 		void PmtmgmpRoutePath::SetMTERPaddress(Mac48Address address)
 		{
 			m_MTERPaddress = address;
@@ -229,53 +211,6 @@ namespace ns3 {
 		{
 			m_PMTGMGMProutePathInforUpdateTime = Simulator::Now();
 		}
-#ifdef ROUTE_USE_PART_PATH ////不使用部分路径
-		////获取路径重复度
-		uint8_t PmtmgmpRoutePath::GetPartPathRepeatability(PmtmgmpRoutePath compare)
-		{
-			uint8_t Repeatability = 0;
-			for (std::vector<Mac48Address>::iterator selectIter = m_PathInfo.begin(); selectIter != m_PathInfo.end(); selectIter++)
-			{
-				std::vector<Mac48Address>::iterator iter = std::find_if(compare.GetPathInfo().begin(), compare.GetPathInfo().end(), PmtmgmpRoutePath_Finder(*selectIter));
-				if (iter == compare.GetPathInfo().end())
-				{
-					Repeatability++;
-				}
-			}
-			return Repeatability;
-		}
-		////添加节点
-		void PmtmgmpRoutePath::AddPartPathNode(Mac48Address address)
-		{
-			while (m_PathInfo.size() >= m_PMTMGMPpathNodeListNum)
-			{
-				m_PathInfo.erase(m_PathInfo.begin());
-			}
-			m_PathInfo.push_back(address);
-		}
-		////获取路径结点地址
-		Mac48Address PmtmgmpRoutePath::GetNodeMac(int8_t index)
-		{
-			if (index < m_PathInfo.size())
-			{
-				return m_PathInfo[index];
-			}
-			else
-			{
-				NS_LOG_ERROR("Out of size.");
-			}
-		}
-		////获取路径最大结点数量
-		uint8_t PmtmgmpRoutePath::GetMaxNodeListNum()
-		{
-			return m_PMTMGMPpathNodeListNum;
-		}
-		////获取路径当前结点数量
-		uint8_t PmtmgmpRoutePath::GetCurrentNodeListNum()
-		{
-			return m_PathInfo.size();
-		}
-#endif
 		////复制类
 		Ptr<PmtmgmpRoutePath> PmtmgmpRoutePath::GetCopy()
 		{
@@ -287,12 +222,6 @@ namespace ns3 {
 			copy->SetNodeType(m_NodeType);
 			copy->SetHopcount(m_hopCount);
 			copy->SetMetric(m_metric);
-#ifdef ROUTE_USE_PART_PATH ////不使用部分路径
-			for (std::vector<Mac48Address>::iterator selectIter = m_PathInfo.begin(); selectIter != m_PathInfo.end(); selectIter++)
-			{
-				copy->AddPartPathNode(*selectIter);
-			}
-#endif
 			return copy;
 		}
 		/*************************
