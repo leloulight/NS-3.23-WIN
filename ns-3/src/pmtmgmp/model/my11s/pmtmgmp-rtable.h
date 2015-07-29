@@ -156,6 +156,8 @@ namespace ns3 {
 			void RepeatabilityReset();
 			////接受某个候选信息
 			void AcceptCandidateRouteInformaiton(Mac48Address address);
+			////获取确认状态路径的数量
+			uint8_t GetConfirmedPathSize();
 
 			////Python调用函数
 			uint8_t GetTreeSize() const;

@@ -40,6 +40,8 @@
 #include "ns3/ie-my11s-secack.h"
 #include "ns3/ie-my11s-pger.h"
 #include "ns3/ie-my11s-pgen.h"
+#include "ns3/ie-my11s-pupd.h"
+#include "ns3/ie-my11s-pupgq.h"
 #endif
 
 namespace ns3 {
@@ -95,6 +97,12 @@ namespace ns3 {
 			break;
 		case IE11S_PGEN:
 			newElement = Create<my11s::IePgen>();
+			break;
+		case IE11S_PUPD:
+			newElement = Create<my11s::IePupd>();
+			break;
+		case IE11S_PUPGQ:
+			newElement = Create<my11s::IePupgq>();
 			break;
 #endif
 		case IE11S_WMN_PMTMGMP_PEERING_PROTOCOL_VERSION:

@@ -110,6 +110,12 @@
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-pger.h">
       <Filter>model</Filter>
     </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-pupd.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-pupgq.h">
+      <Filter>model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="helper">
@@ -214,6 +220,12 @@
       <Filter>model</Filter>
     </ClCompile>
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-pger.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-pupd.cc">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-pupgq.cc">
       <Filter>model</Filter>
     </ClCompile>
   </ItemGroup>

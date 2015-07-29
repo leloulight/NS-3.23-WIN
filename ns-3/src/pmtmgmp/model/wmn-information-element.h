@@ -55,8 +55,10 @@ namespace ns3 {
 #define IE11S_SECREQ                             ((WifiInformationElementId)255)
 #define IE11S_SECREP                             ((WifiInformationElementId)254)
 #define IE11S_SECACK                             ((WifiInformationElementId)253)
-#define IE11S_PGEN                               ((WifiInformationElementId)252)
-#define IE11S_PGER                               ((WifiInformationElementId)251)
+#define IE11S_PGER                               ((WifiInformationElementId)252)
+#define IE11S_PGEN                               ((WifiInformationElementId)251)
+#define IE11S_PUPD                               ((WifiInformationElementId)250)
+#define IE11S_PUPGQ                               ((WifiInformationElementId)249)
 #endif
 #define IE11S_WMN_PMTMGMP_PEERING_PROTOCOL_VERSION    ((WifiInformationElementId)74)
 }

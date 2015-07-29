@@ -44,8 +44,10 @@ namespace ns3 {
 		class IeSecreq;
 		class IeSecrep;
 		class IeSecack;
-		class IePgen;
 		class IePger;
+		class IePgen;
+		class IePupd;
+		class IePupgq;
 #endif
 		/**
 		 * \ingroup my11s

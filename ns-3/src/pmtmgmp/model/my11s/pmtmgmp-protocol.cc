@@ -45,6 +45,8 @@
 #include "ns3/ie-my11s-secack.h"
 #include "ns3/ie-my11s-pger.h"
 #include "ns3/ie-my11s-pgen.h"
+#include "ns3/ie-my11s-pupd.h"
+#include "ns3/ie-my11s-pupgq.h"
 
 #endif
 

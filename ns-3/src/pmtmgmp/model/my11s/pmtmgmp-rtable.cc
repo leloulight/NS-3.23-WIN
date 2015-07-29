@@ -323,6 +323,7 @@ namespace ns3 {
 		////添加新路径
 		void PmtmgmpRouteTree::AddNewPath(Ptr<PmtmgmpRoutePath> path)
 		{
+			if (m_tree.size() >= 255) NS_LOG_ERROR("Add too many path to a PmtmgmpRouteTree(MTERP:" << m_MTERPaddress << ")");
 			std::vector<Ptr<PmtmgmpRoutePath> >::iterator exist = std::find_if(m_tree.begin(), m_tree.end(), PmtmgmpRouteTree_Finder(path->GetMSECPaddress()));
 			if (exist != m_tree.end())
 			{
@@ -439,6 +440,16 @@ namespace ns3 {
 			select->SetStatus(PmtmgmpRoutePath::Confirmed);
 			RepeatabilityIncrease(select->GetFromNode());
 			AddNewPath(select);
+		}
+		////获取确认状态路径的数量
+		uint8_t PmtmgmpRouteTree::GetConfirmedPathSize()
+		{
+			uint8_t size = 0;
+			for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin(); iter != m_tree.end(); iter++)
+			{
+				if ((*iter)->GetStatus == PmtmgmpRoutePath::Confirmed) size++;
+			}
+			return size;
 		}
 		////Python调用函数
 		uint8_t PmtmgmpRouteTree::GetTreeSize() const
