@@ -64,7 +64,7 @@ namespace ns3 {
 			void SetPathGenerationSequenceNumber(uint32_t seq_number);
 			void SetNodeType(PmtmgmpProtocol::NodeType nodeType);
 			void SetHopcount(uint8_t hopcount);
-			void SetMetric(double metric);
+			void SetMetric(uint32_t metric);
 			void SetFromNode(Mac48Address address);
 			void SetStatus(RouteInformationStatus status);
 			void SetAcceptCandidateRouteInformaitonEvent(EventId id);
@@ -75,7 +75,7 @@ namespace ns3 {
 			uint32_t GetPathGenerationSequenceNumber() const;
 			PmtmgmpProtocol::NodeType GetNodeType() const;
 			uint8_t  GetHopCount() const;
-			double GetMetric() const;
+			uint32_t GetMetric() const;
 			Mac48Address GetFromNode() const;
 			RouteInformationStatus GetStatus() const;
 			EventId GetAcceptCandidateRouteInformaitonEvent() const;
@@ -98,7 +98,7 @@ namespace ns3 {
 			uint32_t m_PathGenerationSeqNumber;
 			PmtmgmpProtocol::NodeType m_NodeType;
 			uint8_t  m_hopCount;
-			double m_metric;
+			uint32_t m_metric;
 
 			////候选路由信息列表
 			std::vector<Ptr<PmtmgmpRoutePath> >  m_CandidateRouteInformaiton;

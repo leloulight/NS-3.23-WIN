@@ -45,7 +45,7 @@ namespace ns3 {
 			void SetNodeType(PmtmgmpProtocol::NodeType nodeType);
 			void SetHopcount(uint8_t hopcount);
 			void SetTTL(uint8_t ttl);
-			void SetMetric(double metric);
+			void SetMetric(uint32_t metric);
 
 			// Getters for fields:
 			Mac48Address GetMTERPAddress() const;
@@ -55,12 +55,12 @@ namespace ns3 {
 			PmtmgmpProtocol::NodeType GetNodeType() const;
 			uint8_t  GetHopCount() const;
 			uint8_t  GetTtl() const;
-			double GetMetric() const;
+			uint32_t GetMetric() const;
 			Ptr<PmtmgmpRoutePath> GetPathInfo() const;
 
 			/// Handle TTL and Metric:
 			void  DecrementTtl();
-			void  IncrementMetric(double metric, double k);
+			void  IncrementMetric(uint32_t metric, double k);
 
 			// Inherited from WifiInformationElement
 			virtual WifiInformationElementId ElementId() const;

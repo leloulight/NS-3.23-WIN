@@ -396,7 +396,6 @@ namespace ns3 {
 			EventId m_MSECPSearchInterval;
 			EventId m_MSECPSetTimer;
 			EventId m_PgerWaitTimer;
-			uint8_t m_UnicastSecreqThreshold;
 			////节点类型属性
 			NodeType m_NodeType;
 			////MTERP的辅助节点列表

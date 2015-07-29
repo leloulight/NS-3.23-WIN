@@ -136,7 +136,7 @@ namespace ns3 {
 		{
 			m_hopCount = hopcount;
 		}
-		void PmtmgmpRoutePath::SetMetric(double metric)
+		void PmtmgmpRoutePath::SetMetric(uint32_t metric)
 		{
 			m_metric = metric;
 		}
@@ -176,7 +176,7 @@ namespace ns3 {
 		{
 			return m_hopCount;
 		}
-		double PmtmgmpRoutePath::GetMetric() const
+		uint32_t PmtmgmpRoutePath::GetMetric() const
 		{
 			return m_metric;
 		}
@@ -222,6 +222,7 @@ namespace ns3 {
 			copy->SetNodeType(m_NodeType);
 			copy->SetHopcount(m_hopCount);
 			copy->SetMetric(m_metric);
+			copy->SetStatus(m_InformationStatus);
 			return copy;
 		}
 		/*************************
@@ -387,9 +388,14 @@ namespace ns3 {
 		{
 			////已经接受信息
 			Ptr<PmtmgmpRoutePath> path = GetPathByMACaddress(address);
+			if (path == 0)
+			{
+				NS_LOG_DEBUG("Path information about MTERP:" << m_MTERPaddress << " MSECP:" << address << "has been Delete before the timer expired.");
+				return;
+			}
 			if (path->GetStatus() == PmtmgmpRoutePath::Confirmed)
 			{
-				NS_LOG_DEBUG("Path information about MTERP:" << path->GetMTERPaddress() << " MSECP:" << path->GetMSECPaddress() << "has been accept before the timer expired.");
+				NS_LOG_DEBUG("Path information about MTERP:" << m_MTERPaddress << " MSECP:" << address << "has been Accept before the timer expired.");
 				return;
 			}
 

@@ -181,13 +181,6 @@ namespace ns3 {
 					"ns3::Time::TracedCallback"
 					)
 #ifndef PMTMGMP_UNUSED_MY_CODE
-				.AddAttribute("UnicastSecreqThreshold",
-					"Maximum number of SecREQ receivers, when we send a SECREQ as a chain of unicasts",
-					UintegerValue(10),
-					MakeUintegerAccessor(
-						&PmtmgmpProtocol::m_UnicastSecreqThreshold),
-					MakeUintegerChecker<uint8_t>(1)
-					)
 				.AddAttribute("My11WmnPMTMGMPsecStartDelayTime",
 					"Delay time of start MSECP search",
 					TimeValue(MicroSeconds(1024 * 120000)),
@@ -204,14 +197,14 @@ namespace ns3 {
 					)
 				.AddAttribute("My11WmnPMTMGMPsecSetTime",
 					"Delay time of waiting for accept SECREP",
-					TimeValue(MicroSeconds(1024 * 4000)),
+					TimeValue(MicroSeconds(1024 * 2000)),
 					MakeTimeAccessor(
 						&PmtmgmpProtocol::m_My11WmnPMTMGMPsecSetTime),
 					MakeTimeChecker()
 					)
 				.AddAttribute("My11WmnPMTGMGMPpgerWaitTime",
 					"Delay time of waiting for receive PGER",
-					TimeValue(MicroSeconds(1024 * 4000)),
+					TimeValue(MicroSeconds(1024 * 2000)),
 					MakeTimeAccessor(
 						&PmtmgmpProtocol::m_My11WmnPMTMGMPpgerWaitTime),
 					MakeTimeChecker()
@@ -265,10 +258,9 @@ namespace ns3 {
 			m_doFlag(false),
 			m_rfFlag(false),
 #ifndef PMTMGMP_UNUSED_MY_CODE
-			m_UnicastSecreqThreshold(10),
 			m_NodeType(Mesh_STA),
-			m_My11WmnPMTMGMPsecStartDelayTime(MicroSeconds(1024 * 2000)),
-			m_My11WmnPMTMGMPsecInterval(MicroSeconds(1024 * 2000)),
+			m_My11WmnPMTMGMPsecStartDelayTime(MicroSeconds(1024 * 120000)),
+			m_My11WmnPMTMGMPsecInterval(MicroSeconds(1024 * 60000)),
 			m_My11WmnPMTMGMPsecSetTime(MicroSeconds(1024 * 2000)),
 			m_My11WmnPMTMGMPpgerWaitTime(MicroSeconds(1024 * 2000)),
 			m_PathGenerationSeqNumber(0),
@@ -1252,9 +1244,6 @@ namespace ns3 {
 				"unicastPerrThreshold=\"" << (uint16_t)m_unicastPerrThreshold << "\"" << std::endl <<
 				"unicastPreqThreshold=\"" << (uint16_t)m_unicastPreqThreshold << "\"" << std::endl <<
 				"unicastDataThreshold=\"" << (uint16_t)m_unicastDataThreshold << "\"" << std::endl <<
-#ifndef PMTMGMP_UNUSED_MY_CODE
-				"unicastSecreqThreshold=\"" << (uint16_t)m_UnicastSecreqThreshold << "\"" << std::endl <<
-#endif
 				"doFlag=\"" << m_doFlag << "\"" << std::endl <<
 				"rfFlag=\"" << m_rfFlag << "\">" << std::endl;
 			m_stats.Print(os);
@@ -1531,7 +1520,7 @@ namespace ns3 {
 					tempPath->SetMSECPaddress(from);
 					tempPath->SetPathGenerationSequenceNumber(pger.GetPathGenerationSequenceNumber());
 					tempPath->SetNodeType(m_NodeType);
-					tempPath->SetFromNode(from);
+					tempPath->SetFromNode(m_address);
 					m_RouteTable->AddNewPath(tempPath);
 					NS_LOG_DEBUG("Receive PGER from at " << m_address << " from " << from);
 				}
@@ -1682,9 +1671,9 @@ namespace ns3 {
 							Ptr<PmtmgmpRoutePath> newPath = pathCopy->GetCopy();
 
 							////将新增路径设为未接受状态
+							newPath->SetStatus(PmtmgmpRoutePath::Waited);
 							newPath->SetPathGenerationSequenceNumber(GenSeqNum - 1);
 							newPath->AddCandidateRouteInformaiton(pathCopy);
-							newPath->SetStatus(PmtmgmpRoutePath::Waited);
 							newPath->SetAcceptCandidateRouteInformaitonEvent(Simulator::Schedule(routeTree->GetAcceptInformaitonDelay(), &PmtmgmpRouteTree::AcceptCandidateRouteInformaiton, routeTree, pathCopy->GetMSECPaddress()));
 							routeTree->AddNewPath(newPath);
 							NS_LOG_DEBUG("Receive PGEN (MTERP:" << pgen.GetMTERPAddress() << " MSECP:" << pgen.GetMSECPaddress() << ") from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", GSN is " << pgen.GetPathGenerationSequenceNumber() << " start waiting");
@@ -1695,8 +1684,8 @@ namespace ns3 {
 							switch (existPath->GetStatus())
 							{
 							case PmtmgmpRoutePath::Expired:
-								existPath->AddCandidateRouteInformaiton(pathCopy);
 								existPath->SetStatus(PmtmgmpRoutePath::Waited);
+								existPath->AddCandidateRouteInformaiton(pathCopy);
 								existPath->SetAcceptCandidateRouteInformaitonEvent(Simulator::Schedule(routeTree->GetAcceptInformaitonDelay(), &PmtmgmpRouteTree::AcceptCandidateRouteInformaiton, routeTree, pathCopy->GetMSECPaddress()));
 								NS_LOG_DEBUG("Receive PGEN (MTERP:" << pgen.GetMTERPAddress() << " MSECP:" << pgen.GetMSECPaddress() << ") from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", GSN is " << pgen.GetPathGenerationSequenceNumber() << " start waiting");
 								return;

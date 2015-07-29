@@ -96,8 +96,8 @@ class ShowPmtmgmpInforamtion(InformationWindow):
                 self.page_column_num = ns.pmtmgmp.my11s.PmtmgmpRoutePath().GetMaxCandidateNum()
                 for i in range(0, self.page_column_num):
                     list_type.append(str)
-                    list_type.append(float)
-                self.page_treeview_model = gtk.ListStore(int, str, str, int, int, str, int, float, str, str, *list_type)
+                    list_type.append(int)
+                self.page_treeview_model = gtk.ListStore(int, str, str, int, int, str, int, int, str, str, *list_type)
                 self.page_treeview = gtk.TreeView(self.page_treeview_model)
                 self.page_treeview.show()
                 self.page_vbox.add(self.page_treeview)

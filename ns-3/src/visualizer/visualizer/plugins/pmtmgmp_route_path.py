@@ -53,6 +53,7 @@ class Pmtmgmp_Node(object):
         for (key,link) in self.link_list.items():
             link.destroy()
             del(self.link_list[key])
+        self.link_list.clear()
         self.link_list = {}
 
     def update_link_list(self):
@@ -70,12 +71,37 @@ class Pmtmgmp_Node(object):
         if self.link_list.has_key(str(mterp) + "," + str(msecp)):
             self.link_list[str(mterp) + "," + str(msecp)].update_points()
             self.link_list[str(mterp) + "," + str(msecp)] = self.link_list[str(mterp) + "," + str(msecp)]
+            if SHOW_LOG:
+                print "Pmtmgmp_Node::crearte_route_path() exist " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
             return
         else:
+            if mac_node_list[str(route_path.GetFromNode())] is self:
+                return
             route_link = Pmtmgmp_Path_Link(self, mac_node_list[str(route_path.GetFromNode())], route_table, mterp, msecp, parent_canvas_item)
             self.link_list[str(mterp) + "," + str(msecp)] = route_link
         if SHOW_LOG:
-            print "Pmtmgmp_Node::crearte_route_path() " + str(self.pmtmgmp.GetMacAddress()) + "ink to " + str(route_path.GetFromNode())
+            print "Pmtmgmp_Node::crearte_route_path() " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
+
+    def create_part_route_path_recursion(self, mac_node_list, mterp, msecp, parent_canvas_item):
+        # if SHOW_LOG:
+        #     print self
+        self.update_link_list()
+        route_table = self.pmtmgmp.GetPmtmgmpRPRouteTable()
+        route_path = route_table.GetPathByMACaddress(mterp,msecp)
+        if route_path is None:
+             return
+        if self.link_list.has_key(str(mterp) + "," + str(msecp)):
+            self.link_list[str(mterp) + "," + str(msecp)].update_points()
+            self.link_list[str(mterp) + "," + str(msecp)] = self.link_list[str(mterp) + "," + str(msecp)]
+        else:
+            if mac_node_list[str(route_path.GetFromNode())] is self:
+                return
+            route_link = Pmtmgmp_Path_Link(self, mac_node_list[str(route_path.GetFromNode())], route_table, mterp, msecp, parent_canvas_item)
+            self.link_list[str(mterp) + "," + str(msecp)] = route_link
+        node = mac_node_list[str(route_path.GetFromNode())]
+        node.create_part_route_path_recursion(mac_node_list, mterp, msecp, parent_canvas_item)
+        if SHOW_LOG:
+            print "Pmtmgmp_Node::create_part_route_path_recursion() " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
 
     def create_part_route_path_start(self, mac_node_list, mterp, parent_canvas_item):
         self.update_link_list()
@@ -94,7 +120,7 @@ class Pmtmgmp_Node(object):
                 route_link = Pmtmgmp_Path_Link(self, mac_node_list[str(route_path.GetFromNode())], route_table, mterp, msecp, parent_canvas_item)
                 self.link_list[str(mterp) + "," + str(msecp)] = route_link
             next_hop = mac_node_list[str(route_path.GetFromNode())]
-            next_hop.crearte_route_path(mac_node_list, mterp, route_path.GetMSECPaddress(), parent_canvas_item)
+            next_hop.create_part_route_path_recursion(mac_node_list, mterp, route_path.GetMSECPaddress(), parent_canvas_item)
             if SHOW_LOG:
                 print "Pmtmgmp_Node::create_part_route_path_start() " + str(self.pmtmgmp.GetMacAddress()) + "ink to " + str(route_path.GetFromNode())
 
@@ -117,6 +143,7 @@ class Pmtmgmp_Route(object):
 
     def route_path_clean(self):
         self.mac_to_node.clear()
+        self.mac_to_node = {}
         for node in self.node_list:
             node.destory()
         del self.node_list[:]
@@ -127,11 +154,9 @@ class Pmtmgmp_Route(object):
         if SHOW_LOG:
             print "Pmtmgmp_Route::route_path_link_full() Node list:" + str(len(self.node_list))
         for node in self.node_list:
-            # if SHOW_LOG:
-            #     print node
             node.crearte_route_path(self.mac_to_node, self.pmtmgmp.GetMacAddress(), msecp, self.viz.links_group)
-            if SHOW_LOG:
-                print "Pmtmgmp_Route::route_path_link_full()" + str(node.base_mac)
+            # if SHOW_LOG:
+            #     print "Pmtmgmp_Route::route_path_link_full()" + str(node.base_mac)
 
     def route_path_link_part(self, mterp):
         if SHOW_LOG:
