@@ -177,35 +177,42 @@ namespace ns3 {
 					Ptr<IeSecreq> secreq = DynamicCast<IeSecreq>(*i);
 					NS_ASSERT(secreq != 0);
 					m_stats.rxSecreq++;
-					m_protocol->ReceiveSecreq(*secreq, header.GetAddr2(), m_ifIndex, header.GetAddr3(), m_parent->GetLinkMetric(header.GetAddr2()));
+					m_protocol->ReceiveSECREQ(*secreq, header.GetAddr2(), m_ifIndex, header.GetAddr3(), m_parent->GetLinkMetric(header.GetAddr2()));
 				}
 				if ((*i)->ElementId() == IE11S_SECREP)
 				{
 					Ptr<IeSecrep> secrep = DynamicCast<IeSecrep>(*i);
 					NS_ASSERT(secrep != 0);
 					m_stats.rxSecrep++;
-					m_protocol->ReceiveSecrep(*secrep, header.GetAddr2(), m_ifIndex, header.GetAddr3(), m_parent->GetLinkMetric(header.GetAddr2()));
+					m_protocol->ReceiveSECREP(*secrep, header.GetAddr2(), m_ifIndex, header.GetAddr3(), m_parent->GetLinkMetric(header.GetAddr2()));
 				}
 				if ((*i)->ElementId() == IE11S_SECACK)
 				{
 					Ptr<IeSecack> secack = DynamicCast<IeSecack>(*i);
 					NS_ASSERT(secack != 0);
 					m_stats.rxSecack++;
-					m_protocol->ReceiveSecack(*secack, header.GetAddr2(), m_ifIndex, header.GetAddr3(), m_parent->GetLinkMetric(header.GetAddr2()));
+					m_protocol->ReceiveSECACK(*secack, header.GetAddr2(), m_ifIndex, header.GetAddr3(), m_parent->GetLinkMetric(header.GetAddr2()));
 				}
 				if ((*i)->ElementId() == IE11S_PGER)
 				{
 					Ptr<IePger> pger = DynamicCast<IePger>(*i);
 					NS_ASSERT(pger != 0);
 					m_stats.rxPger++;
-					m_protocol->ReceivePger(*pger, header.GetAddr2(), m_ifIndex, header.GetAddr3(), m_parent->GetLinkMetric(header.GetAddr2()));
+					m_protocol->ReceivePGER(*pger, header.GetAddr2(), m_ifIndex, header.GetAddr3(), m_parent->GetLinkMetric(header.GetAddr2()));
 				}
 				if ((*i)->ElementId() == IE11S_PGEN)
 				{
 					Ptr<IePgen> pgen = DynamicCast<IePgen>(*i);
 					NS_ASSERT(pgen != 0);
 					m_stats.rxPgen++;
-					m_protocol->ReceivePgen(*pgen, header.GetAddr2(), m_ifIndex, header.GetAddr3(), m_parent->GetLinkMetric(header.GetAddr2()));
+					m_protocol->ReceivePGEN(*pgen, header.GetAddr2(), m_ifIndex, header.GetAddr3(), m_parent->GetLinkMetric(header.GetAddr2()));
+				}
+				if ((*i)->ElementId() == IE11S_PUPD)
+				{
+					Ptr<IePupd> pupd = DynamicCast<IePupd>(*i);
+					NS_ASSERT(pupd != 0);
+					m_stats.rxPupd++;
+					m_protocol->ReceivePUPD(*pupd, header.GetAddr2(), m_ifIndex, header.GetAddr3(), m_parent->GetLinkMetric(header.GetAddr2()));
 				}
 #endif
 			}
@@ -516,6 +523,7 @@ namespace ns3 {
 				"txSecack=\"" << txSecack << "\"" << std::endl <<
 				"txPger=\"" << txPger << "\"" << std::endl <<
 				"txPgen=\"" << txPgen << "\"" << std::endl <<
+				"txPupd=\"" << txPupd << "\"" << std::endl <<
 #endif
 				"rxPreq=\"" << rxPreq << "\"" << std::endl <<
 				"rxPrep=\"" << rxPrep << "\"" << std::endl <<
@@ -526,6 +534,7 @@ namespace ns3 {
 				"rxSecack=\"" << rxSecack << "\"" << std::endl <<
 				"rxPger=\"" << rxPger << "\"" << std::endl <<
 				"rxPgen=\"" << rxPgen << "\"" << std::endl <<
+				"rxPupd=\"" << rxPupd << "\"" << std::endl <<
 #endif
 				"txMgt=\"" << txMgt << "\"" << std::endl <<
 				"txMgtBytes=\"" << txMgtBytes << "\"" << std::endl <<
@@ -558,14 +567,14 @@ namespace ns3 {
 
 #ifndef PMTMGMP_UNUSED_MY_CODE
 		////发送SECREQ
-		void PmtmgmpProtocolMac::SendSecreq(IeSecreq secreq)
+		void PmtmgmpProtocolMac::SendSECREQ(IeSecreq secreq)
 		{
 			NS_LOG_FUNCTION_NOARGS();
 			std::vector<IeSecreq> secreq_vector;
 			secreq_vector.push_back(secreq);
-			SendSecreq(secreq_vector);
+			SendSECREQ(secreq_vector);
 		}
-		void PmtmgmpProtocolMac::SendSecreq(std::vector<IeSecreq> secreq)
+		void PmtmgmpProtocolMac::SendSECREQ(std::vector<IeSecreq> secreq)
 		{
 			Ptr<Packet> packet = Create<Packet>();
 			WmnInformationElementVector elements;
@@ -603,14 +612,14 @@ namespace ns3 {
 #endif
 		}
 		////发送SECREP
-		void PmtmgmpProtocolMac::SendSecrep(IeSecrep secrep, Mac48Address receiver)
+		void PmtmgmpProtocolMac::SendSECREP(IeSecrep secrep, Mac48Address receiver)
 		{
 			NS_LOG_FUNCTION_NOARGS();
 			std::vector<IeSecrep> secrep_vector;
 			secrep_vector.push_back(secrep);
-			SendSecrep(secrep_vector, receiver);
+			SendSECREP(secrep_vector, receiver);
 		}
-		void PmtmgmpProtocolMac::SendSecrep(std::vector<IeSecrep> secrep, Mac48Address receiver)
+		void PmtmgmpProtocolMac::SendSECREP(std::vector<IeSecrep> secrep, Mac48Address receiver)
 		{
 			Ptr<Packet> packet = Create<Packet>();
 			WmnInformationElementVector elements;
@@ -635,14 +644,14 @@ namespace ns3 {
 			m_parent->SendManagementFrame(packet, hdr);
 		}
 		////发送SECACK
-		void PmtmgmpProtocolMac::SendSecack(IeSecack secack, Mac48Address receiver)
+		void PmtmgmpProtocolMac::SendSECACK(IeSecack secack, Mac48Address receiver)
 		{
 			NS_LOG_FUNCTION_NOARGS();
 			std::vector<IeSecack> secack_vector;
 			secack_vector.push_back(secack);
-			SendSecack(secack_vector, receiver);
+			SendSECACK(secack_vector, receiver);
 		}
-		void PmtmgmpProtocolMac::SendSecack(std::vector<IeSecack> secack, Mac48Address receiver)
+		void PmtmgmpProtocolMac::SendSECACK(std::vector<IeSecack> secack, Mac48Address receiver)
 		{
 			Ptr<Packet> packet = Create<Packet>();
 			WmnInformationElementVector elements;
@@ -667,14 +676,14 @@ namespace ns3 {
 			m_parent->SendManagementFrame(packet, hdr);
 		}
 		////发送PGER
-		void PmtmgmpProtocolMac::SendPger(IePger pger, Mac48Address receiver)
+		void PmtmgmpProtocolMac::SendPGER(IePger pger, Mac48Address receiver)
 		{
 			NS_LOG_FUNCTION_NOARGS();
 			std::vector<IePger> pger_vector;
 			pger_vector.push_back(pger);
-			SendPger(pger_vector, receiver);
+			SendPGER(pger_vector, receiver);
 		}
-		void PmtmgmpProtocolMac::SendPger(std::vector<IePger> pger, Mac48Address receiver)
+		void PmtmgmpProtocolMac::SendPGER(std::vector<IePger> pger, Mac48Address receiver)
 		{
 			Ptr<Packet> packet = Create<Packet>();
 			WmnInformationElementVector elements;
@@ -699,14 +708,14 @@ namespace ns3 {
 			m_parent->SendManagementFrame(packet, hdr);
 		}
 		////发送PGEN
-		void PmtmgmpProtocolMac::SendPgen(IePgen pgen)
+		void PmtmgmpProtocolMac::SendPGEN(IePgen pgen)
 		{
 			NS_LOG_FUNCTION_NOARGS();
 			std::vector<IePgen> pgen_vector;
 			pgen_vector.push_back(pgen);
-			SendPgen(pgen_vector);
+			SendPGEN(pgen_vector);
 		}
-		void PmtmgmpProtocolMac::SendPgen(std::vector<IePgen> pgen)
+		void PmtmgmpProtocolMac::SendPGEN(std::vector<IePgen> pgen)
 		{
 			Ptr<Packet> packet = Create<Packet>();
 			WmnInformationElementVector elements;
@@ -738,6 +747,51 @@ namespace ns3 {
 #else
 			hdr.SetAddr1(Mac48Address::GetBroadcast());
 			m_stats.txPgen++;
+			m_stats.txMgt++;
+			m_stats.txMgtBytes += packet->GetSize();
+			m_parent->SendManagementFrame(packet, hdr);
+#endif
+		}
+		////发送PGEN
+		void PmtmgmpProtocolMac::SendPUPD(IePupd pupd)
+		{
+			NS_LOG_FUNCTION_NOARGS();
+			std::vector<IePupd> pupd_vector;
+			pupd_vector.push_back(pupd);
+			SendPUPD(pupd_vector);
+		}
+		void PmtmgmpProtocolMac::SendPUPD(std::vector<IePupd> pupd)
+		{
+			Ptr<Packet> packet = Create<Packet>();
+			WmnInformationElementVector elements;
+			for (std::vector<IePupd>::iterator i = pupd.begin(); i != pupd.end(); i++)
+			{
+				elements.AddInformationElement(Ptr<IePupd>(&(*i)));
+			}
+			packet->AddHeader(elements);
+			packet->AddHeader(GetWifiActionHeader());
+			//create 802.11 header:
+			WifiMacHeader hdr;
+			hdr.SetAction();
+			hdr.SetDsNotFrom();
+			hdr.SetDsNotTo();
+			hdr.SetAddr2(m_parent->GetAddress());
+			hdr.SetAddr3(m_protocol->GetAddress());
+			//Send Management frame
+#ifdef PMTMGMP_USE_MULTICAST
+			////注释为多播，使用为广播
+			std::vector<Mac48Address> receivers = m_protocol->GetBroadcastReceivers(m_ifIndex);
+			for (std::vector<Mac48Address>::const_iterator i = receivers.begin(); i != receivers.end(); i++)
+			{
+				hdr.SetAddr1(*i);
+				m_stats.txPupd++;
+				m_stats.txMgt++;
+				m_stats.txMgtBytes += packet->GetSize();
+				m_parent->SendManagementFrame(packet, hdr);
+			}
+#else
+			hdr.SetAddr1(Mac48Address::GetBroadcast());
+			m_stats.txPupd++;
 			m_stats.txMgt++;
 			m_stats.txMgtBytes += packet->GetSize();
 			m_parent->SendManagementFrame(packet, hdr);

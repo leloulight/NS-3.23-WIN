@@ -192,7 +192,7 @@ namespace ns3 {
 					)
 				.AddAttribute("My11WmnPMTMGMPsecInterval",
 					"Interval MSECP search, it also the interval of path Generation",
-					TimeValue(MicroSeconds(1024 * 60000)),
+					TimeValue(MicroSeconds(1024 * 65000)),
 					MakeTimeAccessor(
 						&PmtmgmpProtocol::m_My11WmnPMTMGMPsecInterval),
 					MakeTimeChecker()
@@ -209,6 +209,13 @@ namespace ns3 {
 					TimeValue(MicroSeconds(1024 * 2000)),
 					MakeTimeAccessor(
 						&PmtmgmpProtocol::m_My11WmnPMTMGMPpgerWaitTime),
+					MakeTimeChecker()
+					)
+				.AddAttribute("My11WmnPMTMGMPpathMetricUpdatePeriod",
+					"Period for Update the Metric of Route Path, also the Period for PUDP",
+					TimeValue(MicroSeconds(1024 * 2000)),
+					MakeTimeAccessor(
+						&PmtmgmpProtocol::m_My11WmnPMTMGMPpathMetricUpdatePeriod),
 					MakeTimeChecker()
 					)
 				.AddAttribute("MSECPnumForMTERP",
@@ -262,9 +269,10 @@ namespace ns3 {
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			m_NodeType(Mesh_STA),
 			m_My11WmnPMTMGMPsecStartDelayTime(MicroSeconds(1024 * 120000)),
-			m_My11WmnPMTMGMPsecInterval(MicroSeconds(1024 * 60000)),
+			m_My11WmnPMTMGMPsecInterval(MicroSeconds(1024 * 65000)),
 			m_My11WmnPMTMGMPsecSetTime(MicroSeconds(1024 * 2000)),
 			m_My11WmnPMTMGMPpgerWaitTime(MicroSeconds(1024 * 2000)),
+			m_My11WmnPMTMGMPpathMetricUpdatePeriod(MicroSeconds(1024 * 2000)),
 			m_PathGenerationSeqNumber(0),
 			m_PathUpdateSeqNumber(0),
 			m_MSECPnumForMTERP(2),
@@ -296,8 +304,10 @@ namespace ns3 {
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			if (IsMTERP())
 			{
-				m_MSECPSearchTimer = Simulator::Schedule(m_My11WmnPMTMGMPsecStartDelayTime, &PmtmgmpProtocol::MSECPSearch, this);
+				m_MSECPsearchStartEventTimer = Simulator::Schedule(m_My11WmnPMTMGMPsecStartDelayTime, &PmtmgmpProtocol::MSECPSearch, this);
 			}
+			////PUPD周期，初始延迟与MSECP搜索相同
+			m_PUPDperiodEventTimer = Simulator::Schedule(m_My11WmnPMTMGMPsecStartDelayTime, &PmtmgmpProtocol::PUPDperiod, this);
 #endif
 		}
 
@@ -1296,11 +1306,12 @@ namespace ns3 {
 			NS_LOG_DEBUG("MSECP Search start");
 			m_PathGenerationSeqNumber += 1;
 			m_SECREPinformation.clear();
-			SendSecreq();
-			m_MSECPSearchInterval = Simulator::Schedule(m_My11WmnPMTMGMPsecInterval, &PmtmgmpProtocol::MSECPSearch, this);
+			SendSECREQ();
+			////MSECP周期
+			m_MSECPsearchPeriodEventTimer = Simulator::Schedule(m_My11WmnPMTMGMPsecInterval, &PmtmgmpProtocol::MSECPSearch, this);
 		}
 		////发送SECREQ
-		void PmtmgmpProtocol::SendSecreq()
+		void PmtmgmpProtocol::SendSECREQ()
 		{
 			NS_LOG_DEBUG("Send SECREQ at " << m_address);
 			IeSecreq secreq;
@@ -1309,13 +1320,13 @@ namespace ns3 {
 			secreq.SetNodeType(m_NodeType);
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
-				i->second->SendSecreq(secreq);
+				i->second->SendSECREQ(secreq);
 			}
 			////延迟等待处理选择MSECP
-			m_MSECPSetTimer = Simulator::Schedule(m_My11WmnPMTMGMPsecSetTime, &PmtmgmpProtocol::SelectMSECP, this);
+			m_MSECPsetEventTimer = Simulator::Schedule(m_My11WmnPMTMGMPsecSetTime, &PmtmgmpProtocol::SelectMSECP, this);
 		}
 		////接收SECREQ
-		void PmtmgmpProtocol::ReceiveSecreq(IeSecreq secreq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
+		void PmtmgmpProtocol::ReceiveSECREQ(IeSecreq secreq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
 			NS_LOG_DEBUG("Receive SECREQ from " << from << " at interface " << interface << " while metric is " << metric << " at " << m_address);
 			////终端节点不会作为其他的终端节点的辅助节点
@@ -1324,7 +1335,7 @@ namespace ns3 {
 				std::vector<MSECPaffiliatedMSECPInformation>::iterator iter = std::find_if(m_AffiliatedMTERPlist.begin(), m_AffiliatedMTERPlist.end(), MSECPaffiliatedMSECPInformation_Finder(secreq.GetMTERPaddress()));
 				if (iter != m_AffiliatedMTERPlist.end()) m_AffiliatedMTERPlist.erase(iter);
 				if (m_AffiliatedMTERPlist.size() == 0) m_NodeType = Mesh_STA;
-				SendSecrep(secreq.GetMTERPaddress(), secreq.GetPathGenerationSequenceNumber(), secreq.GetNodeType());
+				SendSECREP(secreq.GetMTERPaddress(), secreq.GetPathGenerationSequenceNumber(), secreq.GetNodeType());
 			}
 		}
 		////获取非同类（MAP，MPP）终端节点数量
@@ -1338,7 +1349,7 @@ namespace ns3 {
 			return i;
 		}
 		////发送SECREP
-		void PmtmgmpProtocol::SendSecrep(Mac48Address receiver, uint32_t index, NodeType type)
+		void PmtmgmpProtocol::SendSECREP(Mac48Address receiver, uint32_t index, NodeType type)
 		{
 			NS_LOG_DEBUG("Send SECREP to " << receiver << " at " << m_address);
 			IeSecrep secrep;
@@ -1348,11 +1359,11 @@ namespace ns3 {
 			secrep.SetPathGenerationSequenceNumber(index);
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
-				i->second->SendSecrep(secrep, receiver);
+				i->second->SendSECREP(secrep, receiver);
 			}
 		}
 		////接收SECREP
-		void PmtmgmpProtocol::ReceiveSecrep(IeSecrep secrep, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
+		void PmtmgmpProtocol::ReceiveSECREP(IeSecrep secrep, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
 			NS_LOG_DEBUG("Receive SECREP from " << from << " at interface " << interface << " while metric is " << metric << " at " << m_address);
 			if ((secrep.GetPathGenerationSequenceNumber() != m_PathGenerationSeqNumber) || (secrep.GetMTERPaddress() != m_address))
@@ -1425,13 +1436,13 @@ namespace ns3 {
 			}
 
 			///为筛选出的结果发送SECACK
-			SendSecack();
+			SendSECACK();
 
 			////延迟等待接收PGER
-			m_PgerWaitTimer = Simulator::Schedule(m_My11WmnPMTMGMPpgerWaitTime, &PmtmgmpProtocol::WaitForRecivePGER, this);
+			m_PGERwaitEventTimer = Simulator::Schedule(m_My11WmnPMTMGMPpgerWaitTime, &PmtmgmpProtocol::WaitForRecivePGER, this);
 		}
 		////发送SECACK
-		void PmtmgmpProtocol::SendSecack()
+		void PmtmgmpProtocol::SendSECACK()
 		{
 			IeSecack secack;
 			secack.SetMTERPaddress(GetAddress());
@@ -1451,13 +1462,13 @@ namespace ns3 {
 					for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 					{
 						NS_LOG_DEBUG("Send SECACK at " << m_address << " to " << iter->m_address);
-						i->second->SendSecack(secack, iter->m_address);
+						i->second->SendSECACK(secack, iter->m_address);
 					}
 				}
 			}
 		}
 		////接收SECACK
-		void PmtmgmpProtocol::ReceiveSecack(IeSecack secack, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
+		void PmtmgmpProtocol::ReceiveSECACK(IeSecack secack, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
 			NS_LOG_DEBUG("Receive SECACK from " << from << " at interface " << interface << " while metric is " << metric << " at " << m_address);
 
@@ -1468,11 +1479,11 @@ namespace ns3 {
 			newInformation.selectIndex = secack.GetPathGenerationSequenceNumber();
 			m_AffiliatedMTERPlist.push_back(newInformation);
 
-			SendPger(newInformation.selectIndex, secack.GetMTERPaddress());
-			SendFirstPgen(secack, metric);
+			SendPGER(newInformation.selectIndex, secack.GetMTERPaddress());
+			SendFirstPGEN(secack, metric);
 		}
 		////发送PGER
-		void PmtmgmpProtocol::SendPger(uint32_t gsn, Mac48Address address)
+		void PmtmgmpProtocol::SendPGER(uint32_t gsn, Mac48Address address)
 		{
 			IePger pger;
 			pger.SetPathGenerationSequenceNumber(gsn);
@@ -1480,7 +1491,7 @@ namespace ns3 {
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
 				NS_LOG_DEBUG("Send PGER at " << m_address << " to " << address);
-				i->second->SendPger(pger, address);
+				i->second->SendPGER(pger, address);
 			}
 		}
 		////定时处理PGER
@@ -1500,13 +1511,13 @@ namespace ns3 {
 			}
 			else
 			{
-				SendSecack();
+				SendSECACK();
 				////再次延迟等待接收PGER
-				m_PgerWaitTimer = Simulator::Schedule(m_My11WmnPMTMGMPpgerWaitTime, &PmtmgmpProtocol::WaitForRecivePGER, this);
+				m_PGERwaitEventTimer = Simulator::Schedule(m_My11WmnPMTMGMPpgerWaitTime, &PmtmgmpProtocol::WaitForRecivePGER, this);
 			}
 		}
 		////接收PGER
-		void PmtmgmpProtocol::ReceivePger(IePger pger, Mac48Address from, uint32_t, Mac48Address fromMp, uint32_t metric)
+		void PmtmgmpProtocol::ReceivePGER(IePger pger, Mac48Address from, uint32_t, Mac48Address fromMp, uint32_t metric)
 		{
 			std::vector<SECREPinformation>::iterator iter = std::find_if(m_AffiliatedMSECPlist.begin(), m_AffiliatedMSECPlist.end(), SECREPinformation_Finder(from));
 			if (pger.GetPathGenerationSequenceNumber() == m_PathGenerationSeqNumber)
@@ -1537,7 +1548,7 @@ namespace ns3 {
 			}
 		}
 		////发送初始PGEN
-		void PmtmgmpProtocol::SendFirstPgen(IeSecack secack, uint32_t metric)
+		void PmtmgmpProtocol::SendFirstPGEN(IeSecack secack, uint32_t metric)
 		{
 			NS_LOG_DEBUG("Send first PGEN " << " at node " << m_address << " while metric is " << metric << ", origination is " << secack.GetMTERPaddress() << ", GSN is " << secack.GetPathGenerationSequenceNumber());
 			IePgen pgen;
@@ -1552,7 +1563,7 @@ namespace ns3 {
 
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
-				i->second->SendPgen(pgen);
+				i->second->SendPGEN(pgen);
 			}
 
 			////路由表存储
@@ -1561,16 +1572,16 @@ namespace ns3 {
 			m_RouteTable->AddNewPath(tempPath);
 		}
 		////转发pgen
-		void PmtmgmpProtocol::sendPgen(IePgen pgen)
+		void PmtmgmpProtocol::sendPGEN(IePgen pgen)
 		{
 			NS_LOG_DEBUG("Send PGEN " << " at node " << m_address << " while metric is " << pgen.GetMetric() << ", origination is " << pgen.GetMTERPAddress() << ", GSN is " << pgen.GetPathGenerationSequenceNumber());
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
-				i->second->SendPgen(pgen);
+				i->second->SendPGEN(pgen);
 			}
 		}
 		////接收PGEN
-		void PmtmgmpProtocol::ReceivePgen(IePgen pgen, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
+		void PmtmgmpProtocol::ReceivePGEN(IePgen pgen, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
 			////返回起始节点
 			if (pgen.GetMTERPAddress() == m_address)
@@ -1713,8 +1724,37 @@ namespace ns3 {
 			{
 				////转发PGEN
 				NS_LOG_DEBUG("Receive PGEN (MTERP:" << pgen.GetMTERPAddress() << " MSECP:" << pgen.GetMSECPaddress() << ") from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", GSN is " << pgen.GetPathGenerationSequenceNumber() << " has been Transmit");
-				sendPgen(pgen);
+				sendPGEN(pgen);
 			}
+		}
+		////AALM更新
+		void PmtmgmpProtocol::PUPDperiod()
+		{
+			if (m_RouteTable->GetConfirmedPathSize() != 0)
+			{
+				SendPUPD();	
+				NS_LOG_DEBUG("Period for PUPD at " << m_address << " , do send.");
+			}
+			else
+			{
+				NS_LOG_DEBUG("Period for PUPD at " << m_address << " , do not send.");
+			}
+			m_PUPDperiodEventTimer = Simulator::Schedule(m_My11WmnPMTMGMPpathMetricUpdatePeriod, &PmtmgmpProtocol::PUPDperiod, this);
+		}
+		////发送PUPD
+		void PmtmgmpProtocol::SendPUPD()
+		{
+			NS_LOG_DEBUG("Send PUPD at " << m_address);
+			IePupd pupd = IePupd(m_RouteTable);
+			
+			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
+			{
+				i->second->SendPUPD(pupd);
+			}
+		}
+		////接收PUPD
+		void PmtmgmpProtocol::ReceivePUPD(IePupd pupd, Mac48Address from, uint32_t, Mac48Address fromMp, uint32_t metric)
+		{
 		}
 #endif
 	} // namespace my11s

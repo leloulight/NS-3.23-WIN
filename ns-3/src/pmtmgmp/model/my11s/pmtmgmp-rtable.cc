@@ -447,7 +447,7 @@ namespace ns3 {
 			uint8_t size = 0;
 			for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin(); iter != m_tree.end(); iter++)
 			{
-				if ((*iter)->GetStatus == PmtmgmpRoutePath::Confirmed) size++;
+				if ((*iter)->GetStatus() == PmtmgmpRoutePath::Confirmed) size++;
 			}
 			return size;
 		}
@@ -546,6 +546,16 @@ namespace ns3 {
 			}
 			
 			routeTree->AddNewPath(path);
+		}
+		////获取确认状态路径的数量
+		uint16_t PmtmgmpRouteTable::GetConfirmedPathSize()
+		{
+			uint16_t size = 0;
+			for (std::vector<Ptr<PmtmgmpRouteTree> >::iterator iter = m_table.begin(); iter != m_table.end(); iter++)
+			{
+				size += (*iter)->GetConfirmedPathSize();
+			}
+			return size;
 		}
 		////Python调用函数
 		uint8_t PmtmgmpRouteTable::GetTableSize() const

@@ -93,12 +93,25 @@ namespace ns3 {
 		/*************************
 		* IePupd
 		************************/
-		IePupd::~IePupd()
+		IePupd::IePupd(Ptr<PmtmgmpRouteTable> table)
 		{
+			std::vector<Ptr<PmtmgmpRouteTree> > temp = table->GetRouteTable();
+			m_size = 0;
+			for (std::vector<Ptr<PmtmgmpRouteTree> >::iterator iter = temp.begin(); iter != temp.end(); iter++)
+			{
+				if ((*iter)->GetTreeSize() != 0)
+				{
+					m_table.push_back(AALMupdateTreeData(*iter));
+					m_size += 1;
+				}
+			}			
 		}
 		IePupd::IePupd()
 		{
 
+		}
+		IePupd::~IePupd()
+		{
 		}
 		void IePupd::SetSize(uint8_t seq_number)
 		{

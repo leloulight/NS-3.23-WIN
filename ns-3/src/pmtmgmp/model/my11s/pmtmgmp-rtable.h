@@ -222,6 +222,8 @@ namespace ns3 {
 			Ptr<PmtmgmpRoutePath> GetPathByMACaddress(Mac48Address mterp, Mac48Address msecp);
 			////添加新路径
 			void AddNewPath(Ptr<PmtmgmpRoutePath> path);
+			////获取确认状态路径的数量
+			uint16_t GetConfirmedPathSize();
 
 			////Python调用函数
 			uint8_t GetTableSize() const;

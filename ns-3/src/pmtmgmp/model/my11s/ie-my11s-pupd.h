@@ -70,6 +70,7 @@ namespace ns3 {
 		{
 		public:
 			IePupd();
+			IePupd(Ptr<PmtmgmpRouteTable> table);
 			~IePupd();
 
 			// Setters for fields:

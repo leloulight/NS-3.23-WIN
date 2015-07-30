@@ -111,8 +111,6 @@ namespace ns3 {
 			Mac48Address GetMacAddress();
 			////获取协议的路由表
 			Ptr<PmtmgmpRouteTable> GetPmtmgmpRPRouteTable();
-			////终端节点发动 
-			void MSECPSearch();
 			////PMTMGMP协议中节点的类型枚举
 			enum NodeType
 			{
@@ -288,36 +286,45 @@ namespace ns3 {
 				}
 				Mac48Address address;
 			};
+			////终端节点发动 
+			void MSECPSearch();
 			////发送SECREQ
-			void SendSecreq();
+			void SendSECREQ();
 			////接收SECREQ
-			void ReceiveSecreq(IeSecreq secreq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
+			void ReceiveSECREQ(IeSecreq secreq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
 			////获取非同类（MAP，MPP）终端节点数量
 			uint8_t GetDifferentTypeMTERPnum(NodeType type, Mac48Address source);
 			////发送SECREP
-			void SendSecrep(Mac48Address receiver, uint32_t index, NodeType type);
+			void SendSECREP(Mac48Address receiver, uint32_t index, NodeType type);
 			////接收SECREP
-			void ReceiveSecrep(IeSecrep secrep, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
+			void ReceiveSECREP(IeSecrep secrep, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
 			////验证协议所属结点是否为终端节点MTERP
 			bool IsMTERP();
 			////延迟整理SECREP信息，选取可接受的MSECP
 			void SelectMSECP();
 			////发送SECACK
-			void SendSecack();
+			void SendSECACK();
 			////接收SECACK
-			void ReceiveSecack(IeSecack secack, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
+			void ReceiveSECACK(IeSecack secack, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
 			////发送PGER
-			void SendPger(uint32_t gsn, Mac48Address address);
+			void SendPGER(uint32_t gsn, Mac48Address address);
 			////定时处理PGER
 			void WaitForRecivePGER();
-			////接收PGEr
-			void ReceivePger(IePger pger, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
+			////接收PGER
+			void ReceivePGER(IePger pger, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
 			////发送初始PGEN
-			void SendFirstPgen(IeSecack secack, uint32_t metric);
+			void SendFirstPGEN(IeSecack secack, uint32_t metric);
 			////转发Pgen
-			void sendPgen(IePgen pgen);
+			void sendPGEN(IePgen pgen);
 			////接收PGEN
-			void ReceivePgen(IePgen pgen, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
+			void ReceivePGEN(IePgen pgen, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
+			////AALM更新
+			void PUPDperiod();
+			////发送PUPD
+			void SendPUPD();
+			////接收PUPD
+			void ReceivePUPD(IePupd pupd, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
+
 #endif
 		private:
 			///\name Statistics:
@@ -394,10 +401,11 @@ namespace ns3 {
 			Ptr<UniformRandomVariable> m_coefficient;
 			Callback <std::vector<Mac48Address>, uint32_t> m_neighboursCallback;
 #ifndef PMTMGMP_UNUSED_MY_CODE
-			EventId m_MSECPSearchTimer;
-			EventId m_MSECPSearchInterval;
-			EventId m_MSECPSetTimer;
-			EventId m_PgerWaitTimer;
+			EventId m_MSECPsearchStartEventTimer;
+			EventId m_MSECPsearchPeriodEventTimer;
+			EventId m_MSECPsetEventTimer;
+			EventId m_PGERwaitEventTimer;
+			EventId m_PUPDperiodEventTimer;
 			////节点类型属性
 			NodeType m_NodeType;
 			////MTERP的辅助节点列表
@@ -412,6 +420,8 @@ namespace ns3 {
 			Time m_My11WmnPMTMGMPsecSetTime;
 			////PGER等待时间
 			Time m_My11WmnPMTMGMPpgerWaitTime;
+			////路由度量更新周期
+			Time m_My11WmnPMTMGMPpathMetricUpdatePeriod;
 			////SECREP接收信息记录
 			std::vector<SECREPinformation> m_SECREPinformation;
 			////MSECP选择序号（从零开始，奇数开启，偶数关闭。）

@@ -100,20 +100,23 @@ namespace ns3 {
 			void ResetStats();
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			////发送SECREQ
-			void SendSecreq(IeSecreq secreq);
-			void SendSecreq(std::vector<IeSecreq> secreq);
+			void SendSECREQ(IeSecreq secreq);
+			void SendSECREQ(std::vector<IeSecreq> secreq);
 			////发送SECREP
-			void SendSecrep(IeSecrep secrep, Mac48Address receiver);
-			void SendSecrep(std::vector<IeSecrep> secrep, Mac48Address receiver);
+			void SendSECREP(IeSecrep secrep, Mac48Address receiver);
+			void SendSECREP(std::vector<IeSecrep> secrep, Mac48Address receiver);
 			////发送SECACK
-			void SendSecack(IeSecack secack, Mac48Address receiver);
-			void SendSecack(std::vector<IeSecack> secack, Mac48Address receiver);
+			void SendSECACK(IeSecack secack, Mac48Address receiver);
+			void SendSECACK(std::vector<IeSecack> secack, Mac48Address receiver);
 			////发送PGER
-			void SendPger(IePger pger, Mac48Address receiver);
-			void SendPger(std::vector<IePger> pger, Mac48Address receiver);
+			void SendPGER(IePger pger, Mac48Address receiver);
+			void SendPGER(std::vector<IePger> pger, Mac48Address receiver);
 			////发送PGEN
-			void SendPgen(IePgen Pgen);
-			void SendPgen(std::vector<IePgen> Pgen);
+			void SendPGEN(IePgen pgen);
+			void SendPGEN(std::vector<IePgen> pgen);
+			////发送PGEN
+			void SendPUPD(IePupd pupd);
+			void SendPUPD(std::vector<IePupd> pupd);
 #endif
 		private:
 			Ptr<WmnWifiInterfaceMac> m_parent;
@@ -154,6 +157,8 @@ namespace ns3 {
 				uint16_t rxPger;
 				uint16_t txPgen;
 				uint16_t rxPgen;
+				uint16_t txPupd;
+				uint16_t rxPupd;
 #endif
 				uint16_t txMgt;
 				uint32_t txMgtBytes;
