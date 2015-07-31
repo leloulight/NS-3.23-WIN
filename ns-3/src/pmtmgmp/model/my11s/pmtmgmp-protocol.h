@@ -40,6 +40,7 @@ namespace ns3 {
 		class IePreq;
 		class IePrep;
 #ifndef PMTMGMP_UNUSED_MY_CODE
+		class PmtmgmpRouteTree;
 		class PmtmgmpRouteTable;
 		class IeSecreq;
 		class IeSecrep;

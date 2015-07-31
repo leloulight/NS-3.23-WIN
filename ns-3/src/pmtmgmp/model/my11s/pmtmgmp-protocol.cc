@@ -293,21 +293,21 @@ namespace ns3 {
 		void
 			PmtmgmpProtocol::DoInitialize()
 		{
-#ifdef PMTMGMP_UNUSED_MY_CODE
 			m_coefficient->SetAttribute("Max", DoubleValue(m_randomStart.GetSeconds()));
+			Time randomStart = m_My11WmnPMTMGMPsecStartDelayTime + Seconds(m_coefficient->GetValue());
+#ifdef PMTMGMP_UNUSED_MY_CODE
 			if (m_isRoot)
 			{
-				Time randomStart = Seconds(m_coefficient->GetValue());
 				m_proactivePreqTimer = Simulator::Schedule(randomStart, &PmtmgmpProtocol::SendProactivePreq, this);
 			}
 #endif
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			if (IsMTERP())
 			{
-				m_MSECPsearchStartEventTimer = Simulator::Schedule(m_My11WmnPMTMGMPsecStartDelayTime, &PmtmgmpProtocol::MSECPSearch, this);
+				m_MSECPsearchStartEventTimer = Simulator::Schedule(randomStart, &PmtmgmpProtocol::MSECPSearch, this);
 			}
 			////PUPD周期，初始延迟与MSECP搜索相同
-			m_PUPDperiodEventTimer = Simulator::Schedule(m_My11WmnPMTMGMPsecStartDelayTime, &PmtmgmpProtocol::PUPDperiod, this);
+			m_PUPDperiodEventTimer = Simulator::Schedule(randomStart, &PmtmgmpProtocol::PUPDperiod, this);
 #endif
 		}
 

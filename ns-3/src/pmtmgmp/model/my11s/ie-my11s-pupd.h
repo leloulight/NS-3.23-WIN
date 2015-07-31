@@ -90,7 +90,7 @@ namespace ns3 {
 		private:
 			uint8_t m_size;
 			std::vector<AALMupdateTreeData> m_table;
-
+			
 			friend bool operator== (const IePupd & a, const IePupd & b);
 
 		};

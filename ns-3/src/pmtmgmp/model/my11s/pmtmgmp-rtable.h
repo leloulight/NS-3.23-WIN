@@ -74,7 +74,7 @@ namespace ns3 {
 			uint8_t GetMSECPindex() const;
 			uint32_t GetPathGenerationSequenceNumber() const;
 			PmtmgmpProtocol::NodeType GetNodeType() const;
-			uint8_t  GetHopCount() const;
+			uint8_t GetHopCount() const;
 			uint32_t GetMetric() const;
 			Mac48Address GetFromNode() const;
 			RouteInformationStatus GetStatus() const;
@@ -216,6 +216,10 @@ namespace ns3 {
 
 			std::vector<Ptr<PmtmgmpRouteTree> > GetRouteTable();
 
+			void SetPUPDsendRouteTreeIndex(uint8_t index);
+
+			uint8_t GetPUPDsendRouteTreeIndex() const;
+
 			////获取MTERP对应的Tree，找不到则返回0
 			Ptr<PmtmgmpRouteTree> GetTreeByMACaddress(Mac48Address mterp);
 			////获取MTERP、MSECP对应的Path，找不到则返回0
@@ -259,6 +263,12 @@ namespace ns3 {
 
 			////路由表检测事件
 			EventId PMTGMGMProuteInforCheckEvent;
+
+			////PUPD发送的RouteTree的序号
+			uint8_t m_PUPDsendRouteTreeIndex;
+
+			////每个PUPD可以发送的路由路径最大约数
+			uint16_t m_MaxRoutePathPerPUPD;
 		};
 #endif
 		/*************************

@@ -481,7 +481,9 @@ namespace ns3 {
 		************************/
 		PmtmgmpRouteTable::PmtmgmpRouteTable():
 			m_table(std::vector<Ptr<PmtmgmpRouteTree> >()),
-			m_PMTGMGMProuteInforCheckPeriod(MicroSeconds(1024 * 1000))
+			m_PMTGMGMProuteInforCheckPeriod(MicroSeconds(1024 * 1000)),
+			m_PUPDsendRouteTreeIndex(0),
+			m_MaxRoutePathPerPUPD(10)
 		{
 			PMTGMGMProuteInforCheckEvent = Simulator::Schedule(m_PMTGMGMProuteInforCheckPeriod, &PmtmgmpRouteTable::RouteTableInforLifeCheck, this);
 		}
@@ -501,12 +503,27 @@ namespace ns3 {
 						&PmtmgmpRouteTable::m_PMTGMGMProuteInforCheckPeriod),
 					MakeTimeChecker()
 					)
+				.AddAttribute("MaxRoutePathPerPUPD",
+					"Max Route Path in each PUPD, same times it may be more then this value.",
+					UintegerValue(10),
+					MakeUintegerAccessor(
+						&PmtmgmpRouteTable::m_MaxRoutePathPerPUPD),
+					MakeUintegerChecker<uint16_t>(1)
+					)
 				;
 			return tid;
 		}
 		std::vector<Ptr<PmtmgmpRouteTree> > PmtmgmpRouteTable::GetRouteTable()
 		{
 			return m_table;
+		}
+		void PmtmgmpRouteTable::SetPUPDsendRouteTreeIndex(uint8_t index)
+		{
+			m_PUPDsendRouteTreeIndex = index;
+		}
+		uint8_t PmtmgmpRouteTable::GetPUPDsendRouteTreeIndex() const
+		{
+			return m_PUPDsendRouteTreeIndex;
 		}
 		////获取MTERP对应的Tree
 		Ptr<PmtmgmpRouteTree> PmtmgmpRouteTable::GetTreeByMACaddress(Mac48Address mterp)

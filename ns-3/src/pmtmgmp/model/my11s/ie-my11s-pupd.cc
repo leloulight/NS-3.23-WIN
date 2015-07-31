@@ -24,6 +24,8 @@
 #include "ns3/assert.h"
 #include "ns3/packet.h"
 
+////find_if
+#include <algorithm>
 
 namespace ns3 {
 	namespace my11s {
@@ -95,7 +97,13 @@ namespace ns3 {
 		************************/
 		IePupd::IePupd(Ptr<PmtmgmpRouteTable> table)
 		{
+			uint8_t index = table->GetPUPDsendRouteTreeIndex();
 			std::vector<Ptr<PmtmgmpRouteTree> > temp = table->GetRouteTable();
+			if (index > temp.size())
+			{
+				std::random_shuffle(temp.begin(), temp.end());
+				index = 0;
+			}
 			m_size = 0;
 			for (std::vector<Ptr<PmtmgmpRouteTree> >::iterator iter = temp.begin(); iter != temp.end(); iter++)
 			{
