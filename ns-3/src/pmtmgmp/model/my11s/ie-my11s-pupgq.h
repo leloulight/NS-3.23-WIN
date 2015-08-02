@@ -27,17 +27,32 @@
 
 namespace ns3 {
 	namespace my11s {
+		class PUPGQdata
+		{
+		public:
+			PUPGQdata(Buffer::Iterator i);
+			PUPGQdata(Mac48Address mterp, uint8_t index);
+			~PUPGQdata();
+
+			void SetMTERPaddress(Mac48Address address) ;
+			void SetMSECPindex(uint8_t index);
+
+			Mac48Address GetMTERPaddress() const;
+			uint8_t GetMSECPindex() const;
+
+			void ToBuffer(Buffer::Iterator i) const;
+		private:
+			Mac48Address m_MTERPaddress;
+			uint8_t m_MSECPindex;
+		};
 		class IePupgq : public WifiInformationElement
 		{
 		public:
 			IePupgq();
+			IePupgq(std::vector<PUPGQdata> list);
 			~IePupgq();
-
-			// Setters for fields:
-			void SetPathGenerationSequenceNumber(uint32_t seq_number);
-
-			// Getters for fields:
-			uint32_t GetPathGenerationSequenceNumber() const;
+			
+			std::vector<PUPGQdata> GetPathList() const;
 
 			// Inherited from WifiInformationElement
 			virtual WifiInformationElementId ElementId() const;
@@ -46,7 +61,7 @@ namespace ns3 {
 			virtual uint8_t GetInformationFieldSize() const;
 			virtual void Print(std::ostream& os) const;
 		private:
-			uint32_t m_PathGenerationSeqNumber;
+			std::vector<PUPGQdata> m_PathList;
 
 			friend bool operator== (const IePupgq & a, const IePupgq & b);
 

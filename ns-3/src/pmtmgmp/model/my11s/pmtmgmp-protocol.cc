@@ -239,6 +239,20 @@ namespace ns3 {
 						&PmtmgmpProtocol::m_PMTMGMPmsecpAALMmagnification),
 					MakeDoubleChecker<double>(1)
 					)
+				.AddAttribute("MaxRoutePathPerPUPD",
+					"Max Route Path in each PUPD, same times it may be more then this value.",
+					UintegerValue(10),
+					MakeUintegerAccessor(
+						&PmtmgmpProtocol::m_MaxRoutePathPerPUPD),
+					MakeUintegerChecker<uint8_t>(1)
+					)
+				.AddAttribute("MaxRoutePathPerPUPGQ",
+					"Max Route Path in each PUDGQ, same times it may be more then this value.",
+					UintegerValue(6),
+					MakeUintegerAccessor(
+						&PmtmgmpProtocol::m_MaxRoutePathPerPUPGQ),
+					MakeUintegerChecker<uint8_t>(1)
+					)
 #endif
 				;
 			return tid;
@@ -278,7 +292,9 @@ namespace ns3 {
 			m_MSECPnumForMTERP(2),
 			m_PMTMGMPmterpAALMmagnification(3),
 			m_PMTMGMPmsecpAALMmagnification(2),
-			m_RouteTable(CreateObject<PmtmgmpRouteTable>())
+			m_RouteTable(CreateObject<PmtmgmpRouteTable>()),
+			m_MaxRoutePathPerPUPD(10),
+			m_MaxRoutePathPerPUPGQ(6)
 #endif
 		{
 			NS_LOG_FUNCTION_NOARGS();
@@ -1572,7 +1588,7 @@ namespace ns3 {
 			m_RouteTable->AddNewPath(tempPath);
 		}
 		////转发pgen
-		void PmtmgmpProtocol::sendPGEN(IePgen pgen)
+		void PmtmgmpProtocol::SendPGEN(IePgen pgen)
 		{
 			NS_LOG_DEBUG("Send PGEN " << " at node " << m_address << " while metric is " << pgen.GetMetric() << ", origination is " << pgen.GetMTERPAddress() << ", GSN is " << pgen.GetPathGenerationSequenceNumber());
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
@@ -1724,7 +1740,7 @@ namespace ns3 {
 			{
 				////转发PGEN
 				NS_LOG_DEBUG("Receive PGEN (MTERP:" << pgen.GetMTERPAddress() << " MSECP:" << pgen.GetMSECPaddress() << ") from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", GSN is " << pgen.GetPathGenerationSequenceNumber() << " has been Transmit");
-				sendPGEN(pgen);
+				SendPGEN(pgen);
 			}
 		}
 		////AALM更新
@@ -1745,7 +1761,7 @@ namespace ns3 {
 		void PmtmgmpProtocol::SendPUPD()
 		{
 			NS_LOG_DEBUG("Send PUPD at " << m_address);
-			IePupd pupd = IePupd(m_RouteTable);
+			IePupd pupd = IePupd(m_RouteTable, m_MaxRoutePathPerPUPD);
 			
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
@@ -1753,8 +1769,85 @@ namespace ns3 {
 			}
 		}
 		////接收PUPD
-		void PmtmgmpProtocol::ReceivePUPD(IePupd pupd, Mac48Address from, uint32_t, Mac48Address fromMp, uint32_t metric)
+		void PmtmgmpProtocol::ReceivePUPD(IePupd pupd, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
+			std::vector<PUPGQdata> recreateList;
+			std::vector<PUPDaalmTreeData> data = pupd.GetData();
+			////AALM更新参数设置
+			double magnification;
+			switch (m_NodeType)
+			{
+			case Mesh_Access_Point:
+			case Mesh_Portal:
+				magnification = m_PMTMGMPmterpAALMmagnification;
+				break;
+			case Mesh_Secondary_Point:
+				magnification = m_PMTMGMPmsecpAALMmagnification;
+				break;
+			case Mesh_STA:
+				magnification = 1;
+				break;
+			default:
+				NS_LOG_ERROR("Error node type.");
+			}
+			for (std::vector<PUPDaalmTreeData>::iterator iter = data.begin(); iter != data.end(); iter++)
+			{
+				std::vector<PUPDaalmPathData> tempData = iter->GetData();
+				Mac48Address mterp = iter->GetMTERPaddress();
+				for (std::vector<PUPDaalmPathData>::iterator select = tempData.begin(); select != tempData.end(); select++)
+				{
+					Ptr<PmtmgmpRoutePath> find = m_RouteTable->GetPathByMACindex(mterp, select->GetMSECPindex());
+					if (find == 0)
+					{
+						////路由表中不存在更新信息中的路由路径，需添加
+						if (recreateList.size() < m_MaxRoutePathPerPUPGQ)
+						{
+							recreateList.push_back(PUPGQdata(mterp, select->GetMSECPindex()));
+						}
+					}
+					else if(find->GetFromNode() == from)
+					{
+						////路由表中存在指定路由路径且来自于PUPD的发送者，更新Metric
+						find->IncrementMetric(metric, magnification);
+					}
+					else
+					{
+						////路由表中存在指定路由路径且并非来自于PUPD的发送者，不做任何事情
+						continue;
+					}
+				}
+			}
+			if (recreateList.size() != 0)
+			{
+				SendPUPGQ(from, recreateList);
+			}
+			NS_LOG_DEBUG("Receive PUPD  from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", and PUPGQ  contain " << recreateList.size() << " Route Path.");
+
+		}
+		////发送PUPGQ
+		void PmtmgmpProtocol::SendPUPGQ(Mac48Address receiver, std::vector<PUPGQdata> list)
+		{
+			NS_LOG_DEBUG("Send PUPGQ to " << receiver << " at " << m_address);
+			IePupgq pupgq = IePupgq(list);
+			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
+			{
+				i->second->SendPUPGQ(pupgq, receiver);
+			}
+		}
+		void PmtmgmpProtocol::ReceivePUPGQ(IePupgq pupgq, Mac48Address from, uint32_t, Mac48Address fromMp, uint32_t metric)
+		{
+			std::vector<PUPGQdata> temp = pupgq.GetPathList();
+			for (std::vector<PUPGQdata>::iterator iter = temp.begin(); iter != temp.end(); iter++)
+			{
+				Ptr<PmtmgmpRoutePath> path = m_RouteTable->GetPathByMACindex(iter->GetMTERPaddress(), iter->GetMSECPindex());
+				if (path != 0)
+				{
+					if (path->GetStatus() == PmtmgmpRoutePath::Confirmed)
+					{
+						SendPGEN(IePgen(path));
+					}
+				}
+			}
 		}
 #endif
 	} // namespace my11s

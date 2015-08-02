@@ -30,38 +30,44 @@ namespace ns3 {
 	namespace my11s {
 
 		/*************************
-		* AALMupdatePathData
+		* PUPDaalmPathData
 		************************/
-		class AALMupdatePathData
+		class PUPDaalmPathData
 		{
 		public:
-			AALMupdatePathData(Buffer::Iterator i);
-			AALMupdatePathData(Ptr<PmtmgmpRoutePath> path);
-			~AALMupdatePathData();
+			PUPDaalmPathData(Buffer::Iterator i);
+			PUPDaalmPathData(Ptr<PmtmgmpRoutePath> path);
+			~PUPDaalmPathData();
 
 			void ToBuffer(Buffer::Iterator i) const;
+
+			uint8_t GetMSECPindex() const;
+			uint32_t GetMetric() const;
 
 		private:
 			uint8_t m_MSECPindex;
 			uint32_t m_metric;
 		};
 		/*************************
-		* AALMupdateTreeData
+		* PUPDaalmTreeData
 		************************/
-		class AALMupdateTreeData
+		class PUPDaalmTreeData
 		{
 		public:
-			AALMupdateTreeData(Buffer::Iterator i);
-			AALMupdateTreeData(Ptr<PmtmgmpRouteTree> tree);
-			~AALMupdateTreeData();
+			PUPDaalmTreeData(Buffer::Iterator i);
+			PUPDaalmTreeData(Ptr<PmtmgmpRouteTree> tree);
+			~PUPDaalmTreeData();
 
+			std::vector<PUPDaalmPathData> GetData() const;
 			void ToBuffer(Buffer::Iterator i) const;
 			////获取此RouteTree数据的长度
 			uint8_t GetSize() const;
 
+			Mac48Address GetMTERPaddress() const;
+
 		private:
-			Mac48Address m_MTERP;
-			std::vector<AALMupdatePathData> m_tree;
+			Mac48Address m_MTERPaddress;
+			std::vector<PUPDaalmPathData> m_tree;
 		};
 		/*************************
 		* IePupd
@@ -70,15 +76,10 @@ namespace ns3 {
 		{
 		public:
 			IePupd();
-			IePupd(Ptr<PmtmgmpRouteTable> table);
+			IePupd::IePupd(Ptr<PmtmgmpRouteTable> table, uint16_t maxPath);
 			~IePupd();
 
-			// Setters for fields:
-			void SetSize(uint8_t seq_number);
-
-			// Getters for fields:
-			uint8_t GetSize() const;
-			std::vector<AALMupdateTreeData> GetData() const;
+			std::vector<PUPDaalmTreeData> GetData() const;
 
 			// Inherited from WifiInformationElement
 			virtual WifiInformationElementId ElementId() const;
@@ -88,8 +89,8 @@ namespace ns3 {
 			virtual void Print(std::ostream& os) const;
 
 		private:
-			uint8_t m_size;
-			std::vector<AALMupdateTreeData> m_table;
+			//uint8_t m_size;
+			std::vector<PUPDaalmTreeData> m_table;
 			
 			friend bool operator== (const IePupd & a, const IePupd & b);
 

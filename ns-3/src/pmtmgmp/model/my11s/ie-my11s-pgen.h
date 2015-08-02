@@ -33,6 +33,7 @@ namespace ns3 {
 		{
 		public:
 			IePgen();
+			IePgen(Ptr<PmtmgmpRoutePath> path);
 			~IePgen();
 
 			Ptr<PmtmgmpRoutePath> GetPathInfo();
@@ -69,7 +70,6 @@ namespace ns3 {
 			virtual uint8_t GetInformationFieldSize() const;
 			virtual void Print(std::ostream& os) const;
 		private:
-			uint8_t  m_ttl;
 			Ptr<PmtmgmpRoutePath> m_PathInfo;
 
 			friend bool operator== (const IePgen & a, const IePgen & b);

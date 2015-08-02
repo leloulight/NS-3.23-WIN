@@ -114,9 +114,12 @@ namespace ns3 {
 			////发送PGEN
 			void SendPGEN(IePgen pgen);
 			void SendPGEN(std::vector<IePgen> pgen);
-			////发送PGEN
+			////发送PUPD
 			void SendPUPD(IePupd pupd);
 			void SendPUPD(std::vector<IePupd> pupd);
+			////发送PUPGQ
+			void SendPUPGQ(IePupgq pupgq, Mac48Address receiver);
+			void SendPUPGQ(std::vector<IePupgq> pupgq, Mac48Address receiver);
 #endif
 		private:
 			Ptr<WmnWifiInterfaceMac> m_parent;
@@ -159,6 +162,8 @@ namespace ns3 {
 				uint16_t rxPgen;
 				uint16_t txPupd;
 				uint16_t rxPupd;
+				uint16_t txPupgq;
+				uint16_t rxPupgq;
 #endif
 				uint16_t txMgt;
 				uint32_t txMgtBytes;

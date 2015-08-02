@@ -214,6 +214,13 @@ namespace ns3 {
 					m_stats.rxPupd++;
 					m_protocol->ReceivePUPD(*pupd, header.GetAddr2(), m_ifIndex, header.GetAddr3(), m_parent->GetLinkMetric(header.GetAddr2()));
 				}
+				if ((*i)->ElementId() == IE11S_PUPGQ)
+				{
+					Ptr<IePupgq> pupgq = DynamicCast<IePupgq>(*i);
+					NS_ASSERT(pupgq != 0);
+					m_stats.rxPupgq++;
+					m_protocol->ReceivePUPGQ(*pupgq, header.GetAddr2(), m_ifIndex, header.GetAddr3(), m_parent->GetLinkMetric(header.GetAddr2()));
+				}
 #endif
 			}
 			if (failedDestinations.size() > 0)
@@ -524,6 +531,7 @@ namespace ns3 {
 				"txPger=\"" << txPger << "\"" << std::endl <<
 				"txPgen=\"" << txPgen << "\"" << std::endl <<
 				"txPupd=\"" << txPupd << "\"" << std::endl <<
+				"txPupgq=\"" << txPupd << "\"" << std::endl <<
 #endif
 				"rxPreq=\"" << rxPreq << "\"" << std::endl <<
 				"rxPrep=\"" << rxPrep << "\"" << std::endl <<
@@ -535,6 +543,7 @@ namespace ns3 {
 				"rxPger=\"" << rxPger << "\"" << std::endl <<
 				"rxPgen=\"" << rxPgen << "\"" << std::endl <<
 				"rxPupd=\"" << rxPupd << "\"" << std::endl <<
+				"rxPupgq=\"" << rxPupd << "\"" << std::endl <<
 #endif
 				"txMgt=\"" << txMgt << "\"" << std::endl <<
 				"txMgtBytes=\"" << txMgtBytes << "\"" << std::endl <<
@@ -752,7 +761,7 @@ namespace ns3 {
 			m_parent->SendManagementFrame(packet, hdr);
 #endif
 		}
-		////·¢ËÍPGEN
+		////·¢ËÍPUPD
 		void PmtmgmpProtocolMac::SendPUPD(IePupd pupd)
 		{
 			NS_LOG_FUNCTION_NOARGS();
@@ -796,6 +805,38 @@ namespace ns3 {
 			m_stats.txMgtBytes += packet->GetSize();
 			m_parent->SendManagementFrame(packet, hdr);
 #endif
+		}
+		////·¢ËÍPUPGQ
+		void PmtmgmpProtocolMac::SendPUPGQ(IePupgq pupgq, Mac48Address receiver)
+		{
+			NS_LOG_FUNCTION_NOARGS();
+			std::vector<IePupgq> pupgq_vector;
+			pupgq_vector.push_back(pupgq);
+			SendPUPGQ(pupgq_vector, receiver);
+		}
+		void PmtmgmpProtocolMac::SendPUPGQ(std::vector<IePupgq> pupgq, Mac48Address receiver)
+		{
+			Ptr<Packet> packet = Create<Packet>();
+			WmnInformationElementVector elements;
+			for (std::vector<IePupgq>::iterator i = pupgq.begin(); i != pupgq.end(); i++)
+			{
+				elements.AddInformationElement(Ptr<IePupgq>(&(*i)));
+			}
+			packet->AddHeader(elements);
+			packet->AddHeader(GetWifiActionHeader());
+			//create 802.11 header:
+			WifiMacHeader hdr;
+			hdr.SetAction();
+			hdr.SetDsNotFrom();
+			hdr.SetDsNotTo();
+			hdr.SetAddr2(m_parent->GetAddress());
+			hdr.SetAddr3(m_protocol->GetAddress());
+			//Send Management frame
+			hdr.SetAddr1(receiver);
+			m_stats.txPupgq++;
+			m_stats.txMgt++;
+			m_stats.txMgtBytes += packet->GetSize();
+			m_parent->SendManagementFrame(packet, hdr);
 		}
 #endif
 	} // namespace my11s

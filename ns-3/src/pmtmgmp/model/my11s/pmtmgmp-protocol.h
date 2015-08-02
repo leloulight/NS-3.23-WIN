@@ -49,6 +49,7 @@ namespace ns3 {
 		class IePgen;
 		class IePupd;
 		class IePupgq;
+		class PUPGQdata;
 #endif
 		/**
 		 * \ingroup my11s
@@ -316,7 +317,7 @@ namespace ns3 {
 			////发送初始PGEN
 			void SendFirstPGEN(IeSecack secack, uint32_t metric);
 			////转发Pgen
-			void sendPGEN(IePgen pgen);
+			void SendPGEN(IePgen pgen);
 			////接收PGEN
 			void ReceivePGEN(IePgen pgen, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
 			////AALM更新
@@ -325,6 +326,10 @@ namespace ns3 {
 			void SendPUPD();
 			////接收PUPD
 			void ReceivePUPD(IePupd pupd, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
+			////发送PUPGQ
+			void SendPUPGQ(Mac48Address receiver, std::vector<PUPGQdata> list);
+			////接收PUPD
+			void ReceivePUPGQ(IePupgq pupgq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
 
 #endif
 		private:
@@ -437,6 +442,10 @@ namespace ns3 {
 			double m_PMTMGMPmsecpAALMmagnification;
 			////Pmtmgmp路由表
 			Ptr<PmtmgmpRouteTable> m_RouteTable;
+			////每个PUPD可以发送的路由路径最大数量
+			uint8_t m_MaxRoutePathPerPUPD;
+			////每个PUPGQ可以发送的路由路径最大数量
+			uint8_t m_MaxRoutePathPerPUPGQ;
 #endif
 		};
 	} // namespace my11s

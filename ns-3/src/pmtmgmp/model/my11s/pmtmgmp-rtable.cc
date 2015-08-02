@@ -136,6 +136,10 @@ namespace ns3 {
 		{
 			m_hopCount = hopcount;
 		}
+		void PmtmgmpRoutePath::SetTTL(uint8_t ttl)
+		{
+			m_ttl = ttl;
+		}
 		void PmtmgmpRoutePath::SetMetric(uint32_t metric)
 		{
 			m_metric = metric;
@@ -175,6 +179,10 @@ namespace ns3 {
 		uint8_t PmtmgmpRoutePath::GetHopCount() const
 		{
 			return m_hopCount;
+		}
+		uint8_t PmtmgmpRoutePath::GetTTL() const
+		{
+			return m_ttl;
 		}
 		uint32_t PmtmgmpRoutePath::GetMetric() const
 		{
@@ -224,6 +232,12 @@ namespace ns3 {
 			copy->SetMetric(m_metric);
 			copy->SetStatus(m_InformationStatus);
 			return copy;
+		}
+		////度量值更新
+		void PmtmgmpRoutePath::IncrementMetric(uint32_t metric, double k)
+		{
+			////按公式积累计算度量，见AALM计算公式
+			m_metric = (sqrt(m_hopCount) * k * metric + (m_hopCount - 1) * (double)m_metric) / sqrt(m_hopCount * (m_hopCount + 1));
 		}
 		/*************************
 		* PmtmgmpRouteTree
@@ -277,11 +291,25 @@ namespace ns3 {
 		{
 			return m_AcceptInformaitonDelay;
 		}
-		////获取MTERP、MSECP对应的Path
+		////获取MTERP、MSECP(Index)对应的Path，找不到则返回0
 		Ptr<PmtmgmpRoutePath> PmtmgmpRouteTree::GetPathByMACaddress(Mac48Address msecp)
 		{
 			if (m_tree.size() == 0) return 0;
-			std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = std::find_if(m_tree.begin(), m_tree.end(), PmtmgmpRouteTree_Finder(msecp));
+			std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = std::find_if(m_tree.begin(), m_tree.end(), PmtmgmpRouteTree_AddressFinder(msecp));
+			if (iter == m_tree.end())
+			{
+				return 0;
+				//NS_LOG_ERROR("Can not find the path with MTERP is " << mterp << ",MSECP is " << msecp);
+			}
+			else
+			{
+				return *iter;
+			}
+		}
+		Ptr<PmtmgmpRoutePath> PmtmgmpRouteTree::GetPathByMACindex(uint8_t index)
+		{
+			if (m_tree.size() == 0) return 0;
+			std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = std::find_if(m_tree.begin(), m_tree.end(), PmtmgmpRouteTree_IndexFinder(index));
 			if (iter == m_tree.end())
 			{
 				return 0;
@@ -324,7 +352,7 @@ namespace ns3 {
 		void PmtmgmpRouteTree::AddNewPath(Ptr<PmtmgmpRoutePath> path)
 		{
 			if (m_tree.size() >= 255) NS_LOG_ERROR("Add too many path to a PmtmgmpRouteTree(MTERP:" << m_MTERPaddress << ")");
-			std::vector<Ptr<PmtmgmpRoutePath> >::iterator exist = std::find_if(m_tree.begin(), m_tree.end(), PmtmgmpRouteTree_Finder(path->GetMSECPaddress()));
+			std::vector<Ptr<PmtmgmpRoutePath> >::iterator exist = std::find_if(m_tree.begin(), m_tree.end(), PmtmgmpRouteTree_AddressFinder(path->GetMSECPaddress()));
 			if (exist != m_tree.end())
 			{
 				m_tree.erase(exist);
@@ -482,8 +510,7 @@ namespace ns3 {
 		PmtmgmpRouteTable::PmtmgmpRouteTable():
 			m_table(std::vector<Ptr<PmtmgmpRouteTree> >()),
 			m_PMTGMGMProuteInforCheckPeriod(MicroSeconds(1024 * 1000)),
-			m_PUPDsendRouteTreeIndex(0),
-			m_MaxRoutePathPerPUPD(10)
+			m_PUPDsendRouteTreeIndex(0)
 		{
 			PMTGMGMProuteInforCheckEvent = Simulator::Schedule(m_PMTGMGMProuteInforCheckPeriod, &PmtmgmpRouteTable::RouteTableInforLifeCheck, this);
 		}
@@ -502,13 +529,6 @@ namespace ns3 {
 					MakeTimeAccessor(
 						&PmtmgmpRouteTable::m_PMTGMGMProuteInforCheckPeriod),
 					MakeTimeChecker()
-					)
-				.AddAttribute("MaxRoutePathPerPUPD",
-					"Max Route Path in each PUPD, same times it may be more then this value.",
-					UintegerValue(10),
-					MakeUintegerAccessor(
-						&PmtmgmpRouteTable::m_MaxRoutePathPerPUPD),
-					MakeUintegerChecker<uint16_t>(1)
 					)
 				;
 			return tid;
@@ -540,7 +560,7 @@ namespace ns3 {
 				return *iter;
 			}
 		}
-		////获取MTERP、MSECP对应的Path
+		////获取MTERP、MSECP(Index)对应的Path，找不到则返回0
 		Ptr<PmtmgmpRoutePath> PmtmgmpRouteTable::GetPathByMACaddress(Mac48Address mterp, Mac48Address msecp)
 		{
 			Ptr<PmtmgmpRouteTree> pTree = GetTreeByMACaddress(mterp);
@@ -550,6 +570,16 @@ namespace ns3 {
 				return 0;
 			}
 			return pTree->GetPathByMACaddress(msecp);
+		}
+		Ptr<PmtmgmpRoutePath> PmtmgmpRouteTable::GetPathByMACindex(Mac48Address mterp, uint8_t index)
+		{
+			Ptr<PmtmgmpRouteTree> pTree = GetTreeByMACaddress(mterp);
+			if (pTree == 0)
+			{
+				////没有找到对应的路由树
+				return 0;
+			}
+			return pTree->GetPathByMACindex(index);
 		}
 		////添加新路径
 		void PmtmgmpRouteTable::AddNewPath(Ptr<PmtmgmpRoutePath> path)

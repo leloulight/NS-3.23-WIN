@@ -35,6 +35,10 @@ namespace ns3 {
 		{
 			m_PathInfo = CreateObject<PmtmgmpRoutePath>();
 		}
+		IePgen::IePgen(Ptr<PmtmgmpRoutePath> path)
+		{
+			m_PathInfo = path;
+		}
 		Ptr<PmtmgmpRoutePath> IePgen::GetPathInfo()
 		{
 			return m_PathInfo;
@@ -65,7 +69,7 @@ namespace ns3 {
 		}
 		void IePgen::SetTTL(uint8_t ttl)
 		{
-			m_ttl = ttl;
+			m_PathInfo->SetTTL(ttl);
 		}
 		void IePgen::SetMetric(uint32_t metric)
 		{
@@ -97,7 +101,7 @@ namespace ns3 {
 		}
 		uint8_t IePgen::GetTtl() const
 		{
-			return m_ttl;
+			return m_PathInfo->GetHopCount();
 		}
 		uint32_t IePgen::GetMetric() const
 		{
@@ -109,15 +113,13 @@ namespace ns3 {
 		}
 		void IePgen::DecrementTtl()
 		{
-			m_ttl--;
+			m_PathInfo->SetTTL(m_PathInfo->GetTTL() - 1);
 			m_PathInfo->SetHopcount(m_PathInfo->GetHopCount() + 1);
 		}
 		void IePgen::IncrementMetric(uint32_t metric, double k)
 		{
-			double lastAALM = m_PathInfo->GetMetric();
-			double i = m_PathInfo->GetHopCount();
 			////按公式积累计算度量，见AALM计算公式
-			m_PathInfo->SetMetric((sqrt(i) * k * metric + (i - 1) * (double) lastAALM ) / sqrt(i * (i + 1)));
+			m_PathInfo->IncrementMetric(metric, k);
 		}
 		WifiInformationElementId IePgen::ElementId() const
 		{
@@ -131,7 +133,7 @@ namespace ns3 {
 			os << " MSECP index                    = " << m_PathInfo->GetMSECPindex() << std::endl;
 			os << " path generation sequence number  = " << m_PathInfo->GetPathGenerationSequenceNumber() << std::endl;
 			os << " node type                        = " << m_PathInfo->GetNodeType() << std::endl;
-			os << " TTL                              = " << (uint16_t)m_ttl << std::endl;
+			os << " TTL                              = " << (uint16_t)m_PathInfo->GetTTL() << std::endl;
 			os << " hop count                        = " << (uint16_t)m_PathInfo->GetHopCount() << std::endl;
 			os << " metric                           = " << m_PathInfo->GetMetric() << std::endl;
 			os << "</information_element>" << std::endl;
@@ -144,7 +146,7 @@ namespace ns3 {
 			i.WriteHtolsbU32(m_PathInfo->GetPathGenerationSequenceNumber());
 			i.WriteU8(m_PathInfo->GetNodeType());
 			i.WriteU8(m_PathInfo->GetHopCount());
-			i.WriteU8(m_ttl);
+			i.WriteU8(m_PathInfo->GetTTL());
 			i.WriteHtolsbU32(m_PathInfo->GetMetric());
 		}
 		uint8_t IePgen::DeserializeInformationField(Buffer::Iterator start, uint8_t length)
@@ -159,7 +161,7 @@ namespace ns3 {
 			m_PathInfo->SetPathGenerationSequenceNumber(i.ReadLsbtohU32());
 			m_PathInfo->SetNodeType((PmtmgmpProtocol::NodeType) i.ReadU8());
 			m_PathInfo->SetHopcount(i.ReadU8());
-			m_ttl = i.ReadU8();
+			m_PathInfo->SetTTL(i.ReadU8());
 			m_PathInfo->SetMetric(i.ReadLsbtohU32());
 			return i.GetDistanceFrom(start);
 		}

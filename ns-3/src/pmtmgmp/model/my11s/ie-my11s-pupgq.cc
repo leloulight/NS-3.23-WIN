@@ -27,20 +27,59 @@
 
 namespace ns3 {
 	namespace my11s {
+		/*************************
+		* PUPGQdata
+		************************/
+		PUPGQdata::PUPGQdata(Buffer::Iterator i)
+		{
+			ReadFrom(i, m_MTERPaddress);
+			m_MSECPindex = i.ReadU8();
+		}
+		PUPGQdata::PUPGQdata(Mac48Address mterp, uint8_t index)
+		{
+			m_MTERPaddress = mterp;
+			m_MSECPindex = index;
+		}
+		PUPGQdata::~PUPGQdata()
+		{
+		}
+		void PUPGQdata::SetMTERPaddress(Mac48Address address)
+		{
+			m_MTERPaddress = address;
+		}
+		void PUPGQdata::SetMSECPindex(uint8_t index)
+		{
+			m_MSECPindex = index;
+		}
+		Mac48Address PUPGQdata::GetMTERPaddress() const
+		{
+			return m_MTERPaddress;
+		}
+		uint8_t PUPGQdata::GetMSECPindex() const
+		{
+			return m_MSECPindex;
+		}
+		void PUPGQdata::ToBuffer(Buffer::Iterator i) const
+		{
+			WriteTo(i, m_MTERPaddress);
+			i.WriteU8(m_MSECPindex);
+		}
+		/*************************
+		* IePupgq
+		************************/
+		IePupgq::IePupgq()
+		{
+		}
+		IePupgq::IePupgq(std::vector<PUPGQdata> list)
+		{
+			m_PathList = list;
+		}
 		IePupgq::~IePupgq()
 		{
 		}
-		IePupgq::IePupgq()
+		std::vector<PUPGQdata> IePupgq::GetPathList() const
 		{
-
-		}
-		void IePupgq::SetPathGenerationSequenceNumber(uint32_t seq_number)
-		{
-			m_PathGenerationSeqNumber = seq_number;
-		}
-		uint32_t IePupgq::GetPathGenerationSequenceNumber() const
-		{
-			return m_PathGenerationSeqNumber;
+			return m_PathList;
 		}
 		WifiInformationElementId IePupgq::ElementId() const
 		{
@@ -49,22 +88,31 @@ namespace ns3 {
 		void IePupgq::Print(std::ostream &os) const
 		{
 			os << std::endl << "<information_element id=" << ElementId() << ">" << std::endl;
-			os << " path generation sequence number  = " << m_PathGenerationSeqNumber << std::endl;
+			os << " Route Path size  = " << m_PathList.size() << std::endl;
 			os << "</information_element>" << std::endl;
 		}
 		void IePupgq::SerializeInformationField(Buffer::Iterator i) const
 		{
-			i.WriteHtolsbU32(m_PathGenerationSeqNumber);
+			i.WriteU8(m_PathList.size());
+			for (std::vector<PUPGQdata>::const_iterator iter = m_PathList.begin(); iter != m_PathList.end(); iter++)
+			{
+				iter->ToBuffer(i);
+			}
 		}
 		uint8_t IePupgq::DeserializeInformationField(Buffer::Iterator start, uint8_t length)
 		{
 			Buffer::Iterator i = start;
-			m_PathGenerationSeqNumber = i.ReadLsbtohU32();
+			uint8_t j = i.ReadU8();
+			for (; j > 0; j--)
+			{
+				m_PathList.push_back(PUPGQdata(i));
+			}
 			return i.GetDistanceFrom(start);
 		}
 		uint8_t IePupgq::GetInformationFieldSize() const
 		{
-			uint8_t retval = 4;			//Path Generation Sequence Number
+			uint8_t retval = 1 			//Size
+				+ m_PathList.size() * 7;
 			return retval;
 		}
 		bool operator== (const IePupgq & a, const IePupgq & b)

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.22823.1
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "core\core.vcxproj", "{B7820E24-D8E4-463F-BF3E-204B9D8114B4}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -307,6 +307,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "相关说明", "相关说�
 		相关说明\MSECP筛选.vsdx = 相关说明\MSECP筛选.vsdx
 		相关说明\先验多树多网关多路径无线Mesh协议.docx = 相关说明\先验多树多网关多路径无线Mesh协议.docx
 		相关说明\先验树生成.vsdx = 相关说明\先验树生成.vsdx
+		相关说明\路由信息更新和路径补充生成.vsdx = 相关说明\路由信息更新和路径补充生成.vsdx
 	EndProjectSection
 EndProject
 Global

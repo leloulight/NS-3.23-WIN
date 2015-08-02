@@ -64,6 +64,7 @@ namespace ns3 {
 			void SetPathGenerationSequenceNumber(uint32_t seq_number);
 			void SetNodeType(PmtmgmpProtocol::NodeType nodeType);
 			void SetHopcount(uint8_t hopcount);
+			void SetTTL(uint8_t ttl);
 			void SetMetric(uint32_t metric);
 			void SetFromNode(Mac48Address address);
 			void SetStatus(RouteInformationStatus status);
@@ -75,6 +76,7 @@ namespace ns3 {
 			uint32_t GetPathGenerationSequenceNumber() const;
 			PmtmgmpProtocol::NodeType GetNodeType() const;
 			uint8_t GetHopCount() const;
+			uint8_t  GetTTL() const;
 			uint32_t GetMetric() const;
 			Mac48Address GetFromNode() const;
 			RouteInformationStatus GetStatus() const;
@@ -91,6 +93,9 @@ namespace ns3 {
 			
 			////复制类
 			Ptr<PmtmgmpRoutePath> GetCopy();
+
+			////度量值更新
+			void IncrementMetric(uint32_t metric, double k);
 		private:
 			Mac48Address m_MTERPaddress;
 			Mac48Address m_MSECPaddress;
@@ -98,6 +103,7 @@ namespace ns3 {
 			uint32_t m_PathGenerationSeqNumber;
 			PmtmgmpProtocol::NodeType m_NodeType;
 			uint8_t  m_hopCount;
+			uint8_t  m_ttl;
 			uint32_t m_metric;
 
 			////候选路由信息列表
@@ -136,8 +142,9 @@ namespace ns3 {
 			Mac48Address GetMTERPaddress() const;
 			Time GetAcceptInformaitonDelay() const;
 			
-			////获取MTERP、MSECP对应的Path，找不到则返回0
+			////获取MTERP、MSECP(Index)对应的Path，找不到则返回0
 			Ptr<PmtmgmpRoutePath> GetPathByMACaddress(Mac48Address msecp);
+			Ptr<PmtmgmpRoutePath> GetPathByMACindex(uint8_t index);
 			////获取度量最小的路径
 			std::vector<Ptr<PmtmgmpRoutePath> > GetBestPath();
 			////获取度量最小的路径
@@ -170,14 +177,23 @@ namespace ns3 {
 
 		private:
 			////路由表树搜索器
-			struct PmtmgmpRouteTree_Finder
+			struct PmtmgmpRouteTree_AddressFinder
 			{
-				PmtmgmpRouteTree_Finder(Mac48Address msecp) :m_msecp(msecp){};
+				PmtmgmpRouteTree_AddressFinder(Mac48Address msecp) :m_msecp(msecp) {};
 				bool operator()(Ptr<PmtmgmpRoutePath> p)
 				{
 					return m_msecp == p->GetMSECPaddress();
 				}
 				Mac48Address m_msecp;
+			};
+			struct PmtmgmpRouteTree_IndexFinder
+			{
+				PmtmgmpRouteTree_IndexFinder(uint8_t index) :m_index(index) {};
+				bool operator()(Ptr<PmtmgmpRoutePath> p)
+				{
+					return m_index == p->GetMSECPindex();
+				}
+				uint8_t m_index;
 			};
 			////路由表树路径寿命检测器
 			struct PmtmgmpRouteTree_PathLifeChecker
@@ -222,8 +238,9 @@ namespace ns3 {
 
 			////获取MTERP对应的Tree，找不到则返回0
 			Ptr<PmtmgmpRouteTree> GetTreeByMACaddress(Mac48Address mterp);
-			////获取MTERP、MSECP对应的Path，找不到则返回0
+			////获取MTERP、MSECP(Index)对应的Path，找不到则返回0
 			Ptr<PmtmgmpRoutePath> GetPathByMACaddress(Mac48Address mterp, Mac48Address msecp);
+			Ptr<PmtmgmpRoutePath> GetPathByMACindex(Mac48Address mterp, uint8_t index);
 			////添加新路径
 			void AddNewPath(Ptr<PmtmgmpRoutePath> path);
 			////获取确认状态路径的数量
@@ -266,9 +283,6 @@ namespace ns3 {
 
 			////PUPD发送的RouteTree的序号
 			uint8_t m_PUPDsendRouteTreeIndex;
-
-			////每个PUPD可以发送的路由路径最大约数
-			uint16_t m_MaxRoutePathPerPUPD;
 		};
 #endif
 		/*************************
