@@ -35,6 +35,7 @@ namespace ns3 {
 		class PUPDaalmPathData
 		{
 		public:
+			PUPDaalmPathData();
 			PUPDaalmPathData(Buffer::Iterator i);
 			PUPDaalmPathData(Ptr<PmtmgmpRoutePath> path);
 			~PUPDaalmPathData();
@@ -54,6 +55,7 @@ namespace ns3 {
 		class PUPDaalmTreeData
 		{
 		public:
+			PUPDaalmTreeData();
 			PUPDaalmTreeData(Buffer::Iterator i);
 			PUPDaalmTreeData(Ptr<PmtmgmpRouteTree> tree);
 			~PUPDaalmTreeData();
@@ -76,7 +78,7 @@ namespace ns3 {
 		{
 		public:
 			IePupd();
-			IePupd::IePupd(Ptr<PmtmgmpRouteTable> table, uint16_t maxPath);
+			IePupd(Ptr<PmtmgmpRouteTable> table, uint16_t maxPath);
 			~IePupd();
 
 			std::vector<PUPDaalmTreeData> GetData() const;

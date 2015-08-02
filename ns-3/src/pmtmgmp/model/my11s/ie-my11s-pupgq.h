@@ -30,6 +30,7 @@ namespace ns3 {
 		class PUPGQdata
 		{
 		public:
+			PUPGQdata();
 			PUPGQdata(Buffer::Iterator i);
 			PUPGQdata(Mac48Address mterp, uint8_t index);
 			~PUPGQdata();

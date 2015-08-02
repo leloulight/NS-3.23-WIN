@@ -32,6 +32,9 @@ namespace ns3 {
 		/*************************
 		* PUPDaalmPathData
 		************************/
+		PUPDaalmPathData::PUPDaalmPathData()
+		{
+		}
 		PUPDaalmPathData::PUPDaalmPathData(Buffer::Iterator i)
 		{
 			m_MSECPindex = i.ReadU8();
@@ -61,6 +64,9 @@ namespace ns3 {
 		/*************************
 		* PUPDaalmTreeData
 		************************/
+		PUPDaalmTreeData::PUPDaalmTreeData()
+		{
+		}
 		PUPDaalmTreeData::PUPDaalmTreeData(Buffer::Iterator i)
 		{
 			ReadFrom(i, m_MTERPaddress);
@@ -92,7 +98,6 @@ namespace ns3 {
 		void PUPDaalmTreeData::ToBuffer(Buffer::Iterator i) const
 		{
 			WriteTo(i, m_MTERPaddress);
-			uint8_t j = m_tree.size();
 			i.WriteU8(m_tree.size());
 			for (std::vector<PUPDaalmPathData>::const_iterator iter = m_tree.begin(); iter != m_tree.end(); iter++)
 			{
@@ -139,7 +144,7 @@ namespace ns3 {
 				////更新临时路由表Index
 				if (index >= temp.size() - 1)
 				{
-					index == 0;
+					index = 0;
 				}
 				else
 				{

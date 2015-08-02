@@ -27,6 +27,9 @@
 
 namespace ns3 {
 	namespace my11s {
+		PUPGQdata::PUPGQdata()
+		{
+		}
 		/*************************
 		* PUPGQdata
 		************************/
