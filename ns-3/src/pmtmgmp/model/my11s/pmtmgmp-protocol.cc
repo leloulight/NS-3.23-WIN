@@ -1802,8 +1802,8 @@ namespace ns3 {
 					Ptr<PmtmgmpRoutePath> find = m_RouteTable->GetPathByMACindex(mterp, select->GetMSECPindex());
 					if (find == 0)
 					{
-						////路由表中不存在更新信息中的路由路径，需添加
-						if (recreateList.size() < m_MaxRoutePathPerPUPGQ)
+						////路由表中不存在更新信息中的路由路径，且PUPD发送者不是此路径的MTERP，需添加
+						if (recreateList.size() < m_MaxRoutePathPerPUPGQ && mterp != from)
 						{
 							recreateList.push_back(PUPGQdata(mterp, select->GetMSECPindex()));
 						}
