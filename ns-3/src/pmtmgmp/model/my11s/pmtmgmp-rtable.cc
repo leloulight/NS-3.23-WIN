@@ -57,7 +57,8 @@ namespace ns3 {
 			m_CandidateRouteInformaiton(std::vector<Ptr<PmtmgmpRoutePath> >()),
 			m_InformationStatus(Confirmed),
 			m_MaxCandidateNum(4),
-			m_PMTGMGMProutePathInforLife(MicroSeconds(1024 * 60000))
+			m_PMTGMGMProutePathInforLife(MicroSeconds(1024 * 60000)),
+			m_PMTMGMPpathRecreateDelay(MicroSeconds(1024 * 5000))
 		{
 			RoutePathInforLifeUpdate();
 		}
@@ -84,6 +85,13 @@ namespace ns3 {
 					TimeValue(MicroSeconds(1024 * 60000)),
 					MakeTimeAccessor(
 						&PmtmgmpRoutePath::m_PMTGMGMProutePathInforLife),
+					MakeTimeChecker()
+					)
+				.AddAttribute("My11WmnPMTMGMPpathRecreateDelay",
+					"Delay for Recreate the Route Path, in Delay Time PUPGQ would not be sended",
+					TimeValue(MicroSeconds(1024 * 5000)),
+					MakeTimeAccessor(
+						&PmtmgmpRoutePath::m_PMTMGMPpathRecreateDelay),
 					MakeTimeChecker()
 					)
 				;
@@ -156,6 +164,10 @@ namespace ns3 {
 		{
 			m_AcceptCandidateRouteInformaitonEvent = id;
 		}
+		void PmtmgmpRoutePath::SetPGENsendTime()
+		{
+			m_PMTGMGMPpgenSendTime = Simulator::Now();
+		}
 		Mac48Address PmtmgmpRoutePath::GetMTERPaddress() const
 		{
 			return m_MTERPaddress;
@@ -200,6 +212,14 @@ namespace ns3 {
 		{
 			return m_AcceptCandidateRouteInformaitonEvent;
 		}
+		Time PmtmgmpRoutePath::GetPGENsendTime() const
+		{
+			return m_PMTGMGMPpgenSendTime;
+		}
+		Time PmtmgmpRoutePath::GetPathRecreateDelay() const
+		{
+			return m_PMTMGMPpathRecreateDelay;
+		}
 		////Python调用函数
 		uint8_t PmtmgmpRoutePath::GetCandidateRouteInformaitonSize() const
 		{
@@ -219,7 +239,7 @@ namespace ns3 {
 		{
 			m_PMTGMGMProutePathInforUpdateTime = Simulator::Now();
 		}
-		////复制类
+		////复制类(仅复制PGEN相关属性)
 		Ptr<PmtmgmpRoutePath> PmtmgmpRoutePath::GetCopy()
 		{
 			Ptr<PmtmgmpRoutePath> copy = CreateObject<PmtmgmpRoutePath>();
@@ -229,6 +249,7 @@ namespace ns3 {
 			copy->SetPathGenerationSequenceNumber(m_PathGenerationSeqNumber);
 			copy->SetNodeType(m_NodeType);
 			copy->SetHopcount(m_hopCount);
+			copy->SetTTL(m_ttl);
 			copy->SetMetric(m_metric);
 			copy->SetStatus(m_InformationStatus);
 			return copy;

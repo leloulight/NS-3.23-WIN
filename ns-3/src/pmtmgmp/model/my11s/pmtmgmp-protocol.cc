@@ -323,7 +323,7 @@ namespace ns3 {
 				m_MSECPsearchStartEventTimer = Simulator::Schedule(randomStart, &PmtmgmpProtocol::MSECPSearch, this);
 			}
 			////PUPD周期，初始延迟与MSECP搜索相同
-			m_PUPDperiodEventTimer = Simulator::Schedule(randomStart, &PmtmgmpProtocol::PUPDperiod, this);
+			m_PUPDperiodEventTimer = Simulator::Schedule(randomStart + m_My11WmnPMTMGMPpathMetricUpdatePeriod, &PmtmgmpProtocol::PUPDperiod, this);
 #endif
 		}
 
@@ -1550,6 +1550,7 @@ namespace ns3 {
 					tempPath->SetPathGenerationSequenceNumber(pger.GetPathGenerationSequenceNumber());
 					tempPath->SetNodeType(m_NodeType);
 					tempPath->SetFromNode(m_address);
+					tempPath->GetPGENsendTime();
 					m_RouteTable->AddNewPath(tempPath);
 					NS_LOG_DEBUG("Receive PGER from at " << m_address << " from " << from);
 				}
@@ -1585,6 +1586,7 @@ namespace ns3 {
 			////路由表存储
 			Ptr<PmtmgmpRoutePath> tempPath = pgen.GetPathInfo()->GetCopy();
 			tempPath->SetFromNode(secack.GetMTERPaddress());
+			tempPath->SetPGENsendTime();
 			m_RouteTable->AddNewPath(tempPath);
 		}
 		////转发pgen
@@ -1634,6 +1636,7 @@ namespace ns3 {
 			}
 			pgen.IncrementMetric(metric, magnification);
 			pathCopy->SetFromNode(from);
+			pathCopy->SetPGENsendTime();
 
 			////路由表是否存在PGEN来源对应路径
 			Ptr<PmtmgmpRouteTree> routeTree = m_RouteTable->GetTreeByMACaddress(pgen.GetMTERPAddress());
@@ -1834,8 +1837,9 @@ namespace ns3 {
 				i->second->SendPUPGQ(pupgq, receiver);
 			}
 		}
-		void PmtmgmpProtocol::ReceivePUPGQ(IePupgq pupgq, Mac48Address from, uint32_t, Mac48Address fromMp, uint32_t metric)
+		void PmtmgmpProtocol::ReceivePUPGQ(IePupgq pupgq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
+			int sendTimes = 0;
 			std::vector<PUPGQdata> temp = pupgq.GetPathList();
 			for (std::vector<PUPGQdata>::iterator iter = temp.begin(); iter != temp.end(); iter++)
 			{
@@ -1844,10 +1848,15 @@ namespace ns3 {
 				{
 					if (path->GetStatus() == PmtmgmpRoutePath::Confirmed)
 					{
-						SendPGEN(IePgen(path));
+						////发送间隔大约PUPD发送间隔，避免连续多次发送
+						if (Simulator::Now()- path->GetPGENsendTime() > m_My11WmnPMTMGMPpathMetricUpdatePeriod)
+						path->SetPGENsendTime();
+						SendPGEN(IePgen(path->GetCopy()));
+						sendTimes++;
 					}
 				}
 			}
+			NS_LOG_DEBUG("Receive PUPGQ  from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", and PUPGQ  contain " << sendTimes << " Route Path.");
 		}
 #endif
 	} // namespace my11s

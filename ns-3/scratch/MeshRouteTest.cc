@@ -35,11 +35,11 @@
 #include <ctime>
 
 //输出到文件
-//#define OUT_TO_FILE 
+#define OUT_TO_FILE 
 //无应用层模式
 #define NO_APPLICATION
 //测试模式
-#define TEST_LOCATION
+//#define TEST_LOCATION
 
 
 //角度转换
@@ -142,14 +142,14 @@ m_Size(4),
 m_RandomStart(0.1),
 m_NumIface(1),
 m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
-m_Step(70),
+m_Step(100),
 m_ApplicationNum(0),
 m_MaxBytes(0),
 m_SourceNum(0),
 m_DestinationNum(0),
 m_PacketSize(1024),
 m_DataRate("150kbps"),
-m_TotalTime(200),
+m_TotalTime(500),
 m_Root("00:00:00:00:00:06"),
 m_Pcap(false)
 {

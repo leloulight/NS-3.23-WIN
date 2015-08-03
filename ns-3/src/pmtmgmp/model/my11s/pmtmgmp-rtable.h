@@ -69,6 +69,7 @@ namespace ns3 {
 			void SetFromNode(Mac48Address address);
 			void SetStatus(RouteInformationStatus status);
 			void SetAcceptCandidateRouteInformaitonEvent(EventId id);
+			void SetPGENsendTime();
 
 			Mac48Address GetMTERPaddress() const;
 			Mac48Address GetMSECPaddress() const;
@@ -81,6 +82,8 @@ namespace ns3 {
 			Mac48Address GetFromNode() const;
 			RouteInformationStatus GetStatus() const;
 			EventId GetAcceptCandidateRouteInformaitonEvent() const;
+			Time GetPGENsendTime() const;
+			Time GetPathRecreateDelay() const;
 
 			////Python调用函数
 			uint8_t GetCandidateRouteInformaitonSize() const;
@@ -91,7 +94,7 @@ namespace ns3 {
 			////路径信息更新
 			void RoutePathInforLifeUpdate();
 			
-			////复制类
+			////复制类(仅复制PGEN相关属性)
 			Ptr<PmtmgmpRoutePath> GetCopy();
 
 			////度量值更新
@@ -122,6 +125,12 @@ namespace ns3 {
 
 			////路由表路径刷新时刻
 			Time m_PMTGMGMProutePathInforUpdateTime;
+
+			////路由路径补充生成（重发PGEN）时刻
+			Time m_PMTGMGMPpgenSendTime;
+
+			////路由路径补充生成延迟
+			Time m_PMTMGMPpathRecreateDelay;
 		};
 
 		/*************************

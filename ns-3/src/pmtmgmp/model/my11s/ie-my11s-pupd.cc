@@ -23,6 +23,7 @@
 #include "ns3/address-utils.h"
 #include "ns3/assert.h"
 #include "ns3/packet.h"
+#include "ns3/core-module.h"
 
 ////find_if
 #include <algorithm>
@@ -82,7 +83,7 @@ namespace ns3 {
 			std::vector<Ptr<PmtmgmpRoutePath> > temp = tree->GetPartTree();
 			for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = temp.begin(); iter != temp.end(); iter++)
 			{
-				if ((*iter)->GetStatus() == PmtmgmpRoutePath::Confirmed)
+				if ((*iter)->GetStatus() == PmtmgmpRoutePath::Confirmed && Simulator::Now() - (*iter)->GetPGENsendTime() > (*iter)->GetPathRecreateDelay())
 				{
 					m_tree.push_back(PUPDaalmPathData(*iter));
 				}
@@ -201,7 +202,7 @@ namespace ns3 {
 		}
 		uint8_t IePupd::GetInformationFieldSize() const
 		{
-			uint8_t retval = 1;			//Path Generation Sequence Number
+			uint8_t retval = 1;			//Size
 			for (std::vector<PUPDaalmTreeData>::const_iterator iter = m_table.begin(); iter != m_table.end(); iter++)
 			{
 				retval += iter->GetSize();
