@@ -195,15 +195,6 @@ namespace ns3 {
 				}
 				Mac48Address m_msecp;
 			};
-			struct PmtmgmpRouteTree_IndexFinder
-			{
-				PmtmgmpRouteTree_IndexFinder(uint8_t index) :m_index(index) {};
-				bool operator()(Ptr<PmtmgmpRoutePath> p)
-				{
-					return m_index == p->GetMSECPindex();
-				}
-				uint8_t m_index;
-			};
 			////路由表树路径寿命检测器
 			struct PmtmgmpRouteTree_PathLifeChecker
 			{

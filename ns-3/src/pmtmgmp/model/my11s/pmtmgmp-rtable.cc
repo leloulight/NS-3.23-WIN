@@ -330,15 +330,23 @@ namespace ns3 {
 		Ptr<PmtmgmpRoutePath> PmtmgmpRouteTree::GetPathByMACindex(uint8_t index)
 		{
 			if (m_tree.size() == 0) return 0;
-			std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = std::find_if(m_tree.begin(), m_tree.end(), PmtmgmpRouteTree_IndexFinder(index));
-			if (iter == m_tree.end())
+			uint32_t gsn = -1;
+			std::vector<Ptr<PmtmgmpRoutePath> >::iterator select = m_tree.end();
+			for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin(); iter != m_tree.end(); iter++)
+			{
+				if ((*iter)->GetMSECPindex() == index && gsn < (*iter)->GetPathGenerationSequenceNumber())
+				{
+					gsn = (*iter)->GetPathGenerationSequenceNumber();
+					*select = *iter;
+				}
+			}
+			if (select == m_tree.end())
 			{
 				return 0;
-				//NS_LOG_ERROR("Can not find the path with MTERP is " << mterp << ",MSECP is " << msecp);
 			}
 			else
 			{
-				return *iter;
+				return *select;
 			}
 		}
 		////获取度量最小的路径
