@@ -1323,7 +1323,7 @@ namespace ns3 {
 		////终端节点发动 
 		void PmtmgmpProtocol::MSECPSearch()
 		{
-			NS_LOG_DEBUG("MSECP Search start");
+			NS_LOG_DEBUG("MSECP Search start at " << m_address);
 			////初始化MTERP路由树
 			m_RouteTable->ClearMTERProutePath();
 
@@ -1388,7 +1388,6 @@ namespace ns3 {
 		////设置和获取当前节点类型
 		void PmtmgmpProtocol::SetNodeType(NodeType type)
 		{
-			NS_LOG_DEBUG(this << type);
 			m_NodeType = type;
 			m_RouteTable->SetNodeType(type);
 		}
@@ -1514,7 +1513,7 @@ namespace ns3 {
 			uint8_t count = m_RouteTable->GetUnreceivedPathCount();
 			if (count == 0)
 			{
-				NS_LOG_DEBUG("Unreceived MSECP's number " << count << " at " << m_address);
+				NS_LOG_DEBUG("Unreceived MSECP's number " << (uint32_t)count << " at " << m_address);
 				return;
 			}
 			else
@@ -1680,7 +1679,7 @@ namespace ns3 {
 								NS_LOG_DEBUG("Receive PGEN (MTERP:" << pathCopy->GetMTERPaddress() << " MSECP:" << pathCopy->GetMSECPaddress() << ") from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", GSN is " << pathCopy->GetPathGenerationSequenceNumber() << " waits for Confirm");
 								return;
 							case PmtmgmpRoutePath::Confirmed:
-								NS_LOG_ERROR("Pgen form " << from << " :Path is Confirmed ,but GSN is not update at node " << m_address);
+								NS_LOG_ERROR("PGEN form " << from << " :Path is Confirmed ,but GSN is not update at node " << m_address);
 								return;
 							}
 						}
@@ -1802,7 +1801,7 @@ namespace ns3 {
 				{
 					if (path->GetStatus() == PmtmgmpRoutePath::Confirmed)
 					{
-						////发送间隔大约PUPD发送间隔，避免连续多次发送
+						////发送间隔大于PUPD发送间隔，避免连续多次发送
 						if (Simulator::Now()- path->GetPGENsendTime() > m_My11WmnPMTMGMPpathMetricUpdatePeriod)
 						path->SetPGENsendTime();
 						SendPGEN(IePgen(path->GetCopy()));

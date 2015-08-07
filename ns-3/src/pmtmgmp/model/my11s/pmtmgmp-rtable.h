@@ -28,7 +28,6 @@
 #include "ns3/traced-value.h"
 namespace ns3 {
 	namespace my11s {
-
 #ifndef PMTMGMP_UNUSED_MY_CODE
 		/*************************
 		* PmtmgmpRoutePath
@@ -94,7 +93,7 @@ namespace ns3 {
 			Ptr<PmtmgmpRoutePath> GetCandidateRouteInformaitonItem(uint8_t index) const;
 
 			////路径信息更新自检
-			bool RoutePathInforLifeCheck();
+			bool RoutePathInforLifeCheck(Ptr<PmtmgmpRouteTable> table);
 			////路径信息更新
 			void RoutePathInforLifeUpdate();
 			
@@ -195,7 +194,7 @@ namespace ns3 {
 			uint8_t GetRepeatabilityItem(uint8_t index) const;
 
 			////路由树信息寿命检测
-			bool RouteTreeInforLifeCheck();
+			bool RouteTreeInforLifeCheck(Ptr<PmtmgmpRouteTable> table);
 
 		private:
 			////路由表树搜索器
@@ -211,11 +210,12 @@ namespace ns3 {
 			////路由表树路径寿命检测器
 			struct PmtmgmpRouteTree_PathLifeChecker
 			{
-				PmtmgmpRouteTree_PathLifeChecker() {};
+				PmtmgmpRouteTree_PathLifeChecker(Ptr<PmtmgmpRouteTable> table):m_table(table) {};
 				bool operator()(Ptr<PmtmgmpRoutePath> p)
 				{
-					return p->RoutePathInforLifeCheck();
+					return p->RoutePathInforLifeCheck(m_table);
 				}
+				Ptr<PmtmgmpRouteTable> m_table;
 			};
 		private:
 			std::vector<Ptr<PmtmgmpRoutePath> >  m_tree;
@@ -258,9 +258,16 @@ namespace ns3 {
 			uint8_t GetPUPDsendRouteTreeIndex() const;
 			uint32_t GetMTERPgenerationSeqNumber() const;
 			uint32_t GetAsMSECPcount() const;
+			Mac48Address GetMac48Address() const;
+
+			////MSECP处理函数
+			void IncreaseAsMSECPcount();
+			void DecreaseAsMSECPcount();
 			
 			////获取以当前节点为MTERP节点的路由树
 			Ptr<PmtmgmpRouteTree> GetMTERPtree();
+			////清理MTERP节点的路由树的设置
+			void ClearMTERPtree();
 			////MTERP路径清理
 			void ClearMTERProutePath();
 			////获取路由路径数量(存在当前MTERP-1，不同NodeType+1，相同NodeType+2)
@@ -271,8 +278,6 @@ namespace ns3 {
 			void SelectMSECP();
 			////获取未接收到PGER的MTERP路由路径计数
 			uint8_t GetUnreceivedPathCount();
-			////遍历路由表统计当前节点作为MSECP的数量并返回当前节点应属的NodeType
-			PmtmgmpProtocol::NodeType CountMSECP();
 									
 			////获取MTERP对应的Tree，找不到则返回0
 			Ptr<PmtmgmpRouteTree> GetTreeByMACaddress(Mac48Address mterp);
@@ -310,11 +315,17 @@ namespace ns3 {
 			////路由表寿命检测器
 			struct PmtmgmpRouteTable_PathLifeChecker
 			{
-				PmtmgmpRouteTable_PathLifeChecker() {};
+				PmtmgmpRouteTable_PathLifeChecker(Ptr<PmtmgmpRouteTable> table):m_table(table){};
 				bool operator()(Ptr<PmtmgmpRouteTree> p)
 				{
-					return p->RouteTreeInforLifeCheck();
+					bool checker = p->RouteTreeInforLifeCheck(m_table);
+					if (checker && m_table->GetMac48Address() == p->GetMTERPaddress())
+					{
+						m_table->ClearMTERPtree();
+					}
+					return checker;
 				}
+				Ptr<PmtmgmpRouteTable> m_table;
 			};
 		private:
 			std::vector<Ptr<PmtmgmpRouteTree> >  m_table;

@@ -226,6 +226,9 @@ class Pmtmgmp_Route(object):
             return
         self.pmtmgmp = WmnDevice.GetRoutingProtocol()
 
+        if SHOW_LOG:
+            print self.pmtmgmp.GetNodeType()
+
         route = self
         route_table = self.pmtmgmp.GetPmtmgmpRPRouteTable()
 
