@@ -36,13 +36,13 @@ namespace ns3 {
 			// Setters for fields:
 			void SetMTERPaddress(Mac48Address originator_address);
 			void SetCandidateMSECPaddress(Mac48Address candidateMSECP_address);
-			void SetAffiliatedMTERPnum(uint8_t mTERP_number);
+			void SetMSECPcount(uint8_t mTERP_number);
 			void SetPathGenerationSequenceNumber(uint32_t seq_number);
 
 			// Getters for fields:
 			Mac48Address GetMTERPaddress() const;
 			Mac48Address GetCandidateMSECPaddress() const;
-			uint8_t GetAffiliatedMTERPnum() const;
+			uint8_t GetMSECPcount() const;
 			uint32_t GetPathGenerationSequenceNumber() const;
 
 			// Inherited from WifiInformationElement
@@ -54,7 +54,7 @@ namespace ns3 {
 		private:
 			Mac48Address m_MTERPaddress;
 			Mac48Address m_candidateMSECPaddress;
-			uint8_t m_affiliatedMTERPnum;
+			uint8_t m_MSECPcount;
 			uint32_t m_PathGenerationSeqNumber;
 
 			friend bool operator== (const IeSecrep & a, const IeSecrep & b);

@@ -38,6 +38,7 @@ namespace ns3 {
 		{
 		public:
 			PmtmgmpRoutePath();
+			PmtmgmpRoutePath(Mac48Address mterp, Mac48Address msecp, uint32_t seq_number, PmtmgmpProtocol::NodeType nodeType, uint8_t hopcount, uint8_t ttl, uint32_t metric);
 			~PmtmgmpRoutePath(); 
 			static TypeId GetTypeId();
 
@@ -85,6 +86,9 @@ namespace ns3 {
 			Time GetPGENsendTime() const;
 			Time GetPathRecreateDelay() const;
 
+			void DecrementTtl();
+			void IncreasePathGenerationSequenceNumber();
+
 			////Python调用函数
 			uint8_t GetCandidateRouteInformaitonSize() const;
 			Ptr<PmtmgmpRoutePath> GetCandidateRouteInformaitonItem(uint8_t index) const;
@@ -100,6 +104,11 @@ namespace ns3 {
 			////度量值更新
 			void IncrementMetric(uint32_t metric, double k);
 		private:
+			////按Metric排序
+			bool operator < (const Ptr<PmtmgmpRoutePath> path) const
+			{
+				return m_metric < path->GetMetric();
+			}
 			Mac48Address m_MTERPaddress;
 			Mac48Address m_MSECPaddress;
 			uint8_t m_MSECPindex;
@@ -160,6 +169,10 @@ namespace ns3 {
 			std::vector<Ptr<PmtmgmpRoutePath> > GetBestPath(std::vector<Ptr<PmtmgmpRoutePath> > pathList);
 			////添加新路径
 			void AddNewPath(Ptr<PmtmgmpRoutePath> path);
+			////选择MSECP(仅MTERP路由树)
+			void SelectMSECP();
+			////添加MSECP路径(仅当前节点为MTERP)
+			void AddMSECPpath(Ptr<PmtmgmpRoutePath> path);
 			////获取当前路径的最大生成顺序号
 			uint32_t GetTreeMaxGenerationSeqNumber();
 			////全部路径置为过期
@@ -216,6 +229,9 @@ namespace ns3 {
 
 			////延迟时间
 			Time m_AcceptInformaitonDelay;
+
+			////每个MTERP可有的SECREP的最大数量
+			uint8_t m_MaxMSECPcountForMTERP;
 		};
 
 		/*************************
@@ -230,19 +246,47 @@ namespace ns3 {
 
 			static TypeId GetTypeId();
 
+			////初始化RouteTable
+			void InitRouteTable(Mac48Address address, PmtmgmpProtocol::NodeType type, Callback<void, PmtmgmpProtocol::NodeType> cb);
+
 			std::vector<Ptr<PmtmgmpRouteTree> > GetRouteTable();
 
 			void SetPUPDsendRouteTreeIndex(uint8_t index);
+			void SetMTERPgenerationSeqNumber(uint32_t gsn);
+			void SetNodeType(PmtmgmpProtocol::NodeType nodeType);
 
 			uint8_t GetPUPDsendRouteTreeIndex() const;
-
+			uint32_t GetMTERPgenerationSeqNumber() const;
+			uint32_t GetAsMSECPcount() const;
+			
+			////获取以当前节点为MTERP节点的路由树
+			Ptr<PmtmgmpRouteTree> GetMTERPtree();
+			////MTERP路径清理
+			void ClearMTERProutePath();
+			////获取路由路径数量(存在当前MTERP-1，不同NodeType+1，相同NodeType+2)
+			uint8_t GetAllMSECPcount(Mac48Address mterp, PmtmgmpProtocol::NodeType type);
+			////获取下一个MSECPindex
+			uint8_t GetNextMSECPindex();
+			////选择MSECP
+			void SelectMSECP();
+			////获取未接收到PGER的MTERP路由路径计数
+			uint8_t GetUnreceivedPathCount();
+			////遍历路由表统计当前节点作为MSECP的数量并返回当前节点应属的NodeType
+			PmtmgmpProtocol::NodeType CountMSECP();
+									
 			////获取MTERP对应的Tree，找不到则返回0
 			Ptr<PmtmgmpRouteTree> GetTreeByMACaddress(Mac48Address mterp);
 			////获取MTERP、MSECP(Index)对应的Path，找不到则返回0
 			Ptr<PmtmgmpRoutePath> GetPathByMACaddress(Mac48Address mterp, Mac48Address msecp);
 			Ptr<PmtmgmpRoutePath> GetPathByMACindex(Mac48Address mterp, uint8_t index);
+
 			////添加新路径
 			void AddNewPath(Ptr<PmtmgmpRoutePath> path);
+			////添加MSECP新路径(仅当前节点为MSECP)
+			void AddAsMSECPpath(Ptr<PmtmgmpRoutePath> path);
+			////添加MSECP路径(仅当前节点为MTERP)
+			void AddMSECPpath(Mac48Address mterp, Mac48Address msecp, uint8_t count, uint32_t metric, uint32_t gsn, uint8_t maxTTL);
+			
 			////获取确认状态路径的数量
 			uint16_t GetConfirmedPathSize();
 
@@ -275,6 +319,10 @@ namespace ns3 {
 		private:
 			std::vector<Ptr<PmtmgmpRouteTree> >  m_table;
 
+			////PMTMGMP的数据
+			Mac48Address m_address;
+			PmtmgmpProtocol::NodeType m_NodeType;
+
 			////路由表检测间隔
 			Time m_PMTGMGMProuteInforCheckPeriod;
 
@@ -283,6 +331,17 @@ namespace ns3 {
 
 			////PUPD发送的RouteTree的序号
 			uint8_t m_PUPDsendRouteTreeIndex;
+
+			////以当前节点为MTERP节点的路由树
+			Ptr<PmtmgmpRouteTree> m_MTERPtree;
+			////作为MTERP的生成顺序号GSN
+			uint32_t m_MTERPgenerationSeqNumber;
+			////设置NodeType回调
+			Callback<void, PmtmgmpProtocol::NodeType> m_NodeTypeCallBack;
+			////此节点作为MSECP的计数
+			uint8_t m_AsMSECPcount;
+			////MSECPindex分配标记(从1开始)
+			uint8_t m_MSECPindex;
 		};
 #endif
 		/*************************

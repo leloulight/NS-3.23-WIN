@@ -63,6 +63,18 @@ namespace ns3 {
 			RoutePathInforLifeUpdate();
 		}
 
+		PmtmgmpRoutePath::PmtmgmpRoutePath(Mac48Address mterp, Mac48Address msecp, uint32_t seq_number, PmtmgmpProtocol::NodeType nodeType, uint8_t hopcount, uint8_t ttl, uint32_t metric)
+		{
+			m_MTERPaddress = mterp;
+			m_MSECPaddress = msecp;
+			m_PathGenerationSeqNumber = seq_number;
+			m_NodeType = nodeType;
+			m_hopCount = hopcount;
+			m_ttl = ttl;
+			m_metric = metric;
+			RoutePathInforLifeUpdate();
+		}
+
 		PmtmgmpRoutePath::~PmtmgmpRoutePath()
 		{
 		}
@@ -220,6 +232,15 @@ namespace ns3 {
 		{
 			return m_PMTMGMPpathRecreateDelay;
 		}
+		void PmtmgmpRoutePath::DecrementTtl()
+		{
+			m_ttl --;
+			m_hopCount ++;
+		}
+		void PmtmgmpRoutePath::IncreasePathGenerationSequenceNumber()
+		{
+			m_PathGenerationSeqNumber++;
+		}
 		////Python调用函数
 		uint8_t PmtmgmpRoutePath::GetCandidateRouteInformaitonSize() const
 		{
@@ -266,7 +287,8 @@ namespace ns3 {
 		PmtmgmpRouteTree::PmtmgmpRouteTree() :
 			m_tree(std::vector<Ptr<PmtmgmpRoutePath> >()),
 			m_MSECPnumForMTERP(2),
-			m_AcceptInformaitonDelay(MicroSeconds(1024 * 1000))
+			m_AcceptInformaitonDelay(MicroSeconds(1024 * 1000)),
+			m_MaxMSECPcountForMTERP(2)
 		{
 		}
 
@@ -292,6 +314,13 @@ namespace ns3 {
 					MakeTimeAccessor(
 						&PmtmgmpRouteTree::m_AcceptInformaitonDelay),
 					MakeTimeChecker()
+					)
+				.AddAttribute("MaxMSECPcountForMTERP",
+					"The count of MESCP that each MTERP can have. It need define the same as \"ns3::my11s::PmtmgmpRoutePath::PMTMGMPpgenNodeListNum\"",
+					UintegerValue(2),
+					MakeUintegerAccessor(
+						&PmtmgmpRouteTree::m_MaxMSECPcountForMTERP),
+					MakeUintegerChecker<uint8_t>(1)
 					)
 				;
 			return tid;
@@ -381,13 +410,33 @@ namespace ns3 {
 		void PmtmgmpRouteTree::AddNewPath(Ptr<PmtmgmpRoutePath> path)
 		{
 			if (m_tree.size() >= 255) NS_LOG_ERROR("Add too many path to a PmtmgmpRouteTree(MTERP:" << m_MTERPaddress << ")");
-			std::vector<Ptr<PmtmgmpRoutePath> >::iterator exist = std::find_if(m_tree.begin(), m_tree.end(), PmtmgmpRouteTree_AddressFinder(path->GetMSECPaddress()));
-			if (exist != m_tree.end())
+			std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = std::find_if(m_tree.begin(), m_tree.end(), PmtmgmpRouteTree_AddressFinder(path->GetMSECPaddress()));
+			if (iter != m_tree.end())
 			{
-				m_tree.erase(exist);
+				m_tree.erase(iter);
 			}
 			m_tree.push_back(path);
 			if (m_tree.size() > m_MSECPnumForMTERP) NS_LOG_ERROR("Too many path have add to tree");
+		}
+		////选择MSECP
+		void PmtmgmpRouteTree::SelectMSECP()
+		{
+			std::sort(m_tree.begin(), m_tree.end());
+			if (m_tree.size() > m_MaxMSECPcountForMTERP)
+			{
+				std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin() + m_MaxMSECPcountForMTERP;
+				m_tree.erase(iter, m_tree.end());
+			}
+		}
+		void PmtmgmpRouteTree::AddMSECPpath(Ptr<PmtmgmpRoutePath> path)
+		{
+			if (m_tree.size() >= 255) NS_LOG_ERROR("Add too many path to a PmtmgmpRouteTree when add Candidate MSECP path(MTERP:" << m_MTERPaddress << ")");
+			std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = std::find_if(m_tree.begin(), m_tree.end(), PmtmgmpRouteTree_AddressFinder(path->GetMSECPaddress()));
+			if (iter != m_tree.end())
+			{
+				m_tree.erase(iter);
+			}
+			m_tree.push_back(path);
 		}
 		////获取当前路径的最大生成顺序号
 		uint32_t PmtmgmpRouteTree::GetTreeMaxGenerationSeqNumber()
@@ -539,7 +588,9 @@ namespace ns3 {
 		PmtmgmpRouteTable::PmtmgmpRouteTable():
 			m_table(std::vector<Ptr<PmtmgmpRouteTree> >()),
 			m_PMTGMGMProuteInforCheckPeriod(MicroSeconds(1024 * 1000)),
-			m_PUPDsendRouteTreeIndex(0)
+			m_PUPDsendRouteTreeIndex(0),
+			m_MTERPtree(0),
+			m_MTERPgenerationSeqNumber(0)
 		{
 			PMTGMGMProuteInforCheckEvent = Simulator::Schedule(m_PMTGMGMProuteInforCheckPeriod, &PmtmgmpRouteTable::RouteTableInforLifeCheck, this);
 		}
@@ -562,6 +613,12 @@ namespace ns3 {
 				;
 			return tid;
 		}
+		void PmtmgmpRouteTable::InitRouteTable(Mac48Address address, PmtmgmpProtocol::NodeType type, Callback<void, PmtmgmpProtocol::NodeType> cb)
+		{
+			m_address = address;
+			m_NodeType = type;
+			m_NodeTypeCallBack = cb;
+		}
 		std::vector<Ptr<PmtmgmpRouteTree> > PmtmgmpRouteTable::GetRouteTable()
 		{
 			return m_table;
@@ -570,9 +627,119 @@ namespace ns3 {
 		{
 			m_PUPDsendRouteTreeIndex = index;
 		}
+		void PmtmgmpRouteTable::SetMTERPgenerationSeqNumber(uint32_t gsn)
+		{
+			m_MTERPgenerationSeqNumber = gsn;
+		}
+		void PmtmgmpRouteTable::SetNodeType(PmtmgmpProtocol::NodeType type)
+		{
+			m_NodeType = type;
+		}
 		uint8_t PmtmgmpRouteTable::GetPUPDsendRouteTreeIndex() const
 		{
 			return m_PUPDsendRouteTreeIndex;
+		}
+		uint32_t PmtmgmpRouteTable::GetMTERPgenerationSeqNumber() const
+		{
+			return m_MTERPgenerationSeqNumber;
+		}
+		uint32_t PmtmgmpRouteTable::GetAsMSECPcount() const
+		{
+			return m_AsMSECPcount;
+		}
+		////获取以当前节点为MTERP节点的路由树
+		Ptr<PmtmgmpRouteTree> PmtmgmpRouteTable::GetMTERPtree()
+		{
+			return m_MTERPtree;
+		}
+		////MTERP路径清理
+		void PmtmgmpRouteTable::ClearMTERProutePath()
+		{
+			m_MTERPgenerationSeqNumber++;
+			m_MSECPindex = 1;
+			////MTERP路由树未设置
+			if (m_MTERPtree == 0) return;
+			std::vector<Ptr<PmtmgmpRouteTree> >::iterator iter = std::find_if(m_table.begin(), m_table.end(), PmtmgmpRouteTable_Finder(m_address));
+			if (iter != m_table.end())
+			{
+				m_table.erase(iter);
+				m_MTERPtree = 0;
+			}
+		}
+		////获取路由路径数量
+		uint8_t PmtmgmpRouteTable::GetAllMSECPcount(Mac48Address mterp, PmtmgmpProtocol::NodeType type)
+		{
+			uint16_t count = 2;
+			for (std::vector<Ptr<PmtmgmpRouteTree> >::iterator iter = m_table.begin(); iter != m_table.end(); iter++)
+			{
+				Ptr<PmtmgmpRoutePath> path = (*iter)->GetPathByMACaddress(m_address);
+				if (path != 0)
+				{
+					if ((*iter)->GetMTERPaddress() == mterp)
+					{
+						count--;
+					}
+					else
+					{
+						if (path->GetNodeType() != type)
+						{
+							count++;
+						}
+						else
+						{
+							count += 2;
+						}
+					}
+				}
+			}
+			return uint16_t();
+		}
+		uint8_t PmtmgmpRouteTable::GetNextMSECPindex()
+		{
+			m_MSECPindex++;
+			return m_MSECPindex;
+		}
+		void PmtmgmpRouteTable::SelectMSECP()
+		{
+			m_MTERPgenerationSeqNumber++;
+			m_MTERPtree->SelectMSECP();
+		}
+		////获取未接收到PGER的MTERP路由路径计数
+		uint8_t PmtmgmpRouteTable::GetUnreceivedPathCount()
+		{
+			std::vector<Ptr<PmtmgmpRoutePath> > paths = m_MTERPtree->GetPartTree();
+			uint8_t unreceivedCount = 0;
+			////搜索未接收到PGER的辅助节点
+			for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = paths.begin(); iter != paths.end(); iter++)
+			{
+				if ((*iter)->GetStatus() == PmtmgmpRoutePath::Waited)
+				{
+					unreceivedCount++;
+				}
+			}
+			return unreceivedCount;
+		}
+		////遍历路由表统计当前节点作为MSECP的数量并返回当前节点应属的NodeType
+		PmtmgmpProtocol::NodeType PmtmgmpRouteTable::CountMSECP()
+		{
+			uint16_t count = 0;
+			for (std::vector<Ptr<PmtmgmpRouteTree> >::iterator iter = m_table.begin(); iter != m_table.end(); iter++)
+			{
+				std::vector<Ptr<PmtmgmpRoutePath> > paths = (*iter)->GetPartTree();
+				for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator select = paths.begin(); select != paths.end(); select++)
+				{
+					if ((*select)->GetMSECPaddress() == m_address) count++;
+				}
+			}
+			m_AsMSECPcount = count;
+			if (count == 0)
+			{
+				return PmtmgmpProtocol::Mesh_STA;
+			}
+			else
+			{
+				return PmtmgmpProtocol::Mesh_Secondary_Point;
+			}
 		}
 		////获取MTERP对应的Tree
 		Ptr<PmtmgmpRouteTree> PmtmgmpRouteTable::GetTreeByMACaddress(Mac48Address mterp)
@@ -619,9 +786,51 @@ namespace ns3 {
 				routeTree = CreateObject<PmtmgmpRouteTree>();
 				routeTree->SetMTERPaddress(path->GetMTERPaddress());
 				m_table.push_back(routeTree);
+				if (routeTree->GetMTERPaddress() == m_address)
+				{
+					m_MTERPtree = routeTree;
+				}
 			}
+			if (m_table.size() >= 255) NS_LOG_ERROR("Add too many path to a PmtmgmpRouteTable at " << m_address);
 			
 			routeTree->AddNewPath(path);
+		}
+		void PmtmgmpRouteTable::AddAsMSECPpath(Ptr<PmtmgmpRoutePath> path)
+		{
+			Ptr<PmtmgmpRouteTree> routeTree = GetTreeByMACaddress(path->GetMTERPaddress());
+			if (routeTree == 0)
+			{
+				routeTree = CreateObject<PmtmgmpRouteTree>();
+				routeTree->SetMTERPaddress(path->GetMTERPaddress());
+				m_table.push_back(routeTree);
+				if (routeTree->GetMTERPaddress() == m_address)
+				{
+					m_MTERPtree = routeTree;
+				}
+			}
+			if (m_table.size() >= 255) NS_LOG_ERROR("Add too many path to a PmtmgmpRouteTable at " << m_address);
+
+			routeTree->AddNewPath(path);
+			m_AsMSECPcount++;
+			if (m_AsMSECPcount != 0)
+			{
+				m_NodeTypeCallBack(PmtmgmpProtocol::Mesh_Secondary_Point);
+			}
+		}
+		////添加MSECP路径(仅当前节点为MTERP)
+		void PmtmgmpRouteTable::AddMSECPpath(Mac48Address mterp, Mac48Address msecp, uint8_t count, uint32_t metric, uint32_t gsn, uint8_t maxTTL)
+		{
+			if (m_MTERPtree == 0)
+			{
+				m_MTERPtree = CreateObject<PmtmgmpRouteTree>();
+				m_MTERPtree->SetMTERPaddress(mterp);
+				m_table.push_back(m_MTERPtree);
+			}
+			Ptr<PmtmgmpRoutePath> path = CreateObject<PmtmgmpRoutePath>(mterp, msecp,  gsn, m_NodeType, 0, maxTTL, metric * count);
+			path->SetMSECPindex(GetNextMSECPindex());
+			path->SetStatus(PmtmgmpRoutePath::Waited);
+			path->SetFromNode(m_address);
+			m_MTERPtree->AddMSECPpath(path);
 		}
 		////获取确认状态路径的数量
 		uint16_t PmtmgmpRouteTable::GetConfirmedPathSize()
@@ -646,6 +855,10 @@ namespace ns3 {
 		void PmtmgmpRouteTable::RouteTableInforLifeCheck()
 		{
 			m_table.erase(std::remove_if(m_table.begin(), m_table.end(), PmtmgmpRouteTable_PathLifeChecker()), m_table.end());
+			if ((m_NodeType & (PmtmgmpProtocol::Mesh_Access_Point | PmtmgmpProtocol::Mesh_Portal)) == 0)
+			{
+				m_NodeTypeCallBack(CountMSECP());
+			}
 			PMTGMGMProuteInforCheckEvent = Simulator::Schedule(m_PMTGMGMProuteInforCheckPeriod, &PmtmgmpRouteTable::RouteTableInforLifeCheck, this);
 		}
 #endif

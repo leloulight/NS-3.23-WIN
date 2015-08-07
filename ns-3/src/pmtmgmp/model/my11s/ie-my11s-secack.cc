@@ -27,52 +27,88 @@
 
 namespace ns3 {
 	namespace my11s {
+		IeSecack::IeSecack()
+		{
+			m_PathInfo = CreateObject<PmtmgmpRoutePath>();
+		}
+		IeSecack::IeSecack(Ptr<PmtmgmpRoutePath> path)
+		{
+			m_PathInfo = path;
+		}
 		IeSecack::~IeSecack()
 		{
 		}
-		IeSecack::IeSecack()
+		Ptr<PmtmgmpRoutePath> IeSecack::GetPathInfo()
 		{
-
+			return m_PathInfo;
 		}
 		void IeSecack::SetMTERPaddress(Mac48Address originator_address)
 		{
-			m_MTERPaddress = originator_address;
+			m_PathInfo->SetMTERPaddress(originator_address);
 		}
-		void IeSecack::SetPathGenerationSequenceNumber(uint32_t seq_number)
+		void IeSecack::SetMSECPaddress(Mac48Address mSECP_address)
 		{
-			m_PathGenerationSeqNumber = seq_number;
-		}
-		void IeSecack::SetPathUpdateSeqNumber(uint32_t seq_number)
-		{
-			m_PathUpdateSeqNumber = seq_number;
-		}
-		void IeSecack::SetNodeType(PmtmgmpProtocol::NodeType nodeType)
-		{
-			m_NodeType = nodeType;
+			m_PathInfo->SetMSECPaddress(mSECP_address);
 		}
 		void IeSecack::SetMSECPindex(uint8_t index)
 		{
-			m_MSECPindex = index;
+			m_PathInfo->SetMSECPindex(index);
+		}
+		void IeSecack::SetPathGenerationSequenceNumber(uint32_t seq_number)
+		{
+			m_PathInfo->SetPathGenerationSequenceNumber(seq_number);
+		}
+		void IeSecack::SetNodeType(PmtmgmpProtocol::NodeType nodeType)
+		{
+			m_PathInfo->SetNodeType(nodeType);
+		}
+		void IeSecack::SetHopcount(uint8_t hopcount)
+		{
+			m_PathInfo->SetHopcount(hopcount);
+		}
+		void IeSecack::SetTTL(uint8_t ttl)
+		{
+			m_PathInfo->SetTTL(ttl);
+		}
+		void IeSecack::SetMetric(uint32_t metric)
+		{
+			m_PathInfo->SetMetric(metric);
 		}
 		Mac48Address IeSecack::GetMTERPaddress() const
 		{
-			return m_MTERPaddress;
+			return m_PathInfo->GetMTERPaddress();
 		}
-		uint32_t IeSecack::GetPathGenerationSequenceNumber() const
+		Mac48Address IeSecack::GetMSECPaddress() const
 		{
-			return m_PathGenerationSeqNumber;
-		}
-		uint32_t IeSecack::GetPathUpdateSeqNumber() const
-		{
-			return m_PathUpdateSeqNumber;
-		}
-		PmtmgmpProtocol::NodeType IeSecack::GetNodeType() const
-		{
-			return m_NodeType;
+			return m_PathInfo->GetMSECPaddress();
 		}
 		uint8_t IeSecack::GetMSECPindex() const
 		{
-			return m_MSECPindex;
+			return m_PathInfo->GetMSECPindex();
+		}
+		uint32_t IeSecack::GetPathGenerationSequenceNumber() const
+		{
+			return m_PathInfo->GetPathGenerationSequenceNumber();
+		}
+		PmtmgmpProtocol::NodeType IeSecack::GetNodeType() const
+		{
+			return m_PathInfo->GetNodeType();
+		}
+		uint8_t IeSecack::GetHopCount() const
+		{
+			return m_PathInfo->GetHopCount();
+		}
+		uint8_t IeSecack::GetTtl() const
+		{
+			return m_PathInfo->GetHopCount();
+		}
+		uint32_t IeSecack::GetMetric() const
+		{
+			return m_PathInfo->GetMetric();
+		}
+		Ptr<PmtmgmpRoutePath> IeSecack::GetPathInfo() const
+		{
+			return m_PathInfo;
 		}
 		WifiInformationElementId IeSecack::ElementId() const
 		{
@@ -81,38 +117,54 @@ namespace ns3 {
 		void IeSecack::Print(std::ostream &os) const
 		{
 			os << std::endl << "<information_element id=" << ElementId() << ">" << std::endl;
-			os << " MTERP address               = " << m_MTERPaddress << std::endl; 
-			os << " path generation sequence number  = " << m_PathGenerationSeqNumber << std::endl;
-			os << " path update sequence number      = " << m_PathUpdateSeqNumber << std::endl;
-			os << " node type                        = " << m_NodeType << std::endl;
-			os << " MSECP Index                        = " << m_MSECPindex << std::endl;
+			os << " MTERP address               = " << m_PathInfo->GetMTERPaddress() << std::endl;
+			os << " MSECP address                    = " << m_PathInfo->GetMSECPaddress() << std::endl;
+			os << " MSECP index                    = " << m_PathInfo->GetMSECPindex() << std::endl;
+			os << " path generation sequence number  = " << m_PathInfo->GetPathGenerationSequenceNumber() << std::endl;
+			os << " node type                        = " << m_PathInfo->GetNodeType() << std::endl;
+			os << " TTL                              = " << (uint16_t)m_PathInfo->GetTTL() << std::endl;
+			os << " hop count                        = " << (uint16_t)m_PathInfo->GetHopCount() << std::endl;
+			os << " metric                           = " << m_PathInfo->GetMetric() << std::endl;
 			os << "</information_element>" << std::endl;
 		}
 		void IeSecack::SerializeInformationField(Buffer::Iterator i) const
 		{
-			WriteTo(i, m_MTERPaddress);
-			i.WriteHtolsbU32(m_PathGenerationSeqNumber);
-			i.WriteHtolsbU32(m_PathUpdateSeqNumber);
-			i.WriteU8(m_NodeType);
-			i.WriteU8(m_MSECPindex);
+			WriteTo(i, m_PathInfo->GetMTERPaddress());
+			WriteTo(i, m_PathInfo->GetMSECPaddress());
+			i.WriteU8(m_PathInfo->GetMSECPindex());
+			i.WriteHtolsbU32(m_PathInfo->GetPathGenerationSequenceNumber());
+			i.WriteU8(m_PathInfo->GetNodeType());
+			i.WriteU8(m_PathInfo->GetHopCount());
+			i.WriteU8(m_PathInfo->GetTTL());
+			i.WriteHtolsbU32(m_PathInfo->GetMetric());
 		}
 		uint8_t IeSecack::DeserializeInformationField(Buffer::Iterator start, uint8_t length)
 		{
 			Buffer::Iterator i = start;
-			ReadFrom(i, m_MTERPaddress);
-			m_PathGenerationSeqNumber = i.ReadLsbtohU32();
-			m_PathUpdateSeqNumber = i.ReadLsbtohU32();
-			m_NodeType = (PmtmgmpProtocol::NodeType) i.ReadU8();
-			m_MSECPindex = i.ReadU8();
+			Mac48Address address;
+			ReadFrom(i, address);
+			m_PathInfo->SetMTERPaddress(address);
+			ReadFrom(i, address);
+			m_PathInfo->SetMSECPaddress(address);
+			m_PathInfo->SetMSECPindex(i.ReadU8());
+			m_PathInfo->SetPathGenerationSequenceNumber(i.ReadLsbtohU32());
+			m_PathInfo->SetNodeType((PmtmgmpProtocol::NodeType) i.ReadU8());
+			m_PathInfo->SetHopcount(i.ReadU8());
+			m_PathInfo->SetTTL(i.ReadU8());
+			m_PathInfo->SetMetric(i.ReadLsbtohU32());
 			return i.GetDistanceFrom(start);
 		}
 		uint8_t IeSecack::GetInformationFieldSize() const
 		{
-			uint8_t retval = 6	//Source address (originator)
-				+ 4 			//Path Generation Sequence Number
-				+ 4				//Path Update Sequence Number
-				+ 1 			//NodeType
-				+ 1;			//MSECP Index
+			uint8_t retval = 6							//MTERP address (originator)
+				+ 6										//MSECP address
+				+ 1										//MSECP Index
+				+ 4										//Path Generation Sequence Number
+				+ 1 									//NodeType
+				+ 1										//Hopcount
+				+ 1										//TTL
+				+ 4										//metric
+				;
 			return retval;
 		}
 		bool operator== (const IeSecack & a, const IeSecack & b)

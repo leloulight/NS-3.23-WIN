@@ -49,7 +49,7 @@ namespace ns3 {
 			void SetMetric(uint32_t metric);
 
 			// Getters for fields:
-			Mac48Address GetMTERPAddress() const;
+			Mac48Address GetMTERPaddress() const;
 			Mac48Address GetMSECPaddress() const;
 			uint8_t GetMSECPindex() const;
 			uint32_t GetPathGenerationSequenceNumber() const;
@@ -58,11 +58,7 @@ namespace ns3 {
 			uint8_t  GetTtl() const;
 			uint32_t GetMetric() const;
 			Ptr<PmtmgmpRoutePath> GetPathInfo() const;
-
-			/// Handle TTL and Metric:
-			void  DecrementTtl();
-			void  IncrementMetric(uint32_t metric, double k);
-
+			
 			// Inherited from WifiInformationElement
 			virtual WifiInformationElementId ElementId() const;
 			virtual void SerializeInformationField(Buffer::Iterator i) const;

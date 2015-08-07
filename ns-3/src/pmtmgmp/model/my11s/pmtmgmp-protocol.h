@@ -247,55 +247,12 @@ namespace ns3 {
 			uint8_t GetUnicastPerrThreshold();
 			///\}
 #ifndef PMTMGMP_UNUSED_MY_CODE
-			////SECREP信息记录
-			struct SECREPinformation
-			{
-				////升序
-				bool operator < (const SECREPinformation si) const
-				{
-					return m_metric * (m_affiliatedNumber + 1) < si.m_metric * (si.m_affiliatedNumber + 1);
-				}
-				Mac48Address m_address;
-				uint32_t m_metric;
-				uint8_t m_affiliatedNumber;
-				bool m_generationPath;
-				uint8_t m_MSECPindex;
-			};
-			////SECREPinformation搜索器
-			struct SECREPinformation_Finder
-			{
-				SECREPinformation_Finder(Mac48Address address) :m_address(address){};
-				bool operator()(SECREPinformation p)
-				{
-					return m_address == p.m_address;
-				}
-				Mac48Address m_address;
-			};
-			struct MSECPaffiliatedMSECPInformation
-			{
-				Mac48Address address;
-				uint32_t selectIndex;
-				uint32_t metric;
-				NodeType nodeType;
-			};
-			////SECREPinformation搜索器
-			struct MSECPaffiliatedMSECPInformation_Finder
-			{
-				MSECPaffiliatedMSECPInformation_Finder(Mac48Address address) :address(address){};
-				bool operator()(MSECPaffiliatedMSECPInformation p)
-				{
-					return address == p.address;
-				}
-				Mac48Address address;
-			};
-			////终端节点发动 
+			////终端节搜索点发动 
 			void MSECPSearch();
 			////发送SECREQ
 			void SendSECREQ();
 			////接收SECREQ
 			void ReceiveSECREQ(IeSecreq secreq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
-			////获取非同类（MAP，MPP）终端节点数量
-			uint8_t GetDifferentTypeMTERPnum(NodeType type, Mac48Address source);
 			////发送SECREP
 			void SendSECREP(Mac48Address receiver, uint32_t index, NodeType type);
 			////接收SECREP
@@ -314,8 +271,6 @@ namespace ns3 {
 			void WaitForRecivePGER();
 			////接收PGER
 			void ReceivePGER(IePger pger, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
-			////发送初始PGEN
-			void SendFirstPGEN(IeSecack secack, uint32_t metric);
 			////转发Pgen
 			void SendPGEN(IePgen pgen);
 			////接收PGEN
@@ -414,10 +369,6 @@ namespace ns3 {
 			EventId m_PUPDperiodEventTimer;
 			////节点类型属性
 			NodeType m_NodeType;
-			////MTERP的辅助节点列表
-			std::vector<SECREPinformation> m_AffiliatedMSECPlist;
-			////MSECP从属的辅助节点列表
-			std::vector<MSECPaffiliatedMSECPInformation> m_AffiliatedMTERPlist;
 			////MSECP搜索初始延迟
 			Time m_My11WmnPMTMGMPsecStartDelayTime;
 			////MSECP搜索间隔
@@ -428,8 +379,6 @@ namespace ns3 {
 			Time m_My11WmnPMTMGMPpgerWaitTime;
 			////路由度量更新周期
 			Time m_My11WmnPMTMGMPpathMetricUpdatePeriod;
-			////SECREP接收信息记录
-			std::vector<SECREPinformation> m_SECREPinformation;
 			////MSECP选择序号（从零开始，奇数开启，偶数关闭。）
 			uint32_t m_PathGenerationSeqNumber;
 			////路径更新序号

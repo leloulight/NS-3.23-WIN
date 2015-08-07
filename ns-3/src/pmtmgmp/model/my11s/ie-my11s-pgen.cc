@@ -28,9 +28,6 @@
 namespace ns3 {
 	namespace my11s {
 		////其他函数
-		IePgen::~IePgen()
-		{
-		}
 		IePgen::IePgen()
 		{
 			m_PathInfo = CreateObject<PmtmgmpRoutePath>();
@@ -38,6 +35,9 @@ namespace ns3 {
 		IePgen::IePgen(Ptr<PmtmgmpRoutePath> path)
 		{
 			m_PathInfo = path;
+		}
+		IePgen::~IePgen()
+		{
 		}
 		Ptr<PmtmgmpRoutePath> IePgen::GetPathInfo()
 		{
@@ -75,7 +75,7 @@ namespace ns3 {
 		{
 			m_PathInfo->SetMetric(metric);
 		}
-		Mac48Address IePgen::GetMTERPAddress() const
+		Mac48Address IePgen::GetMTERPaddress() const
 		{
 			return m_PathInfo->GetMTERPaddress();
 		}
@@ -110,16 +110,6 @@ namespace ns3 {
 		Ptr<PmtmgmpRoutePath> IePgen::GetPathInfo() const
 		{
 			return m_PathInfo;
-		}
-		void IePgen::DecrementTtl()
-		{
-			m_PathInfo->SetTTL(m_PathInfo->GetTTL() - 1);
-			m_PathInfo->SetHopcount(m_PathInfo->GetHopCount() + 1);
-		}
-		void IePgen::IncrementMetric(uint32_t metric, double k)
-		{
-			////按公式积累计算度量，见AALM计算公式
-			m_PathInfo->IncrementMetric(metric, k);
 		}
 		WifiInformationElementId IePgen::ElementId() const
 		{

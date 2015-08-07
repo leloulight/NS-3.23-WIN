@@ -42,9 +42,9 @@ namespace ns3 {
 		{
 			m_candidateMSECPaddress = candidateMSECP_address;
 		}
-		void IeSecrep::SetAffiliatedMTERPnum(uint8_t mTERP_number)
+		void IeSecrep::SetMSECPcount(uint8_t mTERP_number)
 		{
-			m_affiliatedMTERPnum = mTERP_number;
+			m_MSECPcount = mTERP_number;
 		}
 		void IeSecrep::SetPathGenerationSequenceNumber(uint32_t seq_number)
 		{
@@ -58,9 +58,9 @@ namespace ns3 {
 		{
 			return m_candidateMSECPaddress;
 		}
-		uint8_t IeSecrep::GetAffiliatedMTERPnum() const
+		uint8_t IeSecrep::GetMSECPcount() const
 		{
-			return m_affiliatedMTERPnum;
+			return m_MSECPcount;
 		}
 		uint32_t IeSecrep::GetPathGenerationSequenceNumber() const
 		{
@@ -75,7 +75,7 @@ namespace ns3 {
 			os << std::endl << "<information_element id=" << ElementId() << ">" << std::endl;
 			os << " originator address               = " << m_MTERPaddress << std::endl;
 			os << " candidate MSECP address          = " << m_candidateMSECPaddress << std::endl;
-			os << " belong MTERP number              = " << m_affiliatedMTERPnum << std::endl; 
+			os << " belong MTERP number              = " << m_MSECPcount << std::endl; 
 			os << " path generation sequence number  = " << m_PathGenerationSeqNumber << std::endl;
 			os << "</information_element>" << std::endl;
 		}
@@ -83,7 +83,7 @@ namespace ns3 {
 		{
 			WriteTo(i, m_MTERPaddress);
 			WriteTo(i, m_candidateMSECPaddress);
-			i.WriteU8(m_affiliatedMTERPnum);
+			i.WriteU8(m_MSECPcount);
 			i.WriteHtolsbU32(m_PathGenerationSeqNumber);
 		}
 		uint8_t IeSecrep::DeserializeInformationField(Buffer::Iterator start, uint8_t length)
@@ -91,7 +91,7 @@ namespace ns3 {
 			Buffer::Iterator i = start;
 			ReadFrom(i, m_MTERPaddress);
 			ReadFrom(i, m_candidateMSECPaddress);
-			m_affiliatedMTERPnum = i.ReadU8();
+			m_MSECPcount = i.ReadU8();
 			m_PathGenerationSeqNumber = i.ReadLsbtohU32();
 			return i.GetDistanceFrom(start);
 		}

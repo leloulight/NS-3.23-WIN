@@ -25,6 +25,7 @@
 #include "ns3/mac48-address.h"
 #include "ns3/wmn-information-element-vector.h"
 #include "ns3/pmtmgmp-protocol.h"
+#include "ns3/pmtmgmp-rtable.h"
 
 namespace ns3 {
 	namespace my11s {
@@ -32,22 +33,32 @@ namespace ns3 {
 		{
 		public:
 			IeSecack();
+			IeSecack(Ptr<PmtmgmpRoutePath> path);
 			~IeSecack();
+
+			Ptr<PmtmgmpRoutePath> GetPathInfo();
 
 			// Setters for fields:
 			void SetMTERPaddress(Mac48Address originator_address);
-			void SetPathGenerationSequenceNumber(uint32_t seq_number);
-			void SetPathUpdateSeqNumber(uint32_t seq_number);
-			void SetNodeType(PmtmgmpProtocol::NodeType nodeType);
+			void SetMSECPaddress(Mac48Address mSECP_address);
 			void SetMSECPindex(uint8_t index);
+			void SetPathGenerationSequenceNumber(uint32_t seq_number);
+			void SetNodeType(PmtmgmpProtocol::NodeType nodeType);
+			void SetHopcount(uint8_t hopcount);
+			void SetTTL(uint8_t ttl);
+			void SetMetric(uint32_t metric);
 
 			// Getters for fields:
 			Mac48Address GetMTERPaddress() const;
-			uint32_t GetPathGenerationSequenceNumber() const;
-			uint32_t GetPathUpdateSeqNumber() const;
-			PmtmgmpProtocol::NodeType GetNodeType() const;
+			Mac48Address GetMSECPaddress() const;
 			uint8_t GetMSECPindex() const;
-
+			uint32_t GetPathGenerationSequenceNumber() const;
+			PmtmgmpProtocol::NodeType GetNodeType() const;
+			uint8_t  GetHopCount() const;
+			uint8_t  GetTtl() const;
+			uint32_t GetMetric() const;
+			Ptr<PmtmgmpRoutePath> GetPathInfo() const;
+			
 			// Inherited from WifiInformationElement
 			virtual WifiInformationElementId ElementId() const;
 			virtual void SerializeInformationField(Buffer::Iterator i) const;
@@ -55,11 +66,7 @@ namespace ns3 {
 			virtual uint8_t GetInformationFieldSize() const;
 			virtual void Print(std::ostream& os) const;
 		private:
-			Mac48Address m_MTERPaddress;
-			uint32_t m_PathGenerationSeqNumber;
-			uint32_t m_PathUpdateSeqNumber;
-			PmtmgmpProtocol::NodeType m_NodeType;
-			uint8_t m_MSECPindex;
+			Ptr<PmtmgmpRoutePath> m_PathInfo;
 
 			friend bool operator== (const IeSecack & a, const IeSecack & b);
 
