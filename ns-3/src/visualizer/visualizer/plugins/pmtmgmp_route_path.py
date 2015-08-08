@@ -48,17 +48,9 @@ class Pmtmgmp_Node(object):
         self.base_route_table = pmtmgmp.GetPmtmgmpRPRouteTable()
         self.pmtmgmp = pmtmgmp
         self.link_list = {}
-        node_type = self.pmtmgmp.GetNodeType()
-        self.color = 0x000000FF
-        if (node_type == 2):
-            self.color = 0xFF0000C0
-        elif (node_type == 4):
-            self.color = 0x0000FFC0
-        elif (node_type == 8):
-            self.color = 0x000000C0
 
-    def set_color(self):
-        self.viz_node.canvas_item.set_properties(fill_color_rgba=self.color)
+    def set_color(self, color):
+        self.viz_node.canvas_item.set_properties(fill_color_rgba=color)
 
     def clean_link_list(self):
         for (key,link) in self.link_list.items():
@@ -166,6 +158,15 @@ class Pmtmgmp_Route(object):
             print "Pmtmgmp_Route::route_path_link_full() Node list:" + str(len(self.node_list))
         for node in self.node_list:
             node.crearte_route_path(self.mac_to_node, self.pmtmgmp.GetMacAddress(), msecp, self.viz.links_group)
+            node_type = node.pmtmgmp.GetNodeType()
+            color = 0xFF0000FF
+            if (node_type == 2):
+                color = 0x00FF00FF
+            elif (node_type == 4):
+                color = 0x0000FFFF
+            elif (node_type == 8 and msecp ==node.pmtmgmp.GetMacAddress()):
+                color = 0x0000FFFF
+            node.set_color(color)
             # if SHOW_LOG:
             #     print "Pmtmgmp_Route::route_path_link_full()" + str(node.base_mac)
 
@@ -211,8 +212,6 @@ class Pmtmgmp_Route(object):
         if SHOW_LOG:
             print "simulation_periodic_update"
         self.route_path_link()
-        for node in self.node_list:
-            node.set_color()
 
     def populate_node_menu(self, viz, node, menu):
         ns3_node = ns.network.NodeList.GetNode(node.node_index)

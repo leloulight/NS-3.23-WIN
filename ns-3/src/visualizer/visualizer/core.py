@@ -681,7 +681,10 @@ class Visualizer(gobject.GObject):
         _zoom_changed(zoom_adj)
 
         # speed
-        speed_adj = gtk.Adjustment(1.0, 0.01, 10.0, 0.02, 1.0, 0)
+        ##PMTMGMP_UNUSED_MY_CODE
+        #speed_adj = gtk.Adjustment(1.0, 0.01, 10.0, 0.02, 1.0, 0)
+        speed_adj = gtk.Adjustment(10, 0.01, 10.0, 0.02, 1.0, 0)
+        ####
         def _speed_changed(adj):
             self.speed = adj.value
             self.sample_period = SAMPLE_PERIOD*adj.value
@@ -693,6 +696,22 @@ class Visualizer(gobject.GObject):
         hbox.pack_start(gobject.new(gtk.Label, label="  Speed:", visible=True), False, False, 4)
         hbox.pack_start(speed, False, False, 4)
         _speed_changed(speed_adj)
+
+        ##PMTMGMP_UNUSED_MY_CODE
+        # stop_time
+        self.stop_time_adj = gtk.Adjustment(0, 0, 1000.0, 0.02, 1.0, 0)
+        # def _stop_time_changed(adj):
+        #     self.stop_time = adj.value
+        #     self.sample_period = SAMPLE_PERIOD*adj.value
+        #     self._start_update_timer()
+        # stop_time_adj.connect("value-changed", _stop_time_changed)
+        stop_time = gtk.SpinButton(self.stop_time_adj)
+        stop_time.set_digits(3)
+        stop_time.show()
+        hbox.pack_start(gobject.new(gtk.Label, label="  Stop:", visible=True), False, False, 4)
+        hbox.pack_start(stop_time, False, False, 4)
+        # _stop_time_changed(self.stop_time_adj)
+        ####
 
         # Current time
         self.time_label = gobject.new(gtk.Label, label="  Speed:", visible=True)
@@ -852,7 +871,7 @@ class Visualizer(gobject.GObject):
         #print "update_view"
 
         self.time_label.set_text("Time: %f s" % ns.core.Simulator.Now().GetSeconds())
-        
+
         self._update_node_positions()
 
         # Update information 
@@ -863,6 +882,15 @@ class Visualizer(gobject.GObject):
         self._update_drops_view()
 
         self.emit("update-view")
+
+        ##PMTMGMP_UNUSED_MY_CODE
+        print self.stop_time_adj.get_value()
+        if (self.stop_time_adj.get_value() != 0):
+            print ns.core.Simulator.Now().GetSeconds()
+            if (self.stop_time_adj.get_value() < ns.core.Simulator.Now().GetSeconds()):
+                self.play_button.set_active(False)
+                self._on_play_button_toggled(self.play_button)
+        ####
 
     def _update_node_positions(self):
         for node in self.nodes.itervalues():
@@ -1105,6 +1133,9 @@ class Visualizer(gobject.GObject):
         if button.get_active():
             self._start_update_timer()
         else:
+            ##PMTMGMP_UNUSED_MY_CODE
+            self.stop_time_adj.set_value(0)
+            ####
             if self._update_timeout_id is not None:
                 gobject.source_remove(self._update_timeout_id)
 
