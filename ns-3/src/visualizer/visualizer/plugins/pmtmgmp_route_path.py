@@ -44,18 +44,19 @@ class Pmtmgmp_Path_Link(Link):
             angle = math.atan2(pos2_y - pos1_y, pos2_x - pos1_x) + math.pi / 2
             x = POINT_MODIFY * math.cos(angle)
             y = POINT_MODIFY * math.sin(angle)
+            next_index = 0
             if self.next_link != None:
-                self.next_index = self.next_link.way_index
-            return goocanvas.Points([(pos1_x + x * self.next_index, pos1_y + y * self.next_index), (pos2_x + x * self.way_index, pos2_y + y * self.way_index)])
+                next_index = self.next_link.way_index
+            return goocanvas.Points([(pos1_x + x * next_index, pos1_y + y * next_index), (pos2_x + x * self.way_index, pos2_y + y * self.way_index)])
 
     def update_points(self):
         if self.base_route_table.GetPathByMACaddress(self.mterp, self.msecp) == None:
-            if SHOW_LOG:
-                print "Delete(Path) " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
+            # if SHOW_LOG:
+            #     print "Delete(Path) " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
             self.destroy()
         elif (self.base_node == None) or (self.link_node == None):
-            if SHOW_LOG:
-                print "Delete(MAC) " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
+            # if SHOW_LOG:
+            #     print "Delete(MAC) " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
             self.destroy()
         else:
             # if SHOW_LOG:
