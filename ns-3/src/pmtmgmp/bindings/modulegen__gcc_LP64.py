@@ -11001,8 +11001,8 @@ def register_Ns3My11sIePupd_methods(root_module, cls):
     cls.add_constructor([param('ns3::my11s::IePupd const &', 'arg0')])
     ## ie-my11s-pupd.h (module 'pmtmgmp'): ns3::my11s::IePupd::IePupd() [constructor]
     cls.add_constructor([])
-    ## ie-my11s-pupd.h (module 'pmtmgmp'): ns3::my11s::IePupd::IePupd(ns3::Ptr<ns3::my11s::PmtmgmpRouteTable> table, uint16_t maxPath) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::my11s::PmtmgmpRouteTable >', 'table'), param('uint16_t', 'maxPath')])
+    ## ie-my11s-pupd.h (module 'pmtmgmp'): ns3::my11s::IePupd::IePupd(ns3::Ptr<ns3::my11s::PmtmgmpRouteTable> table, uint16_t maxPath, ns3::Time secInterval) [constructor]
+    cls.add_constructor([param('ns3::Ptr< ns3::my11s::PmtmgmpRouteTable >', 'table'), param('uint16_t', 'maxPath'), param('ns3::Time', 'secInterval')])
     ## ie-my11s-pupd.h (module 'pmtmgmp'): uint8_t ns3::my11s::IePupd::DeserializeInformationField(ns3::Buffer::Iterator i, uint8_t length) [member function]
     cls.add_method('DeserializeInformationField', 
                    'uint8_t', 
@@ -11584,8 +11584,8 @@ def register_Ns3My11sPUPDaalmTreeData_methods(root_module, cls):
     cls.add_constructor([])
     ## ie-my11s-pupd.h (module 'pmtmgmp'): ns3::my11s::PUPDaalmTreeData::PUPDaalmTreeData(ns3::Buffer::Iterator i) [constructor]
     cls.add_constructor([param('ns3::Buffer::Iterator', 'i')])
-    ## ie-my11s-pupd.h (module 'pmtmgmp'): ns3::my11s::PUPDaalmTreeData::PUPDaalmTreeData(ns3::Ptr<ns3::my11s::PmtmgmpRouteTree> tree) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::my11s::PmtmgmpRouteTree >', 'tree')])
+    ## ie-my11s-pupd.h (module 'pmtmgmp'): ns3::my11s::PUPDaalmTreeData::PUPDaalmTreeData(ns3::Ptr<ns3::my11s::PmtmgmpRouteTree> tree, ns3::Time secInterval) [constructor]
+    cls.add_constructor([param('ns3::Ptr< ns3::my11s::PmtmgmpRouteTree >', 'tree'), param('ns3::Time', 'secInterval')])
     ## ie-my11s-pupd.h (module 'pmtmgmp'): std::vector<ns3::my11s::PUPDaalmPathData, std::allocator<ns3::my11s::PUPDaalmPathData> > ns3::my11s::PUPDaalmTreeData::GetData() const [member function]
     cls.add_method('GetData', 
                    'std::vector< ns3::my11s::PUPDaalmPathData >', 
@@ -12153,10 +12153,10 @@ def register_Ns3My11sPmtmgmpRoutePath_methods(root_module, cls):
     cls.add_method('IncrementMetric', 
                    'void', 
                    [param('uint32_t', 'metric'), param('double', 'k')])
-    ## pmtmgmp-rtable.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpRoutePath::RoutePathInforLifeCheck() [member function]
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpRoutePath::RoutePathInforLifeCheck(ns3::Ptr<ns3::my11s::PmtmgmpRouteTable> table) [member function]
     cls.add_method('RoutePathInforLifeCheck', 
                    'bool', 
-                   [])
+                   [param('ns3::Ptr< ns3::my11s::PmtmgmpRouteTable >', 'table')])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRoutePath::RoutePathInforLifeUpdate() [member function]
     cls.add_method('RoutePathInforLifeUpdate', 
                    'void', 
@@ -12232,9 +12232,13 @@ def register_Ns3My11sPmtmgmpRouteTable_methods(root_module, cls):
     cls.add_method('ClearMTERProutePath', 
                    'void', 
                    [])
-    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpProtocol::NodeType ns3::my11s::PmtmgmpRouteTable::CountMSECP() [member function]
-    cls.add_method('CountMSECP', 
-                   'ns3::my11s::PmtmgmpProtocol::NodeType', 
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRouteTable::ClearMTERPtree() [member function]
+    cls.add_method('ClearMTERPtree', 
+                   'void', 
+                   [])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRouteTable::DecreaseAsMSECPcount() [member function]
+    cls.add_method('DecreaseAsMSECPcount', 
+                   'void', 
                    [])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): uint8_t ns3::my11s::PmtmgmpRouteTable::GetAllMSECPcount(ns3::Mac48Address mterp, ns3::my11s::PmtmgmpProtocol::NodeType type) [member function]
     cls.add_method('GetAllMSECPcount', 
@@ -12258,6 +12262,11 @@ def register_Ns3My11sPmtmgmpRouteTable_methods(root_module, cls):
     cls.add_method('GetMTERPtree', 
                    'ns3::Ptr< ns3::my11s::PmtmgmpRouteTree >', 
                    [])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::PmtmgmpRouteTable::GetMac48Address() const [member function]
+    cls.add_method('GetMac48Address', 
+                   'ns3::Mac48Address', 
+                   [], 
+                   is_const=True)
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): uint8_t ns3::my11s::PmtmgmpRouteTable::GetNextMSECPindex() [member function]
     cls.add_method('GetNextMSECPindex', 
                    'uint8_t', 
@@ -12301,6 +12310,10 @@ def register_Ns3My11sPmtmgmpRouteTable_methods(root_module, cls):
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): uint8_t ns3::my11s::PmtmgmpRouteTable::GetUnreceivedPathCount() [member function]
     cls.add_method('GetUnreceivedPathCount', 
                    'uint8_t', 
+                   [])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRouteTable::IncreaseAsMSECPcount() [member function]
+    cls.add_method('IncreaseAsMSECPcount', 
+                   'void', 
                    [])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRouteTable::InitRouteTable(ns3::Mac48Address address, ns3::my11s::PmtmgmpProtocol::NodeType type, ns3::Callback<void, ns3::my11s::PmtmgmpProtocol::NodeType, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> cb) [member function]
     cls.add_method('InitRouteTable', 
@@ -12420,10 +12433,10 @@ def register_Ns3My11sPmtmgmpRouteTree_methods(root_module, cls):
     cls.add_method('RepeatabilityReset', 
                    'void', 
                    [])
-    ## pmtmgmp-rtable.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpRouteTree::RouteTreeInforLifeCheck() [member function]
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpRouteTree::RouteTreeInforLifeCheck(ns3::Ptr<ns3::my11s::PmtmgmpRouteTable> table) [member function]
     cls.add_method('RouteTreeInforLifeCheck', 
                    'bool', 
-                   [])
+                   [param('ns3::Ptr< ns3::my11s::PmtmgmpRouteTable >', 'table')])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRouteTree::SelectMSECP() [member function]
     cls.add_method('SelectMSECP', 
                    'void', 

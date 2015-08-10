@@ -1716,9 +1716,16 @@ namespace ns3 {
 		////发送PUPD
 		void PmtmgmpProtocol::SendPUPD()
 		{
+			IePupd pupd = IePupd(m_RouteTable, m_MaxRoutePathPerPUPD, m_My11WmnPMTMGMPsecInterval);
+
+			////PUPD更新路径列表为空时不发送PUPD
+			if (pupd.GetData().size() == 0)
+			{
+				NS_LOG_DEBUG("Not Send PUPD at " << m_address);
+				return;
+			}
+
 			NS_LOG_DEBUG("Send PUPD at " << m_address);
-			IePupd pupd = IePupd(m_RouteTable, m_MaxRoutePathPerPUPD);
-			
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
 				i->second->SendPUPD(pupd);

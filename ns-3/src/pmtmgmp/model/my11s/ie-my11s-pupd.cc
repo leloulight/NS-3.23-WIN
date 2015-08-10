@@ -77,13 +77,14 @@ namespace ns3 {
 				m_tree.push_back(PUPDaalmPathData(i));
 			}
 		}
-		PUPDaalmTreeData::PUPDaalmTreeData(Ptr<PmtmgmpRouteTree> tree)
+		PUPDaalmTreeData::PUPDaalmTreeData(Ptr<PmtmgmpRouteTree> tree, Time secInterval)
 		{
 			m_MTERPaddress = tree->GetMTERPaddress();
 			std::vector<Ptr<PmtmgmpRoutePath> > temp = tree->GetPartTree();
 			for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = temp.begin(); iter != temp.end(); iter++)
 			{
-				if ((*iter)->GetStatus() == PmtmgmpRoutePath::Confirmed && Simulator::Now() - (*iter)->GetPGENsendTime() > (*iter)->GetPathRecreateDelay())
+				Time life = Simulator::Now() - (*iter)->GetPGENsendTime();
+				if ((*iter)->GetStatus() == PmtmgmpRoutePath::Confirmed && life > (*iter)->GetPathRecreateDelay() && life < secInterval)
 				{
 					m_tree.push_back(PUPDaalmPathData(*iter));
 				}
@@ -117,7 +118,7 @@ namespace ns3 {
 		/*************************
 		* IePupd
 		************************/
-		IePupd::IePupd(Ptr<PmtmgmpRouteTable> table, uint16_t maxPath)
+		IePupd::IePupd(Ptr<PmtmgmpRouteTable> table, uint16_t maxPath, Time secInterval)
 		{
 			uint8_t index = table->GetPUPDsendRouteTreeIndex();
 			std::vector<Ptr<PmtmgmpRouteTree> > temp = table->GetRouteTable();
@@ -139,8 +140,12 @@ namespace ns3 {
 			{
 				if (tempPathSize != 0)
 				{
-					pathNum += tempPathSize;
-					m_table.push_back(PUPDaalmTreeData(temp[index]));
+					PUPDaalmTreeData tempData = PUPDaalmTreeData(temp[index], secInterval);
+					if (tempData.GetData().size() != 0)
+					{
+						pathNum += tempPathSize;
+						m_table.push_back(tempData);
+					}
 				}
 				////更新临时路由表Index
 				if (index >= temp.size() - 1)
@@ -157,7 +162,7 @@ namespace ns3 {
 					break;
 				}
 				tempPathSize = temp[index]->GetPartTree().size();
-			} while (pathNum + tempPathSize < maxPath);
+			} while (pathNum + tempPathSize < maxPath || pathNum == 0);
 			////更新路由表Index
 			table->SetPUPDsendRouteTreeIndex(index);
 		}
