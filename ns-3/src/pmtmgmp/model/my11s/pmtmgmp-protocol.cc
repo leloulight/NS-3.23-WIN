@@ -1659,6 +1659,7 @@ namespace ns3 {
 							newPath->SetStatus(PmtmgmpRoutePath::Waited);
 							newPath->SetPathGenerationSequenceNumber(GenSeqNum - 1);
 							newPath->AddCandidateRouteInformaiton(pathCopy);
+							newPath->SetFromNode(from);
 							newPath->SetAcceptCandidateRouteInformaitonEvent(Simulator::Schedule(routeTree->GetAcceptInformaitonDelay(), &PmtmgmpRouteTree::AcceptCandidateRouteInformaiton, routeTree, pathCopy->GetMSECPaddress()));
 							routeTree->AddNewPath(newPath);
 							NS_LOG_DEBUG("Receive PGEN (MTERP:" << pathCopy->GetMTERPaddress() << " MSECP:" << pathCopy->GetMSECPaddress() << ") from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", GSN is " << pathCopy->GetPathGenerationSequenceNumber() << " start waiting");

@@ -32,6 +32,9 @@ class Pmtmgmp_Path_Link(Link):
     def set_next_link(self, link):
         next_link = link
 
+    def set_color(self, color):
+        self.line.set_properties(stroke_color_rgba=color)
+
     def get_move_node(self):
         pos1_x, pos1_y = self.link_node.viz_node.get_position()
         pos2_x, pos2_y = self.base_node.viz_node.get_position()
@@ -41,16 +44,22 @@ class Pmtmgmp_Path_Link(Link):
             angle = math.atan2(pos2_y - pos1_y, pos2_x - pos1_x) + math.pi / 2
             x = POINT_MODIFY * math.cos(angle)
             y = POINT_MODIFY * math.sin(angle)
-            if self.next_link is not None:
+            if self.next_link != None:
                 self.next_index = self.next_link.way_index
             return goocanvas.Points([(pos1_x + x * self.next_index, pos1_y + y * self.next_index), (pos2_x + x * self.way_index, pos2_y + y * self.way_index)])
 
     def update_points(self):
-        if self.base_route_table.GetPathByMACaddress(self.mterp, self.msecp) is None:
+        if self.base_route_table.GetPathByMACaddress(self.mterp, self.msecp) == None:
+            if SHOW_LOG:
+                print "Delete(Path) " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
             self.destroy()
-        elif (self.base_node is None) or (self.link_node is None):
+        elif (self.base_node == None) or (self.link_node == None):
+            if SHOW_LOG:
+                print "Delete(MAC) " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
             self.destroy()
         else:
+            # if SHOW_LOG:
+            #     print "Move " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
             self.line.set_property("points", self.get_move_node())
 
     def destroy(self):
@@ -84,14 +93,29 @@ class Pmtmgmp_Node(object):
         for (key,link) in self.link_list.items():
             link.set_way_index(int((i + 1) / 2) * int((i % 2) * 2 - 1))
             i += 1
+            # if SHOW_LOG:
+            #     print "update_points() "  + str(link.base_node.pmtmgmp.GetMacAddress()) + " to " + str(link.link_node.pmtmgmp.GetMacAddress())
             link.update_points()
 
     def crearte_route_path(self, mac_node_list, mterp, msecp, parent_canvas_item):
         # if SHOW_LOG:
         #     print self
+
+        node_type = self.pmtmgmp.GetNodeType()
+        color = 0xFF0000FF
+        if (node_type == 2):
+            color = 0x00FF00FF
+        elif (node_type == 4):
+            color = 0x0000FFFF
+        elif (node_type == 8 and msecp == self.pmtmgmp.GetMacAddress()):
+            color = 0x0000FFFF
+        if (self.pmtmgmp.GetPmtmgmpRPRouteTable().GetTableSize() == 0):
+            color = 0xFFFFFFFF
+        self.set_color(color)
+
         route_table = self.pmtmgmp.GetPmtmgmpRPRouteTable()
         route_path = route_table.GetPathByMACaddress(mterp,msecp)
-        if route_path is None:
+        if route_path == None:
              return
         if self.link_list.has_key(str(mterp) + "," + str(msecp)):
             self.link_list[str(mterp) + "," + str(msecp)].update_points()
@@ -100,18 +124,27 @@ class Pmtmgmp_Node(object):
         else:
             if mac_node_list[str(route_path.GetFromNode())] is self:
                 return
-            route_link = Pmtmgmp_Path_Link(None, self, mac_node_list[str(route_path.GetFromNode())], route_table, mterp, msecp, parent_canvas_item, COLOR[2])
+            route_link = Pmtmgmp_Path_Link(None, self, mac_node_list[str(route_path.GetFromNode())], route_table, mterp, msecp, parent_canvas_item, COLOR[1])
             self.link_list[str(mterp) + "," + str(msecp)] = route_link
             # if SHOW_LOG:
             #     print "Pmtmgmp_Node::crearte_route_path() " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
         self.update_link_list()
 
     def create_part_route_path_recursion(self, mac_node_list, mterp, msecp, parent_canvas_item, color):
-        # if SHOW_LOG:
-        #     print self
+        node_type = self.pmtmgmp.GetNodeType()
+        node_color = 0xFF0000FF
+        if (node_type == 2):
+            node_color = 0x00FF00FF
+        elif (node_type == 4):
+            node_color = 0x0000FFFF
+        elif (node_type == 8):
+            node_color = 0x0000FFFF
+        if (self.pmtmgmp.GetPmtmgmpRPRouteTable().GetTableSize() == 0):
+            node_color = 0xFFFFFFFF
+        self.set_color(node_color)
         route_table = self.pmtmgmp.GetPmtmgmpRPRouteTable()
         route_path = route_table.GetPathByMACaddress(mterp,msecp)
-        if route_path is None:
+        if route_path == None:
              return None
         next_hop = mac_node_list[str(route_path.GetFromNode())]
         if next_hop is self:
@@ -119,6 +152,7 @@ class Pmtmgmp_Node(object):
         next_link = next_hop.create_part_route_path_recursion(mac_node_list, mterp, msecp, parent_canvas_item, color)
         key = str(mterp) + "," + str(msecp)
         if self.link_list.has_key(key):
+            self.link_list[key].set_color(color)
             self.link_list[key].set_next_link(next_link)
             # if SHOW_LOG:
             #     print "Pmtmgmp_Node::create_part_route_path_recursion() exist " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
@@ -130,9 +164,20 @@ class Pmtmgmp_Node(object):
         return self.link_list[key]
 
     def create_part_route_path_start(self, mac_node_list, mterp, parent_canvas_item):
+        node_type = self.pmtmgmp.GetNodeType()
+        node_color = 0xFF0000FF
+        if (node_type == 2):
+            node_color = 0x00FF00FF
+        elif (node_type == 4):
+            node_color = 0x0000FFFF
+        elif (node_type == 8):
+            node_color = 0x0000FFFF
+        if (self.pmtmgmp.GetPmtmgmpRPRouteTable().GetTableSize() == 0):
+            node_color = 0xFFFFFFFF
+        self.set_color(node_color)
         route_table = self.pmtmgmp.GetPmtmgmpRPRouteTable()
         route_tree = route_table.GetTreeByMACaddress(mterp)
-        if route_tree is None:
+        if route_tree == None:
             return
         for i in range(0, route_tree.GetTreeSize()):
             route_path = route_tree.GetTreeItem(i)
@@ -143,6 +188,7 @@ class Pmtmgmp_Node(object):
             next_link = next_hop.create_part_route_path_recursion(mac_node_list, mterp, msecp, parent_canvas_item, COLOR[i%10])
             key = str(mterp) + "," + str(msecp)
             if self.link_list.has_key(key):
+                self.link_list[key].set_color(COLOR[i%10])
                 self.link_list[key].set_next_link(next_link)
                 # if SHOW_LOG:
                 #     print "Pmtmgmp_Node::create_part_route_path_recursion() exist " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
@@ -168,6 +214,7 @@ class Pmtmgmp_Route(object):
         self.show_mterp_mac = None
         self.node_list = []
         self.mac_to_node = {} #(str(Mac48Address), Pmtmgmp_Route)
+        self.last_scan_time = ns.core.Simulator.Now().GetSeconds()
 
     def route_path_clean(self):
         self.mac_to_node.clear()
@@ -183,17 +230,6 @@ class Pmtmgmp_Route(object):
         #     print "Pmtmgmp_Route::route_path_link_full() Node list:" + str(len(self.node_list))
         for node in self.node_list:
             node.crearte_route_path(self.mac_to_node, self.pmtmgmp.GetMacAddress(), msecp, self.viz.links_group)
-            node_type = node.pmtmgmp.GetNodeType()
-            color = 0xFF0000FF
-            if (node_type == 2):
-                color = 0x00FF00FF
-            elif (node_type == 4):
-                color = 0x0000FFFF
-            elif (node_type == 8 and msecp ==node.pmtmgmp.GetMacAddress()):
-                color = 0x0000FFFF
-            if (self.pmtmgmp.GetPmtmgmpRPRouteTable().GetTableSize() == 0):
-                color = 0xFFFFFFFF
-            node.set_color(color)
             # if SHOW_LOG:
             #     print "Pmtmgmp_Route::route_path_link_full()" + str(node.base_mac)
 
@@ -203,15 +239,17 @@ class Pmtmgmp_Route(object):
         self.mac_to_node[str(self.pmtmgmp.GetMacAddress())].create_part_route_path_start(self.mac_to_node, mterp, self.viz.links_group)
 
     def route_path_link(self):
-        if (self.show_msecp_mac is None and self.show_mterp_mac is None):
+        if (self.show_msecp_mac == None and self.show_mterp_mac == None):
             # if SHOW_LOG:
             #     print "Pmtmgmp_Route::route_path_link().route_path_clean"
             self. route_path_clean()
-        elif self.show_msecp_mac is None:
+        elif self.show_msecp_mac == None:
             # if SHOW_LOG:
             #     print "Pmtmgmp_Route::route_path_link().route_path_link_part"
             self.route_path_link_part(self.show_mterp_mac)
-        elif self.show_mterp_mac is None:
+        elif self.show_mterp_mac == None:
+            # if (self.mac_to_node[str(self.pmtmgmp.GetMacAddress())].pmtmgmp.GetPmtmgmpRPRouteTable().GetPathByMACaddress(self.pmtmgmp.GetMacAddress(), self.show_msecp_mac) == 0):
+            #     self. route_path_clean()
             # if SHOW_LOG:
             #     print "Pmtmgmp_Route::route_path_link().route_path_link_full"
             self.route_path_link_full(self.show_msecp_mac)
@@ -238,6 +276,11 @@ class Pmtmgmp_Route(object):
     def simulation_periodic_update(self, viz):
         # if SHOW_LOG:
         #     print "simulation_periodic_update"
+        if (ns.core.Simulator.Now().GetSeconds() - self.last_scan_time > 60):
+            self.scan_nodes(self.viz)
+            self.last_scan_time = ns.core.Simulator.Now().GetSeconds()
+            if SHOW_LOG:
+                print "Time Scan" + str(self.last_scan_time)
         self.route_path_link()
 
     def populate_node_menu(self, viz, node, menu):
@@ -247,7 +290,7 @@ class Pmtmgmp_Route(object):
             dev = ns3_node.GetDevice(devI)
             if isinstance(dev, ns.pmtmgmp.WmnPointDevice):
                 WmnDevice = dev
-        if WmnDevice is None:
+        if WmnDevice == None:
             print "No PMTMGMP"
             return
         self.pmtmgmp = WmnDevice.GetRoutingProtocol()
@@ -313,7 +356,7 @@ class Pmtmgmp_Route(object):
 
         #As a MTERP
         route_tree = route_table.GetTreeByMACaddress(self.pmtmgmp.GetMacAddress())
-        if route_tree is None:
+        if route_tree == None:
             if SHOW_LOG:
                 print "There is no full path start at this node while the MSECP is " + str(self.pmtmgmp.GetMacAddress())
         elif self.pmtmgmp.GetNodeType() & 0x06 == 0:
@@ -350,7 +393,7 @@ class Pmtmgmp_Route(object):
 pmtmgmp_route = None
 def register(viz):
     global pmtmgmp_route
-    if pmtmgmp_route is None:
+    if pmtmgmp_route == None:
         pmtmgmp_route = Pmtmgmp_Route(viz)
     viz.connect("populate-node-menu", pmtmgmp_route.populate_node_menu)
     viz.connect("simulation-periodic-update", pmtmgmp_route.simulation_periodic_update)
