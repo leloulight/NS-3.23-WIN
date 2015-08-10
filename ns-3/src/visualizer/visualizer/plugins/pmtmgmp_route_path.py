@@ -81,6 +81,8 @@ class Pmtmgmp_Node(object):
 
     def set_color(self, color):
         self.viz_node.canvas_item.set_properties(fill_color_rgba=color)
+        # if SHOW_LOG:
+        #     print str(self.pmtmgmp.GetMacAddress()) + " set color " + str(color)
 
     def clean_link_list(self):
         for (key,link) in self.link_list.items():
@@ -221,6 +223,7 @@ class Pmtmgmp_Route(object):
         self.mac_to_node.clear()
         self.mac_to_node = {}
         for node in self.node_list:
+            node.set_color(0xFF0000FF)
             node.destory()
         del self.node_list[:]
         # if SHOW_LOG:
@@ -277,11 +280,11 @@ class Pmtmgmp_Route(object):
     def simulation_periodic_update(self, viz):
         # if SHOW_LOG:
         #     print "simulation_periodic_update"
-        if (ns.core.Simulator.Now().GetSeconds() - self.last_scan_time > 60):
+        if (ns.core.Simulator.Now().GetSeconds() - self.last_scan_time > 1):
             self.scan_nodes(self.viz)
             self.last_scan_time = ns.core.Simulator.Now().GetSeconds()
-            if SHOW_LOG:
-                print "Time Scan" + str(self.last_scan_time)
+            # if SHOW_LOG:
+            #     print "Time Scan" + str(self.last_scan_time)
         self.route_path_link()
 
     def populate_node_menu(self, viz, node, menu):
