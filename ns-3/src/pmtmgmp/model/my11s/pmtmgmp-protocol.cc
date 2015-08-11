@@ -185,7 +185,7 @@ namespace ns3 {
 #ifndef PMTMGMP_UNUSED_MY_CODE
 				.AddAttribute("My11WmnPMTMGMPsecStartDelayTime",
 					"Delay time of start MSECP search",
-					TimeValue(MicroSeconds(1024 * 120000)),
+					TimeValue(MicroSeconds(1024 * 1000)),
 					MakeTimeAccessor(
 						&PmtmgmpProtocol::m_My11WmnPMTMGMPsecStartDelayTime),
 					MakeTimeChecker()
@@ -282,7 +282,7 @@ namespace ns3 {
 			m_rfFlag(false),
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			m_NodeType(Mesh_STA),
-			m_My11WmnPMTMGMPsecStartDelayTime(MicroSeconds(1024 * 120000)),
+			m_My11WmnPMTMGMPsecStartDelayTime(MicroSeconds(1024 * 1000)),
 			m_My11WmnPMTMGMPsecInterval(MicroSeconds(1024 * 65000)),
 			m_My11WmnPMTMGMPsecSetTime(MicroSeconds(1024 * 2000)),
 			m_My11WmnPMTMGMPpgerWaitTime(MicroSeconds(1024 * 2000)),
@@ -1443,7 +1443,7 @@ namespace ns3 {
 				{
 					for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 					{
-						NS_LOG_DEBUG("Send SECACK at " << m_address << " to " << (*iter)->GetMSECPaddress());
+						NS_LOG_DEBUG("Send SECACK at " << m_address << " to " << (*iter)->GetMSECPaddress() << " MSECPindex:" << uint32_t((*iter)->GetMSECPindex()));
 						i->second->SendSECACK(secack, (*iter)->GetMSECPaddress());
 					}
 				}
@@ -1705,8 +1705,8 @@ namespace ns3 {
 		{
 			if (m_RouteTable->GetConfirmedPathSize() != 0)
 			{
-				SendPUPD();	
 				NS_LOG_DEBUG("Period for PUPD at " << m_address << " , do send.");
+				SendPUPD();	
 			}
 			else
 			{
@@ -1722,11 +1722,11 @@ namespace ns3 {
 			////PUPD更新路径列表为空时不发送PUPD
 			if (pupd.GetData().size() == 0)
 			{
-				NS_LOG_DEBUG("Not Send PUPD at " << m_address);
+				NS_LOG_DEBUG("PUPD is empty at " << m_address << " do not send.");
 				return;
 			}
 
-			NS_LOG_DEBUG("Send PUPD at " << m_address);
+			NS_LOG_DEBUG("Send PUPD at " << m_address << ", its size is " << uint32_t(pupd.GetInformationFieldSize()));
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
 				i->second->SendPUPD(pupd);
@@ -1754,6 +1754,7 @@ namespace ns3 {
 			default:
 				NS_LOG_ERROR("Error node type.");
 			}
+			NS_LOG_DEBUG("Receive PUPD  from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric);
 			for (std::vector<PUPDaalmTreeData>::iterator iter = data.begin(); iter != data.end(); iter++)
 			{
 				std::vector<PUPDaalmPathData> tempData = iter->GetData();
@@ -1768,11 +1769,14 @@ namespace ns3 {
 						{
 							recreateList.push_back(PUPGQdata(mterp, select->GetMSECPindex()));
 						}
+						NS_LOG_DEBUG("PUPD  Infor: MTERP(" << mterp << "),MSECPindex(" << uint32_t(select->GetMSECPindex()) << "), RecreateListSize(" << recreateList.size());
 					}
 					else if(find->GetFromNode() == from)
 					{
 						////路由表中存在指定路由路径且来自于PUPD的发送者，更新Metric
+						find->SetMetric(select->GetMetric());
 						find->IncrementMetric(metric, magnification);
+						NS_LOG_DEBUG("PUPD  Infor: MTERP(" << mterp << "),M SECPindex(" << uint32_t(select->GetMSECPindex()) << "), Metric(" << find->GetMetric() << ")");
 					}
 					else
 					{
@@ -1785,8 +1789,7 @@ namespace ns3 {
 			{
 				SendPUPGQ(from, recreateList);
 			}
-			NS_LOG_DEBUG("Receive PUPD  from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", and PUPGQ  contain " << recreateList.size() << " Route Path.");
-
+			NS_LOG_DEBUG("Receive PUPD, it is PUPGQ  contain " << recreateList.size() << " Route Path.");
 		}
 		////发送PUPGQ
 		void PmtmgmpProtocol::SendPUPGQ(Mac48Address receiver, std::vector<PUPGQdata> list)

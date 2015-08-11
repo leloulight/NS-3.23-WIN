@@ -44,7 +44,7 @@
 
 //角度转换
 #define DEGREES_TO_RADIANS(__ANGLE__) ((__ANGLE__) * 0.01745329252f) // PI / 180
-#define MIN_APPLICATION_TIME 120 // 仿真前路由生成时间
+#define MIN_APPLICATION_TIME 1 // 仿真前路由生成时间
 #define END_APPLICATION_TIME 15 // 仿真后等待时间
 
 using namespace ns3;
