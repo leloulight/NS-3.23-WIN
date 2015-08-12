@@ -36,10 +36,10 @@ namespace ns3 {
 		PUPDaalmPathData::PUPDaalmPathData()
 		{
 		}
-		PUPDaalmPathData::PUPDaalmPathData(Buffer::Iterator i)
+		PUPDaalmPathData::PUPDaalmPathData(Buffer::Iterator *i)
 		{
-			m_MSECPindex = i.ReadU8();
-			m_metric = i.ReadLsbtohU32();
+			m_MSECPindex = i->ReadU8();
+			m_metric = i->ReadLsbtohU32();
 		}
 		PUPDaalmPathData::PUPDaalmPathData(Ptr<PmtmgmpRoutePath> path)
 		{
@@ -49,10 +49,10 @@ namespace ns3 {
 		PUPDaalmPathData::~PUPDaalmPathData()
 		{
 		}
-		void PUPDaalmPathData::ToBuffer(Buffer::Iterator i) const
+		void PUPDaalmPathData::ToBuffer(Buffer::Iterator *i) const
 		{
-			i.WriteU8(m_MSECPindex);
-			i.WriteHtolsbU32(m_metric);
+			i->WriteU8(m_MSECPindex);
+			i->WriteHtolsbU32(m_metric);
 		}
 		uint8_t PUPDaalmPathData::GetMSECPindex() const
 		{
@@ -68,11 +68,10 @@ namespace ns3 {
 		PUPDaalmTreeData::PUPDaalmTreeData()
 		{
 		}
-		PUPDaalmTreeData::PUPDaalmTreeData(Buffer::Iterator i)
+		PUPDaalmTreeData::PUPDaalmTreeData(Buffer::Iterator *i)
 		{
-			ReadFrom(i, m_MTERPaddress);
-			uint8_t j = i.ReadU8();
-			for (; j > 0; j--)
+			ReadFrom(*i, m_MTERPaddress);
+			for (uint8_t j = (*i).ReadU8(); j > 0; j--)
 			{
 				m_tree.push_back(PUPDaalmPathData(i));
 			}
@@ -97,10 +96,10 @@ namespace ns3 {
 		{
 			return m_tree;
 		}
-		void PUPDaalmTreeData::ToBuffer(Buffer::Iterator i) const
+		void PUPDaalmTreeData::ToBuffer(Buffer::Iterator *i) const
 		{
-			WriteTo(i, m_MTERPaddress);
-			i.WriteU8(m_tree.size());
+			WriteTo(*i, m_MTERPaddress);
+			(*i).WriteU8(m_tree.size());
 			for (std::vector<PUPDaalmPathData>::const_iterator iter = m_tree.begin(); iter != m_tree.end(); iter++)
 			{
 				iter->ToBuffer(i);
@@ -192,16 +191,15 @@ namespace ns3 {
 			i.WriteU8(m_table.size());
 			for (std::vector<PUPDaalmTreeData>::const_iterator iter = m_table.begin(); iter != m_table.end(); iter++)
 			{
-				iter->ToBuffer(i);
+				iter->ToBuffer(&i);
 			}
 		}
 		uint8_t IePupd::DeserializeInformationField(Buffer::Iterator start, uint8_t length)
 		{
 			Buffer::Iterator i = start;
-			uint8_t j = i.ReadU8();
-			for (; j > 0; j--)
+			for (uint8_t j = i.ReadU8(); j > 0; j--)
 			{
-				m_table.push_back(PUPDaalmTreeData(i));
+				m_table.push_back(PUPDaalmTreeData(&i));
 			}
 			return i.GetDistanceFrom(start);
 		}

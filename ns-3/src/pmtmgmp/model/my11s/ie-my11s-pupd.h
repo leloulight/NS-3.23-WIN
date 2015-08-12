@@ -36,11 +36,11 @@ namespace ns3 {
 		{
 		public:
 			PUPDaalmPathData();
-			PUPDaalmPathData(Buffer::Iterator i);
+			PUPDaalmPathData(Buffer::Iterator *i);
 			PUPDaalmPathData(Ptr<PmtmgmpRoutePath> path);
 			~PUPDaalmPathData();
 
-			void ToBuffer(Buffer::Iterator i) const;
+			void ToBuffer(Buffer::Iterator *i) const;
 
 			uint8_t GetMSECPindex() const;
 			uint32_t GetMetric() const;
@@ -56,12 +56,12 @@ namespace ns3 {
 		{
 		public:
 			PUPDaalmTreeData();
-			PUPDaalmTreeData(Buffer::Iterator i);
+			PUPDaalmTreeData(Buffer::Iterator *i);
 			PUPDaalmTreeData(Ptr<PmtmgmpRouteTree> tree, Time secInterval);
 			~PUPDaalmTreeData();
 
 			std::vector<PUPDaalmPathData> GetData() const;
-			void ToBuffer(Buffer::Iterator i) const;
+			void ToBuffer(Buffer::Iterator *i) const;
 			////获取此RouteTree数据的长度
 			uint8_t GetSize() const;
 

@@ -27,11 +27,14 @@
 
 namespace ns3 {
 	namespace my11s {
+		/*************************
+		* PUPGQdata
+		************************/
 		class PUPGQdata
 		{
 		public:
 			PUPGQdata();
-			PUPGQdata(Buffer::Iterator i);
+			PUPGQdata(Buffer::Iterator *i);
 			PUPGQdata(Mac48Address mterp, uint8_t index);
 			~PUPGQdata();
 
@@ -41,11 +44,14 @@ namespace ns3 {
 			Mac48Address GetMTERPaddress() const;
 			uint8_t GetMSECPindex() const;
 
-			void ToBuffer(Buffer::Iterator i) const;
+			void ToBuffer(Buffer::Iterator *i) const;
 		private:
 			Mac48Address m_MTERPaddress;
 			uint8_t m_MSECPindex;
 		};
+		/*************************
+		* IePupgq
+		************************/
 		class IePupgq : public WifiInformationElement
 		{
 		public:

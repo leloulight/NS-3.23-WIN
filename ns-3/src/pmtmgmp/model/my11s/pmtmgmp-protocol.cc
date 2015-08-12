@@ -1801,6 +1801,7 @@ namespace ns3 {
 				i->second->SendPUPGQ(pupgq, receiver);
 			}
 		}
+		////Ω” ’PUPD
 		void PmtmgmpProtocol::ReceivePUPGQ(IePupgq pupgq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
 			int sendTimes = 0;

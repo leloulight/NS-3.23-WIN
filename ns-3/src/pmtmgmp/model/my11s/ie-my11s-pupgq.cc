@@ -27,16 +27,16 @@
 
 namespace ns3 {
 	namespace my11s {
-		PUPGQdata::PUPGQdata()
-		{
-		}
 		/*************************
 		* PUPGQdata
 		************************/
-		PUPGQdata::PUPGQdata(Buffer::Iterator i)
+		PUPGQdata::PUPGQdata()
 		{
-			ReadFrom(i, m_MTERPaddress);
-			m_MSECPindex = i.ReadU8();
+		}
+		PUPGQdata::PUPGQdata(Buffer::Iterator *i)
+		{
+			ReadFrom(*i, m_MTERPaddress);
+			m_MSECPindex = (*i).ReadU8();
 		}
 		PUPGQdata::PUPGQdata(Mac48Address mterp, uint8_t index)
 		{
@@ -62,10 +62,10 @@ namespace ns3 {
 		{
 			return m_MSECPindex;
 		}
-		void PUPGQdata::ToBuffer(Buffer::Iterator i) const
+		void PUPGQdata::ToBuffer(Buffer::Iterator *i) const
 		{
-			WriteTo(i, m_MTERPaddress);
-			i.WriteU8(m_MSECPindex);
+			WriteTo(*i, m_MTERPaddress);
+			(*i).WriteU8(m_MSECPindex);
 		}
 		/*************************
 		* IePupgq
@@ -99,7 +99,7 @@ namespace ns3 {
 			i.WriteU8(m_PathList.size());
 			for (std::vector<PUPGQdata>::const_iterator iter = m_PathList.begin(); iter != m_PathList.end(); iter++)
 			{
-				iter->ToBuffer(i);
+				iter->ToBuffer(&i);
 			}
 		}
 		uint8_t IePupgq::DeserializeInformationField(Buffer::Iterator start, uint8_t length)
@@ -108,7 +108,7 @@ namespace ns3 {
 			uint8_t j = i.ReadU8();
 			for (; j > 0; j--)
 			{
-				m_PathList.push_back(PUPGQdata(i));
+				m_PathList.push_back(PUPGQdata(&i));
 			}
 			return i.GetDistanceFrom(start);
 		}
