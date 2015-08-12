@@ -37,7 +37,7 @@
 //输出到文件
 #define OUT_TO_FILE 
 //无应用层模式
-#define NO_APPLICATION
+//#define NO_APPLICATION
 //测试模式
 //#define TEST_LOCATION
 
@@ -727,7 +727,7 @@ int main(int argc, char *argv[])
 	//LogComponentEnable("HwmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("MeshPointDevice", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 
-	//LogComponentEnable("BulkSendApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	LogComponentEnable("BulkSendApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 
 	LogComponentEnable("MeshRouteTest", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 

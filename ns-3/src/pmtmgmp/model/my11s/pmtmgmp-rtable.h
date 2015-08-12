@@ -106,7 +106,7 @@ namespace ns3 {
 			////按Metric排序
 			bool operator < (const Ptr<PmtmgmpRoutePath> path) const
 			{
-				return m_metric < path->GetMetric();
+				return m_PathGenerationSeqNumber < path->GetPathGenerationSequenceNumber() || (m_PathGenerationSeqNumber == path->GetPathGenerationSequenceNumber() && m_metric < path->GetMetric());
 			}
 			Mac48Address m_MTERPaddress;
 			Mac48Address m_MSECPaddress;
@@ -162,10 +162,10 @@ namespace ns3 {
 			////获取MTERP、MSECP(Index)对应的Path，找不到则返回0
 			Ptr<PmtmgmpRoutePath> GetPathByMACaddress(Mac48Address msecp);
 			Ptr<PmtmgmpRoutePath> GetPathByMACindex(uint8_t index);
-			////获取度量最小的路径
-			std::vector<Ptr<PmtmgmpRoutePath> > GetBestPath();
-			////获取度量最小的路径
-			std::vector<Ptr<PmtmgmpRoutePath> > GetBestPath(std::vector<Ptr<PmtmgmpRoutePath> > pathList);
+			//////获取度量最小的路径
+			//std::vector<Ptr<PmtmgmpRoutePath> > GetBestPath();
+			//////获取度量最小的路径
+			//std::vector<Ptr<PmtmgmpRoutePath> > GetBestPath(std::vector<Ptr<PmtmgmpRoutePath> > pathList);
 			////添加新路径
 			void AddNewPath(Ptr<PmtmgmpRoutePath> path);
 			////选择MSECP(仅MTERP路由树)

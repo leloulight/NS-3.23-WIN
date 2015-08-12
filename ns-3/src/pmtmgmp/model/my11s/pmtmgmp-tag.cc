@@ -111,7 +111,7 @@ namespace ns3 {
 				+ 1 //ttl
 #ifndef PMTMGMP_UNUSED_MY_CODE
 				+ 4 //seqno
-				+ 6; //MSECP
+				+ 1; //MSECP
 #else
 				+ 4 //metric
 				+ 4; //seqno
@@ -135,11 +135,7 @@ namespace ns3 {
 				i.WriteU8(address[j]);
 			}
 #ifndef PMTMGMP_UNUSED_MY_CODE
-			m_MSECP.CopyTo(address);
-			for (j = 0; j < 6; j++)
-			{
-				i.WriteU8(address[j]);
-			}
+			i.WriteU8(m_MSECPindex);
 #endif
 		}
 
@@ -160,11 +156,7 @@ namespace ns3 {
 			}
 			m_address.CopyFrom(address);
 #ifndef PMTMGMP_UNUSED_MY_CODE
-			for (j = 0; j < 6; j++)
-			{
-				address[j] = i.ReadU8();
-			}
-			m_MSECP.CopyFrom(address);
+			m_MSECPindex = i.ReadU8();
 #endif
 		}
 
@@ -179,7 +171,7 @@ namespace ns3 {
 #endif
 			os << "seqno=" << m_seqno;
 #ifndef PMTMGMP_UNUSED_MY_CODE
-			os << "MSECP=" << m_MSECP;
+			os << "MSECPindex=" << m_MSECPindex;
 #endif
 		}
 		void
@@ -188,13 +180,13 @@ namespace ns3 {
 			m_ttl--;
 		}
 #ifndef PMTMGMP_UNUSED_MY_CODE
-		void PmtmgmpTag::SetMSECP(Mac48Address msecp)
+		void PmtmgmpTag::SetMSECPindex(uint8_t index)
 		{
-			m_MSECP = msecp;
+			m_MSECPindex = index;
 		}
-		Mac48Address PmtmgmpTag::GetMSECP()
+		uint8_t PmtmgmpTag::GetMSECPindex()
 		{
-			return m_MSECP;
+			return m_MSECPindex;
 		}
 #endif
 	} // namespace my11s

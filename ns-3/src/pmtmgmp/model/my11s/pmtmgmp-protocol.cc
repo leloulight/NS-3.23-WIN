@@ -349,6 +349,88 @@ namespace ns3 {
 #endif
 		}
 
+#ifndef PMTMGMP_UNUSED_MY_CODE
+		bool
+			PmtmgmpProtocol::RequestRoute(
+				uint32_t sourceIface,
+				const Mac48Address source,
+				const Mac48Address destination,
+				Ptr<const Packet> constPacket,
+				uint16_t protocolType, //ethrnet 'Protocol' field
+				WmnL2RoutingProtocol::RouteReplyCallback routeReply
+				)
+		{
+			Ptr <Packet> packet = constPacket->Copy();
+			PmtmgmpTag tag;
+			if (sourceIface == GetWmnPoint()->GetIfIndex())
+			{
+				// packet from level 3
+				if (packet->PeekPacketTag(tag))
+				{
+					NS_FATAL_ERROR("PMTMGMP tag has come with a packet from upper layer. This must not occur...");
+				}
+				//Filling TAG:
+				/*if (destination == Mac48Address::GetBroadcast())
+				{
+					tag.SetSeqno(m_dataSeqno++);
+				}*/
+				tag.SetTtl(m_maxTtl);
+			}
+			else
+			{
+				if (!packet->RemovePacketTag(tag))
+				{
+					NS_FATAL_ERROR("PMTMGMP tag is supposed to be here at this point.");
+				}
+				tag.DecrementTtl();
+				if (tag.GetTtl() == 0)
+				{
+					m_stats.droppedTtl++;
+					return false;
+				}
+			}
+			if (destination == Mac48Address::GetBroadcast())
+			{
+				m_stats.txBroadcast++;
+				m_stats.txBytes += packet->GetSize();
+				//channel IDs where we have already sent broadcast:
+				std::vector<uint16_t> channels;
+				for (PmtmgmpProtocolMacMap::const_iterator plugin = m_interfaces.begin(); plugin != m_interfaces.end(); plugin++)
+				{
+					bool shouldSend = true;
+					for (std::vector<uint16_t>::const_iterator chan = channels.begin(); chan != channels.end(); chan++)
+					{
+						if ((*chan) == plugin->second->GetChannelId())
+						{
+							shouldSend = false;
+						}
+					}
+					if (!shouldSend)
+					{
+						continue;
+					}
+					channels.push_back(plugin->second->GetChannelId());
+					std::vector<Mac48Address> receivers = GetBroadcastReceivers(plugin->first);
+					for (std::vector<Mac48Address>::const_iterator i = receivers.begin(); i != receivers.end(); i++)
+					{
+						Ptr<Packet> packetCopy = packet->Copy();
+						//
+						// 64-bit Intel valgrind complains about tag.SetAddress (*i).  It
+						// likes this just fine.
+						//
+						Mac48Address address = *i;
+						tag.SetAddress(address);
+						packetCopy->AddPacketTag(tag);
+						routeReply(true, packetCopy, source, destination, protocolType, plugin->first);
+					}
+				}
+			}
+			else
+			{
+				return ForwardUnicast(sourceIface, source, destination, packet, protocolType, routeReply, tag.GetTtl());
+			}
+		}
+#else
 		bool
 			PmtmgmpProtocol::RequestRoute(
 				uint32_t sourceIface,
@@ -430,6 +512,7 @@ namespace ns3 {
 			}
 			return true;
 		}
+#endif
 		bool
 			PmtmgmpProtocol::RemoveRoutingStuff(uint32_t fromIface, const Mac48Address source,
 				const Mac48Address destination, Ptr<Packet>  packet, uint16_t&  protocolType)

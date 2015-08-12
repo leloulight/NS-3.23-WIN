@@ -383,34 +383,34 @@ namespace ns3 {
 				return *select;
 			}
 		}
-		////获取度量最小的路径
-		std::vector<Ptr<PmtmgmpRoutePath> > PmtmgmpRouteTree::GetBestPath()
-		{
-			if (m_tree.size() == 0) NS_LOG_ERROR("There is no path in this tree.");
+		//////获取度量最小的路径
+		//std::vector<Ptr<PmtmgmpRoutePath> > PmtmgmpRouteTree::GetBestPath()
+		//{
+		//	if (m_tree.size() == 0) NS_LOG_ERROR("There is no path in this tree.");
 
-			return GetBestPath(m_tree);
-		}
-		////获取度量最小的路径
-		std::vector<Ptr<PmtmgmpRoutePath> > PmtmgmpRouteTree::GetBestPath(std::vector<Ptr<PmtmgmpRoutePath> > pathList)
-		{
-			std::vector<Ptr<PmtmgmpRoutePath> >::iterator bestIter = pathList.begin();
-			std::vector<Ptr<PmtmgmpRoutePath> > bestPaths;
-			bestPaths.push_back(*bestIter);
-			for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = pathList.begin(); iter != pathList.end(); iter++)
-			{
-				if ((*bestIter)->GetMetric() < (*iter)->GetMetric())
-				{
-					bestPaths.clear();
-					bestPaths.push_back(*iter);
-					bestIter == iter;
-				}
-				else if ((*bestIter)->GetMetric() == (*iter)->GetMetric())
-				{
-					bestPaths.push_back(*iter);
-				}
-			}
-			return bestPaths;
-		}
+		//	return GetBestPath(m_tree);
+		//}
+		//////获取度量最小的路径
+		//std::vector<Ptr<PmtmgmpRoutePath> > PmtmgmpRouteTree::GetBestPath(std::vector<Ptr<PmtmgmpRoutePath> > pathList)
+		//{
+		//	std::vector<Ptr<PmtmgmpRoutePath> >::iterator bestIter = pathList.begin();
+		//	std::vector<Ptr<PmtmgmpRoutePath> > bestPaths;
+		//	bestPaths.push_back(*bestIter);
+		//	for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = pathList.begin(); iter != pathList.end(); iter++)
+		//	{
+		//		if ((*bestIter)->GetMetric() < (*iter)->GetMetric())
+		//		{
+		//			bestPaths.clear();
+		//			bestPaths.push_back(*iter);
+		//			bestIter == iter;
+		//		}
+		//		else if ((*bestIter)->GetMetric() == (*iter)->GetMetric())
+		//		{
+		//			bestPaths.push_back(*iter);
+		//		}
+		//	}
+		//	return bestPaths;
+		//}
 		////添加新路径
 		void PmtmgmpRouteTree::AddNewPath(Ptr<PmtmgmpRoutePath> path)
 		{
@@ -720,7 +720,7 @@ namespace ns3 {
 					}
 				}
 			}
-			return uint16_t();
+			return count;
 		}
 		uint8_t PmtmgmpRouteTable::GetNextMSECPindex()
 		{
