@@ -102,12 +102,18 @@ namespace ns3 {
 
 			////度量值更新
 			void IncrementMetric(uint32_t metric, double k);
-		private:
-			////按Metric排序
-			bool operator < (const Ptr<PmtmgmpRoutePath> path) const
+
+			////用于RoutePath按度量排序(优先新路径（GSN大），同GSN优先小Metric，同Metric优先MSECP较小的)
+			class RoutePathMetricCompare
 			{
-				return m_PathGenerationSeqNumber < path->GetPathGenerationSequenceNumber() || (m_PathGenerationSeqNumber == path->GetPathGenerationSequenceNumber() && m_metric < path->GetMetric());
-			}
+			public:
+				bool operator () (const Ptr<PmtmgmpRoutePath> pathA, const Ptr<PmtmgmpRoutePath> pathB)
+				{
+					return pathA->GetPathGenerationSequenceNumber() > pathB->GetPathGenerationSequenceNumber() || (pathA->GetPathGenerationSequenceNumber() == pathB->GetPathGenerationSequenceNumber() && (pathA->GetMetric() < pathB->GetMetric() || (pathA->GetMetric() == pathB->GetMetric() && pathA->GetMSECPindex() < pathB->GetMSECPindex())));
+				}
+			};
+
+		private:
 			Mac48Address m_MTERPaddress;
 			Mac48Address m_MSECPaddress;
 			uint8_t m_MSECPindex;

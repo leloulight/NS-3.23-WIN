@@ -426,7 +426,7 @@ namespace ns3 {
 		////Ñ¡ÔñMSECP
 		void PmtmgmpRouteTree::SelectMSECP()
 		{
-			std::sort(m_tree.begin(), m_tree.end());
+			std::sort(m_tree.begin(), m_tree.end(), PmtmgmpRoutePath::RoutePathMetricCompare());
 			if (m_tree.size() > m_MaxMSECPcountForMTERP)
 			{
 				std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin() + m_MaxMSECPcountForMTERP;
