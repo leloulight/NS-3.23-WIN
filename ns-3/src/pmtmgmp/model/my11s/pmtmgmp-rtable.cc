@@ -253,6 +253,8 @@ namespace ns3 {
 		////路径信息更新自检
 		bool PmtmgmpRoutePath::RoutePathInforLifeCheck(Ptr<PmtmgmpRouteTable> table)
 		{
+			////没有新路径（GSN增加时）不会删除旧有路径
+			if (m_InformationStatus == Confirmed) return false;
 			bool checker = Simulator::Now() - m_PMTGMGMProutePathInforUpdateTime > m_PMTGMGMProutePathInforLife;
 			if (checker && table->GetMac48Address() == m_MSECPaddress)
 			{
@@ -426,7 +428,7 @@ namespace ns3 {
 		////选择MSECP
 		void PmtmgmpRouteTree::SelectMSECP()
 		{
-			std::sort(m_tree.begin(), m_tree.end(), PmtmgmpRoutePath::RoutePathMetricCompare());
+			std::sort(m_tree.begin(), m_tree.end(), PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare());
 			if (m_tree.size() > m_MaxMSECPcountForMTERP)
 			{
 				std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin() + m_MaxMSECPcountForMTERP;

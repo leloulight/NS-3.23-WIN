@@ -429,6 +429,7 @@ namespace ns3 {
 			{
 				return ForwardUnicast(sourceIface, source, destination, packet, protocolType, routeReply, tag.GetTtl());
 			}
+			return true;
 		}
 #else
 		bool

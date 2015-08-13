@@ -576,6 +576,10 @@ def register_types_ns3_my11s(module):
     module.add_class('PmtmgmpRoutePath', parent=root_module['ns3::Object'])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRoutePath::RouteInformationStatus [enumeration]
     module.add_enum('RouteInformationStatus', ['Expired', 'Waited', 'Confirmed'], outer_class=root_module['ns3::my11s::PmtmgmpRoutePath'])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRoutePath::DataSendRoutePathMetricCompare [class]
+    module.add_class('DataSendRoutePathMetricCompare', outer_class=root_module['ns3::my11s::PmtmgmpRoutePath'])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare [class]
+    module.add_class('MSECPselectRoutePathMetricCompare', outer_class=root_module['ns3::my11s::PmtmgmpRoutePath'])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRouteTable [class]
     module.add_class('PmtmgmpRouteTable', parent=root_module['ns3::Object'])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRouteTree [class]
@@ -799,6 +803,8 @@ def register_methods(root_module):
     register_Ns3My11sPmtmgmpProtocol_methods(root_module, root_module['ns3::my11s::PmtmgmpProtocol'])
     register_Ns3My11sPmtmgmpProtocolFailedDestination_methods(root_module, root_module['ns3::my11s::PmtmgmpProtocol::FailedDestination'])
     register_Ns3My11sPmtmgmpRoutePath_methods(root_module, root_module['ns3::my11s::PmtmgmpRoutePath'])
+    register_Ns3My11sPmtmgmpRoutePathDataSendRoutePathMetricCompare_methods(root_module, root_module['ns3::my11s::PmtmgmpRoutePath::DataSendRoutePathMetricCompare'])
+    register_Ns3My11sPmtmgmpRoutePathMSECPselectRoutePathMetricCompare_methods(root_module, root_module['ns3::my11s::PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare'])
     register_Ns3My11sPmtmgmpRouteTable_methods(root_module, root_module['ns3::my11s::PmtmgmpRouteTable'])
     register_Ns3My11sPmtmgmpRouteTree_methods(root_module, root_module['ns3::my11s::PmtmgmpRouteTree'])
     register_Ns3My11sPmtmgmpRtable_methods(root_module, root_module['ns3::my11s::PmtmgmpRtable'])
@@ -11556,8 +11562,8 @@ def register_Ns3My11sPUPDaalmPathData_methods(root_module, cls):
     cls.add_constructor([param('ns3::my11s::PUPDaalmPathData const &', 'arg0')])
     ## ie-my11s-pupd.h (module 'pmtmgmp'): ns3::my11s::PUPDaalmPathData::PUPDaalmPathData() [constructor]
     cls.add_constructor([])
-    ## ie-my11s-pupd.h (module 'pmtmgmp'): ns3::my11s::PUPDaalmPathData::PUPDaalmPathData(ns3::Buffer::Iterator i) [constructor]
-    cls.add_constructor([param('ns3::Buffer::Iterator', 'i')])
+    ## ie-my11s-pupd.h (module 'pmtmgmp'): ns3::my11s::PUPDaalmPathData::PUPDaalmPathData(ns3::Buffer::Iterator * i) [constructor]
+    cls.add_constructor([param('ns3::Buffer::Iterator *', 'i')])
     ## ie-my11s-pupd.h (module 'pmtmgmp'): ns3::my11s::PUPDaalmPathData::PUPDaalmPathData(ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> path) [constructor]
     cls.add_constructor([param('ns3::Ptr< ns3::my11s::PmtmgmpRoutePath >', 'path')])
     ## ie-my11s-pupd.h (module 'pmtmgmp'): uint8_t ns3::my11s::PUPDaalmPathData::GetMSECPindex() const [member function]
@@ -11570,10 +11576,10 @@ def register_Ns3My11sPUPDaalmPathData_methods(root_module, cls):
                    'uint32_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-pupd.h (module 'pmtmgmp'): void ns3::my11s::PUPDaalmPathData::ToBuffer(ns3::Buffer::Iterator i) const [member function]
+    ## ie-my11s-pupd.h (module 'pmtmgmp'): void ns3::my11s::PUPDaalmPathData::ToBuffer(ns3::Buffer::Iterator * i) const [member function]
     cls.add_method('ToBuffer', 
                    'void', 
-                   [param('ns3::Buffer::Iterator', 'i')], 
+                   [param('ns3::Buffer::Iterator *', 'i')], 
                    is_const=True)
     return
 
@@ -11582,8 +11588,8 @@ def register_Ns3My11sPUPDaalmTreeData_methods(root_module, cls):
     cls.add_constructor([param('ns3::my11s::PUPDaalmTreeData const &', 'arg0')])
     ## ie-my11s-pupd.h (module 'pmtmgmp'): ns3::my11s::PUPDaalmTreeData::PUPDaalmTreeData() [constructor]
     cls.add_constructor([])
-    ## ie-my11s-pupd.h (module 'pmtmgmp'): ns3::my11s::PUPDaalmTreeData::PUPDaalmTreeData(ns3::Buffer::Iterator i) [constructor]
-    cls.add_constructor([param('ns3::Buffer::Iterator', 'i')])
+    ## ie-my11s-pupd.h (module 'pmtmgmp'): ns3::my11s::PUPDaalmTreeData::PUPDaalmTreeData(ns3::Buffer::Iterator * i) [constructor]
+    cls.add_constructor([param('ns3::Buffer::Iterator *', 'i')])
     ## ie-my11s-pupd.h (module 'pmtmgmp'): ns3::my11s::PUPDaalmTreeData::PUPDaalmTreeData(ns3::Ptr<ns3::my11s::PmtmgmpRouteTree> tree, ns3::Time secInterval) [constructor]
     cls.add_constructor([param('ns3::Ptr< ns3::my11s::PmtmgmpRouteTree >', 'tree'), param('ns3::Time', 'secInterval')])
     ## ie-my11s-pupd.h (module 'pmtmgmp'): std::vector<ns3::my11s::PUPDaalmPathData, std::allocator<ns3::my11s::PUPDaalmPathData> > ns3::my11s::PUPDaalmTreeData::GetData() const [member function]
@@ -11601,10 +11607,10 @@ def register_Ns3My11sPUPDaalmTreeData_methods(root_module, cls):
                    'uint8_t', 
                    [], 
                    is_const=True)
-    ## ie-my11s-pupd.h (module 'pmtmgmp'): void ns3::my11s::PUPDaalmTreeData::ToBuffer(ns3::Buffer::Iterator i) const [member function]
+    ## ie-my11s-pupd.h (module 'pmtmgmp'): void ns3::my11s::PUPDaalmTreeData::ToBuffer(ns3::Buffer::Iterator * i) const [member function]
     cls.add_method('ToBuffer', 
                    'void', 
-                   [param('ns3::Buffer::Iterator', 'i')], 
+                   [param('ns3::Buffer::Iterator *', 'i')], 
                    is_const=True)
     return
 
@@ -11613,8 +11619,8 @@ def register_Ns3My11sPUPGQdata_methods(root_module, cls):
     cls.add_constructor([param('ns3::my11s::PUPGQdata const &', 'arg0')])
     ## ie-my11s-pupgq.h (module 'pmtmgmp'): ns3::my11s::PUPGQdata::PUPGQdata() [constructor]
     cls.add_constructor([])
-    ## ie-my11s-pupgq.h (module 'pmtmgmp'): ns3::my11s::PUPGQdata::PUPGQdata(ns3::Buffer::Iterator i) [constructor]
-    cls.add_constructor([param('ns3::Buffer::Iterator', 'i')])
+    ## ie-my11s-pupgq.h (module 'pmtmgmp'): ns3::my11s::PUPGQdata::PUPGQdata(ns3::Buffer::Iterator * i) [constructor]
+    cls.add_constructor([param('ns3::Buffer::Iterator *', 'i')])
     ## ie-my11s-pupgq.h (module 'pmtmgmp'): ns3::my11s::PUPGQdata::PUPGQdata(ns3::Mac48Address mterp, uint8_t index) [constructor]
     cls.add_constructor([param('ns3::Mac48Address', 'mterp'), param('uint8_t', 'index')])
     ## ie-my11s-pupgq.h (module 'pmtmgmp'): uint8_t ns3::my11s::PUPGQdata::GetMSECPindex() const [member function]
@@ -11635,10 +11641,10 @@ def register_Ns3My11sPUPGQdata_methods(root_module, cls):
     cls.add_method('SetMTERPaddress', 
                    'void', 
                    [param('ns3::Mac48Address', 'address')])
-    ## ie-my11s-pupgq.h (module 'pmtmgmp'): void ns3::my11s::PUPGQdata::ToBuffer(ns3::Buffer::Iterator i) const [member function]
+    ## ie-my11s-pupgq.h (module 'pmtmgmp'): void ns3::my11s::PUPGQdata::ToBuffer(ns3::Buffer::Iterator * i) const [member function]
     cls.add_method('ToBuffer', 
                    'void', 
-                   [param('ns3::Buffer::Iterator', 'i')], 
+                   [param('ns3::Buffer::Iterator *', 'i')], 
                    is_const=True)
     return
 
@@ -12211,6 +12217,30 @@ def register_Ns3My11sPmtmgmpRoutePath_methods(root_module, cls):
                    [param('uint8_t', 'ttl')])
     return
 
+def register_Ns3My11sPmtmgmpRoutePathDataSendRoutePathMetricCompare_methods(root_module, cls):
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRoutePath::DataSendRoutePathMetricCompare::DataSendRoutePathMetricCompare() [constructor]
+    cls.add_constructor([])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRoutePath::DataSendRoutePathMetricCompare::DataSendRoutePathMetricCompare(ns3::my11s::PmtmgmpRoutePath::DataSendRoutePathMetricCompare const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::my11s::PmtmgmpRoutePath::DataSendRoutePathMetricCompare const &', 'arg0')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpRoutePath::DataSendRoutePathMetricCompare::operator()(ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> const pathA, ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> const pathB) [member operator]
+    cls.add_method('operator()', 
+                   'bool', 
+                   [param('ns3::Ptr< ns3::my11s::PmtmgmpRoutePath > const', 'pathA'), param('ns3::Ptr< ns3::my11s::PmtmgmpRoutePath > const', 'pathB')], 
+                   custom_name=u'__call__')
+    return
+
+def register_Ns3My11sPmtmgmpRoutePathMSECPselectRoutePathMetricCompare_methods(root_module, cls):
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare::MSECPselectRoutePathMetricCompare() [constructor]
+    cls.add_constructor([])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare::MSECPselectRoutePathMetricCompare(ns3::my11s::PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::my11s::PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare const &', 'arg0')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare::operator()(ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> const pathA, ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> const pathB) [member operator]
+    cls.add_method('operator()', 
+                   'bool', 
+                   [param('ns3::Ptr< ns3::my11s::PmtmgmpRoutePath > const', 'pathA'), param('ns3::Ptr< ns3::my11s::PmtmgmpRoutePath > const', 'pathB')], 
+                   custom_name=u'__call__')
+    return
+
 def register_Ns3My11sPmtmgmpRouteTable_methods(root_module, cls):
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRouteTable::PmtmgmpRouteTable(ns3::my11s::PmtmgmpRouteTable const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::my11s::PmtmgmpRouteTable const &', 'arg0')])
@@ -12363,14 +12393,6 @@ def register_Ns3My11sPmtmgmpRouteTree_methods(root_module, cls):
                    'ns3::Time', 
                    [], 
                    is_const=True)
-    ## pmtmgmp-rtable.h (module 'pmtmgmp'): std::vector<ns3::Ptr<ns3::my11s::PmtmgmpRoutePath>, std::allocator<ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> > > ns3::my11s::PmtmgmpRouteTree::GetBestPath() [member function]
-    cls.add_method('GetBestPath', 
-                   'std::vector< ns3::Ptr< ns3::my11s::PmtmgmpRoutePath > >', 
-                   [])
-    ## pmtmgmp-rtable.h (module 'pmtmgmp'): std::vector<ns3::Ptr<ns3::my11s::PmtmgmpRoutePath>, std::allocator<ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> > > ns3::my11s::PmtmgmpRouteTree::GetBestPath(std::vector<ns3::Ptr<ns3::my11s::PmtmgmpRoutePath>, std::allocator<ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> > > pathList) [member function]
-    cls.add_method('GetBestPath', 
-                   'std::vector< ns3::Ptr< ns3::my11s::PmtmgmpRoutePath > >', 
-                   [param('std::vector< ns3::Ptr< ns3::my11s::PmtmgmpRoutePath > >', 'pathList')])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): uint8_t ns3::my11s::PmtmgmpRouteTree::GetConfirmedPathSize() [member function]
     cls.add_method('GetConfirmedPathSize', 
                    'uint8_t', 

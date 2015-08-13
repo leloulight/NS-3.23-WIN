@@ -104,7 +104,15 @@ namespace ns3 {
 			void IncrementMetric(uint32_t metric, double k);
 
 			////用于RoutePath按度量排序(优先新路径（GSN大），同GSN优先小Metric，同Metric优先MSECP较小的)
-			class RoutePathMetricCompare
+			class MSECPselectRoutePathMetricCompare
+			{
+			public:
+				bool operator () (const Ptr<PmtmgmpRoutePath> pathA, const Ptr<PmtmgmpRoutePath> pathB)
+				{
+					return pathA->GetMetric() < pathB->GetMetric() || (pathA->GetMetric() == pathB->GetMetric() && pathA->GetMSECPindex() < pathB->GetMSECPindex());
+				}
+			};
+			class DataSendRoutePathMetricCompare
 			{
 			public:
 				bool operator () (const Ptr<PmtmgmpRoutePath> pathA, const Ptr<PmtmgmpRoutePath> pathB)
