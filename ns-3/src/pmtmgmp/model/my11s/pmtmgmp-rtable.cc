@@ -295,7 +295,8 @@ namespace ns3 {
 			m_tree(std::vector<Ptr<PmtmgmpRoutePath> >()),
 			m_MSECPnumForMTERP(2),
 			m_AcceptInformaitonDelay(MicroSeconds(1024 * 1000)),
-			m_MaxMSECPcountForMTERP(2)
+			m_MaxMSECPcountForMTERP(2),
+			m_NotSelectBestRoutePathRate(5)
 		{
 		}
 
@@ -329,6 +330,13 @@ namespace ns3 {
 						&PmtmgmpRouteTree::m_MaxMSECPcountForMTERP),
 					MakeUintegerChecker<uint8_t>(1)
 					)
+				.AddAttribute("NotSelectBestRoutePathRate",
+					"The rate for compare selected path and the best Metric path.",
+					UintegerValue(5),
+					MakeUintegerAccessor(
+						&PmtmgmpRouteTree::m_NotSelectBestRoutePathRate),
+					MakeUintegerChecker<uint8_t>(1)
+					)
 				;
 			return tid;
 		}
@@ -356,7 +364,6 @@ namespace ns3 {
 			if (iter == m_tree.end())
 			{
 				return 0;
-				//NS_LOG_ERROR("Can not find the path with MTERP is " << mterp << ",MSECP is " << msecp);
 			}
 			else
 			{
@@ -366,53 +373,16 @@ namespace ns3 {
 		Ptr<PmtmgmpRoutePath> PmtmgmpRouteTree::GetPathByMACindex(uint8_t index)
 		{
 			if (m_tree.size() == 0) return 0;
-			uint32_t gsn = 0;
-			std::vector<Ptr<PmtmgmpRoutePath> >::iterator select = m_tree.end();
-			for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin(); iter != m_tree.end(); iter++)
-			{
-				if ((*iter)->GetMSECPindex() == index && gsn <= (*iter)->GetPathGenerationSequenceNumber())
-				{
-					gsn = (*iter)->GetPathGenerationSequenceNumber();
-					select = iter;
-				}
-			}
-			if (select == m_tree.end())
+			std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = std::find_if(m_tree.begin(), m_tree.end(), PmtmgmpRouteTree_IndexFinder(index));
+			if (iter == m_tree.end())
 			{
 				return 0;
 			}
 			else
 			{
-				return *select;
+				return *iter;
 			}
 		}
-		//////获取度量最小的路径
-		//std::vector<Ptr<PmtmgmpRoutePath> > PmtmgmpRouteTree::GetBestPath()
-		//{
-		//	if (m_tree.size() == 0) NS_LOG_ERROR("There is no path in this tree.");
-
-		//	return GetBestPath(m_tree);
-		//}
-		//////获取度量最小的路径
-		//std::vector<Ptr<PmtmgmpRoutePath> > PmtmgmpRouteTree::GetBestPath(std::vector<Ptr<PmtmgmpRoutePath> > pathList)
-		//{
-		//	std::vector<Ptr<PmtmgmpRoutePath> >::iterator bestIter = pathList.begin();
-		//	std::vector<Ptr<PmtmgmpRoutePath> > bestPaths;
-		//	bestPaths.push_back(*bestIter);
-		//	for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = pathList.begin(); iter != pathList.end(); iter++)
-		//	{
-		//		if ((*bestIter)->GetMetric() < (*iter)->GetMetric())
-		//		{
-		//			bestPaths.clear();
-		//			bestPaths.push_back(*iter);
-		//			bestIter == iter;
-		//		}
-		//		else if ((*bestIter)->GetMetric() == (*iter)->GetMetric())
-		//		{
-		//			bestPaths.push_back(*iter);
-		//		}
-		//	}
-		//	return bestPaths;
-		//}
 		////添加新路径
 		void PmtmgmpRouteTree::AddNewPath(Ptr<PmtmgmpRoutePath> path)
 		{
@@ -594,6 +564,32 @@ namespace ns3 {
 			}
 			return m_tree.size() == 0;
 		}
+		////数据传输最优路径获取
+		Ptr<PmtmgmpRoutePath> PmtmgmpRouteTree::GetBestRoutePathForData(uint8_t index)
+		{
+			if (m_tree.size() == 0) return 0;
+			std::sort(m_tree.begin(), m_tree.end(), PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare());
+			////MSECPindex为不会分配0，说明当前没有历史路径（iter == m_tree.end()）
+			std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = std::find_if(m_tree.begin(), m_tree.end(), PmtmgmpRouteTree_IndexFinder(index));
+			if (iter == m_tree.end())
+			{
+				////没找到MSECPindex的路径直接返回最优路径
+				return *(m_tree.begin());
+			}
+			else
+			{
+				////比较当前使用路由度量和最优路由路径度量，选取最优路径返回
+				if ((*iter)->GetMetric() < (*(m_tree.begin()))->GetMetric() * m_NotSelectBestRoutePathRate)
+				{
+					return *iter;
+				}
+				else
+				{
+					return *(m_tree.begin());
+				}
+				return *iter;
+			}
+		}
 		/*************************
 		* PmtmgmpRouteTable
 		************************/
@@ -757,7 +753,6 @@ namespace ns3 {
 			if (iter == m_table.end())
 			{
 				return 0;
-				//NS_LOG_ERROR("Can not find the tree with MTERP is " << mterp);
 			}
 			else
 			{
@@ -878,6 +873,20 @@ namespace ns3 {
 				NS_LOG_DEBUG("Life checking is end, delete " << size - m_table.size() << " trees at node " << m_address);
 			}
 			PMTGMGMProuteInforCheckEvent = Simulator::Schedule(m_PMTGMGMProuteInforCheckPeriod, &PmtmgmpRouteTable::RouteTableInforLifeCheck, this);
+		}
+		////数据传输最优路径获取
+		Ptr<PmtmgmpRoutePath> PmtmgmpRouteTable::GetBestRoutePathForData(Mac48Address mterp, uint8_t index)
+		{
+			if (m_table.size() == 0) return 0;
+			std::vector<Ptr<PmtmgmpRouteTree> >::iterator iter = std::find_if(m_table.begin(), m_table.end(), PmtmgmpRouteTable_Finder(mterp));
+			if (iter == m_table.end())
+			{
+				return 0;
+			}
+			else
+			{
+				return (*iter)->GetBestRoutePathForData(index);
+			}
 		}
 #endif
 		/*************************

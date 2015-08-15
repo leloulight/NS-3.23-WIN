@@ -370,10 +370,10 @@ namespace ns3 {
 					NS_FATAL_ERROR("PMTMGMP tag has come with a packet from upper layer. This must not occur...");
 				}
 				//Filling TAG:
-				/*if (destination == Mac48Address::GetBroadcast())
+				if (destination == Mac48Address::GetBroadcast())
 				{
 					tag.SetSeqno(m_dataSeqno++);
-				}*/
+				}
 				tag.SetTtl(m_maxTtl);
 			}
 			else

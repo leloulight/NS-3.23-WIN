@@ -41,15 +41,15 @@ namespace ns3 {
 			~PmtmgmpRoutePath(); 
 			static TypeId GetTypeId();
 
-			////路由路径状态
+			////路由路径状态 (其值用于多路径选择比较时Metric的倍率)
 			enum RouteInformationStatus
 			{
-				////过期
-				Expired,
-				////等待
-				Waited,
 				////确认
-				Confirmed,
+				Confirmed = 1,
+				////等待
+				Waited = 2,
+				////过期
+				Expired = 3,
 			};
 
 			////候选信息
@@ -102,22 +102,20 @@ namespace ns3 {
 
 			////度量值更新
 			void IncrementMetric(uint32_t metric, double k);
-
+			
 			////用于RoutePath按度量排序(优先新路径（GSN大），同GSN优先小Metric，同Metric优先MSECP较小的)
-			class MSECPselectRoutePathMetricCompare
+			struct MSECPselectRoutePathMetricCompare
 			{
-			public:
 				bool operator () (const Ptr<PmtmgmpRoutePath> pathA, const Ptr<PmtmgmpRoutePath> pathB)
 				{
 					return pathA->GetMetric() < pathB->GetMetric() || (pathA->GetMetric() == pathB->GetMetric() && pathA->GetMSECPindex() < pathB->GetMSECPindex());
 				}
 			};
-			class DataSendRoutePathMetricCompare
+			struct DataSendRoutePathMetricCompare
 			{
-			public:
 				bool operator () (const Ptr<PmtmgmpRoutePath> pathA, const Ptr<PmtmgmpRoutePath> pathB)
 				{
-					return pathA->GetPathGenerationSequenceNumber() > pathB->GetPathGenerationSequenceNumber() || (pathA->GetPathGenerationSequenceNumber() == pathB->GetPathGenerationSequenceNumber() && (pathA->GetMetric() < pathB->GetMetric() || (pathA->GetMetric() == pathB->GetMetric() && pathA->GetMSECPindex() < pathB->GetMSECPindex())));
+					return pathA->GetPathGenerationSequenceNumber() > pathB->GetPathGenerationSequenceNumber() || (pathA->GetPathGenerationSequenceNumber() == pathB->GetPathGenerationSequenceNumber() && (pathA->GetMetric() * uint8_t(pathA->GetStatus()) < pathB->GetMetric() * uint8_t(pathB->GetStatus()) || (pathA->GetMetric() * uint8_t(pathA->GetStatus()) == pathB->GetMetric() * uint8_t(pathB->GetStatus()) && pathA->GetMSECPindex() < pathB->GetMSECPindex())));
 				}
 			};
 
@@ -176,10 +174,7 @@ namespace ns3 {
 			////获取MTERP、MSECP(Index)对应的Path，找不到则返回0
 			Ptr<PmtmgmpRoutePath> GetPathByMACaddress(Mac48Address msecp);
 			Ptr<PmtmgmpRoutePath> GetPathByMACindex(uint8_t index);
-			//////获取度量最小的路径
-			//std::vector<Ptr<PmtmgmpRoutePath> > GetBestPath();
-			//////获取度量最小的路径
-			//std::vector<Ptr<PmtmgmpRoutePath> > GetBestPath(std::vector<Ptr<PmtmgmpRoutePath> > pathList);
+			
 			////添加新路径
 			void AddNewPath(Ptr<PmtmgmpRoutePath> path);
 			////选择MSECP(仅MTERP路由树)
@@ -210,6 +205,9 @@ namespace ns3 {
 			////路由树信息寿命检测
 			bool RouteTreeInforLifeCheck(Ptr<PmtmgmpRouteTable> table);
 
+			////数据传输最优路径获取
+			Ptr<PmtmgmpRoutePath> GetBestRoutePathForData(uint8_t index);
+
 		private:
 			////路由表树搜索器
 			struct PmtmgmpRouteTree_AddressFinder
@@ -220,6 +218,15 @@ namespace ns3 {
 					return m_msecp == p->GetMSECPaddress();
 				}
 				Mac48Address m_msecp;
+			};
+			struct PmtmgmpRouteTree_IndexFinder
+			{
+				PmtmgmpRouteTree_IndexFinder(uint8_t index) :m_MSECPindex(index) {};
+				bool operator()(Ptr<PmtmgmpRoutePath> p)
+				{
+					return m_MSECPindex == p->GetMSECPindex();
+				}
+				uint8_t m_MSECPindex;
 			};
 			////路由表树路径寿命检测器
 			struct PmtmgmpRouteTree_PathLifeChecker
@@ -246,6 +253,9 @@ namespace ns3 {
 
 			////每个MTERP可有的SECREP的最大数量
 			uint8_t m_MaxMSECPcountForMTERP;
+
+			////非当前使用路径最优路径比较倍率
+			uint8_t m_NotSelectBestRoutePathRate;
 		};
 
 		/*************************
@@ -315,6 +325,9 @@ namespace ns3 {
 
 			////路由表信息寿命检测
 			void RouteTableInforLifeCheck();
+
+			////数据传输最优路径获取
+			Ptr<PmtmgmpRoutePath> GetBestRoutePathForData(Mac48Address mterp, uint8_t index);
 		private:
 			////路由表路径搜索器
 			struct PmtmgmpRouteTable_Finder

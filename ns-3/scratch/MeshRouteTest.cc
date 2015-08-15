@@ -90,6 +90,7 @@ public:
 	enum MeshProtocolType// Mesh路由协议类型
 	{
 		DOT11S_HWMP,// HWMP路由协议
+		DOT11S_FLAME,
 		MY11S_PMTMGMP,// PMTMGMP路由协议
 	};
 
@@ -117,6 +118,7 @@ private:
 	double m_TotalTime;
 	string m_Root;
 	bool m_Pcap;
+	double m_PacketInterval;
 
 private:
 	// 节点总数
@@ -151,7 +153,8 @@ m_PacketSize(1024),
 m_DataRate("150kbps"),
 m_TotalTime(65),
 m_Root("00:00:00:00:00:06"),
-m_Pcap(false)
+m_Pcap(false),
+m_PacketInterval(0.1)
 {
 	// 链路层及网络层协议设置
 	l_Mesh = MeshHelper::Default();
@@ -200,46 +203,49 @@ void MeshRouteClass::SimulatorSetting()
 	m_TotalTime += MIN_APPLICATION_TIME + END_APPLICATION_TIME;
 
 	// 配置路径
-	string l_AttributePath_PeerLink;// Peer Link
-	string l_AttributePath_PeerManagementProtocol;// Peer Management Protocol
-	string l_AttributePath_RouteProtocol;// Route Protocol
-	string l_AttributePath_RouteProtocolPart;// 部分名称差异
-
-	//路由协议类型
-	switch (m_ProtocolType)
+	if (m_ProtocolType != DOT11S_FLAME)
 	{
-	case MeshRouteClass::DOT11S_HWMP:
-		l_AttributePath_PeerLink = "ns3::dot11s::PeerLink::";
-		l_AttributePath_PeerManagementProtocol = "ns3::dot11s::PeerManagementProtocol::";
-		l_AttributePath_RouteProtocol = "ns3::dot11s::HwmpProtocol::";
-		l_AttributePath_RouteProtocolPart = "Dot11MeshHWMP";
-		break;
-	case MeshRouteClass::MY11S_PMTMGMP:
-		l_AttributePath_PeerLink = "ns3::my11s::PmtmgmpPeerLink::";
-		l_AttributePath_PeerManagementProtocol = "ns3::my11s::PmtmgmpPeerManagementProtocol::";
-		l_AttributePath_RouteProtocol = "ns3::my11s::PmtmgmpProtocol::";
-		l_AttributePath_RouteProtocolPart = "My11WmnPMTMGMP";
-		break;
-	default:
-		break;
+		string l_AttributePath_PeerLink;// Peer Link
+		string l_AttributePath_PeerManagementProtocol;// Peer Management Protocol
+		string l_AttributePath_RouteProtocol;// Route Protocol
+		string l_AttributePath_RouteProtocolPart;// 部分名称差异
+
+		//路由协议类型
+		switch (m_ProtocolType)
+		{
+		case MeshRouteClass::DOT11S_HWMP:
+			l_AttributePath_PeerLink = "ns3::dot11s::PeerLink::";
+			l_AttributePath_PeerManagementProtocol = "ns3::dot11s::PeerManagementProtocol::";
+			l_AttributePath_RouteProtocol = "ns3::dot11s::HwmpProtocol::";
+			l_AttributePath_RouteProtocolPart = "Dot11MeshHWMP";
+			break;
+		case MeshRouteClass::MY11S_PMTMGMP:
+			l_AttributePath_PeerLink = "ns3::my11s::PmtmgmpPeerLink::";
+			l_AttributePath_PeerManagementProtocol = "ns3::my11s::PmtmgmpPeerManagementProtocol::";
+			l_AttributePath_RouteProtocol = "ns3::my11s::PmtmgmpProtocol::";
+			l_AttributePath_RouteProtocolPart = "My11WmnPMTMGMP";
+			break;
+		default:
+			break;
+		}
+
+		// 配置Peer Link参数
+		Config::SetDefault(l_AttributePath_PeerLink + "MaxBeaconLoss", UintegerValue(32));
+		Config::SetDefault(l_AttributePath_PeerLink + "MaxRetries", UintegerValue(8));
+		Config::SetDefault(l_AttributePath_PeerLink + "MaxPacketFailure", UintegerValue(8));
+
+		// 配置Peer Management Protocol参数
+		Config::SetDefault(l_AttributePath_PeerManagementProtocol + "EnableBeaconCollisionAvoidance", BooleanValue(false));
+
+		// 配置路由协议参数
+		Config::SetDefault(l_AttributePath_RouteProtocol + l_AttributePath_RouteProtocolPart + "activePathTimeout", TimeValue(Seconds(100)));
+		Config::SetDefault(l_AttributePath_RouteProtocol + l_AttributePath_RouteProtocolPart + "activeRootTimeout", TimeValue(Seconds(100)));
+		Config::SetDefault(l_AttributePath_RouteProtocol + l_AttributePath_RouteProtocolPart + "maxPREQretries", UintegerValue(5));
+		Config::SetDefault(l_AttributePath_RouteProtocol + "UnicastPreqThreshold", UintegerValue(10));
+		Config::SetDefault(l_AttributePath_RouteProtocol + "UnicastDataThreshold", UintegerValue(5));
+		Config::SetDefault(l_AttributePath_RouteProtocol + "DoFlag", BooleanValue(true));
+		Config::SetDefault(l_AttributePath_RouteProtocol + "RfFlag", BooleanValue(false));
 	}
-
-	// 配置Peer Link参数
-	Config::SetDefault(l_AttributePath_PeerLink + "MaxBeaconLoss", UintegerValue(32));
-	Config::SetDefault(l_AttributePath_PeerLink + "MaxRetries", UintegerValue(8));
-	Config::SetDefault(l_AttributePath_PeerLink + "MaxPacketFailure", UintegerValue(8));
-
-	// 配置Peer Management Protocol参数
-	Config::SetDefault(l_AttributePath_PeerManagementProtocol + "EnableBeaconCollisionAvoidance", BooleanValue(false));
-
-	// 配置路由协议参数
-	Config::SetDefault(l_AttributePath_RouteProtocol + l_AttributePath_RouteProtocolPart + "activePathTimeout", TimeValue(Seconds(100)));
-	Config::SetDefault(l_AttributePath_RouteProtocol + l_AttributePath_RouteProtocolPart + "activeRootTimeout", TimeValue(Seconds(100)));
-	Config::SetDefault(l_AttributePath_RouteProtocol + l_AttributePath_RouteProtocolPart + "maxPREQretries", UintegerValue(5));
-	Config::SetDefault(l_AttributePath_RouteProtocol + "UnicastPreqThreshold", UintegerValue(10));
-	Config::SetDefault(l_AttributePath_RouteProtocol + "UnicastDataThreshold", UintegerValue(5));
-	Config::SetDefault(l_AttributePath_RouteProtocol + "DoFlag", BooleanValue(true));
-	Config::SetDefault(l_AttributePath_RouteProtocol + "RfFlag", BooleanValue(false));
 }
 
 // 创建节点及相关协议设置
@@ -281,15 +287,24 @@ void MeshRouteClass::CreateNodes()
 	switch (m_ProtocolType)
 	{
 	case MeshRouteClass::DOT11S_HWMP:
-		l_Mesh.SetStandard(WIFI_PHY_STANDARD_80211a);
+		l_Mesh.SetStandard(m_WifiPhyStandard);
 		if (!Mac48Address(m_Root.c_str()).IsBroadcast())
 		{
-			l_Mesh.SetStackInstaller("ns3::Dot11sStack", "Root", Mac48AddressValue(Mac48Address(m_Root.c_str())));
+			l_Mesh.SetStackInstaller("ns3::MeshStack", "Root", Mac48AddressValue(Mac48Address(m_Root.c_str())));
 		}
 		else
 		{
-			l_Mesh.SetStackInstaller("ns3::Dot11sStack");
+			l_Mesh.SetStackInstaller("ns3::MeshStack");
 		}
+		l_Mesh.SetMacType("RandomStart", TimeValue(Seconds(m_RandomStart)));
+		l_Mesh.SetRemoteStationManager("ns3::ConstantRateWifiManager", "DataMode", StringValue("OfdmRate6Mbps"), "RtsCtsThreshold", UintegerValue(2500));
+		l_Mesh.SetNumberOfInterfaces(m_NumIface);
+		l_Mesh.SetSpreadInterfaceChannels(MeshHelper::ZERO_CHANNEL);
+		l_NetDevices = l_Mesh.Install(wifiPhy, l_Nodes);
+		break;
+	case MeshRouteClass::DOT11S_FLAME:
+		l_Mesh.SetStandard(m_WifiPhyStandard);
+		l_Mesh.SetStackInstaller("ns3::FlameStack");
 		l_Mesh.SetMacType("RandomStart", TimeValue(Seconds(m_RandomStart)));
 		l_Mesh.SetRemoteStationManager("ns3::ConstantRateWifiManager", "DataMode", StringValue("OfdmRate6Mbps"), "RtsCtsThreshold", UintegerValue(2500));
 		l_Mesh.SetNumberOfInterfaces(m_NumIface);
@@ -389,14 +404,16 @@ void MeshRouteClass::InstallApplicationRandom()
 		m_SourceNum = m_Size + 1;
 		m_DestinationNum = m_Size * (m_Size - 1) - 2;
 
-		BulkSendHelper source("ns3::TcpSocketFactory", InetSocketAddress(l_Interfaces.GetAddress(m_DestinationNum), 49002));
-		source.SetAttribute("MaxBytes", UintegerValue(m_MaxBytes));
+		UdpEchoServerHelper source(9);
 		ApplicationContainer sourceApps = source.Install(l_Nodes.Get(m_SourceNum));
 		sourceApps.Start(Seconds(MIN_APPLICATION_TIME));
 		sourceApps.Stop(Seconds(m_TotalTime - END_APPLICATION_TIME));
 
-		PacketSinkHelper sink("ns3::TcpSocketFactory", InetSocketAddress(l_Interfaces.GetAddress(m_DestinationNum), 49002));
+		UdpEchoClientHelper sink(l_Interfaces.GetAddress(0), 9);
 		ApplicationContainer sinkApps = sink.Install(l_Nodes.Get(m_DestinationNum));
+		sink.SetAttribute("MaxPackets", UintegerValue((uint32_t)(m_TotalTime*(1 / m_PacketInterval))));
+		sink.SetAttribute("Interval", TimeValue(Seconds(m_PacketInterval)));
+		sink.SetAttribute("PacketSize", UintegerValue(m_PacketSize));
 		sinkApps.Start(Seconds(MIN_APPLICATION_TIME));
 		sinkApps.Stop(Seconds(m_TotalTime - END_APPLICATION_TIME));
 
@@ -449,8 +466,8 @@ void MeshRouteClass::InstallApplicationRandom()
 		strcpy(onoff, "onoff");
 		strcpy(sink, "sink");
 		sprintf(num, "%d", i);
-		strcat(onoff, num);
-		strcat(sink, num);
+		std::strcat(onoff, num);
+		std::strcat(sink, num);
 
 		//随机选择源节点和目标结点
 		int sourceNum = rand_Nodes->GetValue();
@@ -718,16 +735,24 @@ int main(int argc, char *argv[])
 
 	//LogComponentEnableAll((LogLevel)(LOG_LEVEL_INFO | LOG_PREFIX_ALL));
 
-	LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
-	//LogComponentEnable("WmnPointDevice", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
-	LogComponentEnable("PmtmgmpRtable", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
-	//LogComponentEnable("WmnWifiInterfaceMac", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpProtocolMac", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpPeerManagementProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("PmtmgmpRtable", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("WmnPointDevice", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("WmnWifiInterfaceMac", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+
+	//LogComponentEnable("FlameProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL)); 
+	//LogComponentEnable("FlameProtocolMac", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+
 	//LogComponentEnable("HwmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("MeshPointDevice", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 
-	LogComponentEnable("BulkSendApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("BulkSendApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	LogComponentEnable("UdpServer", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	LogComponentEnable("UdpClient", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	LogComponentEnable("UdpTraceClient", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL)); 
+	LogComponentEnable("UdpEchoClientApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL)); 
 
 	LogComponentEnable("MeshRouteTest", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 
