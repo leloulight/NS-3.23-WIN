@@ -404,16 +404,15 @@ void MeshRouteClass::InstallApplicationRandom()
 		m_SourceNum = m_Size + 1;
 		m_DestinationNum = m_Size * (m_Size - 1) - 2;
 
-		UdpEchoServerHelper source(9);
-		ApplicationContainer sourceApps = source.Install(l_Nodes.Get(m_SourceNum));
+		OnOffHelper onOffAPP("ns3::UdpSocketFactory", Address(InetSocketAddress(l_Interfaces.GetAddress(m_DestinationNum), 9)));
+		onOffAPP.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]"));
+		onOffAPP.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=0]"));
+		ApplicationContainer sourceApps = onOffAPP.Install(l_Nodes.Get(m_SourceNum));
 		sourceApps.Start(Seconds(MIN_APPLICATION_TIME));
 		sourceApps.Stop(Seconds(m_TotalTime - END_APPLICATION_TIME));
 
-		UdpEchoClientHelper sink(l_Interfaces.GetAddress(0), 9);
+		PacketSinkHelper sink("ns3::TcpSocketFactory", InetSocketAddress(l_Interfaces.GetAddress(m_DestinationNum), 10));
 		ApplicationContainer sinkApps = sink.Install(l_Nodes.Get(m_DestinationNum));
-		sink.SetAttribute("MaxPackets", UintegerValue((uint32_t)(m_TotalTime*(1 / m_PacketInterval))));
-		sink.SetAttribute("Interval", TimeValue(Seconds(m_PacketInterval)));
-		sink.SetAttribute("PacketSize", UintegerValue(m_PacketSize));
 		sinkApps.Start(Seconds(MIN_APPLICATION_TIME));
 		sinkApps.Stop(Seconds(m_TotalTime - END_APPLICATION_TIME));
 
@@ -748,13 +747,14 @@ int main(int argc, char *argv[])
 	//LogComponentEnable("HwmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("MeshPointDevice", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 
+	//LogComponentEnable("OnOffApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("BulkSendApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
-	LogComponentEnable("UdpServer", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
-	LogComponentEnable("UdpClient", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
-	LogComponentEnable("UdpTraceClient", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL)); 
-	LogComponentEnable("UdpEchoClientApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL)); 
+	//LogComponentEnable("UdpServer", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("UdpClient", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("UdpTraceClient", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL)); 
+	//LogComponentEnable("UdpEchoClientApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL)); 
 
-	LogComponentEnable("MeshRouteTest", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("MeshRouteTest", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 
 	PacketMetadata::Enable();
 	MeshRouteClass t;
