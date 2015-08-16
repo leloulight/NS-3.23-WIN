@@ -138,23 +138,23 @@ private:
 
 // 初始化测试
 MeshRouteClass::MeshRouteClass() :
-m_ProtocolType(MY11S_PMTMGMP),
-m_AreaType(SQUARE),
-m_Size(4),
-m_RandomStart(0.1),
-m_NumIface(1),
-m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
-m_Step(100),
-m_ApplicationNum(0),
-m_MaxBytes(0),
-m_SourceNum(0),
-m_DestinationNum(0),
-m_PacketSize(1024),
-m_DataRate("150kbps"),
-m_TotalTime(65),
-m_Root("00:00:00:00:00:06"),
-m_Pcap(false),
-m_PacketInterval(0.1)
+	m_ProtocolType(MY11S_PMTMGMP),
+	m_AreaType(SQUARE),
+	m_Size(4),
+	m_RandomStart(0.1),
+	m_NumIface(1),
+	m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
+	m_Step(100),
+	m_ApplicationNum(0),
+	m_MaxBytes(0),
+	m_SourceNum(0),
+	m_DestinationNum(0),
+	m_PacketSize(1024),
+	m_DataRate("150kbps"),
+	m_TotalTime(65),
+	m_Root("00:00:00:00:00:06"),
+	m_Pcap(false),
+	m_PacketInterval(0.1)
 {
 	// 链路层及网络层协议设置
 	l_Mesh = MeshHelper::Default();
@@ -210,7 +210,7 @@ void MeshRouteClass::SimulatorSetting()
 		string l_AttributePath_RouteProtocol;// Route Protocol
 		string l_AttributePath_RouteProtocolPart;// 部分名称差异
 
-		//路由协议类型
+												 //路由协议类型
 		switch (m_ProtocolType)
 		{
 		case MeshRouteClass::DOT11S_HWMP:
@@ -290,11 +290,11 @@ void MeshRouteClass::CreateNodes()
 		l_Mesh.SetStandard(m_WifiPhyStandard);
 		if (!Mac48Address(m_Root.c_str()).IsBroadcast())
 		{
-			l_Mesh.SetStackInstaller("ns3::MeshStack", "Root", Mac48AddressValue(Mac48Address(m_Root.c_str())));
+			l_Mesh.SetStackInstaller("ns3::Dot11sStack", "Root", Mac48AddressValue(Mac48Address(m_Root.c_str())));
 		}
 		else
 		{
-			l_Mesh.SetStackInstaller("ns3::MeshStack");
+			l_Mesh.SetStackInstaller("ns3::Dot11sStack");
 		}
 		l_Mesh.SetMacType("RandomStart", TimeValue(Seconds(m_RandomStart)));
 		l_Mesh.SetRemoteStationManager("ns3::ConstantRateWifiManager", "DataMode", StringValue("OfdmRate6Mbps"), "RtsCtsThreshold", UintegerValue(2500));
@@ -404,16 +404,15 @@ void MeshRouteClass::InstallApplicationRandom()
 		m_SourceNum = m_Size + 1;
 		m_DestinationNum = m_Size * (m_Size - 1) - 2;
 
-		UdpEchoServerHelper source(9);
-		ApplicationContainer sourceApps = source.Install(l_Nodes.Get(m_SourceNum));
+		OnOffHelper onOffAPP("ns3::UdpSocketFactory", Address(InetSocketAddress(l_Interfaces.GetAddress(m_DestinationNum), 9)));
+		onOffAPP.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]"));
+		onOffAPP.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=0]"));
+		ApplicationContainer sourceApps = onOffAPP.Install(l_Nodes.Get(m_SourceNum));
 		sourceApps.Start(Seconds(MIN_APPLICATION_TIME));
 		sourceApps.Stop(Seconds(m_TotalTime - END_APPLICATION_TIME));
 
-		UdpEchoClientHelper sink(l_Interfaces.GetAddress(0), 9);
+		PacketSinkHelper sink("ns3::TcpSocketFactory", InetSocketAddress(l_Interfaces.GetAddress(m_DestinationNum), 10));
 		ApplicationContainer sinkApps = sink.Install(l_Nodes.Get(m_DestinationNum));
-		sink.SetAttribute("MaxPackets", UintegerValue((uint32_t)(m_TotalTime*(1 / m_PacketInterval))));
-		sink.SetAttribute("Interval", TimeValue(Seconds(m_PacketInterval)));
-		sink.SetAttribute("PacketSize", UintegerValue(m_PacketSize));
 		sinkApps.Start(Seconds(MIN_APPLICATION_TIME));
 		sinkApps.Stop(Seconds(m_TotalTime - END_APPLICATION_TIME));
 
@@ -445,17 +444,17 @@ void MeshRouteClass::InstallApplicationRandom()
 	rand_DurationTime->SetAttribute("Mean", DoubleValue(30));
 
 	// 使用随机应用层配置
-	for (int i = 0; i < m_ApplicationNum; i++){
+	for (int i = 0; i < m_ApplicationNum; i++) {
 		ApplicationContainer apps;
 		int appStartTime = rand_StarTime->GetValue();
 		int appDurationTime = rand_DurationTime->GetValue() + 1;
 		int appStopTime = 0;
 
 		// 应用起止时间
-		if ((appStartTime + appDurationTime) >(m_TotalTime - 10)){
+		if ((appStartTime + appDurationTime) >(m_TotalTime - 10)) {
 			appStopTime = m_TotalTime - 10;
 		}
-		else{
+		else {
 			appStopTime = appStartTime + appDurationTime;
 		}
 
@@ -548,11 +547,11 @@ void MeshRouteClass::FlowMonitorReport()
 		diffrx = i->second.timeLastRxPacket.GetSeconds() - i->second.timeFirstRxPacket.GetSeconds();
 		pdf_value = (double)i->second.rxPackets / (double)i->second.txPackets * 100;
 		txbitrate_value = (double)i->second.txBytes * 8 / 1024 / difftx;
-		if (i->second.rxPackets != 0){
+		if (i->second.rxPackets != 0) {
 			rxbitrate_value = (double)i->second.rxPackets * m_PacketSize * 8 / 1024 / diffrx;
 			delay_value = (double)i->second.delaySum.GetSeconds() / (double)i->second.rxPackets;
 		}
-		else{
+		else {
 			rxbitrate_value = 0;
 			delay_value = 0;
 		}
@@ -581,17 +580,17 @@ void MeshRouteClass::FlowMonitorReport()
 		}
 	}
 	// 平均全部结点数据
-	if (totaltxPackets != 0){
+	if (totaltxPackets != 0) {
 		pdf_total = (double)totalrxPackets / (double)totaltxPackets * 100;
 	}
-	else{
+	else {
 		pdf_total = 0;
 	}
-	if (totalrxPackets != 0){
+	if (totalrxPackets != 0) {
 		rxbitrate_total = totalrxbitrate;
 		delay_total = (double)totaldelay / (double)totalrxPackets;
 	}
-	else{
+	else {
 		rxbitrate_total = 0;
 		delay_total = 0;
 	}
@@ -697,7 +696,7 @@ void MeshRouteClass::Report()
 {
 	unsigned n(0);
 	for (NetDeviceContainer::Iterator i = l_NetDevices.Begin();
-		i != l_NetDevices.End(); ++i, ++n)
+	i != l_NetDevices.End(); ++i, ++n)
 	{
 		std::ostringstream os;
 		//os << "mp-report1-" << n << ".xml";
@@ -735,7 +734,7 @@ int main(int argc, char *argv[])
 
 	//LogComponentEnableAll((LogLevel)(LOG_LEVEL_INFO | LOG_PREFIX_ALL));
 
-	//LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpProtocolMac", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpPeerManagementProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpRtable", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
@@ -748,11 +747,12 @@ int main(int argc, char *argv[])
 	//LogComponentEnable("HwmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("MeshPointDevice", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 
+	//LogComponentEnable("OnOffApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("BulkSendApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
-	LogComponentEnable("UdpServer", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
-	LogComponentEnable("UdpClient", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
-	LogComponentEnable("UdpTraceClient", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL)); 
-	LogComponentEnable("UdpEchoClientApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL)); 
+	//LogComponentEnable("UdpServer", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("UdpClient", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("UdpTraceClient", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL)); 
+	//LogComponentEnable("UdpEchoClientApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL)); 
 
 	LogComponentEnable("MeshRouteTest", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 
