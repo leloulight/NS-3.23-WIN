@@ -165,6 +165,10 @@ namespace ns3 {
 		{
 			m_metric = metric;
 		}
+		void PmtmgmpRoutePath::SetInterface(uint32_t interf)
+		{
+			m_interface = interf;
+		}
 		void PmtmgmpRoutePath::SetFromNode(Mac48Address address)
 		{
 			m_FormNode = address;
@@ -212,6 +216,10 @@ namespace ns3 {
 		uint32_t PmtmgmpRoutePath::GetMetric() const
 		{
 			return m_metric;
+		}
+		uint32_t PmtmgmpRoutePath::GetInterface() const
+		{
+			return m_interface;
 		}
 		Mac48Address PmtmgmpRoutePath::GetFromNode() const
 		{
@@ -281,6 +289,7 @@ namespace ns3 {
 			copy->SetTTL(m_ttl);
 			copy->SetMetric(m_metric);
 			copy->SetStatus(m_InformationStatus);
+			copy->SetInterface(m_interface);
 			return copy;
 		}
 		////度量值更新
@@ -916,10 +925,14 @@ namespace ns3 {
 			std::map<Mac48Address, std::vector<PmtmgmpRouteQueuedPacket> >::iterator iter = m_packets.find(dst);
 			if (iter == m_packets.end())
 			{
-				std::vector<PmtmgmpRouteQueuedPacket> packetList;
+				std::vector<PmtmgmpRouteQueuedPacket> packetList = std::vector<PmtmgmpRouteQueuedPacket>();
 				m_packets[dst] = packetList;
+				m_packets[dst].push_back(queueedPacket);
 			}
-			iter->second.push_back(queueedPacket);
+			else
+			{
+				iter->second.push_back(queueedPacket);
+			}
 			return true;
 		}
 		////发送列队的Packet
@@ -945,7 +958,7 @@ namespace ns3 {
 				select->pkt->AddPacketTag(tag);
 				stats->txUnicast++;
 				stats->txBytes += select->pkt->GetSize();
-				select->reply(true, select->pkt, select->src, select->dst, select->protocol, select->inInterface);
+				select->reply(true, select->pkt, select->src, select->dst, select->protocol, next->GetInterface());
 			}
 		}
 #endif

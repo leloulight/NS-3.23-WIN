@@ -509,6 +509,22 @@ namespace ns3 {
 			}
 			else
 			{
+				//return ForwardUnicast(sourceIface, source, destination, packet, protocolType, routeReply, tag.GetTtl());
+				Ptr<PmtmgmpRoutePath> next = m_RouteTable->GetBestRoutePathForData(destination, tag.GetMSECPindex());
+				if (next != 0)
+				{
+					tag.SetAddress(next->GetFromNode());
+					packet->AddPacketTag(tag);
+
+					NS_LOG_DEBUG("Get next hop " << next->GetFromNode() << " at " << m_address);
+
+					// reply immediately :
+					routeReply(true, packet, source, destination, protocolType, next->GetInterface());
+					m_stats.txUnicast++;
+					m_stats.txBytes += packet->GetSize();
+					return true;
+				}
+
 				if (sourceIface != GetWmnPoint()->GetIfIndex())
 				{
 					//Start path error procedure:
@@ -517,33 +533,17 @@ namespace ns3 {
 					return false;
 				}
 
-				//return ForwardUnicast(sourceIface, source, destination, packet, protocolType, routeReply, tag.GetTtl());
-				Ptr<PmtmgmpRoutePath> next = m_RouteTable->GetBestRoutePathForData(destination, tag.GetMSECPindex()); 
-				if (next == 0)
+				NS_LOG_DEBUG("No RouteTable here now. at " << m_address);
+				if (m_RouteTable->AddPacketToQueue(packet, source, destination, protocolType, sourceIface, routeReply))
 				{
-					NS_LOG_DEBUG("No RouteTable here now. at " << m_address); 
-					if (m_RouteTable->AddPacketToQueue(packet, source, destination, protocolType, sourceIface, routeReply))
-					{
-						m_stats.totalQueued++;
-						return true;
-					}
-					else
-					{
-						m_stats.totalDropped++;
-						return false;
-					}
+					m_stats.totalQueued++;
+					return true;
 				}
-				
-				tag.SetAddress(next->GetFromNode());
-				packet->AddPacketTag(tag); 
-				
-				NS_LOG_DEBUG("Get next hop " << next->GetFromNode() << " at " << m_address);
-
-				// reply immediately :
-				routeReply(true, packet, source, destination, protocolType, sourceIface);
-				m_stats.txUnicast++;
-				m_stats.txBytes += packet->GetSize(); 
-				return true;
+				else
+				{
+					m_stats.totalDropped++;
+					return false;
+				}
 			}
 			return true;
 		}
@@ -1517,7 +1517,7 @@ namespace ns3 {
 		void PmtmgmpProtocol::ReceiveSECREP(IeSecrep secrep, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
 			NS_LOG_DEBUG("Receive SECREP from " << from << " at interface " << interface << " while metric is " << metric << " at " << m_address);
-			
+
 			if ((secrep.GetPathGenerationSequenceNumber() != m_RouteTable->GetMTERPgenerationSeqNumber()) || (secrep.GetMTERPaddress() != m_address))
 			{
 				return;////过期SECREP将会被丢弃
@@ -1574,7 +1574,7 @@ namespace ns3 {
 		////发送SECACK
 		void PmtmgmpProtocol::SendSECACK()
 		{
-			std::vector<Ptr<PmtmgmpRoutePath> > paths = m_RouteTable ->GetMTERPtree()->GetPartTree();
+			std::vector<Ptr<PmtmgmpRoutePath> > paths = m_RouteTable->GetMTERPtree()->GetPartTree();
 			for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = paths.begin(); iter != paths.end(); iter++)
 			{
 				IeSecack secack = IeSecack(*iter);
@@ -1631,6 +1631,7 @@ namespace ns3 {
 			pathCopy->SetFromNode(from);
 			pathCopy->SetPGENsendTime();
 			pathCopy->IncreasePathGenerationSequenceNumber();
+			pathCopy->SetInterface(interface);
 			m_RouteTable->AddAsMSECPpath(pathCopy);
 
 			SendPGER(pathCopy->GetPathGenerationSequenceNumber(), pathCopy->GetMTERPaddress());
@@ -1680,7 +1681,7 @@ namespace ns3 {
 				NS_LOG_DEBUG("PGER have expired at " << m_address << " while GSN of this MTERP node is " << m_RouteTable->GetMTERPgenerationSeqNumber() << " and the GSN of PGER is " << pger.GetPathGenerationSequenceNumber());
 				return;
 			}
-			path->SetStatus(PmtmgmpRoutePath::Confirmed); 
+			path->SetStatus(PmtmgmpRoutePath::Confirmed);
 			NS_LOG_DEBUG("Receive PGER at " << m_address << " while GSN of this MTERP node is " << m_RouteTable->GetMTERPgenerationSeqNumber() << " and the GSN of PGER is " << pger.GetPathGenerationSequenceNumber());
 		}
 		////转发pgen
@@ -1710,6 +1711,7 @@ namespace ns3 {
 
 			////获取PGEN副本
 			Ptr<PmtmgmpRoutePath> pathCopy = pgen.GetPathInfo()->GetCopy();
+			pathCopy->SetInterface(interface);
 
 			////PGEN信息更新
 			pathCopy->DecrementTtl();
@@ -1767,7 +1769,7 @@ namespace ns3 {
 
 					////路径不重复效验
 					if (routeTree->GetRepeatability(from) == 0)
-					{	
+					{
 						////效验通过，立即处理
 						Ptr<PmtmgmpRoutePath> existPath = routeTree->GetPathByMACaddress(pathCopy->GetMSECPaddress());
 						////路由表中路径存在效验	
@@ -1816,6 +1818,7 @@ namespace ns3 {
 							newPath->AddCandidateRouteInformaiton(pathCopy);
 							newPath->SetFromNode(from);
 							newPath->SetAcceptCandidateRouteInformaitonEvent(Simulator::Schedule(routeTree->GetAcceptInformaitonDelay(), &PmtmgmpRouteTree::AcceptCandidateRouteInformaiton, routeTree, pathCopy->GetMSECPaddress()));
+							newPath->SetInterface(interface);
 							routeTree->AddNewPath(newPath);
 							NS_LOG_DEBUG("Receive PGEN (MTERP:" << pathCopy->GetMTERPaddress() << " MSECP:" << pathCopy->GetMSECPaddress() << ") from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", GSN is " << pathCopy->GetPathGenerationSequenceNumber() << " start waiting");
 							return;
@@ -1861,7 +1864,7 @@ namespace ns3 {
 			if (m_RouteTable->GetConfirmedPathSize() != 0)
 			{
 				NS_LOG_DEBUG("Period for PUPD at " << m_address << " , do send.");
-				SendPUPD();	
+				SendPUPD();
 			}
 			else
 			{
@@ -1927,7 +1930,7 @@ namespace ns3 {
 						}
 						NS_LOG_DEBUG("PUPD  Infor: MTERP(" << mterp << "),MSECPindex(" << uint32_t(select->GetMSECPindex()) << "), RecreateListSize(" << recreateList.size());
 					}
-					else if(find->GetFromNode() == from)
+					else if (find->GetFromNode() == from)
 					{
 						////路由表中存在指定路由路径且来自于PUPD的发送者，更新Metric
 						find->SetMetric(select->GetMetric());
@@ -1971,8 +1974,8 @@ namespace ns3 {
 					if (path->GetStatus() == PmtmgmpRoutePath::Confirmed)
 					{
 						////发送间隔大于PUPD发送间隔，避免连续多次发送
-						if (Simulator::Now()- path->GetPGENsendTime() > m_My11WmnPMTMGMPpathMetricUpdatePeriod)
-						path->SetPGENsendTime();
+						if (Simulator::Now() - path->GetPGENsendTime() > m_My11WmnPMTMGMPpathMetricUpdatePeriod)
+							path->SetPGENsendTime();
 						SendPGEN(IePgen(path->GetCopy()));
 						sendTimes++;
 					}

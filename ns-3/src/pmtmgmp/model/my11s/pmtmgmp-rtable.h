@@ -66,6 +66,7 @@ namespace ns3 {
 			void SetHopcount(uint8_t hopcount);
 			void SetTTL(uint8_t ttl);
 			void SetMetric(uint32_t metric);
+			void SetInterface(uint32_t interf);
 			void SetFromNode(Mac48Address address);
 			void SetStatus(RouteInformationStatus status);
 			void SetAcceptCandidateRouteInformaitonEvent(EventId id);
@@ -79,6 +80,7 @@ namespace ns3 {
 			uint8_t GetHopCount() const;
 			uint8_t  GetTTL() const;
 			uint32_t GetMetric() const;
+			uint32_t GetInterface() const;
 			Mac48Address GetFromNode() const;
 			RouteInformationStatus GetStatus() const;
 			EventId GetAcceptCandidateRouteInformaitonEvent() const;
@@ -128,6 +130,7 @@ namespace ns3 {
 			uint8_t  m_hopCount;
 			uint8_t  m_ttl;
 			uint32_t m_metric;
+			uint32_t m_interface;
 
 			////候选路由信息列表
 			std::vector<Ptr<PmtmgmpRoutePath> >  m_CandidateRouteInformaiton;
