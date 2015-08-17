@@ -138,23 +138,23 @@ private:
 
 // 初始化测试
 MeshRouteClass::MeshRouteClass() :
-	m_ProtocolType(MY11S_PMTMGMP),
-	m_AreaType(SQUARE),
-	m_Size(4),
-	m_RandomStart(0.1),
-	m_NumIface(1),
-	m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
-	m_Step(100),
-	m_ApplicationNum(0),
-	m_MaxBytes(0),
-	m_SourceNum(0),
-	m_DestinationNum(0),
-	m_PacketSize(1024),
-	m_DataRate("150kbps"),
-	m_TotalTime(65),
-	m_Root("00:00:00:00:00:06"),
-	m_Pcap(false),
-	m_PacketInterval(0.1)
+m_ProtocolType(MY11S_PMTMGMP),
+m_AreaType(SQUARE),
+m_Size(4),
+m_RandomStart(0.1),
+m_NumIface(1),
+m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
+m_Step(100),
+m_ApplicationNum(0),
+m_MaxBytes(0),
+m_SourceNum(0),
+m_DestinationNum(0),
+m_PacketSize(1024),
+m_DataRate("150kbps"),
+m_TotalTime(65),
+m_Root("00:00:00:00:00:06"),
+m_Pcap(false),
+m_PacketInterval(0.1)
 {
 	// 链路层及网络层协议设置
 	l_Mesh = MeshHelper::Default();
@@ -210,7 +210,7 @@ void MeshRouteClass::SimulatorSetting()
 		string l_AttributePath_RouteProtocol;// Route Protocol
 		string l_AttributePath_RouteProtocolPart;// 部分名称差异
 
-												 //路由协议类型
+		//路由协议类型
 		switch (m_ProtocolType)
 		{
 		case MeshRouteClass::DOT11S_HWMP:
@@ -444,17 +444,17 @@ void MeshRouteClass::InstallApplicationRandom()
 	rand_DurationTime->SetAttribute("Mean", DoubleValue(30));
 
 	// 使用随机应用层配置
-	for (int i = 0; i < m_ApplicationNum; i++) {
+	for (int i = 0; i < m_ApplicationNum; i++){
 		ApplicationContainer apps;
 		int appStartTime = rand_StarTime->GetValue();
 		int appDurationTime = rand_DurationTime->GetValue() + 1;
 		int appStopTime = 0;
 
 		// 应用起止时间
-		if ((appStartTime + appDurationTime) >(m_TotalTime - 10)) {
+		if ((appStartTime + appDurationTime) >(m_TotalTime - 10)){
 			appStopTime = m_TotalTime - 10;
 		}
-		else {
+		else{
 			appStopTime = appStartTime + appDurationTime;
 		}
 
@@ -547,11 +547,11 @@ void MeshRouteClass::FlowMonitorReport()
 		diffrx = i->second.timeLastRxPacket.GetSeconds() - i->second.timeFirstRxPacket.GetSeconds();
 		pdf_value = (double)i->second.rxPackets / (double)i->second.txPackets * 100;
 		txbitrate_value = (double)i->second.txBytes * 8 / 1024 / difftx;
-		if (i->second.rxPackets != 0) {
+		if (i->second.rxPackets != 0){
 			rxbitrate_value = (double)i->second.rxPackets * m_PacketSize * 8 / 1024 / diffrx;
 			delay_value = (double)i->second.delaySum.GetSeconds() / (double)i->second.rxPackets;
 		}
-		else {
+		else{
 			rxbitrate_value = 0;
 			delay_value = 0;
 		}
@@ -580,17 +580,17 @@ void MeshRouteClass::FlowMonitorReport()
 		}
 	}
 	// 平均全部结点数据
-	if (totaltxPackets != 0) {
+	if (totaltxPackets != 0){
 		pdf_total = (double)totalrxPackets / (double)totaltxPackets * 100;
 	}
-	else {
+	else{
 		pdf_total = 0;
 	}
-	if (totalrxPackets != 0) {
+	if (totalrxPackets != 0){
 		rxbitrate_total = totalrxbitrate;
 		delay_total = (double)totaldelay / (double)totalrxPackets;
 	}
-	else {
+	else{
 		rxbitrate_total = 0;
 		delay_total = 0;
 	}
@@ -696,7 +696,7 @@ void MeshRouteClass::Report()
 {
 	unsigned n(0);
 	for (NetDeviceContainer::Iterator i = l_NetDevices.Begin();
-	i != l_NetDevices.End(); ++i, ++n)
+		i != l_NetDevices.End(); ++i, ++n)
 	{
 		std::ostringstream os;
 		//os << "mp-report1-" << n << ".xml";
