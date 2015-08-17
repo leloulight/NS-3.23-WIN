@@ -27,6 +27,7 @@
  ////find_if
 #include <algorithm>
 #include "ns3/random-variable-stream.h"
+#include "ns3/pmtmgmp-tag.h"
 #endif
 
 #include "pmtmgmp-rtable.h"
@@ -599,7 +600,9 @@ namespace ns3 {
 			m_PUPDsendRouteTreeIndex(0),
 			m_MTERPtree(0),
 			m_MTERPgenerationSeqNumber(0),
-			m_AsMSECPcount(0)
+			m_AsMSECPcount(0),
+			m_maxQueueSize(255),
+			m_currentQueueSize(0)
 		{
 			PMTGMGMProuteInforCheckEvent = Simulator::Schedule(m_PMTGMGMProuteInforCheckPeriod, &PmtmgmpRouteTable::RouteTableInforLifeCheck, this);
 		}
@@ -618,6 +621,13 @@ namespace ns3 {
 					MakeTimeAccessor(
 						&PmtmgmpRouteTable::m_PMTGMGMProuteInforCheckPeriod),
 					MakeTimeChecker()
+					)
+				.AddAttribute("MaxQueueSize",
+					"Maximum number of packets we can store when resolving route",
+					UintegerValue(255),
+					MakeUintegerAccessor(
+						&PmtmgmpRouteTable::m_maxQueueSize),
+					MakeUintegerChecker<uint16_t>(1)
 					)
 				;
 			return tid;
@@ -886,6 +896,56 @@ namespace ns3 {
 			else
 			{
 				return (*iter)->GetBestRoutePathForData(index);
+			}
+		}
+		////添加Packet数据
+		bool PmtmgmpRouteTable::AddPacketToQueue(Ptr<Packet> pkt, Mac48Address src, Mac48Address dst, uint16_t protocol, uint32_t inInterface, PmtmgmpProtocol::RouteReplyCallback reply)
+		{
+			if (m_packets.size() > m_maxQueueSize)
+			{
+				return false;
+			}
+			PmtmgmpRouteQueuedPacket queueedPacket;
+			queueedPacket.pkt = pkt;
+			queueedPacket.src = src;
+			queueedPacket.dst = dst;
+			queueedPacket.protocol = protocol;
+			queueedPacket.inInterface = inInterface;
+			queueedPacket.reply = reply;
+			m_currentQueueSize++;
+			std::map<Mac48Address, std::vector<PmtmgmpRouteQueuedPacket> >::iterator iter = m_packets.find(dst);
+			if (iter == m_packets.end())
+			{
+				std::vector<PmtmgmpRouteQueuedPacket> packetList;
+				m_packets[dst] = packetList;
+			}
+			iter->second.push_back(queueedPacket);
+			return true;
+		}
+		////发送列队的Packet
+		void PmtmgmpRouteTable::SendQueuePackets(Mac48Address dst, PmtmgmpProtocol::Statistics * stats)
+		{
+			std::map<Mac48Address, std::vector<PmtmgmpRouteQueuedPacket> >::iterator iter = m_packets.find(dst);
+			if (iter == m_packets.end())
+			{
+				return;
+			}
+			Ptr<PmtmgmpRoutePath> next = GetBestRoutePathForData(dst, 0);
+			if (next == 0)
+			{
+				NS_FATAL_ERROR("Can not find Path when get PGEN as MTERP " << dst << " at node " << m_address); 
+				return;
+			}
+			std::vector<PmtmgmpRouteQueuedPacket> packetList = iter->second;
+			for (std::vector<PmtmgmpRouteQueuedPacket>::iterator select = packetList.begin(); select != packetList.end(); select++)
+			{
+				PmtmgmpTag tag;
+				select->pkt->RemovePacketTag(tag);
+				tag.SetAddress(next->GetFromNode());
+				select->pkt->AddPacketTag(tag);
+				stats->txUnicast++;
+				stats->txBytes += select->pkt->GetSize();
+				select->reply(true, select->pkt, select->src, select->dst, select->protocol, select->inInterface);
 			}
 		}
 #endif

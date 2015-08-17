@@ -109,6 +109,30 @@ namespace ns3 {
 			int64_t AssignStreams(int64_t stream);
 
 #ifndef PMTMGMP_UNUSED_MY_CODE
+
+			struct Statistics
+			{
+				uint16_t txUnicast;
+				uint16_t txBroadcast;
+				uint32_t txBytes;
+				uint16_t droppedTtl;
+				uint16_t totalQueued;
+				uint16_t totalDropped;
+				uint16_t initiatedPreq;
+				uint16_t initiatedPrep;
+				uint16_t initiatedPerr;
+				uint16_t initiatedSecreq;
+				uint16_t initiatedSecrep;
+				uint16_t initiatedSecack;
+				uint16_t initiatedPger;
+				uint16_t initiatedPgen;
+				uint16_t initiatedPupd;
+				uint16_t initiatedPupgq;
+
+				void Print(std::ostream & os) const;
+				Statistics();
+			};
+
 			////获取MAC
 			Mac48Address GetMacAddress();
 			////获取协议的路由表
@@ -285,9 +309,9 @@ namespace ns3 {
 			void SendPUPGQ(Mac48Address receiver, std::vector<PUPGQdata> list);
 			////接收PUPD
 			void ReceivePUPGQ(IePupgq pupgq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
-
 #endif
 		private:
+#ifdef PMTMGMP_UNUSED_MY_CODE
 			///\name Statistics:
 			///\{
 			struct Statistics
@@ -305,6 +329,7 @@ namespace ns3 {
 				void Print(std::ostream & os) const;
 				Statistics();
 			};
+#endif
 			Statistics m_stats;
 			///\}
 			PmtmgmpProtocolMacMap m_interfaces;

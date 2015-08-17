@@ -329,6 +329,12 @@ namespace ns3 {
 			////数据传输最优路径获取
 			Ptr<PmtmgmpRoutePath> GetBestRoutePathForData(Mac48Address mterp, uint8_t index);
 
+			////添加Packet数据
+			bool AddPacketToQueue(Ptr<Packet> pkt, Mac48Address src, Mac48Address dst, uint16_t protocol, uint32_t inInterface, PmtmgmpProtocol::RouteReplyCallback reply);
+
+			////发送列队的Packet
+			void SendQueuePackets(Mac48Address dst, PmtmgmpProtocol::Statistics *stats);
+
 		private:
 			////路由表路径搜索器
 			struct PmtmgmpRouteTable_Finder
@@ -354,6 +360,17 @@ namespace ns3 {
 					return checker;
 				}
 				Ptr<PmtmgmpRouteTable> m_table;
+			};
+
+			////Packet数据
+			struct PmtmgmpRouteQueuedPacket
+			{
+				Ptr<Packet> pkt; ///< the packet
+				Mac48Address src; ///< src address
+				Mac48Address dst; ///< dst address
+				uint16_t protocol; ///< protocol number
+				uint32_t inInterface; ///< incoming device interface ID. (if packet has come from upper layers, this is Wmn point ID)
+				PmtmgmpProtocol::RouteReplyCallback reply; ///< how to reply
 			};
 		private:
 			std::vector<Ptr<PmtmgmpRouteTree> >  m_table;
@@ -382,8 +399,10 @@ namespace ns3 {
 			////MSECPindex分配标记(从1开始)
 			uint8_t m_MSECPindex;
 
-			////待发送包列表
-
+			////待发送包
+			uint16_t m_maxQueueSize;
+			uint16_t m_currentQueueSize;
+			std::map<Mac48Address, std::vector<PmtmgmpRouteQueuedPacket> > m_packets;
 		};
 #endif
 		/*************************

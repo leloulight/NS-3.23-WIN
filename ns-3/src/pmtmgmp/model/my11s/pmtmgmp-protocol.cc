@@ -521,9 +521,17 @@ namespace ns3 {
 				Ptr<PmtmgmpRoutePath> next = m_RouteTable->GetBestRoutePathForData(destination, tag.GetMSECPindex()); 
 				if (next == 0)
 				{
-					NS_LOG_DEBUG("No RouteTable here.");
-					m_stats.totalDropped++;
-					return false;
+					NS_LOG_DEBUG("No RouteTable here now. at " << m_address); 
+					if (m_RouteTable->AddPacketToQueue(packet, source, destination, protocolType, sourceIface, routeReply))
+					{
+						m_stats.totalQueued++;
+						return true;
+					}
+					else
+					{
+						m_stats.totalDropped++;
+						return false;
+					}
 				}
 				
 				tag.SetAddress(next->GetFromNode());
@@ -1349,6 +1357,16 @@ namespace ns3 {
 			initiatedPreq(0),
 			initiatedPrep(0),
 			initiatedPerr(0)
+#ifndef PMTMGMP_UNUSED_MY_CODE
+			,
+			initiatedSecreq(0),
+			initiatedSecrep(0),
+			initiatedSecack(0),
+			initiatedPger(0),
+			initiatedPgen(0),
+			initiatedPupd(0),
+			initiatedPupgq(0)
+#endif
 		{
 		}
 		void PmtmgmpProtocol::Statistics::Print(std::ostream & os) const
@@ -1362,7 +1380,17 @@ namespace ns3 {
 				"totalDropped=\"" << totalDropped << "\" "
 				"initiatedPreq=\"" << initiatedPreq << "\" "
 				"initiatedPrep=\"" << initiatedPrep << "\" "
+#ifdef PMTMGMP_UNUSED_MY_CODE
 				"initiatedPerr=\"" << initiatedPerr << "\"/>" << std::endl;
+#else
+				"initiatedSecreq=\"" << initiatedSecreq << "\" "
+				"initiatedSecrep=\"" << initiatedSecrep << "\" "
+				"initiatedSecack=\"" << initiatedSecack << "\" "
+				"initiatedPger=\"" << initiatedPger << "\" "
+				"initiatedPgen=\"" << initiatedPgen << "\" "
+				"initiatedPupd=\"" << initiatedPupd << "\" "
+				"initiatedPupgq=\"" << initiatedPupgq << "\"/>" << std::endl;
+#endif
 		}
 		void
 			PmtmgmpProtocol::Report(std::ostream & os) const
@@ -1451,6 +1479,7 @@ namespace ns3 {
 			secreq.SetNodeType(m_NodeType);
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
+				m_stats.initiatedSecreq++;
 				i->second->SendSECREQ(secreq);
 			}
 			////延迟等待处理选择MSECP
@@ -1480,6 +1509,7 @@ namespace ns3 {
 			secrep.SetPathGenerationSequenceNumber(index);
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
+				m_stats.initiatedSecrep++;
 				i->second->SendSECREP(secrep, receiver);
 			}
 		}
@@ -1554,6 +1584,7 @@ namespace ns3 {
 					for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 					{
 						NS_LOG_DEBUG("Send SECACK at " << m_address << " to " << (*iter)->GetMSECPaddress() << " MSECPindex:" << uint32_t((*iter)->GetMSECPindex()));
+						m_stats.initiatedSecack++;
 						i->second->SendSECACK(secack, (*iter)->GetMSECPaddress());
 					}
 				}
@@ -1614,6 +1645,7 @@ namespace ns3 {
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
 				NS_LOG_DEBUG("Send PGER at " << m_address << " to " << address);
+				m_stats.initiatedPger++;
 				i->second->SendPGER(pger, address);
 			}
 		}
@@ -1657,6 +1689,7 @@ namespace ns3 {
 			NS_LOG_DEBUG("Send PGEN " << " at node " << m_address << " while metric is " << pgen.GetMetric() << ", origination is " << pgen.GetMTERPaddress() << ", GSN is " << pgen.GetPathGenerationSequenceNumber());
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
+				m_stats.initiatedPgen++;
 				i->second->SendPGEN(pgen);
 			}
 		}
@@ -1710,6 +1743,9 @@ namespace ns3 {
 				m_RouteTable->AddNewPath(pathCopy);
 				routeTree = m_RouteTable->GetTreeByMACaddress(pathCopy->GetMTERPaddress());
 				routeTree->RepeatabilityIncrease(from);
+
+				////发送列队的数据
+				m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats);
 			}
 			else
 			{
@@ -1722,6 +1758,9 @@ namespace ns3 {
 					pathCopy->SetStatus(PmtmgmpRoutePath::Confirmed);
 					routeTree->AddNewPath(pathCopy);
 					routeTree->RepeatabilityIncrease(from);
+
+					////发送列队的数据
+					m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats);
 				}
 				else if (GenSeqNum == routeTree->GetTreeMaxGenerationSeqNumber())
 				{
@@ -1738,6 +1777,9 @@ namespace ns3 {
 							pathCopy->SetStatus(PmtmgmpRoutePath::Confirmed);
 							routeTree->AddNewPath(pathCopy);
 							routeTree->RepeatabilityIncrease(from);
+
+							////发送列队的数据
+							m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats);
 						}
 						else
 						{
@@ -1747,6 +1789,9 @@ namespace ns3 {
 								pathCopy->SetStatus(PmtmgmpRoutePath::Confirmed);
 								routeTree->RepeatabilityIncrease(from);
 								routeTree->AddNewPath(pathCopy);
+
+								////发送列队的数据
+								m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats);
 							}
 							else
 							{
@@ -1839,6 +1884,7 @@ namespace ns3 {
 			NS_LOG_DEBUG("Send PUPD at " << m_address << ", its size is " << uint32_t(pupd.GetInformationFieldSize()));
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
+				m_stats.initiatedPupd++;
 				i->second->SendPUPD(pupd);
 			}
 		}
@@ -1908,6 +1954,7 @@ namespace ns3 {
 			IePupgq pupgq = IePupgq(list);
 			for (PmtmgmpProtocolMacMap::const_iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
 			{
+				m_stats.initiatedPupgq++;
 				i->second->SendPUPGQ(pupgq, receiver);
 			}
 		}
