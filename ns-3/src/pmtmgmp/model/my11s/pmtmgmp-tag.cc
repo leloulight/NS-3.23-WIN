@@ -31,9 +31,11 @@ namespace ns3 {
 			m_ttl(0),
 #ifdef PMTMGMP_UNUSED_MY_CODE
 			//不需要使用度量
-			m_metric(0), 
-#endif
+			m_metric(0),
 			m_seqno(0)
+#else
+			m_MSECPindex(0)
+#endif
 		{
 		}
 
@@ -78,7 +80,6 @@ namespace ns3 {
 		{
 			return m_metric;
 		}
-#endif
 		void
 			PmtmgmpTag::SetSeqno(uint32_t seqno)
 		{
@@ -90,6 +91,7 @@ namespace ns3 {
 		{
 			return m_seqno;
 		}
+#endif
 
 		TypeId
 			PmtmgmpTag::GetTypeId()
@@ -109,9 +111,9 @@ namespace ns3 {
 		{
 			return 6 //address
 				+ 1 //ttl
-#ifndef PMTMGMP_UNUSED_MY_CODE
 				+ 4 //seqno
-				+ 1; //MSECP
+#ifndef PMTMGMP_UNUSED_MY_CODE
+				+ 1; //MSECPindex
 #else
 				+ 4 //metric
 				+ 4; //seqno
@@ -128,8 +130,8 @@ namespace ns3 {
 #ifdef PMTMGMP_UNUSED_MY_CODE
 			//不需要使用度量
 			i.WriteU32(m_metric);
-#endif
 			i.WriteU32(m_seqno);
+#endif
 			for (j = 0; j < 6; j++)
 			{
 				i.WriteU8(address[j]);
@@ -148,8 +150,8 @@ namespace ns3 {
 #ifdef PMTMGMP_UNUSED_MY_CODE
 			//不需要使用度量
 			m_metric = i.ReadU32();
-#endif
 			m_seqno = i.ReadU32();
+#endif
 			for (j = 0; j < 6; j++)
 			{
 				address[j] = i.ReadU8();
@@ -168,8 +170,8 @@ namespace ns3 {
 #ifdef PMTMGMP_UNUSED_MY_CODE
 			//不需要使用度量
 			os << "metrc=" << m_metric;
-#endif
 			os << "seqno=" << m_seqno;
+#endif
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			os << "MSECPindex=" << m_MSECPindex;
 #endif

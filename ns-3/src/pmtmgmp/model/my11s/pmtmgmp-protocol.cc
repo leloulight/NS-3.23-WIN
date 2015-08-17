@@ -349,7 +349,7 @@ namespace ns3 {
 #endif
 		}
 
-#ifndef PMTMGMP_UNUSED_MY_CODE
+#ifdef PMTMGMP_UNUSED_MY_CODE
 		bool
 			PmtmgmpProtocol::RequestRoute(
 				uint32_t sourceIface,
@@ -451,11 +451,11 @@ namespace ns3 {
 				{
 					NS_FATAL_ERROR("PMTMGMP tag has come with a packet from upper layer. This must not occur...");
 				}
-				//Filling TAG:
-				if (destination == Mac48Address::GetBroadcast())
-				{
-					tag.SetSeqno(m_dataSeqno++);
-				}
+				////Filling TAG:
+				//if (destination == Mac48Address::GetBroadcast())
+				//{
+				//	tag.SetSeqno(m_dataSeqno++);
+				//}
 				tag.SetTtl(m_maxTtl);
 			}
 			else
@@ -509,7 +509,33 @@ namespace ns3 {
 			}
 			else
 			{
-				return ForwardUnicast(sourceIface, source, destination, packet, protocolType, routeReply, tag.GetTtl());
+				if (sourceIface != GetWmnPoint()->GetIfIndex())
+				{
+					//Start path error procedure:
+					NS_LOG_DEBUG("Must Send PERR");
+					m_stats.totalDropped++;
+					return false;
+				}
+
+				//return ForwardUnicast(sourceIface, source, destination, packet, protocolType, routeReply, tag.GetTtl());
+				Ptr<PmtmgmpRoutePath> next = m_RouteTable->GetBestRoutePathForData(destination, tag.GetMSECPindex()); 
+				if (next == 0)
+				{
+					NS_LOG_DEBUG("No RouteTable here.");
+					m_stats.totalDropped++;
+					return false;
+				}
+				
+				tag.SetAddress(next->GetFromNode());
+				packet->AddPacketTag(tag); 
+				
+				NS_LOG_DEBUG("Get next hop " << next->GetFromNode() << " at " << m_address);
+
+				// reply immediately :
+				routeReply(true, packet, source, destination, protocolType, sourceIface);
+				m_stats.txUnicast++;
+				m_stats.txBytes += packet->GetSize(); 
+				return true;
 			}
 			return true;
 		}

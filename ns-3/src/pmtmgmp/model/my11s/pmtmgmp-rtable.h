@@ -328,6 +328,7 @@ namespace ns3 {
 
 			////数据传输最优路径获取
 			Ptr<PmtmgmpRoutePath> GetBestRoutePathForData(Mac48Address mterp, uint8_t index);
+
 		private:
 			////路由表路径搜索器
 			struct PmtmgmpRouteTable_Finder
@@ -380,6 +381,9 @@ namespace ns3 {
 			uint8_t m_AsMSECPcount;
 			////MSECPindex分配标记(从1开始)
 			uint8_t m_MSECPindex;
+
+			////待发送包列表
+
 		};
 #endif
 		/*************************

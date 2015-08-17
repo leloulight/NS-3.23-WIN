@@ -290,11 +290,11 @@ void MeshRouteClass::CreateNodes()
 		l_Mesh.SetStandard(m_WifiPhyStandard);
 		if (!Mac48Address(m_Root.c_str()).IsBroadcast())
 		{
-			l_Mesh.SetStackInstaller("ns3::MeshStack", "Root", Mac48AddressValue(Mac48Address(m_Root.c_str())));
+			l_Mesh.SetStackInstaller("ns3::Dot11sStack", "Root", Mac48AddressValue(Mac48Address(m_Root.c_str())));
 		}
 		else
 		{
-			l_Mesh.SetStackInstaller("ns3::MeshStack");
+			l_Mesh.SetStackInstaller("ns3::Dot11sStack");
 		}
 		l_Mesh.SetMacType("RandomStart", TimeValue(Seconds(m_RandomStart)));
 		l_Mesh.SetRemoteStationManager("ns3::ConstantRateWifiManager", "DataMode", StringValue("OfdmRate6Mbps"), "RtsCtsThreshold", UintegerValue(2500));
@@ -734,7 +734,7 @@ int main(int argc, char *argv[])
 
 	//LogComponentEnableAll((LogLevel)(LOG_LEVEL_INFO | LOG_PREFIX_ALL));
 
-	//LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpProtocolMac", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpPeerManagementProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpRtable", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
@@ -754,7 +754,7 @@ int main(int argc, char *argv[])
 	//LogComponentEnable("UdpTraceClient", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL)); 
 	//LogComponentEnable("UdpEchoClientApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL)); 
 
-	//LogComponentEnable("MeshRouteTest", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	LogComponentEnable("MeshRouteTest", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 
 	PacketMetadata::Enable();
 	MeshRouteClass t;

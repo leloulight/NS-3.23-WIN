@@ -58,9 +58,9 @@ public:
   //不需要使用度量
   void  SetMetric (uint32_t metric);
   uint32_t GetMetric ();
+  void  SetSeqno(uint32_t seqno);
+  uint32_t GetSeqno();
 #endif
-  void  SetSeqno (uint32_t seqno);
-  uint32_t GetSeqno ();
   void  DecrementTtl ();
 #ifndef PMTMGMP_UNUSED_MY_CODE
   void SetMSECPindex(uint8_t index);
@@ -79,8 +79,8 @@ private:
 #ifdef PMTMGMP_UNUSED_MY_CODE
   //不需要使用度量
   uint32_t m_metric;
-#endif
   uint32_t m_seqno;
+#endif
 #ifndef PMTMGMP_UNUSED_MY_CODE
   uint8_t m_MSECPindex;
 #endif
