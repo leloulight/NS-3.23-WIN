@@ -34,6 +34,8 @@
 #include <fstream>
 #include <ctime>
 
+//测试所有文件
+#define TEST_ALL
 //输出到文件
 #define OUT_TO_FILE 
 //无应用层模式
@@ -55,37 +57,6 @@ NS_LOG_COMPONENT_DEFINE("MeshRouteTest");
 class MeshRouteClass
 {
 public:
-	// 初始化测试
-	MeshRouteClass();
-	// 配置参数
-	void Configure(int argc, char ** argv);
-	// 开始测试
-	int Run();
-
-private:
-	// 仿真配置
-	void SimulatorSetting();
-	// 创建节点及相关协议设置
-	void CreateNodes();
-	// 节点位置设置
-	void LocateNodes();
-	// 安装网络协议栈
-	void InstallInternetStack();
-	// 安装应用层
-	void InstallApplicationRandom();
-	// 数据统计模块配置
-	void StatsDataSet();
-	// 输出流量数据
-	void FlowMonitorReport();
-
-private:
-	// 回调函数
-	void CallBack_RouteDiscoveryTime(string context, Time time);
-	void CallBack_ApplicationTX(string context, Ptr<const Packet> packet);
-	// 输出报告
-	void Report();
-
-public:
 	//子类型定义
 	enum MeshProtocolType// Mesh路由协议类型
 	{
@@ -100,6 +71,41 @@ public:
 		HEXAGON,// 正六边形
 	};
 
+public:
+	// 初始化测试
+	MeshRouteClass();
+	// 配置参数
+	void Configure(int argc, char ** argv);
+	// 开始测试
+	int Run();
+	// 设置测试类型
+	void SetTestType(MeshProtocolType type);
+
+private:
+	// 仿真配置
+	void SimulatorSetting();
+	// 创建节点及相关协议设置
+	void CreateNodes();
+	// 节点位置设置
+	void LocateNodes();
+	// 安装网络协议栈
+	void InstallInternetStack();
+	// 安装一对应用
+	void InstallCoupleApplication(int srcIndex, int dstIndex, int srcPort, int dstPort, int secDelay);
+	// 安装应用层
+	void InstallApplicationRandom();
+	// 数据统计模块配置
+	void StatsDataSet();
+	// 输出流量数据
+	void FlowMonitorReport();
+
+private:
+	// 回调函数
+	void CallBack_RouteDiscoveryTime(string context, Time time);
+	void CallBack_ApplicationTX(string context, Ptr<const Packet> packet);
+	// 输出报告
+	void Report();
+
 private:
 	// 命令行配置参数
 	MeshProtocolType m_ProtocolType;
@@ -109,7 +115,8 @@ private:
 	uint32_t m_NumIface;
 	WifiPhyStandard m_WifiPhyStandard;
 	double m_Step;
-	uint16_t m_ApplicationNum;
+	uint8_t m_ApplicationStep;
+	bool m_SingleApplication;
 	uint32_t  m_MaxBytes;
 	int m_SourceNum;
 	int m_DestinationNum;
@@ -139,13 +146,14 @@ private:
 // 初始化测试
 MeshRouteClass::MeshRouteClass() :
 m_ProtocolType(MY11S_PMTMGMP),
-m_AreaType(SQUARE),
-m_Size(4),
+m_AreaType(HEXAGON),
+m_Size(6),
 m_RandomStart(0.1),
 m_NumIface(1),
 m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
 m_Step(100),
-m_ApplicationNum(0),
+m_ApplicationStep(4),
+m_SingleApplication(false),
 m_MaxBytes(0),
 m_SourceNum(0),
 m_DestinationNum(0),
@@ -160,6 +168,8 @@ m_PacketInterval(0.1)
 	l_Mesh = MeshHelper::Default();
 	l_Pmtmgmp = WmnHelper::Default();
 }
+
+
 
 // 配置参数
 void MeshRouteClass::Configure(int argc, char ** argv)
@@ -178,7 +188,8 @@ void MeshRouteClass::Configure(int argc, char ** argv)
 	cmd.AddValue("NumIface", "每个节点射频接口的数量。", m_NumIface);
 	cmd.AddValue("WifiPhyStandard", "使用的Wifi物理层标准。可选值：0.WIFI_PHY_STANDARD_80211a；1.WIFI_PHY_STANDARD_80211b；2.WIFI_PHY_STANDARD_80211g；3.WIFI_PHY_STANDARD_80211_10MHZ；4.WIFI_PHY_STANDARD_80211_5MHZ；5.WIFI_PHY_STANDARD_holland；6.WIFI_PHY_STANDARD_80211n_2_4GHZ；7.WIFI_PHY_STANDARD_80211n_5GHZ；。", wifiPhyStandard);
 	cmd.AddValue("Step", "节点间间隔，具体效果由节点区域类型决定。", m_Step);
-	cmd.AddValue("ApplicationNum", "网络中应用层结点的数量，两个节点成出现，如果路由协议为PMTMGMP这两个结点一个作为MAP，一个作为MPP。", m_ApplicationNum);
+	cmd.AddValue("ApplicationStep", "应用节点间距,不小于2（网络中应用层结点的数量，两个节点成对出现，如果路由协议为PMTMGMP这两个结点一个作为MAP，一个作为MPP。）", m_ApplicationStep);
+	cmd.AddValue("SingleApplication", "是否只有一对应用（网络中应用层结点的数量，两个节点成对出现，如果路由协议为PMTMGMP这两个结点一个作为MAP，一个作为MPP）。", m_SingleApplication);
 	cmd.AddValue("MaxBytes", "最大传送总数据。", m_MaxBytes);
 	cmd.AddValue("SourceNum", "源节点序号，如果不符合相关设置，自动设为0。", m_SourceNum);
 	cmd.AddValue("DestinationNum", "目标点序号，如果不符合相关设置，自动设为最后一个节点。", m_DestinationNum);
@@ -245,6 +256,11 @@ void MeshRouteClass::SimulatorSetting()
 		Config::SetDefault(l_AttributePath_RouteProtocol + "UnicastDataThreshold", UintegerValue(5));
 		Config::SetDefault(l_AttributePath_RouteProtocol + "DoFlag", BooleanValue(true));
 		Config::SetDefault(l_AttributePath_RouteProtocol + "RfFlag", BooleanValue(false));
+
+
+		// 设置应用层参数
+		Config::SetDefault("ns3::OnOffApplication::PacketSize", UintegerValue(m_PacketSize));
+		Config::SetDefault("ns3::OnOffApplication::DataRate", StringValue(m_DataRate));
 	}
 }
 
@@ -370,7 +386,7 @@ void MeshRouteClass::LocateNodes()
 			}
 			x = (sx - fx) / r;
 			y = (sy - fy) / r;
-			NS_LOG_INFO("R:" << i << ",s:" << s << ",t:" << t << ",u:" << u << ",r:" << r << ",R:" << x * x + y * y);
+			//NS_LOG_INFO("总序号:" << i << ",当前层内序号:" << s << ",六边序号:" << t << ",边内序号:" << u << ",层数:" << r << ",半径:" << x * x + y * y);
 			initialAlloc->Add(Vector(fx + x * u, fy + y * u, 0.));
 			mobility.SetPositionAllocator(initialAlloc);
 		}
@@ -393,110 +409,149 @@ void MeshRouteClass::InstallInternetStack()
 	l_Interfaces = address.Assign(l_NetDevices);
 }
 
+// 安装一对应用
+void MeshRouteClass::InstallCoupleApplication(int srcIndex, int dstIndex, int srcPort, int dstPort, int secDelay)
+{
+	OnOffHelper onOffAPP("ns3::UdpSocketFactory", Address(InetSocketAddress(l_Interfaces.GetAddress(dstIndex), srcPort)));
+	onOffAPP.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]"));
+	onOffAPP.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=0]"));
+	ApplicationContainer sourceApps = onOffAPP.Install(l_Nodes.Get(srcIndex));
+	sourceApps.Start(Seconds(MIN_APPLICATION_TIME + secDelay));
+	sourceApps.Stop(Seconds(m_TotalTime - END_APPLICATION_TIME));
+
+	PacketSinkHelper sink("ns3::TcpSocketFactory", InetSocketAddress(l_Interfaces.GetAddress(dstIndex), dstPort));
+	ApplicationContainer sinkApps = sink.Install(l_Nodes.Get(srcIndex));
+	sinkApps.Start(Seconds(MIN_APPLICATION_TIME + secDelay));
+	sinkApps.Stop(Seconds(m_TotalTime - END_APPLICATION_TIME));
+
+	if (m_ProtocolType == MY11S_PMTMGMP)
+	{
+		DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(srcIndex)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Access_Point);
+		DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(dstIndex)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Portal);
+	}
+
+}
 // 安装应用层
 void MeshRouteClass::InstallApplicationRandom()
 {
-	// 不使用随机应用层配置
-	if (m_ApplicationNum == 0)
+	switch (m_AreaType)
 	{
-		if (m_SourceNum < 0 || m_SourceNum >= l_NodeNum) m_SourceNum = 0;
-		if (m_DestinationNum < 0 || m_DestinationNum >= l_NodeNum || m_DestinationNum == m_SourceNum) m_DestinationNum = l_NodeNum - 1;
-		m_SourceNum = m_Size + 1;
-		m_DestinationNum = m_Size * (m_Size - 1) - 2;
-
-		OnOffHelper onOffAPP("ns3::UdpSocketFactory", Address(InetSocketAddress(l_Interfaces.GetAddress(m_DestinationNum), 9)));
-		onOffAPP.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]"));
-		onOffAPP.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=0]"));
-		ApplicationContainer sourceApps = onOffAPP.Install(l_Nodes.Get(m_SourceNum));
-		sourceApps.Start(Seconds(MIN_APPLICATION_TIME));
-		sourceApps.Stop(Seconds(m_TotalTime - END_APPLICATION_TIME));
-
-		PacketSinkHelper sink("ns3::TcpSocketFactory", InetSocketAddress(l_Interfaces.GetAddress(m_DestinationNum), 10));
-		ApplicationContainer sinkApps = sink.Install(l_Nodes.Get(m_DestinationNum));
-		sinkApps.Start(Seconds(MIN_APPLICATION_TIME));
-		sinkApps.Stop(Seconds(m_TotalTime - END_APPLICATION_TIME));
-
-		if (m_ProtocolType == MY11S_PMTMGMP)
+	case SQUARE:
+		if (m_Size < 2)
 		{
-			DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(m_SourceNum)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Access_Point);
-			DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(m_DestinationNum)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Portal);
+			NS_LOG_ERROR("区域大小不能小于1");
 		}
-		return;
-	}
-
-	// 设置应用层参数
-	Config::SetDefault("ns3::OnOffApplication::PacketSize", UintegerValue(m_PacketSize));
-	Config::SetDefault("ns3::OnOffApplication::DataRate", StringValue(m_DataRate));
-
-	Ptr<UniformRandomVariable> rand_Nodes = CreateObject<UniformRandomVariable>();
-	rand_Nodes->SetAttribute("Min", DoubleValue(0));
-	rand_Nodes->SetAttribute("Max", DoubleValue(l_NodeNum));
-
-	Ptr<UniformRandomVariable> rand_Port = CreateObject<UniformRandomVariable>();
-	rand_Port->SetAttribute("Min", DoubleValue(49000));
-	rand_Port->SetAttribute("Max", DoubleValue(49100));
-
-	Ptr<UniformRandomVariable> rand_StarTime = CreateObject<UniformRandomVariable>();
-	rand_StarTime->SetAttribute("Min", DoubleValue(MIN_APPLICATION_TIME));
-	rand_StarTime->SetAttribute("Max", DoubleValue(m_TotalTime - END_APPLICATION_TIME));
-
-	Ptr<ExponentialRandomVariable>rand_DurationTime = CreateObject<ExponentialRandomVariable>();
-	rand_DurationTime->SetAttribute("Mean", DoubleValue(30));
-
-	// 使用随机应用层配置
-	for (int i = 0; i < m_ApplicationNum; i++){
-		ApplicationContainer apps;
-		int appStartTime = rand_StarTime->GetValue();
-		int appDurationTime = rand_DurationTime->GetValue() + 1;
-		int appStopTime = 0;
-
-		// 应用起止时间
-		if ((appStartTime + appDurationTime) >(m_TotalTime - 10)){
-			appStopTime = m_TotalTime - 10;
-		}
-		else{
-			appStopTime = appStartTime + appDurationTime;
-		}
-
-		// 应用连接名
-		char num[2];
-		char onoff[7];
-		char sink[6];
-		strcpy(onoff, "onoff");
-		strcpy(sink, "sink");
-		sprintf(num, "%d", i);
-		std::strcat(onoff, num);
-		std::strcat(sink, num);
-
-		//随机选择源节点和目标结点
-		int sourceNum = rand_Nodes->GetValue();
-		int destinationNUM = rand_Nodes->GetValue();
-		while (sourceNum == destinationNUM) // 避免选用相同节点
+		// 不使用随机应用层配置
+		if (m_SingleApplication == true)
 		{
-			destinationNUM = rand_Nodes->GetValue();
+			if (m_SourceNum < 0 || m_SourceNum >= l_NodeNum) m_SourceNum = 0;
+			if (m_DestinationNum < 0 || m_DestinationNum >= l_NodeNum || m_DestinationNum == m_SourceNum) m_DestinationNum = l_NodeNum - 1;
+			m_SourceNum = m_Size + 1;
+			m_DestinationNum = m_Size * (m_Size - 1) - 2;
+
+			InstallCoupleApplication(m_SourceNum, m_DestinationNum, 49000, 49001, 0);
 		}
-		uint32_t destination_Port = rand_Port->GetInteger();
-
-		// 输出相关信息
-		NS_LOG_INFO("\n\t Node " << sourceNum << " to " << destinationNUM);
-		NS_LOG_INFO("\n Start_time: " << appStartTime << "s");
-		NS_LOG_INFO("\n Stop_time: " << appStopTime << "s\n");
-
-		// 定义应用层
-		OnOffHelper onOffAPP("ns3::UdpSocketFactory", Address(InetSocketAddress(l_Interfaces.GetAddress(destinationNUM), destination_Port)));
-		onOffAPP.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]"));
-		onOffAPP.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=0]"));
-		apps = onOffAPP.Install(l_Nodes.Get(sourceNum));
-		apps.Start(Seconds(appStartTime));
-		apps.Stop(Seconds(appStopTime));
-		PacketSinkHelper sinkAPP("ns3::UdpSocketFactory", InetSocketAddress(l_Interfaces.GetAddress(destinationNUM), 49001));
-		apps = sinkAPP.Install(l_Nodes.Get(destinationNUM));
-		apps.Start(Seconds(1.0));
-		if (m_ProtocolType == MY11S_PMTMGMP)
+		else
 		{
-			DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(sourceNum)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Access_Point);
-			DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(destinationNUM)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Portal);
+			if (m_ApplicationStep < 2)
+			{
+				NS_LOG_ERROR("应用间隔不能小于2");
+			}
+			if (m_Size < m_ApplicationStep)
+			{
+				// 节点数量不足使用多应用
+				m_SourceNum = m_Size + 1;
+				m_DestinationNum = m_Size * (m_Size - 1) - 2;
+				InstallCoupleApplication(m_SourceNum, m_DestinationNum, 49000, 49001, 0);
+			}
+			int start = (m_Size % m_ApplicationStep) / 2;
+
+			vector<int> stepList;
+			vector<int> endList;
+			int i = 0;
+			for (int x = start; x < m_Size / 2; x = x + m_ApplicationStep)
+			{
+				stepList.push_back(x);
+				endList.push_back(m_Size - x);
+			}
+			sort(endList.begin(), endList.end());
+			copy(endList.begin(), endList.end(), back_inserter(stepList));
+
+			int size = stepList.size();
+			for (int x = 0; x < size; x++)
+			{
+				for (int y = 0; y <= size / 2; y++)
+				{
+					if ((x + y) % 2 == 0)
+					{
+						InstallCoupleApplication(x * m_Size + y, l_NodeNum - x * m_Size + y - 1, 49000, 49001 + i, i);
+					}
+					else
+					{
+						InstallCoupleApplication(l_NodeNum - x * m_Size + y - 1, x * m_Size + y, 49000, 49001 + i, i);
+					}
+					i++;
+				}
+			}
 		}
+		break;
+	case HEXAGON:
+		// 不使用随机应用层配置
+			if (m_Size < 3)
+			{
+				NS_LOG_ERROR("区域大小不能小于3");
+			}
+		if (m_SingleApplication == true)
+		{
+			if (m_Size == 2)
+			{
+				InstallCoupleApplication(1, 4, 49000, 49001, 0);
+			}
+			else
+			{
+				InstallCoupleApplication(l_NodeNum + 18 - 12 * m_Size, l_NodeNum + 12 - 9 * m_Size, 49000, 49001, 0);
+			}
+		}
+		else
+		{
+			if (m_ApplicationStep < 2)
+			{
+				NS_LOG_ERROR("应用间隔不能小于2");
+			}
+			if (m_Size < m_ApplicationStep)
+			{
+				// 节点数量不足使用多应用
+				if (m_Size == 2)
+				{
+					InstallCoupleApplication(1, 4, 49000, 49001, 0);
+				}
+				else
+				{
+					InstallCoupleApplication(l_NodeNum + 18 - 12 * m_Size, l_NodeNum + 12 - 9 * m_Size, 49000, 49001, 0);
+				}
+			}
+			else
+			{
+				int n = 0;
+				for (int r = 1 + m_ApplicationStep; r < m_Size; r = r + m_ApplicationStep)
+				{
+					int s = r * (r - 1) * 3;
+					for (int i = 0; i < r * 3; i = i + r)
+					{
+						if (n % 2 == 0)
+						{
+							InstallCoupleApplication(s + i, s + r * 3 + i, 49000, 49000 + n, n);
+						}
+						else
+						{
+							InstallCoupleApplication(s + r * 3 + i, s + i, 49000, 49000 + n, n);
+						}
+						n++;
+					}
+				}
+			}
+		}
+		break;
 	}
 }
 
@@ -524,6 +579,21 @@ void MeshRouteClass::StatsDataSet()
 // 输出流量数据
 void MeshRouteClass::FlowMonitorReport()
 {
+	string typeName;
+	switch (m_ProtocolType)
+	{
+	case MeshRouteClass::DOT11S_HWMP:
+		typeName = "DOT11S_HWMP";
+		break;
+	case MeshRouteClass::DOT11S_FLAME:
+		typeName = "DOT11S_FLAME";
+		break;
+	case MeshRouteClass::MY11S_PMTMGMP:
+		typeName = "MY11S_PMTMGMP";
+		break;
+	default:
+		break;
+	}
 	// 定义统计应用的变量
 	int k = 0;
 	int totaltxPackets = 0;
@@ -560,6 +630,9 @@ void MeshRouteClass::FlowMonitorReport()
 		{
 			//输出数据流量
 			k++;
+			NS_LOG_INFO("=============================");
+			NS_LOG_INFO("Protocol: " << typeName);
+			NS_LOG_INFO("=============================");
 			NS_LOG_INFO("\nFlow " << k << " (" << t.sourceAddress << " -> " << t.destinationAddress << ")\n");
 			NS_LOG_INFO("PDF: " << pdf_value << " %\n");
 			NS_LOG_INFO("Tx Packets: " << i->second.txPackets << "\n");
@@ -569,7 +642,7 @@ void MeshRouteClass::FlowMonitorReport()
 			NS_LOG_INFO("PDF: " << pdf_value << " %\n");
 			NS_LOG_INFO("Average delay: " << delay_value << "s\n");
 			NS_LOG_INFO("Rx bitrate: " << rxbitrate_value << " kbps\n");
-			NS_LOG_INFO("Tx bitrate: " << txbitrate_value << " kbps\n\n");
+			NS_LOG_INFO("Tx bitrate: " << txbitrate_value << " kbps\n\n\n");
 			// 统计平均值
 			totaltxPackets += i->second.txPackets;
 			totaltxbytes += i->second.txBytes;
@@ -681,6 +754,11 @@ int MeshRouteClass::Run()
 	return 0;
 }
 
+void MeshRouteClass::SetTestType(MeshProtocolType type)
+{
+	m_ProtocolType = type;
+}
+
 // 回调函数
 void MeshRouteClass::CallBack_RouteDiscoveryTime(string context, Time time)
 {
@@ -734,7 +812,7 @@ int main(int argc, char *argv[])
 
 	//LogComponentEnableAll((LogLevel)(LOG_LEVEL_INFO | LOG_PREFIX_ALL));
 
-	LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpProtocolMac", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpPeerManagementProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpRtable", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
@@ -757,7 +835,22 @@ int main(int argc, char *argv[])
 	LogComponentEnable("MeshRouteTest", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 
 	PacketMetadata::Enable();
+#ifdef TEST_ALL
+	MeshRouteClass t1;
+	t1.SetTestType(MeshRouteClass::MY11S_PMTMGMP);
+	t1.Configure(argc, argv);
+	t1.Run();
+	MeshRouteClass t2;
+	t2.SetTestType(MeshRouteClass::DOT11S_HWMP);
+	t2.Configure(argc, argv);
+	t2.Run();
+	MeshRouteClass t3;
+	t3.SetTestType(MeshRouteClass::DOT11S_FLAME);
+	t3.Configure(argc, argv);
+	return t3.Run();
+#else
 	MeshRouteClass t;
 	t.Configure(argc, argv);
 	return t.Run();
+#endif
 }
