@@ -752,6 +752,9 @@ namespace ns3 {
 		////获取未接收到PGER的MTERP路由路径计数
 		uint8_t PmtmgmpRouteTable::GetUnreceivedPathCount()
 		{
+			////当当前节点没有MTERP路径时返回0
+			if (m_MTERPtree == 0) return 0;
+
 			std::vector<Ptr<PmtmgmpRoutePath> > paths = m_MTERPtree->GetPartTree();
 			uint8_t unreceivedCount = 0;
 			////搜索未接收到PGER的辅助节点

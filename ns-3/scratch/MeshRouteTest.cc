@@ -145,31 +145,29 @@ private:
 
 // 初始化测试
 MeshRouteClass::MeshRouteClass() :
-m_ProtocolType(MY11S_PMTMGMP),
-m_AreaType(SQUARE),
-m_Size(9),
-m_RandomStart(0.1),
-m_NumIface(1),
-m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
-m_Step(100),
-m_ApplicationStep(3),
-m_SingleApplication(false),
-m_MaxBytes(0),
-m_SourceNum(0),
-m_DestinationNum(0),
-m_PacketSize(1024),
-m_DataRate("150kbps"),
-m_TotalTime(65),
-m_Root("00:00:00:00:00:06"),
-m_Pcap(false),
-m_PacketInterval(0.1)
+	m_ProtocolType(MY11S_PMTMGMP),
+	m_AreaType(SQUARE),
+	m_Size(9),
+	m_RandomStart(0.1),
+	m_NumIface(1),
+	m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
+	m_Step(100),
+	m_ApplicationStep(3),
+	m_SingleApplication(false),
+	m_MaxBytes(0),
+	m_SourceNum(0),
+	m_DestinationNum(0),
+	m_PacketSize(1024),
+	m_DataRate("150kbps"),
+	m_TotalTime(600),
+	m_Root("00:00:00:00:00:01"),
+	m_Pcap(false),
+	m_PacketInterval(0.1)
 {
 	// 链路层及网络层协议设置
 	l_Mesh = MeshHelper::Default();
 	l_Pmtmgmp = WmnHelper::Default();
 }
-
-
 
 // 配置参数
 void MeshRouteClass::Configure(int argc, char ** argv)
