@@ -247,14 +247,7 @@ void MeshRouteClass::SimulatorSetting()
 		Config::SetDefault(l_AttributePath_PeerManagementProtocol + "EnableBeaconCollisionAvoidance", BooleanValue(false));
 
 		// 配置路由协议参数
-		Config::SetDefault(l_AttributePath_RouteProtocol + l_AttributePath_RouteProtocolPart + "activePathTimeout", TimeValue(Seconds(100)));
-		Config::SetDefault(l_AttributePath_RouteProtocol + l_AttributePath_RouteProtocolPart + "activeRootTimeout", TimeValue(Seconds(100)));
-		Config::SetDefault(l_AttributePath_RouteProtocol + l_AttributePath_RouteProtocolPart + "maxPREQretries", UintegerValue(5));
-		Config::SetDefault(l_AttributePath_RouteProtocol + "UnicastPreqThreshold", UintegerValue(10));
-		Config::SetDefault(l_AttributePath_RouteProtocol + "UnicastDataThreshold", UintegerValue(5));
-		Config::SetDefault(l_AttributePath_RouteProtocol + "DoFlag", BooleanValue(true));
-		Config::SetDefault(l_AttributePath_RouteProtocol + "RfFlag", BooleanValue(false));
-
+		Config::SetDefault(l_AttributePath_RouteProtocol + "MaxTtl", UintegerValue(100));
 
 		// 设置应用层参数
 		Config::SetDefault("ns3::OnOffApplication::PacketSize", UintegerValue(m_PacketSize));
@@ -835,12 +828,8 @@ int main(int argc, char *argv[])
 	t1.Run();
 	MeshRouteClass t2;
 	t2.SetTestType(MeshRouteClass::DOT11S_HWMP);
-	t2.Configure(argc, argv);
-	t2.Run();
-	MeshRouteClass t3;
-	t3.SetTestType(MeshRouteClass::DOT11S_FLAME);
-	t3.Configure(argc, argv);
-	return t3.Run();
+	t2.Configure(argc, argv);	
+	return t2.Run();
 #else
 	MeshRouteClass t;
 	t.Configure(argc, argv);
