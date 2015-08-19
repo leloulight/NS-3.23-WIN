@@ -46,7 +46,7 @@
 
 //角度转换
 #define DEGREES_TO_RADIANS(__ANGLE__) ((__ANGLE__) * 0.01745329252f) // PI / 180
-#define MIN_APPLICATION_TIME 1 // 仿真前路由生成时间
+#define MIN_APPLICATION_TIME 60 // 仿真前路由生成时间
 #define END_APPLICATION_TIME 15 // 仿真后等待时间
 
 using namespace ns3;
@@ -146,14 +146,14 @@ private:
 // 初始化测试
 MeshRouteClass::MeshRouteClass() :
 m_ProtocolType(MY11S_PMTMGMP),
-m_AreaType(HEXAGON),
-m_Size(3),
+m_AreaType(SQUARE),
+m_Size(9),
 m_RandomStart(0.1),
 m_NumIface(1),
 m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
 m_Step(100),
-m_ApplicationStep(4),
-m_SingleApplication(true),
+m_ApplicationStep(3),
+m_SingleApplication(false),
 m_MaxBytes(0),
 m_SourceNum(0),
 m_DestinationNum(0),
@@ -188,7 +188,7 @@ void MeshRouteClass::Configure(int argc, char ** argv)
 	cmd.AddValue("NumIface", "每个节点射频接口的数量。", m_NumIface);
 	cmd.AddValue("WifiPhyStandard", "使用的Wifi物理层标准。可选值：0.WIFI_PHY_STANDARD_80211a；1.WIFI_PHY_STANDARD_80211b；2.WIFI_PHY_STANDARD_80211g；3.WIFI_PHY_STANDARD_80211_10MHZ；4.WIFI_PHY_STANDARD_80211_5MHZ；5.WIFI_PHY_STANDARD_holland；6.WIFI_PHY_STANDARD_80211n_2_4GHZ；7.WIFI_PHY_STANDARD_80211n_5GHZ；。", wifiPhyStandard);
 	cmd.AddValue("Step", "节点间间隔，具体效果由节点区域类型决定。", m_Step);
-	cmd.AddValue("ApplicationStep", "应用节点间距,不小于2（网络中应用层结点的数量，两个节点成对出现，如果路由协议为PMTMGMP这两个结点一个作为MAP，一个作为MPP。）", m_ApplicationStep);
+	cmd.AddValue("ApplicationStep", "两层应用节点间距（之间节点的数量，大于0.网络中应用层结点的数量，两个节点成对出现，如果路由协议为PMTMGMP这两个结点一个作为MAP，一个作为MPP。）", m_ApplicationStep);
 	cmd.AddValue("SingleApplication", "是否只有一对应用（网络中应用层结点的数量，两个节点成对出现，如果路由协议为PMTMGMP这两个结点一个作为MAP，一个作为MPP）。", m_SingleApplication);
 	cmd.AddValue("MaxBytes", "最大传送总数据。", m_MaxBytes);
 	cmd.AddValue("SourceNum", "源节点序号，如果不符合相关设置，自动设为0。", m_SourceNum);
@@ -434,6 +434,7 @@ void MeshRouteClass::InstallCoupleApplication(int srcIndex, int dstIndex, int sr
 // 安装应用层
 void MeshRouteClass::InstallApplicationRandom()
 {
+	m_ApplicationStep++;
 	switch (m_AreaType)
 	{
 	case SQUARE:
@@ -453,9 +454,9 @@ void MeshRouteClass::InstallApplicationRandom()
 		}
 		else
 		{
-			if (m_ApplicationStep < 2)
+			if (m_ApplicationStep < 1)
 			{
-				NS_LOG_ERROR("应用间隔不能小于2");
+				NS_LOG_ERROR("应用间隔不能小于0");
 			}
 			if (m_Size < m_ApplicationStep)
 			{
@@ -464,33 +465,27 @@ void MeshRouteClass::InstallApplicationRandom()
 				m_DestinationNum = m_Size * (m_Size - 1) - 2;
 				InstallCoupleApplication(m_SourceNum, m_DestinationNum, 49000, 49001, 0);
 			}
-			int start = (m_Size % m_ApplicationStep) / 2;
-
-			vector<int> stepList;
-			vector<int> endList;
-			int i = 0;
-			for (int x = start; x < m_Size / 2; x = x + m_ApplicationStep)
+			int start = ((m_Size - 1) % m_ApplicationStep) / 2;
+			int size = (m_Size - 1) / m_ApplicationStep + 1;
+			
+			int count = size * size / 2;
+			int add = (m_Size + 1) % 2;
+			for (int i = 0; i < count; i++)
 			{
-				stepList.push_back(x);
-				endList.push_back(m_Size - x);
-			}
-			sort(endList.begin(), endList.end());
-			copy(endList.begin(), endList.end(), back_inserter(stepList));
-
-			int size = stepList.size();
-			for (int x = 0; x < size; x++)
-			{
-				for (int y = 0; y <= size / 2; y++)
+				int x = (i % size) * m_ApplicationStep + start;
+				if (x > m_Size / 2)
 				{
-					if ((x + y) % 2 == 0)
-					{
-						InstallCoupleApplication(x * m_Size + y, l_NodeNum - x * m_Size + y - 1, 49000, 49001 + i, i);
-					}
-					else
-					{
-						InstallCoupleApplication(l_NodeNum - x * m_Size + y - 1, x * m_Size + y, 49000, 49001 + i, i);
-					}
-					i++;
+					x = x + add;
+				}
+				int y = (i / size) * m_ApplicationStep + start;
+
+				if (i % 2 == 0)
+				{
+					InstallCoupleApplication(y * m_Size + x, l_NodeNum - y * m_Size - x - 1, 49000, 49001 + i, i);
+				}
+				else
+				{
+					InstallCoupleApplication(l_NodeNum - y * m_Size - x - 1, y * m_Size + x, 49000, 49001 + i, i);
 				}
 			}
 		}
@@ -514,9 +509,9 @@ void MeshRouteClass::InstallApplicationRandom()
 		}
 		else
 		{
-			if (m_ApplicationStep < 2)
+			if (m_ApplicationStep < 1)
 			{
-				NS_LOG_ERROR("应用间隔不能小于2");
+				NS_LOG_ERROR("应用间隔不能小于0");
 			}
 			if (m_Size < m_ApplicationStep)
 			{
