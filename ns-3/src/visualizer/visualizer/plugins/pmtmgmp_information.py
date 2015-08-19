@@ -32,7 +32,7 @@ class ShowPmtmgmpInforamtion(InformationWindow):
             type_str = "Mesh_Portal"
         if type_index == 8:
             type_str = "Mesh_Secondary_Point"
-        self.label = gtk.Label("Information For Node[" + bytes(self.node_index) + "]:" + type_str + "(" + str(device.GetAddress()))
+        self.label = gtk.Label("Information For Node[" + bytes(self.node_index) + "]:" + type_str + "(" + str(device.GetAddress()) + ")")
         self.label.show()
 
         vbox = gtk.VBox()

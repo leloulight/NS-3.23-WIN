@@ -111,7 +111,7 @@ class Pmtmgmp_Node(object):
         elif (node_type == 4):
             color = 0x0000FFFF
         elif (node_type == 8 and msecp == self.pmtmgmp.GetMacAddress()):
-            color = 0x0000FFFF
+            color = 0xFFFF00FF
         if (self.pmtmgmp.GetPmtmgmpRPRouteTable().GetTableSize() == 0):
             color = 0xFFFFFFFF
         self.set_color(color)
@@ -141,7 +141,7 @@ class Pmtmgmp_Node(object):
         elif (node_type == 4):
             node_color = 0x0000FFFF
         elif (node_type == 8):
-            node_color = 0x0000FFFF
+            node_color = 0xFFFF00FF
         if (self.pmtmgmp.GetPmtmgmpRPRouteTable().GetTableSize() == 0):
             node_color = 0xFFFFFFFF
         self.set_color(node_color)
@@ -174,7 +174,7 @@ class Pmtmgmp_Node(object):
         elif (node_type == 4):
             node_color = 0x0000FFFF
         elif (node_type == 8):
-            node_color = 0x0000FFFF
+            node_color = 0xFFFF00FF
         if (self.pmtmgmp.GetPmtmgmpRPRouteTable().GetTableSize() == 0):
             node_color = 0xFFFFFFFF
         self.set_color(node_color)
@@ -223,9 +223,29 @@ class Pmtmgmp_Route(object):
         self.mac_to_node.clear()
         self.mac_to_node = {}
         for node in self.node_list:
-            node.set_color(0xFF0000FF)
             node.destory()
         del self.node_list[:]
+
+        for node in self.viz.nodes.itervalues():
+            ns3_node = ns.network.NodeList.GetNode(node.node_index)
+            for devI in range(ns3_node.GetNDevices()):
+                dev = ns3_node.GetDevice(devI)
+                if isinstance(dev, ns.pmtmgmp.WmnPointDevice):
+                    wmn_device = dev
+                else:
+                    continue
+            pmtmgmp = wmn_device.GetRoutingProtocol()
+            node_type = pmtmgmp.GetNodeType()
+            node_color = 0xFF0000FF
+            if (node_type == 2):
+                node_color = 0x00FF00FF
+            elif (node_type == 4):
+                node_color = 0x0000FFFF
+            elif (node_type == 8):
+                node_color = 0xFFFF00FF
+            if (pmtmgmp.GetPmtmgmpRPRouteTable().GetTableSize() == 0):
+                node_color = 0xFFFFFFFF
+            node.canvas_item.set_properties(fill_color_rgba=node_color)
         # if SHOW_LOG:
         #     print "Clean node list " + str(len(self.node_list))
 
@@ -259,16 +279,17 @@ class Pmtmgmp_Route(object):
             self.route_path_link_full(self.show_msecp_mac)
 
     def scan_nodes(self, viz):
+        self.viz = viz
         self. route_path_clean()
-        for node in viz.nodes.itervalues():
+        for node in self.viz.nodes.itervalues():
             ns3_node = ns.network.NodeList.GetNode(node.node_index)
             for devI in range(ns3_node.GetNDevices()):
                 dev = ns3_node.GetDevice(devI)
                 if isinstance(dev, ns.pmtmgmp.WmnPointDevice):
-                    WmnDevice = dev
+                    wmn_device = dev
                 else:
                     continue
-                new_node = Pmtmgmp_Node(node.node_index, node, WmnDevice.GetRoutingProtocol())
+                new_node = Pmtmgmp_Node(node.node_index, node, wmn_device.GetRoutingProtocol())
                 # if SHOW_LOG:
                 #     print new_node
                 self.node_list.append(new_node)
@@ -289,15 +310,15 @@ class Pmtmgmp_Route(object):
 
     def populate_node_menu(self, viz, node, menu):
         ns3_node = ns.network.NodeList.GetNode(node.node_index)
-        WmnDevice = None
+        wmn_device = None
         for devI in range(ns3_node.GetNDevices()):
             dev = ns3_node.GetDevice(devI)
             if isinstance(dev, ns.pmtmgmp.WmnPointDevice):
-                WmnDevice = dev
-        if WmnDevice == None:
+                wmn_device = dev
+        if wmn_device == None:
             print "No PMTMGMP"
             return
-        self.pmtmgmp = WmnDevice.GetRoutingProtocol()
+        self.pmtmgmp = wmn_device.GetRoutingProtocol()
 
         # if SHOW_LOG:
         #     print self.pmtmgmp.GetNodeType()
