@@ -39,7 +39,7 @@
 //输出到文件
 #define OUT_TO_FILE 
 //无应用层模式
-//#define NO_APPLICATION
+#define NO_APPLICATION
 //测试模式
 //#define TEST_LOCATION
 
@@ -147,7 +147,7 @@ private:
 MeshRouteClass::MeshRouteClass() :
 	m_ProtocolType(MY11S_PMTMGMP),
 	m_AreaType(SQUARE),
-	m_Size(9),
+	m_Size(4),
 	m_RandomStart(0.1),
 	m_NumIface(1),
 	m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),

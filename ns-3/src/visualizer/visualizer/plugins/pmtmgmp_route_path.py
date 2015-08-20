@@ -1,6 +1,7 @@
 import gtk
 import math
 import goocanvas
+import pango
 import ns.core
 import ns.network
 import ns.visualizer
@@ -11,7 +12,7 @@ SHOW_LOG = True
 COLOR = [0xFF0000FF, 0x00FF00FF, 0x0000FFFF, 0x00FFFFFF, 0xFF00FFFF, 0xFFFF00FF, 0x8A2BE2FF, 0xB8860BFF, 0x006400FF, 0xFF1493FF]
 POINT_MODIFY = 10
 class Pmtmgmp_Path_Link(Link):
-    def __init__(self, next_link, base_node, link_node, base_route_table, mterp, msecp, parent_canvas_item, color):
+    def __init__(self, next_link, base_node, link_node, base_route_table, mterp, msecp, parent_canvas_item, color, path, viz):
         self.base_node = base_node
         self.link_node = link_node
         self.base_route_table = base_route_table
@@ -21,10 +22,16 @@ class Pmtmgmp_Path_Link(Link):
         # self.line = goocanvas.Polyline(parent=self.canvas_item, line_width=1.0, stroke_color_rgba=0xC00000FF, start_arrow=True, arrow_length=10,arrow_width=8)
         self.line = goocanvas.Polyline(parent=self.canvas_item, line_width=2.0, stroke_color_rgba=color, start_arrow=True, close_path=False, end_arrow=False, arrow_length=15, arrow_width=15)
         self.line.raise_(None)
+        self.label = goocanvas.Text()#, fill_color_rgba=0x00C000C0)
+        self.label.props.pointer_events = 0
+        self.label.set_property("parent", self.canvas_item)
+        self.label.raise_(None)
         self.canvas_item.set_data("pyviz-object", self)
         self.canvas_item.lower(None)
         self.way_index = 0
         self.next_link = next_link
+        self.path = path
+        self.viz = viz
 
     def set_way_index(self, index):
         self.way_index = index
@@ -35,19 +42,27 @@ class Pmtmgmp_Path_Link(Link):
     def set_color(self, color):
         self.line.set_properties(stroke_color_rgba=color)
 
-    def get_move_node(self):
+    def move_node_and_lable(self):
         pos1_x, pos1_y = self.link_node.viz_node.get_position()
         pos2_x, pos2_y = self.base_node.viz_node.get_position()
-        if (self.way_index == 0):
-            return goocanvas.Points([(pos1_x, pos1_y), (pos2_x, pos2_y)])
-        else:
+        if (self.way_index != 0):
             angle = math.atan2(pos2_y - pos1_y, pos2_x - pos1_x) + math.pi / 2
             x = POINT_MODIFY * math.cos(angle)
             y = POINT_MODIFY * math.sin(angle)
             next_index = 0
             if self.next_link != None:
                 next_index = self.next_link.way_index
-            return goocanvas.Points([(pos1_x + x * next_index, pos1_y + y * next_index), (pos2_x + x * self.way_index, pos2_y + y * self.way_index)])
+            pos1_x = pos1_x + x * next_index
+            pos1_y = pos1_y + y * next_index
+            pos2_x = pos2_x + x * self.way_index
+            pos2_y = pos2_y + y * self.way_index
+
+        self.label.set_properties(font=("Sans Serif %i" % int(1 + self.viz.node_size_adjustment.value * 3)),
+                             text=("%d" % (self.path.GetMetric(),)),
+                             alignment=pango.ALIGN_CENTER,
+                             x=(pos1_x + pos2_x)/2,
+                             y=(pos1_y + pos2_y)/2)
+        self.line.set_property("points", goocanvas.Points([(pos1_x, pos1_y), (pos2_x, pos2_y)]))
 
     def update_points(self):
         if self.base_route_table.GetPathByMACaddress(self.mterp, self.msecp) == None:
@@ -61,23 +76,25 @@ class Pmtmgmp_Path_Link(Link):
         else:
             # if SHOW_LOG:
             #     print "Move " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
-            self.line.set_property("points", self.get_move_node())
+            self.move_node_and_lable()
 
     def destroy(self):
         self.line.remove()
+        self.label.remove()
         self.canvas_item.remove()
         self.ns_node = None
         self.pmtmgmp_node = None
         del(self)
 
 class Pmtmgmp_Node(object):
-    def __init__(self, node_index, viz_node, pmtmgmp):
+    def __init__(self, node_index, viz_node, pmtmgmp, viz):
         self.node_index = node_index
         self.viz_node = viz_node
         self.base_mac = pmtmgmp.GetMacAddress()
         self.base_route_table = pmtmgmp.GetPmtmgmpRPRouteTable()
         self.pmtmgmp = pmtmgmp
         self.link_list = {}
+        self.viz = viz
 
     def set_color(self, color):
         self.viz_node.canvas_item.set_properties(fill_color_rgba=color)
@@ -127,7 +144,7 @@ class Pmtmgmp_Node(object):
         else:
             if mac_node_list[str(route_path.GetFromNode())] is self:
                 return
-            route_link = Pmtmgmp_Path_Link(None, self, mac_node_list[str(route_path.GetFromNode())], route_table, mterp, msecp, parent_canvas_item, COLOR[1])
+            route_link = Pmtmgmp_Path_Link(None, self, mac_node_list[str(route_path.GetFromNode())], route_table, mterp, msecp, parent_canvas_item, COLOR[1], route_path, self.viz)
             self.link_list[str(mterp) + "," + str(msecp)] = route_link
             # if SHOW_LOG:
             #     print "Pmtmgmp_Node::crearte_route_path() " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
@@ -160,7 +177,7 @@ class Pmtmgmp_Node(object):
             # if SHOW_LOG:
             #     print "Pmtmgmp_Node::create_part_route_path_recursion() exist " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
         else:
-            self.link_list[key] = Pmtmgmp_Path_Link(next_link, self, mac_node_list[str(route_path.GetFromNode())], route_table, mterp, msecp, parent_canvas_item, color)
+            self.link_list[key] = Pmtmgmp_Path_Link(next_link, self, mac_node_list[str(route_path.GetFromNode())], route_table, mterp, msecp, parent_canvas_item, color, route_path, self.viz)
             # if SHOW_LOG:
             #     print "Pmtmgmp_Node::create_part_route_path_recursion() " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
         self.update_link_list()
@@ -196,7 +213,7 @@ class Pmtmgmp_Node(object):
                 # if SHOW_LOG:
                 #     print "Pmtmgmp_Node::create_part_route_path_recursion() exist " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
             else:
-                self.link_list[key] = Pmtmgmp_Path_Link(next_link, self, mac_node_list[str(route_path.GetFromNode())], route_table, mterp, msecp, parent_canvas_item, COLOR[i%10])
+                self.link_list[key] = Pmtmgmp_Path_Link(next_link, self, mac_node_list[str(route_path.GetFromNode())], route_table, mterp, msecp, parent_canvas_item, COLOR[i%10], route_path, self.viz)
                 # if SHOW_LOG:
                 #     print "Pmtmgmp_Node::create_part_route_path_recursion() " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
             self.update_link_list()
@@ -289,7 +306,7 @@ class Pmtmgmp_Route(object):
                     wmn_device = dev
                 else:
                     continue
-                new_node = Pmtmgmp_Node(node.node_index, node, wmn_device.GetRoutingProtocol())
+                new_node = Pmtmgmp_Node(node.node_index, node, wmn_device.GetRoutingProtocol(), viz)
                 # if SHOW_LOG:
                 #     print new_node
                 self.node_list.append(new_node)
