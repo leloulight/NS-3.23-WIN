@@ -11957,11 +11957,6 @@ def register_Ns3My11sPmtmgmpProtocol_methods(root_module, cls):
                    'void', 
                    [], 
                    is_virtual=True)
-    ## pmtmgmp-protocol.h (module 'pmtmgmp'): uint8_t ns3::my11s::PmtmgmpProtocol::GetMSECPnumForMTERP() const [member function]
-    cls.add_method('GetMSECPnumForMTERP', 
-                   'uint8_t', 
-                   [], 
-                   is_const=True)
     ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::PmtmgmpProtocol::GetMacAddress() [member function]
     cls.add_method('GetMacAddress', 
                    'ns3::Mac48Address', 

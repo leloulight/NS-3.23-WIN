@@ -233,6 +233,7 @@ void MeshRouteClass::SimulatorSetting()
 			l_AttributePath_PeerManagementProtocol = "ns3::my11s::PmtmgmpPeerManagementProtocol::";
 			l_AttributePath_RouteProtocol = "ns3::my11s::PmtmgmpProtocol::";
 			l_AttributePath_RouteProtocolPart = "My11WmnPMTMGMP";
+			Config::SetDefault("ns3::my11s::PmtmgmpRouteTree::MSECPnumForMTERP", UintegerValue(3));
 			break;
 		default:
 			break;

@@ -218,13 +218,6 @@ namespace ns3 {
 						&PmtmgmpProtocol::m_My11WmnPMTMGMPpathMetricUpdatePeriod),
 					MakeTimeChecker()
 					)
-				.AddAttribute("MSECPnumForMTERP",
-					"The number of MESCP that each MTERP can have. It need define the same as \"ns3::my11s::PmtmgmpRoutePath::PMTMGMPpgenNodeListNum\"",
-					UintegerValue(2),
-					MakeUintegerAccessor(
-						&PmtmgmpProtocol::m_MSECPnumForMTERP),
-					MakeUintegerChecker<uint8_t>(1)
-					)
 				.AddAttribute("PMTMGMPmterpAALMmagnification",
 					"The magnification of the value as M in MTERP node when Compute AALM.",
 					DoubleValue(3),
@@ -289,7 +282,6 @@ namespace ns3 {
 			m_My11WmnPMTMGMPpathMetricUpdatePeriod(MicroSeconds(1024 * 2000)),
 			m_PathGenerationSeqNumber(0),
 			m_PathUpdateSeqNumber(0),
-			m_MSECPnumForMTERP(2),
 			m_PMTMGMPmterpAALMmagnification(3),
 			m_PMTMGMPmsecpAALMmagnification(2),
 			m_RouteTable(CreateObject<PmtmgmpRouteTable>()),
@@ -1547,11 +1539,6 @@ namespace ns3 {
 				return m_PMTMGMPmterpAALMmagnification;
 			}
 			return 1;
-		}
-		////获取设置的MTERP可以附带的MSECP最大数量
-		uint8_t PmtmgmpProtocol::GetMSECPnumForMTERP() const
-		{
-			return m_MSECPnumForMTERP;
 		}
 		////验证协议所属结点是否为终端节点MTERP
 		bool PmtmgmpProtocol::IsMTERP()

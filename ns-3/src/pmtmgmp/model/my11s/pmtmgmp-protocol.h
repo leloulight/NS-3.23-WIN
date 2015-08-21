@@ -150,8 +150,6 @@ namespace ns3 {
 			NodeType GetNodeType();
 			////获取AALM技术时采用的m的值
 			uint8_t GetValueMForAALM();
-			////获取设置的MTERP可以附带的MSECP最大数量
-			uint8_t GetMSECPnumForMTERP() const;
 #endif
 
 		private:
@@ -408,8 +406,6 @@ namespace ns3 {
 			uint32_t m_PathGenerationSeqNumber;
 			////路径更新序号
 			uint32_t m_PathUpdateSeqNumber;
-			////每个MTERP可有的SECREP的最大数量
-			uint8_t m_MSECPnumForMTERP;
 			////MTERP积累传播时间链接度量倍率
 			double m_PMTMGMPmterpAALMmagnification;
 			////MSECP积累传播时间链接度量倍率

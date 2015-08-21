@@ -253,10 +253,7 @@ namespace ns3 {
 
 			////延迟时间
 			Time m_AcceptInformaitonDelay;
-
-			////每个MTERP可有的SECREP的最大数量
-			uint8_t m_MaxMSECPcountForMTERP;
-
+			
 			////非当前使用路径最优路径比较倍率
 			uint8_t m_NotSelectBestRoutePathRate;
 		};

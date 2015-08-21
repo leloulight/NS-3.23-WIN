@@ -305,7 +305,6 @@ namespace ns3 {
 			m_tree(std::vector<Ptr<PmtmgmpRoutePath> >()),
 			m_MSECPnumForMTERP(2),
 			m_AcceptInformaitonDelay(MicroSeconds(1024 * 1000)),
-			m_MaxMSECPcountForMTERP(2),
 			m_NotSelectBestRoutePathRate(5)
 		{
 		}
@@ -332,13 +331,6 @@ namespace ns3 {
 					MakeTimeAccessor(
 						&PmtmgmpRouteTree::m_AcceptInformaitonDelay),
 					MakeTimeChecker()
-					)
-				.AddAttribute("MaxMSECPcountForMTERP",
-					"The count of MESCP that each MTERP can have. It need define the same as \"ns3::my11s::PmtmgmpRoutePath::PMTMGMPpgenNodeListNum\"",
-					UintegerValue(2),
-					MakeUintegerAccessor(
-						&PmtmgmpRouteTree::m_MaxMSECPcountForMTERP),
-					MakeUintegerChecker<uint8_t>(1)
 					)
 				.AddAttribute("NotSelectBestRoutePathRate",
 					"The rate for compare selected path and the best Metric path.",
@@ -409,9 +401,9 @@ namespace ns3 {
 		void PmtmgmpRouteTree::SelectMSECP()
 		{
 			std::sort(m_tree.begin(), m_tree.end(), PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare());
-			if (m_tree.size() > m_MaxMSECPcountForMTERP)
+			if (m_tree.size() > m_MSECPnumForMTERP)
 			{
-				std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin() + m_MaxMSECPcountForMTERP;
+				std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin() + m_MSECPnumForMTERP;
 				m_tree.erase(iter, m_tree.end());
 			}
 		}
