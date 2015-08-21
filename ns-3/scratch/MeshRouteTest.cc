@@ -147,19 +147,19 @@ private:
 MeshRouteClass::MeshRouteClass() :
 	m_ProtocolType(MY11S_PMTMGMP),
 	m_AreaType(SQUARE),
-	m_Size(9),
+	m_Size(6),
 	m_RandomStart(0.1),
 	m_NumIface(1),
 	m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
 	m_Step(100),
-	m_ApplicationStep(3),
+	m_ApplicationStep(2),
 	m_SingleApplication(false),
 	m_MaxBytes(0),
 	m_SourceNum(0),
 	m_DestinationNum(0),
 	m_PacketSize(1024),
 	m_DataRate("150kbps"),
-	m_TotalTime(600),
+	m_TotalTime(120),
 	m_Root("00:00:00:00:00:01"),
 	m_Pcap(false),
 	m_PacketInterval(0.1)
@@ -618,9 +618,8 @@ void MeshRouteClass::FlowMonitorReport()
 			//输出数据流量
 			k++;
 			NS_LOG_INFO("=============================");
-			NS_LOG_INFO("Protocol: " << typeName);
+			NS_LOG_INFO("Protocol: " << typeName << " (" << t.sourceAddress << " -> " << t.destinationAddress << ")\n");
 			NS_LOG_INFO("=============================");
-			NS_LOG_INFO("\nFlow " << k << " (" << t.sourceAddress << " -> " << t.destinationAddress << ")\n");
 			NS_LOG_INFO("PDF: " << pdf_value << " %\n");
 			NS_LOG_INFO("Tx Packets: " << i->second.txPackets << "\n");
 			NS_LOG_INFO("Rx Packets: " << i->second.rxPackets << "\n");
@@ -629,7 +628,7 @@ void MeshRouteClass::FlowMonitorReport()
 			NS_LOG_INFO("PDF: " << pdf_value << " %\n");
 			NS_LOG_INFO("Average delay: " << delay_value << "s\n");
 			NS_LOG_INFO("Rx bitrate: " << rxbitrate_value << " kbps\n");
-			NS_LOG_INFO("Tx bitrate: " << txbitrate_value << " kbps\n\n\n");
+			NS_LOG_INFO("Tx bitrate: " << txbitrate_value << " kbps\n");
 			// 统计平均值
 			totaltxPackets += i->second.txPackets;
 			totaltxbytes += i->second.txBytes;
@@ -655,9 +654,12 @@ void MeshRouteClass::FlowMonitorReport()
 		delay_total = 0;
 	}
 	// 输出全部结点数据
+	NS_LOG_INFO("=============================");
 	NS_LOG_INFO("\nTotal PDF: " << pdf_total << " %\n");
 	NS_LOG_INFO("Total Rx bitrate: " << rxbitrate_total << " kbps\n");
 	NS_LOG_INFO("Total Delay: " << delay_total << " s\n");
+	NS_LOG_INFO("=============================\n\n\n");
+
 	// 输出全部结点数据到文件
 	std::ostringstream os;
 	os << "1_HWMP_PDF.txt";
@@ -730,8 +732,7 @@ int MeshRouteClass::Run()
 	//流量监测
 	l_Monitor = l_Flowmon.InstallAll();
 
-	float timeStart = clock();
-	Simulator::Schedule(Seconds(timeStart), &MeshRouteClass::Report, this);
+	Simulator::Schedule(Seconds(m_TotalTime), &MeshRouteClass::Report, this);
 	Simulator::Stop(Seconds(m_TotalTime));
 	Simulator::Run();
 	Simulator::Destroy();
@@ -760,12 +761,27 @@ void MeshRouteClass::CallBack_ApplicationTX(string context, Ptr<const Packet> pa
 void MeshRouteClass::Report()
 {
 	unsigned n(0);
+	string typeName;
+	switch (m_ProtocolType)
+	{
+	case MeshRouteClass::DOT11S_HWMP:
+		typeName = "DOT11S_HWMP";
+		break;
+	case MeshRouteClass::DOT11S_FLAME:
+		typeName = "DOT11S_FLAME";
+		break;
+	case MeshRouteClass::MY11S_PMTMGMP:
+		typeName = "MY11S_PMTMGMP";
+		break;
+	default:
+		break;
+	}
 	for (NetDeviceContainer::Iterator i = l_NetDevices.Begin();
 		i != l_NetDevices.End(); ++i, ++n)
 	{
 		std::ostringstream os;
 		//os << "mp-report1-" << n << ".xml";
-		os << "mp-report.xml";
+		os << typeName<< "-mp-report-" << n << ".xml";
 		std::ofstream of;
 		of.open(os.str().c_str(), ios::out | ios::app);
 		if (!of.is_open())
@@ -792,7 +808,7 @@ int main(int argc, char *argv[])
 {
 #ifdef OUT_TO_FILE
 #ifdef WIN32
-	ofstream logfile("E:\\Ns-3.23-log.log");
+	ofstream logfile("Ns-3.23-log.log");
 	std::clog.rdbuf(logfile.rdbuf());
 #endif
 #endif

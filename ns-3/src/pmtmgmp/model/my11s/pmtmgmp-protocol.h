@@ -404,8 +404,6 @@ namespace ns3 {
 			Time m_My11WmnPMTMGMPpathMetricUpdatePeriod;
 			////MSECP选择序号（从零开始，奇数开启，偶数关闭。）
 			uint32_t m_PathGenerationSeqNumber;
-			////路径更新序号
-			uint32_t m_PathUpdateSeqNumber;
 			////MTERP积累传播时间链接度量倍率
 			double m_PMTMGMPmterpAALMmagnification;
 			////MSECP积累传播时间链接度量倍率

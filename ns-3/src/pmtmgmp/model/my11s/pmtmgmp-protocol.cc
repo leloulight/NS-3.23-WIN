@@ -281,7 +281,6 @@ namespace ns3 {
 			m_My11WmnPMTMGMPpgerWaitTime(MicroSeconds(1024 * 2000)),
 			m_My11WmnPMTMGMPpathMetricUpdatePeriod(MicroSeconds(1024 * 2000)),
 			m_PathGenerationSeqNumber(0),
-			m_PathUpdateSeqNumber(0),
 			m_PMTMGMPmterpAALMmagnification(3),
 			m_PMTMGMPmsecpAALMmagnification(2),
 			m_RouteTable(CreateObject<PmtmgmpRouteTable>()),
@@ -1375,6 +1374,7 @@ namespace ns3 {
 #ifdef PMTMGMP_UNUSED_MY_CODE
 				"initiatedPerr=\"" << initiatedPerr << "\"/>" << std::endl;
 #else
+				"initiatedPerr=\"" << initiatedPerr << "\" "
 				"initiatedSecreq=\"" << initiatedSecreq << "\" "
 				"initiatedSecrep=\"" << initiatedSecrep << "\" "
 				"initiatedSecack=\"" << initiatedSecack << "\" "
@@ -1387,6 +1387,22 @@ namespace ns3 {
 		void
 			PmtmgmpProtocol::Report(std::ostream & os) const
 		{
+#ifndef PMTMGMP_UNUSED_MY_CODE
+			std::string name[] = {"Mesh_STA", "Mesh_Access_Point", "Mesh_Portal", "Mesh_Secondary_Point"};
+			os << "<Pmtmgmp "
+				"address=\"" << m_address << "\"" << std::endl <<
+				"NodeType=\"" << name[(int)m_NodeType] << std::endl <<
+				"My11WmnPMTMGMPsecStartDelayTime\"" << m_My11WmnPMTMGMPsecStartDelayTime << std::endl <<
+				"My11WmnPMTMGMPsecInterval\"" << m_My11WmnPMTMGMPsecInterval << std::endl <<
+				"My11WmnPMTMGMPsecSetTime\"" << m_My11WmnPMTMGMPsecSetTime << std::endl <<
+				"My11WmnPMTMGMPpgerWaitTime\"" << m_My11WmnPMTMGMPpgerWaitTime << std::endl <<
+				"My11WmnPMTMGMPpathMetricUpdatePeriod\"" << m_My11WmnPMTMGMPpathMetricUpdatePeriod << std::endl <<
+				"PMTMGMPmterpAALMmagnification\"" << m_PMTMGMPmterpAALMmagnification << std::endl <<
+				"PMTMGMPmsecpAALMmagnification\"" << m_PMTMGMPmsecpAALMmagnification << std::endl <<
+				"MaxRoutePathPerPUPD\"" << m_MaxRoutePathPerPUPD << std::endl <<
+				"MaxRoutePathPerPUPGQ\"" << m_MaxRoutePathPerPUPGQ << std::endl;
+
+#else
 			os << "<Pmtmgmp "
 				"address=\"" << m_address << "\"" << std::endl <<
 				"maxQueueSize=\"" << m_maxQueueSize << "\"" << std::endl <<
@@ -1398,9 +1414,6 @@ namespace ns3 {
 				"My11WmnPMTMGMPactivePathTimeout=\"" << m_My11WmnPMTMGMPactivePathTimeout.GetSeconds() << "\"" << std::endl <<
 				"My11WmnPMTMGMPpathToRootInterval=\"" << m_My11WmnPMTMGMPpathToRootInterval.GetSeconds() << "\"" << std::endl <<
 				"My11WmnPMTMGMPrannInterval=\"" << m_My11WmnPMTMGMPrannInterval.GetSeconds() << "\"" << std::endl <<
-#ifndef PMTMGMP_UNUSED_MY_CODE
-				"My11PmtmgmpPMTMGMPsecSetTime=\"" << m_My11WmnPMTMGMPsecSetTime.GetSeconds() << "\"" << std::endl <<
-#endif
 				"isRoot=\"" << m_isRoot << "\"" << std::endl <<
 				"maxTtl=\"" << (uint16_t)m_maxTtl << "\"" << std::endl <<
 				"unicastPerrThreshold=\"" << (uint16_t)m_unicastPerrThreshold << "\"" << std::endl <<
@@ -1408,6 +1421,7 @@ namespace ns3 {
 				"unicastDataThreshold=\"" << (uint16_t)m_unicastDataThreshold << "\"" << std::endl <<
 				"doFlag=\"" << m_doFlag << "\"" << std::endl <<
 				"rfFlag=\"" << m_rfFlag << "\">" << std::endl;
+#endif
 			m_stats.Print(os);
 			for (PmtmgmpProtocolMacMap::const_iterator plugin = m_interfaces.begin(); plugin != m_interfaces.end(); plugin++)
 			{
