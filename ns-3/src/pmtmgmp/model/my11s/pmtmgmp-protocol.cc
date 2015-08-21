@@ -1475,7 +1475,7 @@ namespace ns3 {
 				i->second->SendSECREQ(secreq);
 			}
 			////延迟等待处理选择MSECP
-			m_MSECPsetEventTimer = Simulator::Schedule(m_My11WmnPMTMGMPsecSetTime, &PmtmgmpProtocol::SelectMSECP, this);
+			m_MSECPsetEventTimer = Simulator::Schedule(m_My11WmnPMTMGMPsecSetTime, &PmtmgmpProtocol::SelectMSECP, this, m_RouteTable->GetMTERPgenerationSeqNumber());
 		}
 		////接收SECREQ
 		void PmtmgmpProtocol::ReceiveSECREQ(IeSecreq secreq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
@@ -1546,17 +1546,32 @@ namespace ns3 {
 			return (m_NodeType & (Mesh_Access_Point | Mesh_Portal)) != 0;
 		}
 		////延迟整理SECREP信息，选取可接受的MSECP
-		void PmtmgmpProtocol::SelectMSECP()
+		void PmtmgmpProtocol::SelectMSECP(uint32_t gsn)
 		{
-			NS_LOG_DEBUG("Select MSECP: receive SECREP " << m_RouteTable->GetMTERPtree()->GetPartTree().size() << " at " << m_address);
+			if (gsn != m_RouteTable->GetMTERPgenerationSeqNumber())
+			{
+				////新的路径生成开始，放弃此过程
+				return;
+			}
+			
+			////效验是否收到SECREP，若未收到，重发SECREQ
+			if (m_RouteTable->GetMTERPtree() == 0)
+			{
+				NS_LOG_DEBUG("Select MSECP: receive SECREP " << m_RouteTable->GetMTERPtree()->GetPartTree().size() << " at " << m_address << ", Research.");
+				MSECPSearch();
+			}
+			else
+			{
+				NS_LOG_DEBUG("Select MSECP: receive SECREP " << m_RouteTable->GetMTERPtree()->GetPartTree().size() << " at " << m_address);
+				m_RouteTable->SelectMSECP();
 
-			m_RouteTable->SelectMSECP();
+				///为筛选出的结果发送SECACK
+				SendSECACK();
 
-			///为筛选出的结果发送SECACK
-			SendSECACK();
+				////延迟等待接收PGER
+				m_PGERwaitEventTimer = Simulator::Schedule(m_My11WmnPMTMGMPpgerWaitTime, &PmtmgmpProtocol::WaitForRecivePGER, this);
 
-			////延迟等待接收PGER
-			m_PGERwaitEventTimer = Simulator::Schedule(m_My11WmnPMTMGMPpgerWaitTime, &PmtmgmpProtocol::WaitForRecivePGER, this);
+			}
 		}
 		////发送SECACK
 		void PmtmgmpProtocol::SendSECACK()

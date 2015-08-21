@@ -282,7 +282,7 @@ namespace ns3 {
 			////验证协议所属结点是否为终端节点MTERP
 			bool IsMTERP();
 			////延迟整理SECREP信息，选取可接受的MSECP
-			void SelectMSECP();
+			void SelectMSECP(uint32_t gsn);
 			////发送SECACK
 			void SendSECACK();
 			////接收SECACK
