@@ -153,7 +153,7 @@ MeshRouteClass::MeshRouteClass() :
 	m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
 	m_Step(100),
 	m_ApplicationStep(2),
-	m_SingleApplication(false),
+	m_SingleApplication(true),
 	m_MaxBytes(0),
 	m_SourceNum(0),
 	m_DestinationNum(0),

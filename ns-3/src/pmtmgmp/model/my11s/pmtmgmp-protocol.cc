@@ -1388,10 +1388,28 @@ namespace ns3 {
 			PmtmgmpProtocol::Report(std::ostream & os) const
 		{
 #ifndef PMTMGMP_UNUSED_MY_CODE
+			std::string typeName;
+			switch (m_NodeType)
+			{
+			case Mesh_STA:
+				typeName = "Mesh_STA";
+				break;
+			case Mesh_Access_Point:
+				typeName = "Mesh_Access_Point";
+				break;
+			case Mesh_Portal:
+				typeName = "Mesh_Portal";
+				break;
+			case Mesh_Secondary_Point:
+				typeName = "Mesh_Secondary_Point";
+				break;
+			default:
+				break;
+			}
 			std::string name[] = {"Mesh_STA", "Mesh_Access_Point", "Mesh_Portal", "Mesh_Secondary_Point"};
 			os << "<Pmtmgmp "
 				"address=\"" << m_address << "\"" << std::endl <<
-				"NodeType=\"" << name[(int)m_NodeType] << std::endl <<
+				"NodeType=\"" << typeName << std::endl <<
 				"My11WmnPMTMGMPsecStartDelayTime\"" << m_My11WmnPMTMGMPsecStartDelayTime << std::endl <<
 				"My11WmnPMTMGMPsecInterval\"" << m_My11WmnPMTMGMPsecInterval << std::endl <<
 				"My11WmnPMTMGMPsecSetTime\"" << m_My11WmnPMTMGMPsecSetTime << std::endl <<
@@ -1399,8 +1417,8 @@ namespace ns3 {
 				"My11WmnPMTMGMPpathMetricUpdatePeriod\"" << m_My11WmnPMTMGMPpathMetricUpdatePeriod << std::endl <<
 				"PMTMGMPmterpAALMmagnification\"" << m_PMTMGMPmterpAALMmagnification << std::endl <<
 				"PMTMGMPmsecpAALMmagnification\"" << m_PMTMGMPmsecpAALMmagnification << std::endl <<
-				"MaxRoutePathPerPUPD\"" << m_MaxRoutePathPerPUPD << std::endl <<
-				"MaxRoutePathPerPUPGQ\"" << m_MaxRoutePathPerPUPGQ << std::endl;
+				"MaxRoutePathPerPUPD\"" << (uint32_t)m_MaxRoutePathPerPUPD << std::endl <<
+				"MaxRoutePathPerPUPGQ\"" << (uint32_t)m_MaxRoutePathPerPUPGQ << "\">" << std::endl;
 
 #else
 			os << "<Pmtmgmp "
