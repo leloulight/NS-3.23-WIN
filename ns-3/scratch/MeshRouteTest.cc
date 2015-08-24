@@ -146,13 +146,13 @@ private:
 // 初始化测试
 MeshRouteClass::MeshRouteClass() :
 	m_ProtocolType(MY11S_PMTMGMP),
-	m_AreaType(SQUARE),
-	m_Size(6),
+	m_AreaType(HEXAGON),
+	m_Size(4),
 	m_RandomStart(0.1),
 	m_NumIface(1),
 	m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
 	m_Step(100),
-	m_ApplicationStep(2),
+	m_ApplicationStep(3),
 	m_SingleApplication(false),
 	m_MaxBytes(0),
 	m_SourceNum(0),
@@ -520,10 +520,10 @@ void MeshRouteClass::InstallApplicationRandom()
 			else
 			{
 				int n = 0;
-				for (int r = m_ApplicationStep; r < m_Size; r = r + m_ApplicationStep)
+				for (int r = m_ApplicationStep - 1; r < m_Size; r = r + m_ApplicationStep)
 				{
-					int s = r * (r - 1) * 3;
-					for (int i = 0; i < r * 3; i = i + r)
+					int s = r * (r - 1) * 3 + 1;
+					for (int i = 0; i < r * 3; i = i + m_ApplicationStep - 1)
 					{
 						if (n % 2 == 0)
 						{
@@ -655,7 +655,7 @@ void MeshRouteClass::FlowMonitorReport()
 	}
 	// 输出全部结点数据
 	NS_LOG_INFO("=============================");
-	NS_LOG_INFO("\nTotal PDF: " << pdf_total << " %\n");
+	NS_LOG_INFO("Total PDF: " << pdf_total << " %\n");
 	NS_LOG_INFO("Total Rx bitrate: " << rxbitrate_total << " kbps\n");
 	NS_LOG_INFO("Total Delay: " << delay_total << " s\n");
 	NS_LOG_INFO("=============================\n\n\n");
