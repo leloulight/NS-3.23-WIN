@@ -442,11 +442,6 @@ namespace ns3 {
 				{
 					NS_FATAL_ERROR("PMTMGMP tag has come with a packet from upper layer. This must not occur...");
 				}
-				////Filling TAG:
-				//if (destination == Mac48Address::GetBroadcast())
-				//{
-				//	tag.SetSeqno(m_dataSeqno++);
-				//}
 				tag.SetTtl(m_maxTtl);
 			}
 			else
@@ -1409,15 +1404,15 @@ namespace ns3 {
 			std::string name[] = {"Mesh_STA", "Mesh_Access_Point", "Mesh_Portal", "Mesh_Secondary_Point"};
 			os << "<Pmtmgmp "
 				"address=\"" << m_address << "\"" << std::endl <<
-				"NodeType=\"" << typeName << std::endl <<
-				"My11WmnPMTMGMPsecStartDelayTime\"" << m_My11WmnPMTMGMPsecStartDelayTime << std::endl <<
-				"My11WmnPMTMGMPsecInterval\"" << m_My11WmnPMTMGMPsecInterval << std::endl <<
-				"My11WmnPMTMGMPsecSetTime\"" << m_My11WmnPMTMGMPsecSetTime << std::endl <<
-				"My11WmnPMTMGMPpgerWaitTime\"" << m_My11WmnPMTMGMPpgerWaitTime << std::endl <<
-				"My11WmnPMTMGMPpathMetricUpdatePeriod\"" << m_My11WmnPMTMGMPpathMetricUpdatePeriod << std::endl <<
-				"PMTMGMPmterpAALMmagnification\"" << m_PMTMGMPmterpAALMmagnification << std::endl <<
-				"PMTMGMPmsecpAALMmagnification\"" << m_PMTMGMPmsecpAALMmagnification << std::endl <<
-				"MaxRoutePathPerPUPD\"" << (uint32_t)m_MaxRoutePathPerPUPD << std::endl <<
+				"NodeType=\"" << typeName << "\"" << std::endl <<
+				"My11WmnPMTMGMPsecStartDelayTime\"" << m_My11WmnPMTMGMPsecStartDelayTime << "\"" << std::endl <<
+				"My11WmnPMTMGMPsecInterval\"" << m_My11WmnPMTMGMPsecInterval << "\"" << std::endl <<
+				"My11WmnPMTMGMPsecSetTime\"" << m_My11WmnPMTMGMPsecSetTime << "\"" << std::endl <<
+				"My11WmnPMTMGMPpgerWaitTime\"" << m_My11WmnPMTMGMPpgerWaitTime << "\"" << std::endl <<
+				"My11WmnPMTMGMPpathMetricUpdatePeriod\"" << m_My11WmnPMTMGMPpathMetricUpdatePeriod << "\"" << std::endl <<
+				"PMTMGMPmterpAALMmagnification\"" << m_PMTMGMPmterpAALMmagnification << "\"" << std::endl <<
+				"PMTMGMPmsecpAALMmagnification\"" << m_PMTMGMPmsecpAALMmagnification << "\"" << std::endl <<
+				"MaxRoutePathPerPUPD\"" << (uint32_t)m_MaxRoutePathPerPUPD << "\"" << std::endl <<
 				"MaxRoutePathPerPUPGQ\"" << (uint32_t)m_MaxRoutePathPerPUPGQ << "\">" << std::endl;
 
 #else

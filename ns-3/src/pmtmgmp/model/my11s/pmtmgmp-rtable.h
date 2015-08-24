@@ -110,7 +110,7 @@ namespace ns3 {
 			{
 				bool operator () (const Ptr<PmtmgmpRoutePath> pathA, const Ptr<PmtmgmpRoutePath> pathB)
 				{
-					return pathA->GetMetric() < pathB->GetMetric() || (pathA->GetMetric() == pathB->GetMetric() && pathA->GetMSECPindex() < pathB->GetMSECPindex());
+					return pathA->GetMetric() * pathA->GetHopCount() < pathB->GetMetric()  * pathB->GetHopCount() || (pathA->GetMetric() * pathA->GetHopCount() == pathB->GetMetric() * pathB->GetHopCount() && pathA->GetMSECPindex() < pathB->GetMSECPindex());
 				}
 			};
 			struct DataSendRoutePathMetricCompare
