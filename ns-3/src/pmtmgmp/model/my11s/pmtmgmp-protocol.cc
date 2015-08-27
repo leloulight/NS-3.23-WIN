@@ -500,6 +500,7 @@ namespace ns3 {
 				if (next != 0)
 				{
 					tag.SetAddress(next->GetFromNode());
+					tag.SetMSECPindex(next->GetMSECPindex());
 					packet->AddPacketTag(tag);
 
 					NS_LOG_DEBUG("Get next hop " << next->GetFromNode() << " at " << m_address);
@@ -1473,7 +1474,7 @@ namespace ns3 {
 			return m_address;
 		}
 		////获取协议的路由表
-		Ptr<PmtmgmpRouteTable> PmtmgmpProtocol::GetPmtmgmpRPRouteTable()
+		Ptr<PmtmgmpRouteTable> PmtmgmpProtocol::GetPmtmgmpRouteTable()
 		{
 			return m_RouteTable;
 		}
@@ -1639,23 +1640,7 @@ namespace ns3 {
 
 			////PGEN信息更新
 			pathCopy->DecrementTtl();
-			double magnification;
-			switch (m_NodeType)
-			{
-			case Mesh_Access_Point:
-			case Mesh_Portal:
-				magnification = m_PMTMGMPmterpAALMmagnification;
-				break;
-			case Mesh_Secondary_Point:
-				magnification = m_PMTMGMPmsecpAALMmagnification;
-				break;
-			case Mesh_STA:
-				magnification = 1;
-				break;
-			default:
-				NS_LOG_ERROR("Error node type.");
-			}
-			pathCopy->IncrementMetric(metric, magnification);
+			pathCopy->IncrementMetric(metric, GetValueMForAALM());
 
 			pathCopy->SetFromNode(from);
 			pathCopy->SetPGENsendTime();
@@ -1744,23 +1729,7 @@ namespace ns3 {
 
 			////PGEN信息更新
 			pathCopy->DecrementTtl();
-			double magnification;
-			switch (m_NodeType)
-			{
-			case Mesh_Access_Point:
-			case Mesh_Portal:
-				magnification = m_PMTMGMPmterpAALMmagnification;
-				break;
-			case Mesh_Secondary_Point:
-				magnification = m_PMTMGMPmsecpAALMmagnification;
-				break;
-			case Mesh_STA:
-				magnification = 1;
-				break;
-			default:
-				NS_LOG_ERROR("Error node type.");
-			}
-			pathCopy->IncrementMetric(metric, magnification);
+			pathCopy->IncrementMetric(metric, GetValueMForAALM());
 
 			pathCopy->SetFromNode(from);
 			pathCopy->SetPGENsendTime();
@@ -1926,22 +1895,6 @@ namespace ns3 {
 			std::vector<PUPGQdata> recreateList;
 			std::vector<PUPDaalmTreeData> data = pupd.GetData();
 			////AALM更新参数设置
-			double magnification;
-			switch (m_NodeType)
-			{
-			case Mesh_Access_Point:
-			case Mesh_Portal:
-				magnification = m_PMTMGMPmterpAALMmagnification;
-				break;
-			case Mesh_Secondary_Point:
-				magnification = m_PMTMGMPmsecpAALMmagnification;
-				break;
-			case Mesh_STA:
-				magnification = 1;
-				break;
-			default:
-				NS_LOG_ERROR("Error node type.");
-			}
 			NS_LOG_DEBUG("Receive PUPD  from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric);
 			for (std::vector<PUPDaalmTreeData>::iterator iter = data.begin(); iter != data.end(); iter++)
 			{
@@ -1962,9 +1915,10 @@ namespace ns3 {
 					else if (find->GetFromNode() == from)
 					{
 						////路由表中存在指定路由路径且来自于PUPD的发送者，更新Metric
+						uint32_t metric = find->GetMetric();
 						find->SetMetric(select->GetMetric());
-						find->IncrementMetric(metric, magnification);
-						NS_LOG_DEBUG("PUPD  Infor: MTERP(" << mterp << "),M SECPindex(" << uint32_t(select->GetMSECPindex()) << "), Metric(" << find->GetMetric() << ")");
+						find->IncrementMetric(metric, GetValueMForAALM());
+						NS_LOG_DEBUG("PUPD  Infor: MTERP(" << mterp << "),M SECPindex(" << uint32_t(select->GetMSECPindex()) << "), Metric(" << metric << " to " << find->GetMetric() << ")");
 					}
 					else
 					{

@@ -53,7 +53,7 @@
 
 //测试所有文件
 #define TEST_ALL
-#ifdef TEST_ALL
+
 // 随机应用总数
 #define RANDOM_APPLICATION_COUNT 20 
 // 随机应用运行间隔
@@ -66,7 +66,7 @@
 #define RANDOM_APPLICATION_AREA MeshRouteClass::HEXAGON
 // 区域大小
 #define RANDOM_APPLICATION_SIZE 6 
-#endif
+
 
 using namespace ns3;
 using namespace std;
@@ -180,14 +180,14 @@ private:
 // 初始化测试
 MeshRouteClass::MeshRouteClass() :
 	m_ProtocolType(MY11S_PMTMGMP),
-	m_AreaType(HEXAGON),
+	m_AreaType(SQUARE),
 	m_Size(4),
 	m_RandomStart(0.1),
 	m_NumIface(1),
 	m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
 	m_Step(100),
 	m_ApplicationStep(3),
-	m_ApplicationAddType(Random),
+	m_ApplicationAddType(Simple),
 	m_MaxBytes(0),
 	m_SourceNum(0),
 	m_DestinationNum(0),
@@ -210,7 +210,6 @@ void MeshRouteClass::SetMeshRouteClass(MeshProtocolType protocolType, vector<Nod
 	m_ProtocolType = protocolType;
 	m_Applications = applications;
 	m_TotalTime = totalTime;
-	m_ApplicationAddType = Random;
 	m_AreaType = areaType;
 	m_Size = size;
 }
@@ -418,13 +417,13 @@ void MeshRouteClass::InstallCoupleApplication(int srcIndex, int dstIndex, int sr
 	onOffAPP.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]"));
 	onOffAPP.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=0]"));
 	ApplicationContainer sourceApps = onOffAPP.Install(l_Nodes.Get(srcIndex));
-	sourceApps.Start(Seconds(start));
-	sourceApps.Stop(Seconds(end));
+	sourceApps.Start(Seconds(MIN_APPLICATION_TIME + start));
+	sourceApps.Stop(Seconds(MIN_APPLICATION_TIME + end));
 
 	PacketSinkHelper sink("ns3::UdpSocketFactory", InetSocketAddress(l_Interfaces.GetAddress(dstIndex), dstPort));
 	ApplicationContainer sinkApps = sink.Install(l_Nodes.Get(srcIndex));
-	sinkApps.Start(Seconds(start));
-	sinkApps.Stop(Seconds(end + END_APPLICATION_TIME));
+	sinkApps.Start(Seconds(MIN_APPLICATION_TIME + start));
+	sinkApps.Stop(Seconds(MIN_APPLICATION_TIME + end + END_APPLICATION_TIME));
 
 	if (m_ProtocolType == MY11S_PMTMGMP)
 	{
