@@ -35,9 +35,9 @@
 #include <ctime>
 
 //输出到文件
-#define OUT_TO_FILE 
+//#define OUT_TO_FILE 
 //无应用层模式
-#define NO_APPLICATION
+//#define NO_APPLICATION
 //测试模式
 //#define TEST_LOCATION
 

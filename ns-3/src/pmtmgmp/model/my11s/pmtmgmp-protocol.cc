@@ -503,7 +503,7 @@ namespace ns3 {
 					tag.SetMSECPindex(next->GetMSECPindex());
 					packet->AddPacketTag(tag);
 
-					NS_LOG_DEBUG("Get next hop " << next->GetFromNode() << " at " << m_address);
+					NS_LOG_DEBUG("Get next hop " << next->GetFromNode() << " at " << m_address << " to " << destination << " from " << source);
 
 					// reply immediately :
 					routeReply(true, packet, source, destination, protocolType, next->GetInterface());
