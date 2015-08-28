@@ -114,12 +114,17 @@ namespace ns3 {
 					path->IncrementMetric(m_parent->GetLinkMetric(header.GetAddr2()), m_protocol->GetValueMForAALM());
 				}
 			}
-#endif
+			if ((destination == Mac48Address::GetBroadcast()) && (source == m_protocol->GetAddress()))
+			{
+				return false;
+			}
+#else
 			if ((destination == Mac48Address::GetBroadcast()) && (m_protocol->DropDataFrame(wmnHdr.GetWmnSeqno(),
 				source)))
 			{
 				return false;
 			}
+#endif
 			return true;
 		}
 
