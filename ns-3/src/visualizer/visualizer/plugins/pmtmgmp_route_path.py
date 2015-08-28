@@ -91,7 +91,7 @@ class Pmtmgmp_Node(object):
         self.node_index = node_index
         self.viz_node = viz_node
         self.base_mac = pmtmgmp.GetMacAddress()
-        self.base_route_table = pmtmgmp.GetPmtmgmpRPRouteTable()
+        self.base_route_table = pmtmgmp.GetPmtmgmpRouteTable()
         self.pmtmgmp = pmtmgmp
         self.link_list = {}
         self.viz = viz
@@ -129,11 +129,11 @@ class Pmtmgmp_Node(object):
             color = 0x0000FFFF
         elif (node_type == 8 and msecp == self.pmtmgmp.GetMacAddress()):
             color = 0xFFFF00FF
-        if (self.pmtmgmp.GetPmtmgmpRPRouteTable().GetTableSize() == 0):
+        if (self.pmtmgmp.GetPmtmgmpRouteTable().GetTableSize() == 0):
             color = 0xFFFFFFFF
         self.set_color(color)
 
-        route_table = self.pmtmgmp.GetPmtmgmpRPRouteTable()
+        route_table = self.pmtmgmp.GetPmtmgmpRouteTable()
         route_path = route_table.GetPathByMACaddress(mterp,msecp)
         if route_path == None:
              return
@@ -159,10 +159,10 @@ class Pmtmgmp_Node(object):
             node_color = 0x0000FFFF
         elif (node_type == 8):
             node_color = 0xFFFF00FF
-        if (self.pmtmgmp.GetPmtmgmpRPRouteTable().GetTableSize() == 0):
+        if (self.pmtmgmp.GetPmtmgmpRouteTable().GetTableSize() == 0):
             node_color = 0xFFFFFFFF
         self.set_color(node_color)
-        route_table = self.pmtmgmp.GetPmtmgmpRPRouteTable()
+        route_table = self.pmtmgmp.GetPmtmgmpRouteTable()
         route_path = route_table.GetPathByMACaddress(mterp,msecp)
         if route_path == None:
              return None
@@ -192,10 +192,10 @@ class Pmtmgmp_Node(object):
             node_color = 0x0000FFFF
         elif (node_type == 8):
             node_color = 0xFFFF00FF
-        if (self.pmtmgmp.GetPmtmgmpRPRouteTable().GetTableSize() == 0):
+        if (self.pmtmgmp.GetPmtmgmpRouteTable().GetTableSize() == 0):
             node_color = 0xFFFFFFFF
         self.set_color(node_color)
-        route_table = self.pmtmgmp.GetPmtmgmpRPRouteTable()
+        route_table = self.pmtmgmp.GetPmtmgmpRouteTable()
         route_tree = route_table.GetTreeByMACaddress(mterp)
         if route_tree == None:
             return
@@ -260,7 +260,7 @@ class Pmtmgmp_Route(object):
                 node_color = 0x0000FFFF
             elif (node_type == 8):
                 node_color = 0xFFFF00FF
-            if (pmtmgmp.GetPmtmgmpRPRouteTable().GetTableSize() == 0):
+            if (pmtmgmp.GetPmtmgmpRouteTable().GetTableSize() == 0):
                 node_color = 0xFFFFFFFF
             node.canvas_item.set_properties(fill_color_rgba=node_color)
         # if SHOW_LOG:
@@ -289,7 +289,7 @@ class Pmtmgmp_Route(object):
             #     print "Pmtmgmp_Route::route_path_link().route_path_link_part"
             self.route_path_link_part(self.show_mterp_mac)
         elif self.show_mterp_mac == None:
-            # if (self.mac_to_node[str(self.pmtmgmp.GetMacAddress())].pmtmgmp.GetPmtmgmpRPRouteTable().GetPathByMACaddress(self.pmtmgmp.GetMacAddress(), self.show_msecp_mac) == 0):
+            # if (self.mac_to_node[str(self.pmtmgmp.GetMacAddress())].pmtmgmp.GetPmtmgmpRouteTable().GetPathByMACaddress(self.pmtmgmp.GetMacAddress(), self.show_msecp_mac) == 0):
             #     self. route_path_clean()
             # if SHOW_LOG:
             #     print "Pmtmgmp_Route::route_path_link().route_path_link_full"
@@ -341,7 +341,7 @@ class Pmtmgmp_Route(object):
         #     print self.pmtmgmp.GetNodeType()
 
         route = self
-        route_table = self.pmtmgmp.GetPmtmgmpRPRouteTable()
+        route_table = self.pmtmgmp.GetPmtmgmpRouteTable()
 
         menu_item_main = gtk.MenuItem("Show Route")
         menu_item_main.show()

@@ -11965,8 +11965,8 @@ def register_Ns3My11sPmtmgmpProtocol_methods(root_module, cls):
     cls.add_method('GetNodeType', 
                    'ns3::my11s::PmtmgmpProtocol::NodeType', 
                    [])
-    ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::Ptr<ns3::my11s::PmtmgmpRouteTable> ns3::my11s::PmtmgmpProtocol::GetPmtmgmpRPRouteTable() [member function]
-    cls.add_method('GetPmtmgmpRPRouteTable', 
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::Ptr<ns3::my11s::PmtmgmpRouteTable> ns3::my11s::PmtmgmpProtocol::GetPmtmgmpRouteTable() [member function]
+    cls.add_method('GetPmtmgmpRouteTable', 
                    'ns3::Ptr< ns3::my11s::PmtmgmpRouteTable >', 
                    [])
     ## pmtmgmp-protocol.h (module 'pmtmgmp'): static ns3::TypeId ns3::my11s::PmtmgmpProtocol::GetTypeId() [member function]
@@ -12107,6 +12107,11 @@ def register_Ns3My11sPmtmgmpRoutePath_methods(root_module, cls):
                    'ns3::EventId', 
                    [], 
                    is_const=True)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): uint32_t ns3::my11s::PmtmgmpRoutePath::GetBaseMetric() const [member function]
+    cls.add_method('GetBaseMetric', 
+                   'uint32_t', 
+                   [], 
+                   is_const=True)
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): std::vector<ns3::Ptr<ns3::my11s::PmtmgmpRoutePath>, std::allocator<ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> > > ns3::my11s::PmtmgmpRoutePath::GetCandidateRouteInformaiton() const [member function]
     cls.add_method('GetCandidateRouteInformaiton', 
                    'std::vector< ns3::Ptr< ns3::my11s::PmtmgmpRoutePath > >', 
@@ -12221,6 +12226,10 @@ def register_Ns3My11sPmtmgmpRoutePath_methods(root_module, cls):
     cls.add_method('SetAcceptCandidateRouteInformaitonEvent', 
                    'void', 
                    [param('ns3::EventId', 'id')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRoutePath::SetAllMetric(uint32_t metric, uint32_t base) [member function]
+    cls.add_method('SetAllMetric', 
+                   'void', 
+                   [param('uint32_t', 'metric'), param('uint32_t', 'base')])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRoutePath::SetFromNode(ns3::Mac48Address address) [member function]
     cls.add_method('SetFromNode', 
                    'void', 

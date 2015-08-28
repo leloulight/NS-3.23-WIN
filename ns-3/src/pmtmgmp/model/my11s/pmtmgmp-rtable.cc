@@ -55,6 +55,7 @@ namespace ns3 {
 			m_NodeType(PmtmgmpProtocol::Mesh_STA),
 			m_hopCount(0),
 			m_metric(0),
+			m_BaseMetric(0),
 			m_CandidateRouteInformaiton(std::vector<Ptr<PmtmgmpRoutePath> >()),
 			m_InformationStatus(Confirmed),
 			m_MaxCandidateNum(4),

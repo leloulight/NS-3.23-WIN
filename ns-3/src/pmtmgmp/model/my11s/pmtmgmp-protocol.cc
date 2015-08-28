@@ -1753,7 +1753,7 @@ namespace ns3 {
 				uint32_t GenSeqNum = pathCopy->GetPathGenerationSequenceNumber();
 				if (GenSeqNum > routeTree->GetTreeMaxGenerationSeqNumber())
 				{
-					////当前路由表中没有相同生成顺序号的记录，此为到达的第一个PGEN。
+					////当前路由表中没有相同生成顺序号的记录，为此路径到达的第一个PGEN。
 					routeTree->SetAllStatusExpired();
 					pathCopy->SetStatus(PmtmgmpRoutePath::Confirmed);
 					routeTree->AddNewPath(pathCopy);
@@ -1764,6 +1764,7 @@ namespace ns3 {
 				}
 				else if (GenSeqNum == routeTree->GetTreeMaxGenerationSeqNumber())
 				{
+					////PGEN生成顺序号等于路由表中最大生成顺序号
 
 					////路径不重复效验
 					if (routeTree->GetRepeatability(from) == 0)
@@ -1826,17 +1827,42 @@ namespace ns3 {
 							switch (existPath->GetStatus())
 							{
 							case PmtmgmpRoutePath::Expired:
-								existPath->SetStatus(PmtmgmpRoutePath::Waited);
-								existPath->AddCandidateRouteInformaiton(pathCopy);
-								existPath->SetAcceptCandidateRouteInformaitonEvent(Simulator::Schedule(routeTree->GetAcceptInformaitonDelay(), &PmtmgmpRouteTree::AcceptCandidateRouteInformaiton, routeTree, pathCopy->GetMSECPaddress()));
-								NS_LOG_DEBUG("Receive PGEN (MTERP:" << pathCopy->GetMTERPaddress() << " MSECP:" << pathCopy->GetMSECPaddress() << ") from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", GSN is " << pathCopy->GetPathGenerationSequenceNumber() << " start waiting");
+								if (GenSeqNum == existPath->GetPathGenerationSequenceNumber())
+								{
+									NS_LOG_DEBUG("Receive PGEN (MTERP:" << pathCopy->GetMTERPaddress() << " MSECP:" << pathCopy->GetMSECPaddress() << ") from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", GSN is " << pathCopy->GetPathGenerationSequenceNumber() << " has been Expired");
+								}
+								else
+								{
+									existPath->SetStatus(PmtmgmpRoutePath::Waited);
+									existPath->AddCandidateRouteInformaiton(pathCopy);
+									existPath->SetAcceptCandidateRouteInformaitonEvent(Simulator::Schedule(routeTree->GetAcceptInformaitonDelay(), &PmtmgmpRouteTree::AcceptCandidateRouteInformaiton, routeTree, pathCopy->GetMSECPaddress()));
+									NS_LOG_DEBUG("Receive PGEN (MTERP:" << pathCopy->GetMTERPaddress() << " MSECP:" << pathCopy->GetMSECPaddress() << ") from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", GSN is " << pathCopy->GetPathGenerationSequenceNumber() << " start waiting");
+								}
 								return;
 							case PmtmgmpRoutePath::Waited:
-								existPath->AddCandidateRouteInformaiton(pathCopy);
-								NS_LOG_DEBUG("Receive PGEN (MTERP:" << pathCopy->GetMTERPaddress() << " MSECP:" << pathCopy->GetMSECPaddress() << ") from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", GSN is " << pathCopy->GetPathGenerationSequenceNumber() << " waits for Confirm");
+								if (GenSeqNum == existPath->GetPathGenerationSequenceNumber())
+								{
+									NS_LOG_ERROR("Receive PGEN (MTERP:" << pathCopy->GetMTERPaddress() << " MSECP:" << pathCopy->GetMSECPaddress() << ") from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", GSN is " << pathCopy->GetPathGenerationSequenceNumber() << " , GSN is equal, path status can not be Waited.");
+								}
+								else
+								{
+									existPath->AddCandidateRouteInformaiton(pathCopy);
+									NS_LOG_DEBUG("Receive PGEN (MTERP:" << pathCopy->GetMTERPaddress() << " MSECP:" << pathCopy->GetMSECPaddress() << ") from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", GSN is " << pathCopy->GetPathGenerationSequenceNumber() << " waits for Confirm");
+								}
 								return;
 							case PmtmgmpRoutePath::Confirmed:
-								NS_LOG_ERROR("PGEN form " << from << " :Path is Confirmed ,but GSN is not update at node " << m_address);
+								if (GenSeqNum == existPath->GetPathGenerationSequenceNumber())
+								{
+									////PGEN所属路径生成信息已确定
+									NS_LOG_DEBUG("Receive PGEN (MTERP:" << pathCopy->GetMTERPaddress() << " MSECP:" << pathCopy->GetMSECPaddress() << ") from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", GSN is " << pathCopy->GetPathGenerationSequenceNumber() << " has been Confirmed");
+								}
+								else
+								{
+									existPath->SetStatus(PmtmgmpRoutePath::Waited);
+									existPath->AddCandidateRouteInformaiton(pathCopy);
+									existPath->SetAcceptCandidateRouteInformaitonEvent(Simulator::Schedule(routeTree->GetAcceptInformaitonDelay(), &PmtmgmpRouteTree::AcceptCandidateRouteInformaiton, routeTree, pathCopy->GetMSECPaddress()));
+									NS_LOG_DEBUG("Receive PGEN (MTERP:" << pathCopy->GetMTERPaddress() << " MSECP:" << pathCopy->GetMSECPaddress() << ") from " << from << " at node " << m_address << " at interface " << interface << " while metric is " << metric << ", GSN is " << pathCopy->GetPathGenerationSequenceNumber() << " start waiting");
+								}
 								return;
 							}
 						}
@@ -1910,7 +1936,7 @@ namespace ns3 {
 						{
 							recreateList.push_back(PUPGQdata(mterp, select->GetMSECPindex()));
 						}
-						NS_LOG_DEBUG("PUPD  Infor: MTERP(" << mterp << "),MSECPindex(" << uint32_t(select->GetMSECPindex()) << "), RecreateListSize(" << recreateList.size());
+						NS_LOG_DEBUG("PUPD  Infor: MTERP(" << mterp << "),MSECPindex(" << uint32_t(select->GetMSECPindex()) << "), RecreateListSize(" << recreateList.size() << ")");
 					}
 					else if (find->GetFromNode() == from)
 					{
@@ -1918,7 +1944,7 @@ namespace ns3 {
 						uint32_t metric = find->GetMetric();
 						find->SetMetric(select->GetMetric());
 						find->IncrementMetric(metric, GetValueMForAALM());
-						NS_LOG_DEBUG("PUPD  Infor: MTERP(" << mterp << "),M SECPindex(" << uint32_t(select->GetMSECPindex()) << "), Metric(" << metric << " to " << find->GetMetric() << ")");
+						NS_LOG_DEBUG("PUPD  Infor: MTERP(" << mterp << "),M SECPindex(" << uint32_t(select->GetMSECPindex()) << "), Metric(" << metric << " to " << find->GetMetric() << " , Base:" << find-> GetBaseMetric()<< ")");
 					}
 					else
 					{

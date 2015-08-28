@@ -196,7 +196,7 @@ MeshRouteClass::MeshRouteClass() :
 	m_SourceNum(0),
 	m_DestinationNum(0),
 	m_PacketSize(1024),
-	m_DataRate("1024kbps"),
+	m_DataRate("150kbps"),
 	m_TotalTime(60),
 	m_Root("00:00:00:00:00:01"),
 	m_Pcap(false),
@@ -834,6 +834,9 @@ void MeshRouteClass::Report()
 }
 int main(int argc, char *argv[])
 {
+	// √¸¡Ó––≈‰÷√
+	CommandLine cmd;
+	cmd.Parse(argc, argv);
 #ifdef OUT_TO_FILE
 #ifdef WIN32
 	ofstream logfile("Ns-3.23-log.log");
