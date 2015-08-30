@@ -12424,9 +12424,9 @@ def register_Ns3My11sPmtmgmpRouteTable_methods(root_module, cls):
     cls.add_method('RouteTableInforLifeCheck', 
                    'void', 
                    [])
-    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRouteTable::SelectMSECP() [member function]
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpRouteTable::SelectMSECP() [member function]
     cls.add_method('SelectMSECP', 
-                   'void', 
+                   'bool', 
                    [])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRouteTable::SendQueuePackets(ns3::Mac48Address dst, ns3::my11s::PmtmgmpProtocol::Statistics * stats) [member function]
     cls.add_method('SendQueuePackets', 

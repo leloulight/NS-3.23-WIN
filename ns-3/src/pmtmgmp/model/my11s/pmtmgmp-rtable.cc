@@ -748,10 +748,12 @@ namespace ns3 {
 			m_MSECPindex++;
 			return m_MSECPindex;
 		}
-		void PmtmgmpRouteTable::SelectMSECP()
+		bool PmtmgmpRouteTable::SelectMSECP()
 		{
+			if (m_MTERPtree == 0 || m_MTERPtree->GetPartTree().size() == 0) return false;
 			m_MTERPgenerationSeqNumber++;
 			m_MTERPtree->SelectMSECP();
+			return true;
 		}
 		////获取未接收到PGER的MTERP路由路径计数
 		uint8_t PmtmgmpRouteTable::GetUnreceivedPathCount()

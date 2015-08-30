@@ -1591,14 +1591,20 @@ namespace ns3 {
 			else
 			{
 				NS_LOG_DEBUG("Select MSECP: receive SECREP " << m_RouteTable->GetMTERPtree()->GetPartTree().size() << " at " << m_address);
-				m_RouteTable->SelectMSECP();
+				if (m_RouteTable->SelectMSECP())
+				{
 
-				///为筛选出的结果发送SECACK
-				SendSECACK();
+					///为筛选出的结果发送SECACK
+					SendSECACK();
 
-				////延迟等待接收PGER
-				m_PGERwaitEventTimer = Simulator::Schedule(m_My11WmnPMTMGMPpgerWaitTime, &PmtmgmpProtocol::WaitForRecivePGER, this);
-
+					////延迟等待接收PGER
+					m_PGERwaitEventTimer = Simulator::Schedule(m_My11WmnPMTMGMPpgerWaitTime, &PmtmgmpProtocol::WaitForRecivePGER, this);
+				}
+				else
+				{
+					NS_LOG_DEBUG("Select MSECP: receive SECREP " << m_RouteTable->GetMTERPtree()->GetPartTree().size() << " at " << m_address << ", Research.");
+					MSECPSearch();
+				}
 			}
 		}
 		////发送SECACK

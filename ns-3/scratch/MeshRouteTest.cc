@@ -52,7 +52,7 @@
 
 
 //测试所有文件
-//#define TEST_ALL
+#define TEST_ALL
 #ifdef TEST_ALL
 // 随机应用总数
 #define RANDOM_APPLICATION_COUNT 20 
@@ -185,7 +185,7 @@ private:
 MeshRouteClass::MeshRouteClass() :
 	m_ProtocolType(MY11S_PMTMGMP),
 	m_AreaType(SQUARE),
-	m_Size(4),
+	m_Size(RANDOM_APPLICATION_SIZE),
 	m_RandomStart(0.1),
 	m_NumIface(1),
 	m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
@@ -846,7 +846,7 @@ int main(int argc, char *argv[])
 
 	//LogComponentEnableAll((LogLevel)(LOG_LEVEL_INFO | LOG_PREFIX_ALL));
 
-	LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpProtocolMac", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpPeerManagementProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpRtable", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
@@ -904,10 +904,10 @@ int main(int argc, char *argv[])
 		totalTime = (RANDOM_APPLICATION_COUNT - 1) * RANDOM_APPLICATION_INTERVAL + RANDOM_APPLICATION_LIFE + RANDOM_APPLICATION_RANDOM;
 		//测试
 		MeshRouteClass pmtmgmp;
-		pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, apps, totalTime, MeshRouteClass::SQUARE, 4, RANDOM_APPLICATION_APP);
+		pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, apps, totalTime, MeshRouteClass::SQUARE, RANDOM_APPLICATION_SIZE, RANDOM_APPLICATION_APP);
 		pmtmgmp.Run();
 		MeshRouteClass mesh;
-		mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, apps, totalTime, MeshRouteClass::SQUARE, 4, RANDOM_APPLICATION_APP);
+		mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, apps, totalTime, MeshRouteClass::SQUARE, RANDOM_APPLICATION_SIZE, RANDOM_APPLICATION_APP);
 		mesh.Run();
 	}
 	else

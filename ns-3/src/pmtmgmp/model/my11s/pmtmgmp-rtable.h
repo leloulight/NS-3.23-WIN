@@ -302,7 +302,7 @@ namespace ns3 {
 			////获取下一个MSECPindex
 			uint8_t GetNextMSECPindex();
 			////选择MSECP
-			void SelectMSECP();
+			bool SelectMSECP();
 			////获取未接收到PGER的MTERP路由路径计数
 			uint8_t GetUnreceivedPathCount();
 									
