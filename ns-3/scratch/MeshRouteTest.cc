@@ -67,7 +67,7 @@
 // 应用布置类型
 #define RANDOM_APPLICATION_APP MeshRouteClass::Simple
 // 区域大小
-#define RANDOM_APPLICATION_SIZE 9
+#define RANDOM_APPLICATION_SIZE 10
 #endif
 
 
@@ -189,9 +189,9 @@ MeshRouteClass::MeshRouteClass() :
 	m_RandomStart(0.1),
 	m_NumIface(1),
 	m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
-	m_Step(100),
-	m_ApplicationStep(2),
-	m_ApplicationAddType(Random),
+	m_Step(80),
+	m_ApplicationStep(8),
+	m_ApplicationAddType(Multiple),
 	m_MaxBytes(0),
 	m_SourceNum(0),
 	m_DestinationNum(0),
