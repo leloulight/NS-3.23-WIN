@@ -1473,7 +1473,7 @@ namespace ns3 {
 			return m_address;
 		}
 		////获取协议的路由表
-		Ptr<PmtmgmpRouteTable> PmtmgmpProtocol::GetPmtmgmpRPRouteTable()
+		Ptr<PmtmgmpRouteTable> PmtmgmpProtocol::GetPmtmgmpRouteTable()
 		{
 			return m_RouteTable;
 		}

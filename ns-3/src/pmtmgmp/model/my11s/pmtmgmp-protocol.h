@@ -136,7 +136,7 @@ namespace ns3 {
 			////获取MAC
 			Mac48Address GetMacAddress();
 			////获取协议的路由表
-			Ptr<PmtmgmpRouteTable> GetPmtmgmpRPRouteTable();
+			Ptr<PmtmgmpRouteTable> GetPmtmgmpRouteTable();
 			////PMTMGMP协议中节点的类型枚举
 			enum NodeType
 			{

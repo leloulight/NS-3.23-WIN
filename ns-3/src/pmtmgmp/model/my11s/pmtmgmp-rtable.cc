@@ -55,6 +55,7 @@ namespace ns3 {
 			m_NodeType(PmtmgmpProtocol::Mesh_STA),
 			m_hopCount(0),
 			m_metric(0),
+			m_BaseMetric(0),
 			m_CandidateRouteInformaiton(std::vector<Ptr<PmtmgmpRoutePath> >()),
 			m_InformationStatus(Confirmed),
 			m_MaxCandidateNum(4),
@@ -73,6 +74,7 @@ namespace ns3 {
 			m_hopCount = hopcount;
 			m_ttl = ttl;
 			m_metric = metric;
+			m_BaseMetric = metric;
 			RoutePathInforLifeUpdate();
 		}
 
@@ -163,7 +165,13 @@ namespace ns3 {
 		}
 		void PmtmgmpRoutePath::SetMetric(uint32_t metric)
 		{
+			m_BaseMetric = metric;
 			m_metric = metric;
+		}
+		void PmtmgmpRoutePath::SetAllMetric(uint32_t metric, uint32_t base)
+		{
+			m_metric = metric;
+			m_BaseMetric = base;
 		}
 		void PmtmgmpRoutePath::SetInterface(uint32_t interf)
 		{
@@ -216,6 +224,10 @@ namespace ns3 {
 		uint32_t PmtmgmpRoutePath::GetMetric() const
 		{
 			return m_metric;
+		}
+		uint32_t PmtmgmpRoutePath::GetBaseMetric() const
+		{
+			return m_BaseMetric;
 		}
 		uint32_t PmtmgmpRoutePath::GetInterface() const
 		{
@@ -287,7 +299,7 @@ namespace ns3 {
 			copy->SetNodeType(m_NodeType);
 			copy->SetHopcount(m_hopCount);
 			copy->SetTTL(m_ttl);
-			copy->SetMetric(m_metric);
+			copy->SetAllMetric(m_metric, m_BaseMetric);
 			copy->SetStatus(m_InformationStatus);
 			copy->SetInterface(m_interface);
 			return copy;
@@ -296,7 +308,7 @@ namespace ns3 {
 		void PmtmgmpRoutePath::IncrementMetric(uint32_t metric, double k)
 		{
 			////按公式积累计算度量，见AALM计算公式
-			m_metric = (sqrt(m_hopCount) * k * metric + (m_hopCount - 1) * (double)m_metric) / sqrt(m_hopCount * (m_hopCount + 1));
+			m_metric = (sqrt(m_hopCount) * k * metric + (m_hopCount - 1) * (double)m_BaseMetric) / sqrt(m_hopCount * (m_hopCount + 1));
 		}
 		/*************************
 		* PmtmgmpRouteTree
