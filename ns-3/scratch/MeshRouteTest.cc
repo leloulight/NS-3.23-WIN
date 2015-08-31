@@ -197,7 +197,7 @@ MeshRouteClass::MeshRouteClass() :
 	m_DestinationNum(0),
 	m_PacketSize(1024),
 	m_DataRate("150kbps"),
-	m_TotalTime(60),
+	m_TotalTime(10),
 	m_Root("00:00:00:00:00:01"),
 	m_Pcap(false),
 	m_PacketInterval(0.1)
