@@ -67,7 +67,7 @@
 // 应用布置类型
 #define RANDOM_APPLICATION_APP MeshRouteClass::Simple
 // 区域大小
-#define RANDOM_APPLICATION_SIZE 6
+#define RANDOM_APPLICATION_SIZE 9
 #endif
 
 
@@ -191,13 +191,13 @@ MeshRouteClass::MeshRouteClass() :
 	m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
 	m_Step(100),
 	m_ApplicationStep(2),
-	m_ApplicationAddType(Simple),
+	m_ApplicationAddType(Random),
 	m_MaxBytes(0),
 	m_SourceNum(0),
 	m_DestinationNum(0),
 	m_PacketSize(1024),
 	m_DataRate("150kbps"),
-	m_TotalTime(10),
+	m_TotalTime(60),
 	m_Root("00:00:00:00:00:01"),
 	m_Pcap(false),
 	m_PacketInterval(0.1)
