@@ -503,7 +503,7 @@ namespace ns3 {
 					tag.SetMSECPindex(next->GetMSECPindex());
 					packet->AddPacketTag(tag);
 
-					NS_LOG_DEBUG("Get next hop " << next->GetFromNode() << " at " << m_address);
+					NS_LOG_DEBUG("Get next hop " << next->GetFromNode() << " at " << m_address << " to " << destination << " from " << source);
 
 					// reply immediately :
 					routeReply(true, packet, source, destination, protocolType, next->GetInterface());
@@ -1941,10 +1941,10 @@ namespace ns3 {
 					else if (find->GetFromNode() == from)
 					{
 						////路由表中存在指定路由路径且来自于PUPD的发送者，更新Metric
-						uint32_t metric = find->GetMetric();
+						uint32_t old = find->GetMetric();
 						find->SetMetric(select->GetMetric());
 						find->IncrementMetric(metric, GetValueMForAALM());
-						NS_LOG_DEBUG("PUPD  Infor: MTERP(" << mterp << "),M SECPindex(" << uint32_t(select->GetMSECPindex()) << "), Metric(" << metric << " to " << find->GetMetric() << " , Base:" << find->GetBaseMetric() << ")");
+						NS_LOG_DEBUG("PUPD  Infor: MTERP(" << mterp << "),MSECPindex(" << uint32_t(select->GetMSECPindex()) << "), Metric(From " << old << " to " << find->GetMetric() << " , Base:" << find->GetBaseMetric() << " Step:" << metric << ")");
 					}
 					else
 					{
