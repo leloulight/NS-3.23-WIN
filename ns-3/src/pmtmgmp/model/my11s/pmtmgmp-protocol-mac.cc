@@ -103,7 +103,17 @@ namespace ns3 {
 #endif
 			tag.SetTtl(wmnHdr.GetWmnTtl());
 			packet->AddPacketTag(tag);
-
+#ifndef PMTMGMP_UNUSED_MY_CODE
+			////¸üÐÂMetric
+			if (destination != Mac48Address::GetBroadcast())
+			{
+				Ptr<PmtmgmpRoutePath> path = m_protocol->GetPmtmgmpRouteTable()->GetPathByMACindex(destination, tag.GetMSECPindex());
+				if (path != 0)
+				{
+					path->IncrementMetric(m_parent->GetLinkMetric(header.GetAddr2()), m_protocol->GetValueMForAALM());
+				}
+			}
+#endif
 			if ((destination == Mac48Address::GetBroadcast()) && (m_protocol->DropDataFrame(wmnHdr.GetWmnSeqno(),
 				source)))
 			{
