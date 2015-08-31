@@ -35,7 +35,7 @@
 #include <ctime>
 
 //输出到文件
-#define OUT_TO_FILE 
+//#define OUT_TO_FILE
 //无应用层模式
 //#define NO_APPLICATION
 //测试模式
@@ -46,27 +46,30 @@
 #define DEGREES_TO_RADIANS(__ANGLE__) ((__ANGLE__) * 0.01745329252f) // PI / 180
 
 // 仿真前路由生成时间
-#define MIN_APPLICATION_TIME 60 
+#define MIN_APPLICATION_TIME 60
 // 仿真后等待时间
-#define END_APPLICATION_TIME 15 
+#define END_APPLICATION_TIME 15
 
 
 //测试所有文件
 #define TEST_ALL
 #ifdef TEST_ALL
 // 随机应用总数
-#define RANDOM_APPLICATION_COUNT 20 
+#define RANDOM_APPLICATION_COUNT 20
 // 随机应用运行间隔
-#define RANDOM_APPLICATION_INTERVAL 5 
+#define RANDOM_APPLICATION_INTERVAL 5
 // 随机应用持续时间
-#define RANDOM_APPLICATION_LIFE 8 
+#define RANDOM_APPLICATION_LIFE 8
 // 随机应用随机区间
-#define RANDOM_APPLICATION_RANDOM 2 
+#define RANDOM_APPLICATION_RANDOM 2
 // 区域形状
 #define RANDOM_APPLICATION_AREA MeshRouteClass::HEXAGON
+// 应用布置类型
+#define RANDOM_APPLICATION_APP MeshRouteClass::Simple
 // 区域大小
-#define RANDOM_APPLICATION_SIZE 6 
+#define RANDOM_APPLICATION_SIZE 6
 #endif
+
 
 using namespace ns3;
 using namespace std;
@@ -108,7 +111,8 @@ public:
 	// 初始化测试
 	MeshRouteClass();
 	// 设置参数
-	void SetMeshRouteClass(MeshProtocolType protocolType, vector<NodeApplicationInfor> applications, double totalTime, NodeAreaType areaType, int size);
+	void SetMeshRouteClass(MeshProtocolType protocolType, vector<NodeApplicationInfor> applications, double totalTime, NodeAreaType areaType, int size, ApplicationAddType appType);
+	void SetMeshRouteClass(MeshProtocolType protocolType);
 	//// 配置参数
 	//void Configur/*e(in*/t argc, char ** argv);
 	// 开始测试
@@ -180,20 +184,20 @@ private:
 // 初始化测试
 MeshRouteClass::MeshRouteClass() :
 	m_ProtocolType(MY11S_PMTMGMP),
-	m_AreaType(HEXAGON),
-	m_Size(4),
+	m_AreaType(SQUARE),
+	m_Size(RANDOM_APPLICATION_SIZE),
 	m_RandomStart(0.1),
 	m_NumIface(1),
 	m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
 	m_Step(100),
-	m_ApplicationStep(3),
-	m_ApplicationAddType(Random),
+	m_ApplicationStep(2),
+	m_ApplicationAddType(Simple),
 	m_MaxBytes(0),
 	m_SourceNum(0),
 	m_DestinationNum(0),
 	m_PacketSize(1024),
 	m_DataRate("150kbps"),
-	m_TotalTime(120),
+	m_TotalTime(10),
 	m_Root("00:00:00:00:00:01"),
 	m_Pcap(false),
 	m_PacketInterval(0.1)
@@ -204,15 +208,18 @@ MeshRouteClass::MeshRouteClass() :
 }
 
 // 设置参数
-void MeshRouteClass::SetMeshRouteClass(MeshProtocolType protocolType, vector<NodeApplicationInfor> applications, double totalTime, NodeAreaType areaType, int size)
+void MeshRouteClass::SetMeshRouteClass(MeshProtocolType protocolType, vector<NodeApplicationInfor> applications, double totalTime, NodeAreaType areaType, int size, ApplicationAddType appType)
 {
-	MeshRouteClass();
 	m_ProtocolType = protocolType;
 	m_Applications = applications;
 	m_TotalTime = totalTime;
-	m_ApplicationAddType = Random;
 	m_AreaType = areaType;
 	m_Size = size;
+}
+
+void MeshRouteClass::SetMeshRouteClass(MeshProtocolType protocolType)
+{
+	m_ProtocolType = protocolType;
 }
 
 // 通过配置计算基本参数
@@ -418,13 +425,13 @@ void MeshRouteClass::InstallCoupleApplication(int srcIndex, int dstIndex, int sr
 	onOffAPP.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]"));
 	onOffAPP.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=0]"));
 	ApplicationContainer sourceApps = onOffAPP.Install(l_Nodes.Get(srcIndex));
-	sourceApps.Start(Seconds(start));
-	sourceApps.Stop(Seconds(end));
+	sourceApps.Start(Seconds(MIN_APPLICATION_TIME + start));
+	sourceApps.Stop(Seconds(MIN_APPLICATION_TIME + end));
 
 	PacketSinkHelper sink("ns3::UdpSocketFactory", InetSocketAddress(l_Interfaces.GetAddress(dstIndex), dstPort));
 	ApplicationContainer sinkApps = sink.Install(l_Nodes.Get(srcIndex));
-	sinkApps.Start(Seconds(start));
-	sinkApps.Stop(Seconds(end + END_APPLICATION_TIME));
+	sinkApps.Start(Seconds(MIN_APPLICATION_TIME + start));
+	sinkApps.Stop(Seconds(MIN_APPLICATION_TIME + end + END_APPLICATION_TIME));
 
 	if (m_ProtocolType == MY11S_PMTMGMP)
 	{
@@ -827,6 +834,9 @@ void MeshRouteClass::Report()
 }
 int main(int argc, char *argv[])
 {
+	// 命令行配置
+	CommandLine cmd;
+	cmd.Parse(argc, argv);
 #ifdef OUT_TO_FILE
 #ifdef WIN32
 	ofstream logfile("Ns-3.23-log.log");
@@ -860,41 +870,55 @@ int main(int argc, char *argv[])
 
 	PacketMetadata::Enable();
 #ifdef TEST_ALL
-	int nodeCount;
-	switch (RANDOM_APPLICATION_AREA)
-	{
-	case MeshRouteClass::SQUARE:
-		nodeCount = RANDOM_APPLICATION_SIZE * RANDOM_APPLICATION_SIZE;
-		break;
-	case MeshRouteClass::HEXAGON:
-		nodeCount = 3 * (RANDOM_APPLICATION_SIZE - 1) * RANDOM_APPLICATION_SIZE + 1;
-		break;
-	default:
-		break;
-	}
-
-	Ptr<UniformRandomVariable> randNodes = CreateObject<UniformRandomVariable>();
-	randNodes->SetAttribute("Min", DoubleValue(0));
-	randNodes->SetAttribute("Max", DoubleValue(nodeCount - 1));
-
-	Ptr<UniformRandomVariable> randTime = CreateObject<UniformRandomVariable>();
-
 	vector<NodeApplicationInfor> apps;
-	for (int i = 0; i < RANDOM_APPLICATION_COUNT; i++)
+	int totalTime = 0;
+	if (RANDOM_APPLICATION_APP == MeshRouteClass::Random)
 	{
-		double startTime = RANDOM_APPLICATION_INTERVAL * i + randTime->GetValue(0, RANDOM_APPLICATION_RANDOM);
-		NodeApplicationInfor newApp = { randNodes->GetInteger(), randNodes->GetInteger(), startTime, startTime + RANDOM_APPLICATION_LIFE };
-		apps.push_back(newApp);
-	}
 
-	int totalTime = (RANDOM_APPLICATION_COUNT - 1) * RANDOM_APPLICATION_INTERVAL + RANDOM_APPLICATION_LIFE + RANDOM_APPLICATION_RANDOM;
-	//测试
-	MeshRouteClass pmtmgmp;
-	pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, apps, totalTime, MeshRouteClass::HEXAGON, 6);
-	pmtmgmp.Run();
-	MeshRouteClass mesh;
-	mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, apps, totalTime, MeshRouteClass::HEXAGON, 6);
-	mesh.Run();
+		int nodeCount;
+		switch (RANDOM_APPLICATION_AREA)
+		{
+		case MeshRouteClass::SQUARE:
+			nodeCount = RANDOM_APPLICATION_SIZE * RANDOM_APPLICATION_SIZE;
+			break;
+		case MeshRouteClass::HEXAGON:
+			nodeCount = 3 * (RANDOM_APPLICATION_SIZE - 1) * RANDOM_APPLICATION_SIZE + 1;
+			break;
+		default:
+			break;
+		}
+
+		Ptr<UniformRandomVariable> randNodes = CreateObject<UniformRandomVariable>();
+		randNodes->SetAttribute("Min", DoubleValue(0));
+		randNodes->SetAttribute("Max", DoubleValue(nodeCount - 1));
+
+		Ptr<UniformRandomVariable> randTime = CreateObject<UniformRandomVariable>();
+
+		for (int i = 0; i < RANDOM_APPLICATION_COUNT; i++)
+		{
+			double startTime = RANDOM_APPLICATION_INTERVAL * i + randTime->GetValue(0, RANDOM_APPLICATION_RANDOM);
+			NodeApplicationInfor newApp = { randNodes->GetInteger(), randNodes->GetInteger(), startTime, startTime + RANDOM_APPLICATION_LIFE };
+			apps.push_back(newApp);
+		}
+
+		totalTime = (RANDOM_APPLICATION_COUNT - 1) * RANDOM_APPLICATION_INTERVAL + RANDOM_APPLICATION_LIFE + RANDOM_APPLICATION_RANDOM;
+		//测试
+		MeshRouteClass pmtmgmp;
+		pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, apps, totalTime, MeshRouteClass::SQUARE, RANDOM_APPLICATION_SIZE, RANDOM_APPLICATION_APP);
+		pmtmgmp.Run();
+		MeshRouteClass mesh;
+		mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, apps, totalTime, MeshRouteClass::SQUARE, RANDOM_APPLICATION_SIZE, RANDOM_APPLICATION_APP);
+		mesh.Run();
+	}
+	else
+	{
+		MeshRouteClass pmtmgmp;
+		pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP);
+		pmtmgmp.Run();
+		MeshRouteClass mesh;
+		mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP);
+		mesh.Run();
+	}
 
 	return 0;
 #else
