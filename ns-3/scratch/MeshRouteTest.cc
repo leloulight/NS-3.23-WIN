@@ -55,19 +55,21 @@
 #define TEST_ALL
 #ifdef TEST_ALL
 // 随机应用总数
-#define RANDOM_APPLICATION_COUNT 20
+#define TEST_SET_COUNT 20
 // 随机应用运行间隔
-#define RANDOM_APPLICATION_INTERVAL 5
+#define TEST_SET_INTERVAL 5
 // 随机应用持续时间
-#define RANDOM_APPLICATION_LIFE 8
+#define TEST_SET_LIFE 8
 // 随机应用随机区间
-#define RANDOM_APPLICATION_RANDOM 2
+#define TEST_SET_RANDOM 2
 // 区域形状
-#define RANDOM_APPLICATION_AREA MeshRouteClass::HEXAGON
+#define TEST_SET_AREA MeshRouteClass::HEXAGON
 // 应用布置类型
-#define RANDOM_APPLICATION_APP MeshRouteClass::Simple
+#define TEST_SET_APP MeshRouteClass::Simple
+// 协议
+#define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
 // 区域大小
-#define RANDOM_APPLICATION_SIZE 10
+#define TEST_SET_SIZE 10
 #endif
 
 
@@ -185,7 +187,7 @@ private:
 MeshRouteClass::MeshRouteClass() :
 	m_ProtocolType(MY11S_PMTMGMP),
 	m_AreaType(SQUARE),
-	m_Size(RANDOM_APPLICATION_SIZE),
+	m_Size(TEST_SET_SIZE),
 	m_RandomStart(0.1),
 	m_NumIface(1),
 	m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
@@ -519,28 +521,6 @@ void MeshRouteClass::InstallApplicationRandom()
 					break;
 				}
 			}
-			/*int size = (m_Size - 1) / m_ApplicationStep + 1;
-
-			int count = size * size / 2;
-			int add = m_Size % 2;
-			for (int i = 0; i < count; i++)
-			{
-				int x = (i % size) * m_ApplicationStep + start;
-				if (x > m_Size / 2)
-				{
-					x = x + add;
-				}
-				int y = (i / size) * m_ApplicationStep + start;
-
-				if (i % 2 == 0)
-				{
-					InstallCoupleApplication(y * m_Size + x, l_NodeNum - y * m_Size - x - 1, 49000, 49001 + i, i, m_TotalTime);
-				}
-				else
-				{
-					InstallCoupleApplication(l_NodeNum - y * m_Size - x - 1, y * m_Size + x, 49000, 49001 + i, i, m_TotalTime);
-				}
-			}*/
 		}
 		break;
 		case MeshRouteClass::HEXAGON:
@@ -896,20 +876,19 @@ int main(int argc, char *argv[])
 	LogComponentEnable("MeshRouteTest", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 
 	PacketMetadata::Enable();
-#ifdef TEST_ALL
 	vector<NodeApplicationInfor> apps;
 	int totalTime = 0;
-	if (RANDOM_APPLICATION_APP == MeshRouteClass::Random)
+	if (TEST_SET_APP == MeshRouteClass::Random)
 	{
 
 		int nodeCount;
-		switch (RANDOM_APPLICATION_AREA)
+		switch (TEST_SET_AREA)
 		{
 		case MeshRouteClass::SQUARE:
-			nodeCount = RANDOM_APPLICATION_SIZE * RANDOM_APPLICATION_SIZE;
+			nodeCount = TEST_SET_SIZE * TEST_SET_SIZE;
 			break;
 		case MeshRouteClass::HEXAGON:
-			nodeCount = 3 * (RANDOM_APPLICATION_SIZE - 1) * RANDOM_APPLICATION_SIZE + 1;
+			nodeCount = 3 * (TEST_SET_SIZE - 1) * TEST_SET_SIZE + 1;
 			break;
 		default:
 			break;
@@ -921,35 +900,43 @@ int main(int argc, char *argv[])
 
 		Ptr<UniformRandomVariable> randTime = CreateObject<UniformRandomVariable>();
 
-		for (int i = 0; i < RANDOM_APPLICATION_COUNT; i++)
+		for (int i = 0; i < TEST_SET_COUNT; i++)
 		{
-			double startTime = RANDOM_APPLICATION_INTERVAL * i + randTime->GetValue(0, RANDOM_APPLICATION_RANDOM);
-			NodeApplicationInfor newApp = { randNodes->GetInteger(), randNodes->GetInteger(), startTime, startTime + RANDOM_APPLICATION_LIFE };
+			double startTime = TEST_SET_INTERVAL * i + randTime->GetValue(0, TEST_SET_RANDOM);
+			NodeApplicationInfor newApp = { randNodes->GetInteger(), randNodes->GetInteger(), startTime, startTime + TEST_SET_LIFE };
 			apps.push_back(newApp);
 		}
 
-		totalTime = (RANDOM_APPLICATION_COUNT - 1) * RANDOM_APPLICATION_INTERVAL + RANDOM_APPLICATION_LIFE + RANDOM_APPLICATION_RANDOM;
+		totalTime = (TEST_SET_COUNT - 1) * TEST_SET_INTERVAL + TEST_SET_LIFE + TEST_SET_RANDOM;
+#ifdef TEST_ALL
 		//测试
 		MeshRouteClass pmtmgmp;
-		pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, apps, totalTime, MeshRouteClass::SQUARE, RANDOM_APPLICATION_SIZE, RANDOM_APPLICATION_APP);
+		pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, apps, totalTime, MeshRouteClass::SQUARE, TEST_SET_SIZE, TEST_SET_APP);
 		pmtmgmp.Run();
 		MeshRouteClass mesh;
-		mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, apps, totalTime, MeshRouteClass::SQUARE, RANDOM_APPLICATION_SIZE, RANDOM_APPLICATION_APP);
+		mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, apps, totalTime, MeshRouteClass::SQUARE, TEST_SET_SIZE, TEST_SET_APP);
 		mesh.Run();
+#else
+		MeshRouteClass test;
+		test.SetMeshRouteClass(TEST_SET_PROTOCOL, apps, totalTime, MeshRouteClass::SQUARE, TEST_SET_SIZE, TEST_SET_APP);
+		pmtmgmp.Run();
+#endif
 	}
 	else
 	{
+#ifdef TEST_ALL
 		MeshRouteClass pmtmgmp;
 		pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP);
 		pmtmgmp.Run();
 		MeshRouteClass mesh;
 		mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP);
 		mesh.Run();
+	#else
+		MeshRouteClass test;
+		test.SetMeshRouteClass(TEST_SET_PROTOCOL);
+		pmtmgmp.Run();
+#endif
 	}
 
 	return 0;
-#else
-	MeshRouteClass t;
-	return t.Run();
-#endif
 }
