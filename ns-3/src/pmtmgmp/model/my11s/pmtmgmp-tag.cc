@@ -34,7 +34,8 @@ namespace ns3 {
 			m_metric(0),
 			m_seqno(0)
 #else
-			m_MSECPindex(0)
+			m_MSECPindex(0),
+			m_ChangePath(0)
 #endif
 		{
 		}
@@ -113,7 +114,8 @@ namespace ns3 {
 				+ 1 //ttl
 				+ 4 //seqno
 #ifndef PMTMGMP_UNUSED_MY_CODE
-				+ 1; //MSECPindex
+				+ 1  //MSECPindex
+				+ 1; //ChangePath
 #else
 				+ 4 //metric
 				+ 4; //seqno
@@ -138,6 +140,7 @@ namespace ns3 {
 			}
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			i.WriteU8(m_MSECPindex);
+			i.WriteU8(m_ChangePath);
 #endif
 		}
 
@@ -159,6 +162,7 @@ namespace ns3 {
 			m_address.CopyFrom(address);
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			m_MSECPindex = i.ReadU8();
+			m_ChangePath = i.ReadU8();
 #endif
 		}
 
@@ -174,6 +178,7 @@ namespace ns3 {
 #endif
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			os << "MSECPindex=" << m_MSECPindex;
+			os << "ChangePath=" << m_ChangePath;
 #endif
 		}
 		void
@@ -181,14 +186,26 @@ namespace ns3 {
 		{
 			m_ttl--;
 		}
+		void PmtmgmpTag::IncreaseChange()
+		{
+			m_ChangePath++;
+		}
 #ifndef PMTMGMP_UNUSED_MY_CODE
 		void PmtmgmpTag::SetMSECPindex(uint8_t index)
 		{
 			m_MSECPindex = index;
 		}
+		void PmtmgmpTag::SetChangePath(uint8_t change)
+		{
+			m_ChangePath = change;
+		}
 		uint8_t PmtmgmpTag::GetMSECPindex()
 		{
 			return m_MSECPindex;
+		}
+		uint8_t PmtmgmpTag::GetChangePath()
+		{
+			return m_ChangePath;
 		}
 #endif
 	} // namespace my11s

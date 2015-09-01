@@ -414,6 +414,8 @@ namespace ns3 {
 			uint8_t m_MaxRoutePathPerPUPD;
 			////每个PUPGQ可以发送的路由路径最大数量
 			uint8_t m_MaxRoutePathPerPUPGQ;
+			////最大路径转换次数
+			uint8_t m_MaxPathChange;
 #endif
 		};
 	} // namespace my11s

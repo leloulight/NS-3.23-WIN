@@ -132,7 +132,7 @@ class ShowPmtmgmpInforamtion(InformationWindow):
         self.label.show()
 
         #Shouw Route Table
-        route_table = self.pmtmgmp.GetPmtmgmpRPRouteTable()
+        route_table = self.pmtmgmp.GetPmtmgmpRouteTable()
         for i in range(0, self.notebook.get_n_pages()):
             self.notebook.remove_page(0)
         if (route_table.GetTableSize() == 0):

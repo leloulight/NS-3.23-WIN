@@ -62,9 +62,12 @@ public:
   uint32_t GetSeqno();
 #endif
   void  DecrementTtl ();
+  void  IncreaseChange();
 #ifndef PMTMGMP_UNUSED_MY_CODE
   void SetMSECPindex(uint8_t index);
+  void SetChangePath(uint8_t change);
   uint8_t GetMSECPindex();
+  uint8_t GetChangePath();
 #endif
 
   static  TypeId  GetTypeId ();
@@ -83,6 +86,7 @@ private:
 #endif
 #ifndef PMTMGMP_UNUSED_MY_CODE
   uint8_t m_MSECPindex;
+  uint8_t m_ChangePath;
 #endif
 };
 } // namespace my11s

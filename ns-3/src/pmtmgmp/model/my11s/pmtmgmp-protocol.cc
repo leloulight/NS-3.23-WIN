@@ -246,6 +246,13 @@ namespace ns3 {
 						&PmtmgmpProtocol::m_MaxRoutePathPerPUPGQ),
 					MakeUintegerChecker<uint8_t>(1)
 					)
+				.AddAttribute("MaxPathChange",
+					"Max Route Path count can change when a packet in its way.",
+					UintegerValue(10),
+					MakeUintegerAccessor(
+						&PmtmgmpProtocol::m_MaxPathChange),
+					MakeUintegerChecker<uint8_t>(1)
+					)
 #endif
 				;
 			return tid;
@@ -285,7 +292,8 @@ namespace ns3 {
 			m_PMTMGMPmsecpAALMmagnification(2),
 			m_RouteTable(CreateObject<PmtmgmpRouteTable>()),
 			m_MaxRoutePathPerPUPD(10),
-			m_MaxRoutePathPerPUPGQ(6)
+			m_MaxRoutePathPerPUPGQ(6),
+			m_MaxPathChange(10)
 #endif
 		{
 			NS_LOG_FUNCTION_NOARGS();
@@ -496,7 +504,22 @@ namespace ns3 {
 			else
 			{
 				//return ForwardUnicast(sourceIface, source, destination, packet, protocolType, routeReply, tag.GetTtl());
-				Ptr<PmtmgmpRoutePath> next = m_RouteTable->GetBestRoutePathForData(destination, tag.GetMSECPindex());
+				Ptr<PmtmgmpRoutePath> next;
+				if (tag.GetChangePath() > m_MaxPathChange)
+				{
+					////已到达最大路径转换次数
+					next = m_RouteTable->GetPathByMACindex(destination, tag.GetMSECPindex());
+					if (next == 0)
+					{
+						next = m_RouteTable->GetBestRoutePathForData(destination, tag.GetMSECPindex());
+						tag.IncreaseChange();
+					}
+				}
+				else
+				{
+					next = m_RouteTable->GetBestRoutePathForData(destination, tag.GetMSECPindex());
+					tag.IncreaseChange();
+				}
 				if (next != 0)
 				{
 					tag.SetAddress(next->GetFromNode());

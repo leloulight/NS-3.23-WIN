@@ -484,7 +484,7 @@ void MeshRouteClass::InstallApplicationRandom()
 			{
 				NS_LOG_ERROR("应用间隔不能小于0");
 			}
-			if (m_Size < m_ApplicationStep)
+			if (m_Size <= m_ApplicationStep)
 			{
 				// 节点数量不足使用多应用
 				m_SourceNum = m_Size + 1;
@@ -492,10 +492,37 @@ void MeshRouteClass::InstallApplicationRandom()
 				InstallCoupleApplication(m_SourceNum, m_DestinationNum, 49000, 49001, 0, m_TotalTime);
 			}
 			int start = ((m_Size - 1) % m_ApplicationStep) / 2;
-			int size = (m_Size - 1) / m_ApplicationStep + 1;
+			bool end = false;
+			int count = 0;
+			for (int y = start; y < m_Size; y += m_ApplicationStep)
+			{
+				for (int x = start; x < m_Size; x += m_ApplicationStep)
+				{
+					int i = y * m_Size + x;
+					if (i > (l_NodeNum - 1) / 2)
+					{
+						end = true;
+						break;
+					}
+					if (count % 2 == 0)
+					{
+						InstallCoupleApplication(y * m_Size + x, l_NodeNum - y * m_Size - x - 1, 49000, 49001 + i, i, m_TotalTime);
+					}
+					else
+					{
+						InstallCoupleApplication(l_NodeNum - y * m_Size - x - 1, y * m_Size + x, 49000, 49001 + i, i, m_TotalTime);
+					}
+					count++;
+				}
+				if (end)
+				{
+					break;
+				}
+			}
+			/*int size = (m_Size - 1) / m_ApplicationStep + 1;
 
 			int count = size * size / 2;
-			int add = (m_Size + 1) % 2;
+			int add = m_Size % 2;
 			for (int i = 0; i < count; i++)
 			{
 				int x = (i % size) * m_ApplicationStep + start;
@@ -513,7 +540,7 @@ void MeshRouteClass::InstallApplicationRandom()
 				{
 					InstallCoupleApplication(l_NodeNum - y * m_Size - x - 1, y * m_Size + x, 49000, 49001 + i, i, m_TotalTime);
 				}
-			}
+			}*/
 		}
 		break;
 		case MeshRouteClass::HEXAGON:
@@ -522,7 +549,7 @@ void MeshRouteClass::InstallApplicationRandom()
 			{
 				NS_LOG_ERROR("应用间隔不能小于0");
 			}
-			if (m_Size < m_ApplicationStep)
+			if (m_Size <= m_ApplicationStep)
 			{
 				// 节点数量不足使用多应用
 				if (m_Size == 2)
