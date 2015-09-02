@@ -461,6 +461,7 @@ namespace ns3 {
 				tag.DecrementTtl();
 				if (tag.GetTtl() == 0)
 				{
+					NS_LOG_DEBUG("TTL is 0 " << " at " << m_address << " from " << source << " to " << destination);
 					m_stats.droppedTtl++;
 					return false;
 				}
@@ -526,7 +527,7 @@ namespace ns3 {
 					tag.SetMSECPindex(next->GetMSECPindex());
 					packet->AddPacketTag(tag);
 
-					NS_LOG_DEBUG("Get next hop " << next->GetFromNode() << " at " << m_address << " to " << destination << " from " << source);
+					NS_LOG_DEBUG("Get next hop " << next->GetFromNode() << " at " << m_address << " from " << source << " to " << destination);
 
 					// reply immediately :
 					routeReply(true, packet, source, destination, protocolType, next->GetInterface());
@@ -538,12 +539,12 @@ namespace ns3 {
 				if (sourceIface != GetWmnPoint()->GetIfIndex())
 				{
 					//Start path error procedure:
-					NS_LOG_DEBUG("Must Send PERR");
+					NS_LOG_DEBUG("Must Send PERR at " << m_address << " from " << source << " to " << destination);
 					m_stats.totalDropped++;
 					return false;
 				}
 
-				NS_LOG_DEBUG("No RouteTable here now. at " << m_address);
+				NS_LOG_DEBUG("No RouteTable here now. at " << m_address << " from " << source << " to " << destination);
 				if (m_RouteTable->AddPacketToQueue(packet, source, destination, protocolType, sourceIface, routeReply))
 				{
 					m_stats.totalQueued++;

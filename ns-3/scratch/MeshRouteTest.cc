@@ -53,7 +53,6 @@
 
 //测试所有文件
 #define TEST_ALL
-#ifdef TEST_ALL
 // 随机应用总数
 #define TEST_SET_COUNT 20
 // 随机应用运行间隔
@@ -63,14 +62,15 @@
 // 随机应用随机区间
 #define TEST_SET_RANDOM 2
 // 区域形状
-#define TEST_SET_AREA MeshRouteClass::HEXAGON
+#define TEST_SET_AREA MeshRouteClass::SQUARE
 // 应用布置类型
 #define TEST_SET_APP MeshRouteClass::Simple
 // 协议
 #define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
 // 区域大小
 #define TEST_SET_SIZE 10
-#endif
+// 区域间隔
+#define TEST_SET_APPSTEP 8
 
 
 using namespace ns3;
@@ -113,8 +113,8 @@ public:
 	// 初始化测试
 	MeshRouteClass();
 	// 设置参数
-	void SetMeshRouteClass(MeshProtocolType protocolType, vector<NodeApplicationInfor> applications, double totalTime, NodeAreaType areaType, int size, ApplicationAddType appType);
-	void SetMeshRouteClass(MeshProtocolType protocolType);
+	void SetMeshRouteClass(MeshProtocolType protocolType, vector<NodeApplicationInfor> applications, double totalTime, NodeAreaType areaType, int size, int appStep, ApplicationAddType appType);
+	void SetMeshRouteClass(MeshProtocolType protocolType, NodeAreaType areaType, int size, int appStep, ApplicationAddType appType);
 	//// 配置参数
 	//void Configur/*e(in*/t argc, char ** argv);
 	// 开始测试
@@ -185,15 +185,11 @@ private:
 
 // 初始化测试
 MeshRouteClass::MeshRouteClass() :
-	m_ProtocolType(MY11S_PMTMGMP),
-	m_AreaType(SQUARE),
-	m_Size(TEST_SET_SIZE),
 	m_RandomStart(0.1),
 	m_NumIface(1),
 	m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
 	m_Step(80),
 	m_ApplicationStep(8),
-	m_ApplicationAddType(Multiple),
 	m_MaxBytes(0),
 	m_SourceNum(0),
 	m_DestinationNum(0),
@@ -210,18 +206,24 @@ MeshRouteClass::MeshRouteClass() :
 }
 
 // 设置参数
-void MeshRouteClass::SetMeshRouteClass(MeshProtocolType protocolType, vector<NodeApplicationInfor> applications, double totalTime, NodeAreaType areaType, int size, ApplicationAddType appType)
+void MeshRouteClass::SetMeshRouteClass(MeshProtocolType protocolType, vector<NodeApplicationInfor> applications, double totalTime, NodeAreaType areaType, int size, int appStep, ApplicationAddType appType)
 {
 	m_ProtocolType = protocolType;
 	m_Applications = applications;
 	m_TotalTime = totalTime;
 	m_AreaType = areaType;
 	m_Size = size;
+	m_ApplicationStep = appStep;
+	m_ApplicationAddType = appType;
 }
 
-void MeshRouteClass::SetMeshRouteClass(MeshProtocolType protocolType)
+void MeshRouteClass::SetMeshRouteClass(MeshProtocolType protocolType, NodeAreaType areaType, int size, int appStep, ApplicationAddType appType)
 {
 	m_ProtocolType = protocolType;
+	m_AreaType = areaType;
+	m_Size = size;
+	m_ApplicationStep = appStep;
+	m_ApplicationAddType = appType;
 }
 
 // 通过配置计算基本参数
@@ -290,6 +292,8 @@ void MeshRouteClass::CreateNodes()
 	default:
 		break;
 	}
+
+	NS_ASSERT(l_NodeNum < 255);
 
 	// 创建节点
 	l_Nodes.Create(l_NodeNum);
@@ -911,30 +915,30 @@ int main(int argc, char *argv[])
 #ifdef TEST_ALL
 		//测试
 		MeshRouteClass pmtmgmp;
-		pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, apps, totalTime, MeshRouteClass::SQUARE, TEST_SET_SIZE, TEST_SET_APP);
+		pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, apps, totalTime, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
 		pmtmgmp.Run();
 		MeshRouteClass mesh;
-		mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, apps, totalTime, MeshRouteClass::SQUARE, TEST_SET_SIZE, TEST_SET_APP);
+		mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, apps, totalTime, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
 		mesh.Run();
 #else
 		MeshRouteClass test;
-		test.SetMeshRouteClass(TEST_SET_PROTOCOL, apps, totalTime, MeshRouteClass::SQUARE, TEST_SET_SIZE, TEST_SET_APP);
-		pmtmgmp.Run();
+		test.SetMeshRouteClass(TEST_SET_PROTOCOL, apps, totalTime, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
+		test.Run();
 #endif
 	}
 	else
 	{
 #ifdef TEST_ALL
 		MeshRouteClass pmtmgmp;
-		pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP);
+		pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
 		pmtmgmp.Run();
 		MeshRouteClass mesh;
-		mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP);
+		mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
 		mesh.Run();
 	#else
 		MeshRouteClass test;
-		test.SetMeshRouteClass(TEST_SET_PROTOCOL);
-		pmtmgmp.Run();
+		test.SetMeshRouteClass(TEST_SET_PROTOCOL, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
+		test.Run();
 #endif
 	}
 
