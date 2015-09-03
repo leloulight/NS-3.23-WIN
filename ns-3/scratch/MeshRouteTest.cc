@@ -187,14 +187,14 @@ private:
 MeshRouteClass::MeshRouteClass() :
 	m_RandomStart(0.1),
 	m_NumIface(1),
-	m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
-	m_Step(50),
+	m_WifiPhyStandard(WIFI_PHY_STANDARD_80211g),
+	m_Step(100),
 	m_ApplicationStep(8),
 	m_MaxBytes(0),
 	m_SourceNum(0),
 	m_DestinationNum(0),
 	m_PacketSize(1024),
-	m_DataRate("150kbps"),
+	m_DataRate("1Mbps"),
 	m_TotalTime(60),
 	m_Root("00:00:00:00:00:01"),
 	m_Pcap(false),
@@ -328,7 +328,7 @@ void MeshRouteClass::CreateNodes()
 			l_Mesh.SetStackInstaller("ns3::Dot11sStack");
 		}
 		l_Mesh.SetMacType("RandomStart", TimeValue(Seconds(m_RandomStart)));
-		l_Mesh.SetRemoteStationManager("ns3::ConstantRateWifiManager", "DataMode", StringValue("OfdmRate6Mbps"), "RtsCtsThreshold", UintegerValue(2500));
+		l_Mesh.SetRemoteStationManager("ns3::ConstantRateWifiManager", "DataMode", StringValue("ErpOfdmRate9Mbps"), "RtsCtsThreshold", UintegerValue(2500));
 		l_Mesh.SetNumberOfInterfaces(m_NumIface);
 		l_Mesh.SetSpreadInterfaceChannels(MeshHelper::ZERO_CHANNEL);
 		l_NetDevices = l_Mesh.Install(wifiPhy, l_Nodes);
@@ -337,7 +337,7 @@ void MeshRouteClass::CreateNodes()
 		l_Mesh.SetStandard(m_WifiPhyStandard);
 		l_Mesh.SetStackInstaller("ns3::FlameStack");
 		l_Mesh.SetMacType("RandomStart", TimeValue(Seconds(m_RandomStart)));
-		l_Mesh.SetRemoteStationManager("ns3::ConstantRateWifiManager", "DataMode", StringValue("OfdmRate6Mbps"), "RtsCtsThreshold", UintegerValue(2500));
+		l_Mesh.SetRemoteStationManager("ns3::ConstantRateWifiManager", "DataMode", StringValue("ErpOfdmRate9Mbps"), "RtsCtsThreshold", UintegerValue(2500));
 		l_Mesh.SetNumberOfInterfaces(m_NumIface);
 		l_Mesh.SetSpreadInterfaceChannels(MeshHelper::ZERO_CHANNEL);
 		l_NetDevices = l_Mesh.Install(wifiPhy, l_Nodes);
@@ -353,7 +353,7 @@ void MeshRouteClass::CreateNodes()
 			l_Pmtmgmp.SetStackInstaller("ns3::My11sStack");
 		}
 		l_Pmtmgmp.SetMacType("RandomStart", TimeValue(Seconds(m_RandomStart)));
-		l_Pmtmgmp.SetRemoteStationManager("ns3::ConstantRateWifiManager", "DataMode", StringValue("OfdmRate6Mbps"), "RtsCtsThreshold", UintegerValue(2500));
+		l_Pmtmgmp.SetRemoteStationManager("ns3::ConstantRateWifiManager", "DataMode", StringValue("ErpOfdmRate9Mbps"), "RtsCtsThreshold", UintegerValue(2500));
 		l_Pmtmgmp.SetNumberOfInterfaces(m_NumIface);
 		l_Pmtmgmp.SetSpreadInterfaceChannels(WmnHelper::ZERO_CHANNEL);
 		l_NetDevices = l_Pmtmgmp.Install(wifiPhy, l_Nodes);
