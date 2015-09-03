@@ -293,7 +293,12 @@ namespace ns3 {
 			m_RouteTable(CreateObject<PmtmgmpRouteTable>()),
 			m_MaxRoutePathPerPUPD(10),
 			m_MaxRoutePathPerPUPGQ(6),
+#ifdef PMTMGMP_TAG_INFOR_ATTACH
+			m_MaxPathChange(10),
+			m_SendIndex(0)
+#else
 			m_MaxPathChange(10)
+#endif
 #endif
 		{
 			NS_LOG_FUNCTION_NOARGS();
@@ -451,6 +456,18 @@ namespace ns3 {
 					NS_FATAL_ERROR("PMTMGMP tag has come with a packet from upper layer. This must not occur...");
 				}
 				tag.SetTtl(m_maxTtl);
+				if (destination == Mac48Address::GetBroadcast())
+				{
+					NS_LOG_DEBUG("Start ARP Packet at " << m_address << " from " << source << " to " << destination);
+				}
+#ifdef PMTMGMP_TAG_INFOR_ATTACH
+				else
+				{
+					NS_LOG_DEBUG("Start Packet at " << m_address << " from " << source << " to " << destination << " while tag index is " << tag.GetSendIndex());
+					tag.SetSendIndex(m_SendIndex);
+					m_SendIndex++;
+				}
+#endif
 			}
 			else
 			{
@@ -468,6 +485,7 @@ namespace ns3 {
 			}
 			if (destination == Mac48Address::GetBroadcast())
 			{
+				NS_LOG_DEBUG("Receive ARP Packet at " << m_address << " from " << source << " to " << destination);
 				m_stats.txBroadcast++;
 				m_stats.txBytes += packet->GetSize();
 				//channel IDs where we have already sent broadcast:
@@ -504,6 +522,9 @@ namespace ns3 {
 			}
 			else
 			{
+#ifdef PMTMGMP_TAG_INFOR_ATTACH
+				NS_LOG_DEBUG("Receive Packet at " << m_address << " from " << source << " to " << destination << " while tag index is " << tag.GetSendIndex());
+#endif
 				//return ForwardUnicast(sourceIface, source, destination, packet, protocolType, routeReply, tag.GetTtl());
 				Ptr<PmtmgmpRoutePath> next;
 				if (tag.GetChangePath() > m_MaxPathChange)
@@ -1609,7 +1630,7 @@ namespace ns3 {
 			////效验是否收到SECREP，若未收到，重发SECREQ
 			if (m_RouteTable->GetMTERPtree() == 0)
 			{
-				NS_LOG_DEBUG("Select MSECP: receive SECREP " << m_RouteTable->GetMTERPtree()->GetPartTree().size() << " at " << m_address << ", Research.");
+				NS_LOG_DEBUG("Select MSECP: receive SECREP " << " at " << m_address << ", Research.");
 				MSECPSearch();
 			}
 			else

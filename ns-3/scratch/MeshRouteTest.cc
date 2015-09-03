@@ -46,7 +46,7 @@
 #define DEGREES_TO_RADIANS(__ANGLE__) ((__ANGLE__) * 0.01745329252f) // PI / 180
 
 // 仿真前路由生成时间
-#define MIN_APPLICATION_TIME 60
+#define MIN_APPLICATION_TIME 15
 // 仿真后等待时间
 #define END_APPLICATION_TIME 15
 
@@ -64,7 +64,7 @@
 // 区域形状
 #define TEST_SET_AREA MeshRouteClass::SQUARE
 // 应用布置类型
-#define TEST_SET_APP MeshRouteClass::Simple
+#define TEST_SET_APP MeshRouteClass::Multiple
 // 协议
 #define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
 // 区域大小
@@ -188,7 +188,7 @@ MeshRouteClass::MeshRouteClass() :
 	m_RandomStart(0.1),
 	m_NumIface(1),
 	m_WifiPhyStandard(WIFI_PHY_STANDARD_80211a),
-	m_Step(80),
+	m_Step(50),
 	m_ApplicationStep(8),
 	m_MaxBytes(0),
 	m_SourceNum(0),
@@ -857,7 +857,7 @@ int main(int argc, char *argv[])
 
 	//LogComponentEnableAll((LogLevel)(LOG_LEVEL_INFO | LOG_PREFIX_ALL));
 
-	//LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpProtocolMac", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpPeerManagementProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpRtable", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));

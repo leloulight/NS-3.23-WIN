@@ -35,7 +35,12 @@ namespace ns3 {
 			m_seqno(0)
 #else
 			m_MSECPindex(0),
+#ifdef PMTMGMP_TAG_INFOR_ATTACH
+			m_ChangePath(0),
+			m_SendIndex(0)
+#else
 			m_ChangePath(0)
+#endif
 #endif
 		{
 		}
@@ -115,7 +120,12 @@ namespace ns3 {
 				+ 4 //seqno
 #ifndef PMTMGMP_UNUSED_MY_CODE
 				+ 1  //MSECPindex
+#ifdef PMTMGMP_TAG_INFOR_ATTACH
+				+ 1  //ChangePath
+				+ 4; //SendIndex
+#else
 				+ 1; //ChangePath
+#endif
 #else
 				+ 4 //metric
 				+ 4; //seqno
@@ -141,6 +151,9 @@ namespace ns3 {
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			i.WriteU8(m_MSECPindex);
 			i.WriteU8(m_ChangePath);
+#ifdef PMTMGMP_TAG_INFOR_ATTACH
+			i.WriteU32(m_SendIndex);
+#endif
 #endif
 		}
 
@@ -163,6 +176,9 @@ namespace ns3 {
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			m_MSECPindex = i.ReadU8();
 			m_ChangePath = i.ReadU8();
+#ifdef PMTMGMP_TAG_INFOR_ATTACH
+			m_SendIndex = i.ReadU32();
+#endif
 #endif
 		}
 
@@ -179,6 +195,9 @@ namespace ns3 {
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			os << "MSECPindex=" << m_MSECPindex;
 			os << "ChangePath=" << m_ChangePath;
+#ifdef PMTMGMP_TAG_INFOR_ATTACH
+			os << "SendIndex=" << m_SendIndex;
+#endif
 #endif
 		}
 		void
@@ -207,6 +226,16 @@ namespace ns3 {
 		{
 			return m_ChangePath;
 		}
+#ifdef PMTMGMP_TAG_INFOR_ATTACH
+		void PmtmgmpTag::SetSendIndex(uint32_t index)
+		{
+			m_SendIndex = index;
+		}
+		uint32_t PmtmgmpTag::GetSendIndex()
+		{
+			return m_SendIndex;
+		}
+#endif
 #endif
 	} // namespace my11s
 } // namespace ns3

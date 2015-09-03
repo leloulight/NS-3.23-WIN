@@ -27,6 +27,9 @@
 #include "ns3/traced-value.h"
 #include <vector>
 #include <map>
+#ifndef PMTMGMP_UNUSED_MY_CODE
+#include "ns3/pmtmgmp-tag.h"
+#endif
 
 namespace ns3 {
 	class WmnPointDevice;
@@ -416,6 +419,9 @@ namespace ns3 {
 			uint8_t m_MaxRoutePathPerPUPGQ;
 			////最大路径转换次数
 			uint8_t m_MaxPathChange;
+#ifdef PMTMGMP_TAG_INFOR_ATTACH
+			uint32_t m_SendIndex;
+#endif
 #endif
 		};
 	} // namespace my11s

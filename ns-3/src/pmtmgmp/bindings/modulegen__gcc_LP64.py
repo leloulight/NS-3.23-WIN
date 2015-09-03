@@ -12662,6 +12662,10 @@ def register_Ns3My11sPmtmgmpTag_methods(root_module, cls):
     cls.add_method('GetAddress', 
                    'ns3::Mac48Address', 
                    [])
+    ## pmtmgmp-tag.h (module 'pmtmgmp'): uint8_t ns3::my11s::PmtmgmpTag::GetChangePath() [member function]
+    cls.add_method('GetChangePath', 
+                   'uint8_t', 
+                   [])
     ## pmtmgmp-tag.h (module 'pmtmgmp'): ns3::TypeId ns3::my11s::PmtmgmpTag::GetInstanceTypeId() const [member function]
     cls.add_method('GetInstanceTypeId', 
                    'ns3::TypeId', 
@@ -12670,6 +12674,10 @@ def register_Ns3My11sPmtmgmpTag_methods(root_module, cls):
     ## pmtmgmp-tag.h (module 'pmtmgmp'): uint8_t ns3::my11s::PmtmgmpTag::GetMSECPindex() [member function]
     cls.add_method('GetMSECPindex', 
                    'uint8_t', 
+                   [])
+    ## pmtmgmp-tag.h (module 'pmtmgmp'): uint32_t ns3::my11s::PmtmgmpTag::GetSendIndex() [member function]
+    cls.add_method('GetSendIndex', 
+                   'uint32_t', 
                    [])
     ## pmtmgmp-tag.h (module 'pmtmgmp'): uint32_t ns3::my11s::PmtmgmpTag::GetSerializedSize() const [member function]
     cls.add_method('GetSerializedSize', 
@@ -12685,6 +12693,10 @@ def register_Ns3My11sPmtmgmpTag_methods(root_module, cls):
                    'ns3::TypeId', 
                    [], 
                    is_static=True)
+    ## pmtmgmp-tag.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpTag::IncreaseChange() [member function]
+    cls.add_method('IncreaseChange', 
+                   'void', 
+                   [])
     ## pmtmgmp-tag.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpTag::Print(std::ostream & os) const [member function]
     cls.add_method('Print', 
                    'void', 
@@ -12699,10 +12711,18 @@ def register_Ns3My11sPmtmgmpTag_methods(root_module, cls):
     cls.add_method('SetAddress', 
                    'void', 
                    [param('ns3::Mac48Address', 'retransmitter')])
+    ## pmtmgmp-tag.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpTag::SetChangePath(uint8_t change) [member function]
+    cls.add_method('SetChangePath', 
+                   'void', 
+                   [param('uint8_t', 'change')])
     ## pmtmgmp-tag.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpTag::SetMSECPindex(uint8_t index) [member function]
     cls.add_method('SetMSECPindex', 
                    'void', 
                    [param('uint8_t', 'index')])
+    ## pmtmgmp-tag.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpTag::SetSendIndex(uint32_t index) [member function]
+    cls.add_method('SetSendIndex', 
+                   'void', 
+                   [param('uint32_t', 'index')])
     ## pmtmgmp-tag.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpTag::SetTtl(uint8_t ttl) [member function]
     cls.add_method('SetTtl', 
                    'void', 
