@@ -308,7 +308,18 @@ namespace ns3 {
 		void PmtmgmpRoutePath::IncrementMetric(uint32_t metric, double k)
 		{
 			////按公式积累计算度量，见AALM计算公式
-			m_metric = (sqrt(m_hopCount) * k * metric + (m_hopCount - 1) * (double)m_BaseMetric) / sqrt(m_hopCount * (m_hopCount + 1));
+			if (metric == 0xffffffff)
+			{
+				m_metric = 0xffffffff;
+			}
+			else if (m_BaseMetric == 0xffffffff)
+			{
+				m_metric = 0xffffffff;
+			}
+			else
+			{
+				m_metric = (sqrt(m_hopCount) * k * metric + (m_hopCount - 1) * (double)m_BaseMetric) / sqrt(m_hopCount * (m_hopCount + 1));
+			}
 		}
 		/*************************
 		* PmtmgmpRouteTree

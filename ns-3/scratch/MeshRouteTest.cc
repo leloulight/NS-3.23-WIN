@@ -51,7 +51,7 @@
 #define END_APPLICATION_TIME 15
 
 
-//测试所有文件
+//测试所有协议
 #define TEST_ALL
 // 随机应用总数
 #define TEST_SET_COUNT 20
@@ -194,7 +194,7 @@ MeshRouteClass::MeshRouteClass() :
 	m_SourceNum(0),
 	m_DestinationNum(0),
 	m_PacketSize(1024),
-	m_DataRate("1Mbps"),
+	m_DataRate("150kbps"),
 	m_TotalTime(60),
 	m_Root("00:00:00:00:00:01"),
 	m_Pcap(false),
@@ -857,7 +857,7 @@ int main(int argc, char *argv[])
 
 	//LogComponentEnableAll((LogLevel)(LOG_LEVEL_INFO | LOG_PREFIX_ALL));
 
-	LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpProtocolMac", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpPeerManagementProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpRtable", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));

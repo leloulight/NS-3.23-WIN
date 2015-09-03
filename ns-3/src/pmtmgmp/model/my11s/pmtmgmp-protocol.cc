@@ -213,7 +213,7 @@ namespace ns3 {
 					)
 				.AddAttribute("My11WmnPMTMGMPpathMetricUpdatePeriod",
 					"Period for Update the Metric of Route Path, also the Period for PUDP",
-					TimeValue(MicroSeconds(1024 * 2000)),
+					TimeValue(MicroSeconds(1024 * 4000)),
 					MakeTimeAccessor(
 						&PmtmgmpProtocol::m_My11WmnPMTMGMPpathMetricUpdatePeriod),
 					MakeTimeChecker()
@@ -286,7 +286,7 @@ namespace ns3 {
 			m_My11WmnPMTMGMPsecInterval(MicroSeconds(1024 * 65000)),
 			m_My11WmnPMTMGMPsecSetTime(MicroSeconds(1024 * 2000)),
 			m_My11WmnPMTMGMPpgerWaitTime(MicroSeconds(1024 * 2000)),
-			m_My11WmnPMTMGMPpathMetricUpdatePeriod(MicroSeconds(1024 * 2000)),
+			m_My11WmnPMTMGMPpathMetricUpdatePeriod(MicroSeconds(1024 * 4000)),
 			m_PathGenerationSeqNumber(0),
 			m_PMTMGMPmterpAALMmagnification(3),
 			m_PMTMGMPmsecpAALMmagnification(2),
@@ -2015,7 +2015,7 @@ namespace ns3 {
 				i->second->SendPUPGQ(pupgq, receiver);
 			}
 		}
-		////接收PUPD
+		////接收PUPGQ
 		void PmtmgmpProtocol::ReceivePUPGQ(IePupgq pupgq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
 			int sendTimes = 0;
