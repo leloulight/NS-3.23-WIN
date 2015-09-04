@@ -848,10 +848,12 @@ int main(int argc, char *argv[])
 	// √¸¡Ó––≈‰÷√
 	CommandLine cmd;
 	cmd.Parse(argc, argv);
+	setlocale(LC_ALL, "zh_CN.gbk");
 #ifdef OUT_TO_FILE
 #ifdef WIN32
 	ofstream logfile("Ns-3.23-log.log");
 	std::clog.rdbuf(logfile.rdbuf());
+#else
 #endif
 #endif
 
@@ -907,8 +909,8 @@ int main(int argc, char *argv[])
 		for (int i = 0; i < TEST_SET_COUNT; i++)
 		{
 			double startTime = TEST_SET_INTERVAL * i + randTime->GetValue(0, TEST_SET_RANDOM);
-			int src = randNodes->GetInteger();
-			int dst;
+			uint32_t src = randNodes->GetInteger();
+			uint32_t dst;
 			do
 			{
 				dst = randNodes->GetInteger();
