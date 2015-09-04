@@ -914,7 +914,7 @@ int main(int argc, char *argv[])
 			do
 			{
 				dst = randNodes->GetInteger();
-			} while (dst != src);
+			} while (dst == src);
 			NodeApplicationInfor newApp = { src, dst, startTime, startTime + TEST_SET_LIFE };
 			apps.push_back(newApp);
 		}
