@@ -907,7 +907,13 @@ int main(int argc, char *argv[])
 		for (int i = 0; i < TEST_SET_COUNT; i++)
 		{
 			double startTime = TEST_SET_INTERVAL * i + randTime->GetValue(0, TEST_SET_RANDOM);
-			NodeApplicationInfor newApp = { randNodes->GetInteger(), randNodes->GetInteger(), startTime, startTime + TEST_SET_LIFE };
+			int src = randNodes->GetInteger();
+			int dst;
+			do
+			{
+				dst = randNodes->GetInteger();
+			} while (dst != src);
+			NodeApplicationInfor newApp = { src, dst, startTime, startTime + TEST_SET_LIFE };
 			apps.push_back(newApp);
 		}
 
