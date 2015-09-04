@@ -12675,10 +12675,6 @@ def register_Ns3My11sPmtmgmpTag_methods(root_module, cls):
     cls.add_method('GetMSECPindex', 
                    'uint8_t', 
                    [])
-    ## pmtmgmp-tag.h (module 'pmtmgmp'): uint32_t ns3::my11s::PmtmgmpTag::GetSendIndex() [member function]
-    cls.add_method('GetSendIndex', 
-                   'uint32_t', 
-                   [])
     ## pmtmgmp-tag.h (module 'pmtmgmp'): uint32_t ns3::my11s::PmtmgmpTag::GetSerializedSize() const [member function]
     cls.add_method('GetSerializedSize', 
                    'uint32_t', 
@@ -12719,10 +12715,6 @@ def register_Ns3My11sPmtmgmpTag_methods(root_module, cls):
     cls.add_method('SetMSECPindex', 
                    'void', 
                    [param('uint8_t', 'index')])
-    ## pmtmgmp-tag.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpTag::SetSendIndex(uint32_t index) [member function]
-    cls.add_method('SetSendIndex', 
-                   'void', 
-                   [param('uint32_t', 'index')])
     ## pmtmgmp-tag.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpTag::SetTtl(uint8_t ttl) [member function]
     cls.add_method('SetTtl', 
                    'void', 
