@@ -58,9 +58,9 @@ namespace ns3 {
 			m_BaseMetric(0),
 			m_CandidateRouteInformaiton(std::vector<Ptr<PmtmgmpRoutePath> >()),
 			m_InformationStatus(Confirmed),
-			m_MaxCandidateNum(4),
-			m_PMTGMGMProutePathInforLife(MicroSeconds(1024 * 120000)),
-			m_PMTMGMPpathRecreateDelay(MicroSeconds(1024 * 5000))
+			m_MaxCandidateNum(8),
+			m_PMTGMGMProutePathInforLife(MicroSeconds(1024 * 80000)),
+			m_PMTMGMPpathRecreateDelay(MicroSeconds(1024 * 4000))
 		{
 			RoutePathInforLifeUpdate();
 		}
@@ -90,21 +90,21 @@ namespace ns3 {
 				.AddConstructor<PmtmgmpRoutePath>()
 				.AddAttribute("MaxCandidateNum",
 					"Max number of Candidate Information",
-					UintegerValue(4),
+					UintegerValue(8),
 					MakeUintegerAccessor(
 						&PmtmgmpRoutePath::m_MaxCandidateNum),
 					MakeUintegerChecker<uint8_t>(0)
 					)
 				.AddAttribute("PMTGMGMProutePathInforLife",
 					"Life of route path information.",
-					TimeValue(MicroSeconds(1024 * 120000)),
+					TimeValue(MicroSeconds(1024 * 80000)),
 					MakeTimeAccessor(
 						&PmtmgmpRoutePath::m_PMTGMGMProutePathInforLife),
 					MakeTimeChecker()
 					)
 				.AddAttribute("My11WmnPMTMGMPpathRecreateDelay",
 					"Delay for Recreate the Route Path, in Delay Time PUPGQ would not be sended",
-					TimeValue(MicroSeconds(1024 * 5000)),
+					TimeValue(MicroSeconds(1024 * 4000)),
 					MakeTimeAccessor(
 						&PmtmgmpRoutePath::m_PMTMGMPpathRecreateDelay),
 					MakeTimeChecker()
@@ -326,8 +326,8 @@ namespace ns3 {
 		************************/
 		PmtmgmpRouteTree::PmtmgmpRouteTree() :
 			m_tree(std::vector<Ptr<PmtmgmpRoutePath> >()),
-			m_MSECPnumForMTERP(2),
-			m_AcceptInformaitonDelay(MicroSeconds(1024 * 1000)),
+			m_MSECPnumForMTERP(4),
+			m_AcceptInformaitonDelay(MicroSeconds(1024 * 1500)),
 			m_NotSelectBestRoutePathRate(5)
 		{
 		}
@@ -343,14 +343,14 @@ namespace ns3 {
 				.AddConstructor<PmtmgmpRouteTree>()
 				.AddAttribute("MSECPnumForMTERP",
 					"The number of MESCP that each MTERP can have.",
-					UintegerValue(2),
+					UintegerValue(4),
 					MakeUintegerAccessor(
 						&PmtmgmpRouteTree::m_MSECPnumForMTERP),
 					MakeUintegerChecker<uint8_t>(1)
 					)
 				.AddAttribute("AcceptInformaitonDelay",
 					"Delay for accept information.",
-					TimeValue(MicroSeconds(1024 * 1000)),
+					TimeValue(MicroSeconds(1024 * 1500)),
 					MakeTimeAccessor(
 						&PmtmgmpRouteTree::m_AcceptInformaitonDelay),
 					MakeTimeChecker()

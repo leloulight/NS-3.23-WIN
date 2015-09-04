@@ -192,7 +192,7 @@ namespace ns3 {
 					)
 				.AddAttribute("My11WmnPMTMGMPsecInterval",
 					"Interval MSECP search, it also the interval of path Generation",
-					TimeValue(MicroSeconds(1024 * 65000)),
+					TimeValue(MicroSeconds(1024 * 40000)),
 					MakeTimeAccessor(
 						&PmtmgmpProtocol::m_My11WmnPMTMGMPsecInterval),
 					MakeTimeChecker()
@@ -234,7 +234,7 @@ namespace ns3 {
 					)
 				.AddAttribute("MaxRoutePathPerPUPD",
 					"Max Route Path in each PUPD, same times it may be more then this value.",
-					UintegerValue(10),
+					UintegerValue(12),
 					MakeUintegerAccessor(
 						&PmtmgmpProtocol::m_MaxRoutePathPerPUPD),
 					MakeUintegerChecker<uint8_t>(1)
@@ -283,7 +283,7 @@ namespace ns3 {
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			m_NodeType(Mesh_STA),
 			m_My11WmnPMTMGMPsecStartDelayTime(MicroSeconds(1024 * 5000)),
-			m_My11WmnPMTMGMPsecInterval(MicroSeconds(1024 * 65000)),
+			m_My11WmnPMTMGMPsecInterval(MicroSeconds(1024 * 40000)),
 			m_My11WmnPMTMGMPsecSetTime(MicroSeconds(1024 * 2000)),
 			m_My11WmnPMTMGMPpgerWaitTime(MicroSeconds(1024 * 2000)),
 			m_My11WmnPMTMGMPpathMetricUpdatePeriod(MicroSeconds(1024 * 4000)),
@@ -291,7 +291,7 @@ namespace ns3 {
 			m_PMTMGMPmterpAALMmagnification(3),
 			m_PMTMGMPmsecpAALMmagnification(2),
 			m_RouteTable(CreateObject<PmtmgmpRouteTable>()),
-			m_MaxRoutePathPerPUPD(10),
+			m_MaxRoutePathPerPUPD(12),
 			m_MaxRoutePathPerPUPGQ(6),
 #ifdef PMTMGMP_TAG_INFOR_ATTACH
 			m_MaxPathChange(10),
