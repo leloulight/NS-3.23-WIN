@@ -321,6 +321,15 @@ namespace ns3 {
 				m_metric = (sqrt(m_hopCount) * k * metric + (m_hopCount - 1) * (double)m_BaseMetric) / sqrt(m_hopCount * (m_hopCount + 1));
 			}
 		}
+		////用于RoutePath按度量排序(优先新路径（GSN大），同GSN优先小Metric，同Metric优先MSECP较小的)
+		bool PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare(Ptr<PmtmgmpRoutePath> path)
+		{
+			return m_metric * m_hopCount < path->GetMetric()  * path->GetHopCount() || (m_metric * m_hopCount == path->GetMetric() * path->GetHopCount() && m_MSECPindex < path->GetMSECPindex());
+		}
+		bool PmtmgmpRoutePath::DataSendRoutePathMetricCompare(Ptr<PmtmgmpRoutePath> path)
+		{
+			return m_PathGenerationSeqNumber > path->GetPathGenerationSequenceNumber() || (m_PathGenerationSeqNumber == path->GetPathGenerationSequenceNumber() && (m_metric * uint8_t(m_InformationStatus) < path->GetMetric() * uint8_t(path->GetStatus()) || (m_metric * uint8_t(m_InformationStatus) == path->GetMetric() * uint8_t(path->GetStatus()) && m_MSECPindex < path->GetMSECPindex())));
+		}
 		/*************************
 		* PmtmgmpRouteTree
 		************************/
@@ -593,7 +602,6 @@ namespace ns3 {
 		Ptr<PmtmgmpRoutePath> PmtmgmpRouteTree::GetBestRoutePathForData(uint8_t index)
 		{
 			if (m_tree.size() == 0) return 0;
-			std::sort(m_tree.begin(), m_tree.end(), PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare());
 			////MSECPindex为不会分配0，说明当前没有历史路径（iter == m_tree.end()）
 			std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = std::find_if(m_tree.begin(), m_tree.end(), PmtmgmpRouteTree_IndexFinder(index));
 			if (iter == m_tree.end())
@@ -614,6 +622,19 @@ namespace ns3 {
 				}
 				return *iter;
 			}
+		}
+		Ptr<PmtmgmpRoutePath> PmtmgmpRouteTree::GetBestRoutePathForData()
+		{
+			if (m_tree.size() == 0) return 0;
+			std::vector<Ptr<PmtmgmpRoutePath> >::iterator path = m_tree.begin();
+			for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin() + 1; iter != m_tree.end(); iter++)
+			{
+				if ((*path)->DataSendRoutePathMetricCompare(*iter))
+				{
+					path = iter;
+				}
+			}
+			return *path;
 		}
 		/*************************
 		* PmtmgmpRouteTable

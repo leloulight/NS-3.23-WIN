@@ -108,20 +108,8 @@ namespace ns3 {
 			void IncrementMetric(uint32_t metric, double k);
 			
 			////用于RoutePath按度量排序(优先新路径（GSN大），同GSN优先小Metric，同Metric优先MSECP较小的)
-			struct MSECPselectRoutePathMetricCompare
-			{
-				bool operator () (const Ptr<PmtmgmpRoutePath> pathA, const Ptr<PmtmgmpRoutePath> pathB)
-				{
-					return pathA->GetMetric() * pathA->GetHopCount() < pathB->GetMetric()  * pathB->GetHopCount() || (pathA->GetMetric() * pathA->GetHopCount() == pathB->GetMetric() * pathB->GetHopCount() && pathA->GetMSECPindex() < pathB->GetMSECPindex());
-				}
-			};
-			struct DataSendRoutePathMetricCompare
-			{
-				bool operator () (const Ptr<PmtmgmpRoutePath> pathA, const Ptr<PmtmgmpRoutePath> pathB)
-				{
-					return pathA->GetPathGenerationSequenceNumber() > pathB->GetPathGenerationSequenceNumber() || (pathA->GetPathGenerationSequenceNumber() == pathB->GetPathGenerationSequenceNumber() && (pathA->GetMetric() * uint8_t(pathA->GetStatus()) < pathB->GetMetric() * uint8_t(pathB->GetStatus()) || (pathA->GetMetric() * uint8_t(pathA->GetStatus()) == pathB->GetMetric() * uint8_t(pathB->GetStatus()) && pathA->GetMSECPindex() < pathB->GetMSECPindex())));
-				}
-			};
+			bool MSECPselectRoutePathMetricCompare(Ptr<PmtmgmpRoutePath> path);
+			bool DataSendRoutePathMetricCompare(Ptr<PmtmgmpRoutePath> path);
 
 		private:
 			Mac48Address m_MTERPaddress;
@@ -213,6 +201,8 @@ namespace ns3 {
 
 			////数据传输最优路径获取
 			Ptr<PmtmgmpRoutePath> GetBestRoutePathForData(uint8_t index);
+			Ptr<PmtmgmpRoutePath> GetBestRoutePathForData();
+
 
 		private:
 			////路由表树搜索器

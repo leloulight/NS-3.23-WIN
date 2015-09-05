@@ -64,11 +64,11 @@
 // 区域形状
 #define TEST_SET_AREA MeshRouteClass::SQUARE
 // 应用布置类型
-#define TEST_SET_APP MeshRouteClass::Random
+#define TEST_SET_APP MeshRouteClass::Simple
 // 协议
 #define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
 // 区域大小
-#define TEST_SET_SIZE 10
+#define TEST_SET_SIZE 6
 // 区域间隔
 #define TEST_SET_APPSTEP 8
 
