@@ -607,7 +607,7 @@ namespace ns3 {
 			if (iter == m_tree.end())
 			{
 				////没找到MSECPindex的路径直接返回最优路径
-				return *(m_tree.begin());
+				return GetBestRoutePathForData();
 			}
 			else
 			{
@@ -618,7 +618,7 @@ namespace ns3 {
 				}
 				else
 				{
-					return *(m_tree.begin());
+					return GetBestRoutePathForData();
 				}
 				return *iter;
 			}
