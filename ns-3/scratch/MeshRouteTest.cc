@@ -843,6 +843,7 @@ void MeshRouteClass::Report()
 	}
 	n = 0;
 }
+
 int main(int argc, char *argv[])
 {
 	// √¸¡Ó––≈‰÷√
@@ -856,6 +857,43 @@ int main(int argc, char *argv[])
 #else
 #endif
 #endif
+
+	std::vector<int> m_i;
+	m_i.push_back(2);
+	m_i.push_back(3);
+	m_i.push_back(1);
+	m_i.push_back(5);
+	m_i.push_back(4);
+	partial_sort(m_i.begin(), m_i.begin() + 3, m_i.end());
+
+	std::vector<Ptr<my11s::PmtmgmpRoutePath> >  m_tree;
+	Ptr<my11s::PmtmgmpRoutePath> path = CreateObject<my11s::PmtmgmpRoutePath>();//3
+	path->SetMetric(232);
+	path->SetPathGenerationSequenceNumber(1);
+	path->SetTTL(3);
+	m_tree.push_back(path);
+	path = CreateObject<my11s::PmtmgmpRoutePath>();//5
+	path->SetMetric(252);
+	path->SetPathGenerationSequenceNumber(1);;
+	path->SetTTL(5);
+	m_tree.push_back(path);
+	path = CreateObject<my11s::PmtmgmpRoutePath>();//2
+	path->SetMetric(212);
+	path->SetPathGenerationSequenceNumber(0);;
+	path->SetTTL(2);
+	m_tree.push_back(path);
+	path = CreateObject<my11s::PmtmgmpRoutePath>();//4
+	path->SetMetric(232);
+	path->SetPathGenerationSequenceNumber(0);;
+	path->SetTTL(4);
+	m_tree.push_back(path);
+	path = CreateObject<my11s::PmtmgmpRoutePath>();//1
+	path->SetMetric(202);
+	path->SetPathGenerationSequenceNumber(1);;
+	path->SetTTL(1);
+	m_tree.push_back(path); 
+	sort(m_tree.begin(), m_tree.end(), &my11s::MSECPselectRoutePathMetricCompare);
+
 
 	//LogComponentEnableAll((LogLevel)(LOG_LEVEL_INFO | LOG_PREFIX_ALL));
 

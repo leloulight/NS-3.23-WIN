@@ -23,12 +23,6 @@
 #include "ns3/simulator.h"
 #include "ns3/test.h"
 #include "ns3/log.h"
-#ifndef PMTMGMP_UNUSED_MY_CODE
- ////find_if
-#include <algorithm>
-#include "ns3/random-variable-stream.h"
-#include "ns3/pmtmgmp-tag.h"
-#endif
 
 #include "pmtmgmp-rtable.h"
 
@@ -322,12 +316,31 @@ namespace ns3 {
 			}
 		}
 		////用于RoutePath按度量排序(优先新路径（GSN大），同GSN优先小Metric，同Metric优先MSECP较小的)
-		/*bool PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare(Ptr<PmtmgmpRoutePath> path)
-		{
-			return m_metric * m_hopCount < path->GetMetric()  * path->GetHopCount() || (m_metric * m_hopCount == path->GetMetric() * path->GetHopCount() && m_MSECPindex < path->GetMSECPindex());
-		}*/
+		//bool PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare(const Ptr<PmtmgmpRoutePath> &pathA, const Ptr<PmtmgmpRoutePath> &pathB)
+		//{
+		//	if (pathA->GetMetric() == pathB->GetMetric())
+		//	{
+		//		/*Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
+		//		rand->SetAttribute("Min", DoubleValue(-0.5));
+		//		rand->SetAttribute("Max", DoubleValue(1.5));
+		//		if (rand->GetInteger(0, 1) == 1)
+		//		{
+		//		return true;
+		//		}
+		//		else
+		//		{
+		//		return false;
+		//		}*/
+		//	}
+		//	else
+		//	{
+		//		return pathA->GetMetric() < pathB->GetMetric();
+		//	}
+		//	return false;
+		//}
 		bool PmtmgmpRoutePath::DataSendRoutePathMetricCompare(Ptr<PmtmgmpRoutePath> path)
 		{
+			if (path == this) return false;
 			if (m_PathGenerationSeqNumber == path->GetPathGenerationSequenceNumber() && (m_metric * uint8_t(m_InformationStatus) == path->GetMetric() * uint8_t(path->GetStatus())))
 			{
 				Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
@@ -355,8 +368,9 @@ namespace ns3 {
 			}
 			return false;
 		}
-		bool PmtmgmpRoutePath::operator<(const Ptr<PmtmgmpRoutePath>& path) 
+		/*bool PmtmgmpRoutePath::operator<(const Ptr<PmtmgmpRoutePath>& path) 
 		{
+			if (path == this) return false;
 			if (m_metric == path->GetMetric())
 			{
 				Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
@@ -373,10 +387,10 @@ namespace ns3 {
 			}
 			else
 			{
-				return m_metric * m_hopCount < path->GetMetric();
+				return m_metric < path->GetMetric();
 			}
 			return false;
-		}
+		}*/
 		/*************************
 		* PmtmgmpRouteTree
 		************************/
@@ -479,7 +493,7 @@ namespace ns3 {
 		////选择MSECP
 		void PmtmgmpRouteTree::SelectMSECP()
 		{
-			std::sort(m_tree.begin(), m_tree.end());
+			std::partial_sort(m_tree.begin(), m_tree.begin() + m_MSECPnumForMTERP, m_tree.end());
 			if (m_tree.size() > m_MSECPnumForMTERP)
 			{
 				std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin() + m_MSECPnumForMTERP;

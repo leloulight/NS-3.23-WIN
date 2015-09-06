@@ -578,10 +578,6 @@ def register_types_ns3_my11s(module):
     module.add_class('PmtmgmpRoutePath', parent=root_module['ns3::Object'])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRoutePath::RouteInformationStatus [enumeration]
     module.add_enum('RouteInformationStatus', ['Confirmed', 'Waited', 'Expired'], outer_class=root_module['ns3::my11s::PmtmgmpRoutePath'])
-    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRoutePath::DataSendRoutePathMetricCompare [struct]
-    module.add_class('DataSendRoutePathMetricCompare', outer_class=root_module['ns3::my11s::PmtmgmpRoutePath'])
-    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare [struct]
-    module.add_class('MSECPselectRoutePathMetricCompare', outer_class=root_module['ns3::my11s::PmtmgmpRoutePath'])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRouteTable [class]
     module.add_class('PmtmgmpRouteTable', parent=root_module['ns3::Object'])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRouteTree [class]
@@ -808,8 +804,6 @@ def register_methods(root_module):
     register_Ns3My11sPmtmgmpProtocolFailedDestination_methods(root_module, root_module['ns3::my11s::PmtmgmpProtocol::FailedDestination'])
     register_Ns3My11sPmtmgmpProtocolStatistics_methods(root_module, root_module['ns3::my11s::PmtmgmpProtocol::Statistics'])
     register_Ns3My11sPmtmgmpRoutePath_methods(root_module, root_module['ns3::my11s::PmtmgmpRoutePath'])
-    register_Ns3My11sPmtmgmpRoutePathDataSendRoutePathMetricCompare_methods(root_module, root_module['ns3::my11s::PmtmgmpRoutePath::DataSendRoutePathMetricCompare'])
-    register_Ns3My11sPmtmgmpRoutePathMSECPselectRoutePathMetricCompare_methods(root_module, root_module['ns3::my11s::PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare'])
     register_Ns3My11sPmtmgmpRouteTable_methods(root_module, root_module['ns3::my11s::PmtmgmpRouteTable'])
     register_Ns3My11sPmtmgmpRouteTree_methods(root_module, root_module['ns3::my11s::PmtmgmpRouteTree'])
     register_Ns3My11sPmtmgmpRtable_methods(root_module, root_module['ns3::my11s::PmtmgmpRtable'])
@@ -12098,6 +12092,10 @@ def register_Ns3My11sPmtmgmpRoutePath_methods(root_module, cls):
     cls.add_method('ClearCandidateRouteInformaiton', 
                    'void', 
                    [])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpRoutePath::DataSendRoutePathMetricCompare(ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> path) [member function]
+    cls.add_method('DataSendRoutePathMetricCompare', 
+                   'bool', 
+                   [param('ns3::Ptr< ns3::my11s::PmtmgmpRoutePath >', 'path')])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRoutePath::DecrementTtl() [member function]
     cls.add_method('DecrementTtl', 
                    'void', 
@@ -12280,30 +12278,6 @@ def register_Ns3My11sPmtmgmpRoutePath_methods(root_module, cls):
                    [param('uint8_t', 'ttl')])
     return
 
-def register_Ns3My11sPmtmgmpRoutePathDataSendRoutePathMetricCompare_methods(root_module, cls):
-    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRoutePath::DataSendRoutePathMetricCompare::DataSendRoutePathMetricCompare() [constructor]
-    cls.add_constructor([])
-    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRoutePath::DataSendRoutePathMetricCompare::DataSendRoutePathMetricCompare(ns3::my11s::PmtmgmpRoutePath::DataSendRoutePathMetricCompare const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::my11s::PmtmgmpRoutePath::DataSendRoutePathMetricCompare const &', 'arg0')])
-    ## pmtmgmp-rtable.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpRoutePath::DataSendRoutePathMetricCompare::operator()(ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> const pathA, ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> const pathB) [member operator]
-    cls.add_method('operator()', 
-                   'bool', 
-                   [param('ns3::Ptr< ns3::my11s::PmtmgmpRoutePath > const', 'pathA'), param('ns3::Ptr< ns3::my11s::PmtmgmpRoutePath > const', 'pathB')], 
-                   custom_name=u'__call__')
-    return
-
-def register_Ns3My11sPmtmgmpRoutePathMSECPselectRoutePathMetricCompare_methods(root_module, cls):
-    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare::MSECPselectRoutePathMetricCompare() [constructor]
-    cls.add_constructor([])
-    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare::MSECPselectRoutePathMetricCompare(ns3::my11s::PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::my11s::PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare const &', 'arg0')])
-    ## pmtmgmp-rtable.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare::operator()(ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> const pathA, ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> const pathB) [member operator]
-    cls.add_method('operator()', 
-                   'bool', 
-                   [param('ns3::Ptr< ns3::my11s::PmtmgmpRoutePath > const', 'pathA'), param('ns3::Ptr< ns3::my11s::PmtmgmpRoutePath > const', 'pathB')], 
-                   custom_name=u'__call__')
-    return
-
 def register_Ns3My11sPmtmgmpRouteTable_methods(root_module, cls):
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRouteTable::PmtmgmpRouteTable(ns3::my11s::PmtmgmpRouteTable const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::my11s::PmtmgmpRouteTable const &', 'arg0')])
@@ -12472,6 +12446,10 @@ def register_Ns3My11sPmtmgmpRouteTree_methods(root_module, cls):
     cls.add_method('GetBestRoutePathForData', 
                    'ns3::Ptr< ns3::my11s::PmtmgmpRoutePath >', 
                    [param('uint8_t', 'index')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> ns3::my11s::PmtmgmpRouteTree::GetBestRoutePathForData() [member function]
+    cls.add_method('GetBestRoutePathForData', 
+                   'ns3::Ptr< ns3::my11s::PmtmgmpRoutePath >', 
+                   [])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): uint8_t ns3::my11s::PmtmgmpRouteTree::GetConfirmedPathSize() [member function]
     cls.add_method('GetConfirmedPathSize', 
                    'uint8_t', 
