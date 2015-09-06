@@ -322,13 +322,60 @@ namespace ns3 {
 			}
 		}
 		////用于RoutePath按度量排序(优先新路径（GSN大），同GSN优先小Metric，同Metric优先MSECP较小的)
-		bool PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare(Ptr<PmtmgmpRoutePath> path)
+		/*bool PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare(Ptr<PmtmgmpRoutePath> path)
 		{
 			return m_metric * m_hopCount < path->GetMetric()  * path->GetHopCount() || (m_metric * m_hopCount == path->GetMetric() * path->GetHopCount() && m_MSECPindex < path->GetMSECPindex());
-		}
+		}*/
 		bool PmtmgmpRoutePath::DataSendRoutePathMetricCompare(Ptr<PmtmgmpRoutePath> path)
 		{
-			return m_PathGenerationSeqNumber > path->GetPathGenerationSequenceNumber() || (m_PathGenerationSeqNumber == path->GetPathGenerationSequenceNumber() && (m_metric * uint8_t(m_InformationStatus) < path->GetMetric() * uint8_t(path->GetStatus()) || (m_metric * uint8_t(m_InformationStatus) == path->GetMetric() * uint8_t(path->GetStatus()) && m_MSECPindex < path->GetMSECPindex())));
+			if (m_PathGenerationSeqNumber == path->GetPathGenerationSequenceNumber() && (m_metric * uint8_t(m_InformationStatus) == path->GetMetric() * uint8_t(path->GetStatus())))
+			{
+				Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
+				rand->SetAttribute("Min", DoubleValue(-0.5));
+				rand->SetAttribute("Max", DoubleValue(1.5));
+				if (rand->GetInteger(0, 1) == 1)
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				if (m_metric * uint8_t(m_InformationStatus) == path->GetMetric() * uint8_t(path->GetStatus()))
+				{
+					return m_PathGenerationSeqNumber > path->GetPathGenerationSequenceNumber();
+				}
+				else
+				{
+					return m_metric * uint8_t(m_InformationStatus) < path->GetMetric() * uint8_t(path->GetStatus());
+				}
+			}
+			return false;
+		}
+		bool PmtmgmpRoutePath::operator<(const Ptr<PmtmgmpRoutePath>& path) 
+		{
+			if (m_metric == path->GetMetric())
+			{
+				Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
+				rand->SetAttribute("Min", DoubleValue(-0.5));
+				rand->SetAttribute("Max", DoubleValue(1.5));
+				if (rand->GetInteger(0, 1) == 1)
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return m_metric * m_hopCount < path->GetMetric();
+			}
+			return false;
 		}
 		/*************************
 		* PmtmgmpRouteTree
@@ -432,7 +479,7 @@ namespace ns3 {
 		////选择MSECP
 		void PmtmgmpRouteTree::SelectMSECP()
 		{
-			std::sort(m_tree.begin(), m_tree.end(), PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare());
+			std::sort(m_tree.begin(), m_tree.end());
 			if (m_tree.size() > m_MSECPnumForMTERP)
 			{
 				std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin() + m_MSECPnumForMTERP;
