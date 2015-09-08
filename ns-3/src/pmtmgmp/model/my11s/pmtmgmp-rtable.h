@@ -155,28 +155,6 @@ namespace ns3 {
 			////路由路径补充生成延迟
 			Time m_PMTMGMPpathRecreateDelay;
 		};
-		bool FuncMSECPselectRoutePathMetricCompare(const Ptr<PmtmgmpRoutePath> &pathA, const Ptr<PmtmgmpRoutePath> &pathB)
-		{
-			if (pathA->GetMetric() == pathB->GetMetric())
-			{
-				Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
-				rand->SetAttribute("Min", DoubleValue(-0.5));
-				rand->SetAttribute("Max", DoubleValue(1.5));
-				if (rand->GetInteger(0, 1) == 1)
-				{
-				return true;
-				}
-				else
-				{
-				return false;
-				}
-			}
-			else
-			{
-				return pathA->GetMetric() < pathB->GetMetric();
-			}
-			return false;
-		}
 
 		/*************************
 		* PmtmgmpRouteTree
