@@ -64,11 +64,11 @@
 // 区域形状
 #define TEST_SET_AREA MeshRouteClass::SQUARE
 // 应用布置类型
-#define TEST_SET_APP MeshRouteClass::Simple
+#define TEST_SET_APP MeshRouteClass::Random
 // 协议
 #define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
 // 区域大小
-#define TEST_SET_SIZE 6
+#define TEST_SET_SIZE 10
 // 区域间隔
 #define TEST_SET_APPSTEP 8
 
@@ -705,20 +705,37 @@ void MeshRouteClass::FlowMonitorReport()
 	NS_LOG_INFO("=============================\n\n\n");
 
 	// 输出全部结点数据到文件
+#ifdef WIN32
 	std::ostringstream os;
-	os << "1_HWMP_PDF.txt";
+	os << "results\\1_HWMP_PDF.txt";
 	std::ofstream of(os.str().c_str(), ios::out | ios::app);
 	of << pdf_total << "\n";
 	of.close();
 	std::ostringstream os2;
-	os2 << "1_HWMP_Delay.txt";
+	os2 << "results\\1_HWMP_Delay.txt";
 	std::ofstream of2(os2.str().c_str(), ios::out | ios::app);
 	of2 << delay_total << "\n";
 	of2.close();
 	std::ostringstream os3;
-	os3 << "1_HWMP_Throu.txt";
+	os3 << "results\\1_HWMP_Throu.txt";
 	std::ofstream of3(os3.str().c_str(), ios::out | ios::app);
 	of3 << rxbitrate_total << "\n";
+#else
+	std::ostringstream os;
+	os << "results/1_HWMP_PDF.txt";
+	std::ofstream of(os.str().c_str(), ios::out | ios::app);
+	of << pdf_total << "\n";
+	of.close();
+	std::ostringstream os2;
+	os2 << "results/1_HWMP_Delay.txt";
+	std::ofstream of2(os2.str().c_str(), ios::out | ios::app);
+	of2 << delay_total << "\n";
+	of2.close();
+	std::ostringstream os3;
+	os3 << "results/1_HWMP_Throu.txt";
+	std::ofstream of3(os3.str().c_str(), ios::out | ios::app);
+	of3 << rxbitrate_total << "\n";
+#endif
 	of3.close();
 	Simulator::Destroy();
 }
@@ -820,7 +837,11 @@ void MeshRouteClass::Report()
 	{
 		std::ostringstream os;
 		//os << "mp-report1-" << n << ".xml";
-		os << typeName << "-mp-report-" << n << ".xml";
+#ifdef WIN32
+		os << "results\\" << typeName << "-mp-report-" << n << ".xml";
+#else
+		os << "results/" << typeName << "-mp-report-" << n << ".xml";
+#endif
 		std::ofstream of;
 		of.open(os.str().c_str(), ios::out | ios::app);
 		if (!of.is_open())

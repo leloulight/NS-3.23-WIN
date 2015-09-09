@@ -12869,6 +12869,10 @@ def register_Ns3My11sPmtmgmpRoutePath_methods(root_module, cls):
     cls.add_method('IncrementMetric', 
                    'void', 
                    [param('uint32_t', 'metric'), param('double', 'k')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare(ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> path) [member function]
+    cls.add_method('MSECPselectRoutePathMetricCompare', 
+                   'bool', 
+                   [param('ns3::Ptr< ns3::my11s::PmtmgmpRoutePath >', 'path')])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpRoutePath::RoutePathInforLifeCheck(ns3::Ptr<ns3::my11s::PmtmgmpRouteTable> table) [member function]
     cls.add_method('RoutePathInforLifeCheck', 
                    'bool', 
@@ -13099,13 +13103,17 @@ def register_Ns3My11sPmtmgmpRouteTree_methods(root_module, cls):
                    'ns3::Time', 
                    [], 
                    is_const=True)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): __gnu_cxx::__normal_iterator<ns3::Ptr<ns3::my11s::PmtmgmpRoutePath>*,std::vector<ns3::Ptr<ns3::my11s::PmtmgmpRoutePath>, std::allocator<ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> > > > ns3::my11s::PmtmgmpRouteTree::GetBestMSECPpath() [member function]
+    cls.add_method('GetBestMSECPpath', 
+                   '__gnu_cxx::__normal_iterator< ns3::Ptr< ns3::my11s::PmtmgmpRoutePath >, std::vector< ns3::Ptr< ns3::my11s::PmtmgmpRoutePath > > >', 
+                   [])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> ns3::my11s::PmtmgmpRouteTree::GetBestRoutePathForData(uint8_t index) [member function]
     cls.add_method('GetBestRoutePathForData', 
                    'ns3::Ptr< ns3::my11s::PmtmgmpRoutePath >', 
                    [param('uint8_t', 'index')])
-    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> ns3::my11s::PmtmgmpRouteTree::GetBestRoutePathForData() [member function]
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): __gnu_cxx::__normal_iterator<ns3::Ptr<ns3::my11s::PmtmgmpRoutePath>*,std::vector<ns3::Ptr<ns3::my11s::PmtmgmpRoutePath>, std::allocator<ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> > > > ns3::my11s::PmtmgmpRouteTree::GetBestRoutePathForData() [member function]
     cls.add_method('GetBestRoutePathForData', 
-                   'ns3::Ptr< ns3::my11s::PmtmgmpRoutePath >', 
+                   '__gnu_cxx::__normal_iterator< ns3::Ptr< ns3::my11s::PmtmgmpRoutePath >, std::vector< ns3::Ptr< ns3::my11s::PmtmgmpRoutePath > > >', 
                    [])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): uint8_t ns3::my11s::PmtmgmpRouteTree::GetConfirmedPathSize() [member function]
     cls.add_method('GetConfirmedPathSize', 

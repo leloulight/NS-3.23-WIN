@@ -477,9 +477,10 @@ namespace ns3 {
 			}
 			for (int i = 0; i < size; i++)
 			{
-				std::vector<Ptr<PmtmgmpRoutePath> >::iterator path = GetBestMSECPpath();
-				m_tree.erase(path);
-				tree.push_back(*path);
+				std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = GetBestMSECPpath();
+				Ptr<PmtmgmpRoutePath> path = *iter;
+				tree.push_back(path);
+				m_tree.erase(iter);
 			}
 			m_tree = tree;
 			//std::sort(m_tree.begin(), m_tree.end(), &MSECPselectRoutePathMetricCompare);
