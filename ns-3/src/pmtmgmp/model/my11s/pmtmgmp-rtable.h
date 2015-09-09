@@ -116,9 +116,8 @@ namespace ns3 {
 			void IncrementMetric(uint32_t metric, double k);
 
 			////用于RoutePath按度量排序(优先新路径（GSN大），同GSN优先小Metric，同Metric优先MSECP较小的)
-			//bool MSECPselectRoutePathMetricCompare(const Ptr<PmtmgmpRoutePath> &pathA, const Ptr<PmtmgmpRoutePath> &pathB);
+			bool MSECPselectRoutePathMetricCompare(Ptr<PmtmgmpRoutePath> path);
 			bool DataSendRoutePathMetricCompare(Ptr<PmtmgmpRoutePath> path);
-			//bool operator< (const Ptr<PmtmgmpRoutePath> &path);
 
 		private:
 			Mac48Address m_MTERPaddress;
@@ -210,7 +209,8 @@ namespace ns3 {
 
 			////数据传输最优路径获取
 			Ptr<PmtmgmpRoutePath> GetBestRoutePathForData(uint8_t index);
-			Ptr<PmtmgmpRoutePath> GetBestRoutePathForData();
+			std::vector<Ptr<PmtmgmpRoutePath> >::iterator GetBestRoutePathForData();
+			std::vector<Ptr<PmtmgmpRoutePath> >::iterator GetBestMSECPpath();
 
 
 		private:

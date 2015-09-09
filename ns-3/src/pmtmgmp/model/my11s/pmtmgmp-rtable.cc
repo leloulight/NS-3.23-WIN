@@ -315,6 +315,28 @@ namespace ns3 {
 				m_metric = (sqrt(m_hopCount) * k * metric + (m_hopCount - 1) * (double)m_BaseMetric) / sqrt(m_hopCount * (m_hopCount + 1));
 			}
 		}
+		bool PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare(Ptr<PmtmgmpRoutePath> path)
+		{
+			if (m_metric == path->GetMetric())
+			{
+				Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
+				rand->SetAttribute("Min", DoubleValue(-0.5));
+				rand->SetAttribute("Max", DoubleValue(1.5));
+				if (rand->GetInteger(0, 1) == 1)
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return m_metric > path->GetMetric();
+			}
+			return false;
+		}
 		bool PmtmgmpRoutePath::DataSendRoutePathMetricCompare(Ptr<PmtmgmpRoutePath> path)
 		{
 			if (path == this) return false;
@@ -336,34 +358,12 @@ namespace ns3 {
 			{
 				if (m_metric * uint8_t(m_InformationStatus) == path->GetMetric() * uint8_t(path->GetStatus()))
 				{
-					return m_PathGenerationSeqNumber > path->GetPathGenerationSequenceNumber();
+					return m_PathGenerationSeqNumber < path->GetPathGenerationSequenceNumber();
 				}
 				else
 				{
 					return m_metric * uint8_t(m_InformationStatus) > path->GetMetric() * uint8_t(path->GetStatus());
 				}
-			}
-			return false;
-		}
-		bool MSECPselectRoutePathMetricCompare(const Ptr<PmtmgmpRoutePath> &pathA, const Ptr<PmtmgmpRoutePath> &pathB)
-		{
-			if (pathA->GetMetric() == pathB->GetMetric())
-			{
-				Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
-				rand->SetAttribute("Min", DoubleValue(-0.5));
-				rand->SetAttribute("Max", DoubleValue(1.5));
-				if (rand->GetInteger(0, 1) == 1)
-				{
-				return true;
-				}
-				else
-				{
-				return false;
-				}
-			}
-			else
-			{
-				return pathA->GetMetric() < pathB->GetMetric();
 			}
 			return false;
 		}
@@ -469,12 +469,25 @@ namespace ns3 {
 		////选择MSECP
 		void PmtmgmpRouteTree::SelectMSECP()
 		{
-			std::sort(m_tree.begin(), m_tree.end(), &MSECPselectRoutePathMetricCompare);
-			if (m_tree.size() > m_MSECPnumForMTERP)
+			std::vector<Ptr<PmtmgmpRoutePath> > tree = std::vector<Ptr<PmtmgmpRoutePath> >();
+			uint8_t size = m_tree.size();
+			if (size > m_MSECPnumForMTERP)
 			{
-				std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin() + m_MSECPnumForMTERP;
-				m_tree.erase(iter, m_tree.end());
+				size = m_MSECPnumForMTERP;
 			}
+			for (int i = 0; i < size; i++)
+			{
+				std::vector<Ptr<PmtmgmpRoutePath> >::iterator path = GetBestMSECPpath();
+				m_tree.erase(path);
+				tree.push_back(*path);
+			}
+			m_tree = tree;
+			//std::sort(m_tree.begin(), m_tree.end(), &MSECPselectRoutePathMetricCompare);
+			//if (m_tree.size() > m_MSECPnumForMTERP)
+			//{
+			//	std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin() + m_MSECPnumForMTERP;
+			//	m_tree.erase(iter, m_tree.end());
+			//}
 		}
 		void PmtmgmpRouteTree::AddMSECPpath(Ptr<PmtmgmpRoutePath> path)
 		{
@@ -644,7 +657,7 @@ namespace ns3 {
 			if (iter == m_tree.end())
 			{
 				////没找到MSECPindex的路径直接返回最优路径
-				return GetBestRoutePathForData();
+				return *GetBestRoutePathForData();
 			}
 			else
 			{
@@ -655,14 +668,14 @@ namespace ns3 {
 				}
 				else
 				{
-					return GetBestRoutePathForData();
+					return *GetBestRoutePathForData();
 				}
 				return *iter;
 			}
 		}
-		Ptr<PmtmgmpRoutePath> PmtmgmpRouteTree::GetBestRoutePathForData()
+		std::vector<Ptr<PmtmgmpRoutePath> >::iterator PmtmgmpRouteTree::GetBestRoutePathForData()
 		{
-			if (m_tree.size() == 0) return 0;
+			if (m_tree.size() == 0) return m_tree.end();
 			std::vector<Ptr<PmtmgmpRoutePath> >::iterator path = m_tree.begin();
 			for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin() + 1; iter != m_tree.end(); iter++)
 			{
@@ -671,7 +684,20 @@ namespace ns3 {
 					path = iter;
 				}
 			}
-			return *path;
+			return path;
+		}
+		std::vector<Ptr<PmtmgmpRoutePath> >::iterator PmtmgmpRouteTree::GetBestMSECPpath()
+		{
+			if (m_tree.size() == 0) return m_tree.end();
+			std::vector<Ptr<PmtmgmpRoutePath> >::iterator path = m_tree.begin();
+			for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin() + 1; iter != m_tree.end(); iter++)
+			{
+				if ((*path)->MSECPselectRoutePathMetricCompare(*iter))
+				{
+					path = iter;
+				}
+			}
+			return path;
 		}
 		/*************************
 		* PmtmgmpRouteTable
