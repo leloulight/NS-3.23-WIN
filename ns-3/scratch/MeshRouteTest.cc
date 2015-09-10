@@ -188,7 +188,7 @@ MeshRouteClass::MeshRouteClass() :
 	m_RandomStart(0.1),
 	m_NumIface(1),
 	m_WifiPhyStandard(WIFI_PHY_STANDARD_80211g),
-	m_Step(100),
+	m_Step(75),
 	m_ApplicationStep(8),
 	m_MaxBytes(0),
 	m_SourceNum(0),
