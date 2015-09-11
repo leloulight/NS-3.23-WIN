@@ -93,8 +93,7 @@ namespace ns3 {
 			//不需要使用度量
 			uint32_t m_metric;
 			uint32_t m_seqno;
-#endif
-#ifndef PMTMGMP_UNUSED_MY_CODE
+#else
 			uint8_t m_MSECPindex;
 			uint8_t m_ChangePath;
 #ifdef PMTMGMP_TAG_INFOR_ATTACH

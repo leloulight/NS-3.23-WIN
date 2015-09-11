@@ -117,7 +117,6 @@ namespace ns3 {
 		{
 			return 6 //address
 				+ 1 //ttl
-				+ 4 //seqno
 #ifndef PMTMGMP_UNUSED_MY_CODE
 				+ 1  //MSECPindex
 #ifdef PMTMGMP_TAG_INFOR_ATTACH
