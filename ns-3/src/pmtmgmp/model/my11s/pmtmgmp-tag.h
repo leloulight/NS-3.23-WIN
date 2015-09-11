@@ -64,9 +64,9 @@ namespace ns3 {
 			//不需要使用度量
 			void  SetMetric(uint32_t metric);
 			uint32_t GetMetric();
+#endif
 			void  SetSeqno(uint32_t seqno);
 			uint32_t GetSeqno();
-#endif
 			void  DecrementTtl();
 			void  IncreaseChange();
 #ifndef PMTMGMP_UNUSED_MY_CODE
@@ -94,6 +94,7 @@ namespace ns3 {
 			uint32_t m_metric;
 			uint32_t m_seqno;
 #else
+			uint32_t m_seqno;
 			uint8_t m_MSECPindex;
 			uint8_t m_ChangePath;
 #ifdef PMTMGMP_TAG_INFOR_ATTACH

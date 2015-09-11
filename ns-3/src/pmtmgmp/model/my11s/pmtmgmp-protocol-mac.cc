@@ -97,10 +97,8 @@ namespace ns3 {
 				NS_FATAL_ERROR(
 					"6-address scheme is not yet supported and 4-address extension is not supposed to be used for data frames.");
 			}
-#ifdef PMTMGMP_UNUSED_MY_CODE
 			////PmtmgmpTag去除seqno属性
 			tag.SetSeqno(wmnHdr.GetWmnSeqno());
-#endif
 			tag.SetTtl(wmnHdr.GetWmnTtl());
 			packet->AddPacketTag(tag);
 			if ((destination == Mac48Address::GetBroadcast()) && (m_protocol->DropDataFrame(wmnHdr.GetWmnSeqno(),
@@ -269,10 +267,8 @@ namespace ns3 {
 			m_stats.txData++;
 			m_stats.txDataBytes += packet->GetSize();
 			WmnHeader wmnHdr;
-#ifdef PMTMGMP_UNUSED_MY_CODE
 			////PmtmgmpTag去除seqno属性
 			wmnHdr.SetWmnSeqno(tag.GetSeqno());
-#endif
 			wmnHdr.SetWmnTtl(tag.GetTtl());
 			packet->AddHeader(wmnHdr);
 			header.SetAddr1(tag.GetAddress());

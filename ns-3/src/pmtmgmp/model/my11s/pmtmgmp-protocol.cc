@@ -456,8 +456,10 @@ namespace ns3 {
 					NS_FATAL_ERROR("PMTMGMP tag has come with a packet from upper layer. This must not occur...");
 				}
 				tag.SetTtl(m_maxTtl);
+				//Filling TAG:
 				if (destination == Mac48Address::GetBroadcast())
 				{
+					tag.SetSeqno(m_dataSeqno++);
 					NS_LOG_DEBUG("Start ARP Packet at " << m_address << " from " << source << " to " << destination);
 				}
 #ifdef PMTMGMP_TAG_INFOR_ATTACH

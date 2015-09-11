@@ -46,19 +46,19 @@
 #define DEGREES_TO_RADIANS(__ANGLE__) ((__ANGLE__) * 0.01745329252f) // PI / 180
 
 // 仿真前路由生成时间
-#define MIN_APPLICATION_TIME 15
+#define MIN_APPLICATION_TIME 20
 // 仿真后等待时间
-#define END_APPLICATION_TIME 15
+#define END_APPLICATION_TIME 20
 
 
 //测试所有协议
 #define TEST_ALL
 // 随机应用总数
-#define TEST_SET_COUNT 20
+#define TEST_SET_COUNT 10
 // 随机应用运行间隔
 #define TEST_SET_INTERVAL 5
 // 随机应用持续时间
-#define TEST_SET_LIFE 8
+#define TEST_SET_LIFE 18
 // 随机应用随机区间
 #define TEST_SET_RANDOM 2
 // 区域形状
@@ -68,9 +68,9 @@
 // 协议
 #define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
 // 区域大小
-#define TEST_SET_SIZE 10
+#define TEST_SET_SIZE 8
 // 区域间隔
-#define TEST_SET_APPSTEP 8
+#define TEST_SET_APPSTEP 6
 
 
 using namespace ns3;
@@ -705,37 +705,20 @@ void MeshRouteClass::FlowMonitorReport()
 	NS_LOG_INFO("=============================\n\n\n");
 
 	// 输出全部结点数据到文件
-#ifdef WIN32
 	std::ostringstream os;
-	os << "results\\1_HWMP_PDF.txt";
+	os << "1_HWMP_PDF.txt";
 	std::ofstream of(os.str().c_str(), ios::out | ios::app);
 	of << pdf_total << "\n";
 	of.close();
 	std::ostringstream os2;
-	os2 << "results\\1_HWMP_Delay.txt";
+	os2 << "1_HWMP_Delay.txt";
 	std::ofstream of2(os2.str().c_str(), ios::out | ios::app);
 	of2 << delay_total << "\n";
 	of2.close();
 	std::ostringstream os3;
-	os3 << "results\\1_HWMP_Throu.txt";
+	os3 << "1_HWMP_Throu.txt";
 	std::ofstream of3(os3.str().c_str(), ios::out | ios::app);
 	of3 << rxbitrate_total << "\n";
-#else
-	std::ostringstream os;
-	os << "results/1_HWMP_PDF.txt";
-	std::ofstream of(os.str().c_str(), ios::out | ios::app);
-	of << pdf_total << "\n";
-	of.close();
-	std::ostringstream os2;
-	os2 << "results/1_HWMP_Delay.txt";
-	std::ofstream of2(os2.str().c_str(), ios::out | ios::app);
-	of2 << delay_total << "\n";
-	of2.close();
-	std::ostringstream os3;
-	os3 << "results/1_HWMP_Throu.txt";
-	std::ofstream of3(os3.str().c_str(), ios::out | ios::app);
-	of3 << rxbitrate_total << "\n";
-#endif
 	of3.close();
 	Simulator::Destroy();
 }
@@ -837,11 +820,7 @@ void MeshRouteClass::Report()
 	{
 		std::ostringstream os;
 		//os << "mp-report1-" << n << ".xml";
-#ifdef WIN32
-		os << "results\\" << typeName << "-mp-report-" << n << ".xml";
-#else
-		os << "results/" << typeName << "-mp-report-" << n << ".xml";
-#endif
+		os << typeName << "-mp-report-" << n << ".xml";
 		std::ofstream of;
 		of.open(os.str().c_str(), ios::out | ios::app);
 		if (!of.is_open())
