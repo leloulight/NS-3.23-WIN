@@ -52,7 +52,7 @@
 
 
 //测试所有协议
-#define TEST_ALL
+//#define TEST_ALL
 // 随机应用总数
 #define TEST_SET_COUNT 10
 // 随机应用运行间隔
@@ -157,8 +157,6 @@ private:
 	uint8_t m_ApplicationStep;
 	ApplicationAddType m_ApplicationAddType;
 	uint32_t  m_MaxBytes;
-	int m_SourceNum;
-	int m_DestinationNum;
 	uint16_t  m_PacketSize;
 	string m_DataRate;
 	double m_TotalTime;
@@ -189,10 +187,7 @@ MeshRouteClass::MeshRouteClass() :
 	m_NumIface(1),
 	m_WifiPhyStandard(WIFI_PHY_STANDARD_80211g),
 	m_Step(75),
-	m_ApplicationStep(8),
 	m_MaxBytes(0),
-	m_SourceNum(0),
-	m_DestinationNum(0),
 	m_PacketSize(1024),
 	m_DataRate("150kbps"),
 	m_TotalTime(60),
@@ -457,12 +452,7 @@ void MeshRouteClass::InstallApplicationRandom()
 		{
 		case MeshRouteClass::SQUARE:
 		{
-			if (m_SourceNum < 0 || m_SourceNum >= l_NodeNum) m_SourceNum = 0;
-			if (m_DestinationNum < 0 || m_DestinationNum >= l_NodeNum || m_DestinationNum == m_SourceNum) m_DestinationNum = l_NodeNum - 1;
-			m_SourceNum = m_Size + 1;
-			m_DestinationNum = m_Size * (m_Size - 1) - 2;
-
-			InstallCoupleApplication(m_SourceNum, m_DestinationNum, 49000, 49001, 0, m_TotalTime);
+			InstallCoupleApplication(m_Size + 1, m_Size * (m_Size - 1) - 2, 49000, 49001, 0, m_TotalTime);
 		}
 		break;
 		case MeshRouteClass::HEXAGON:
