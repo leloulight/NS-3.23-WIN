@@ -483,9 +483,7 @@ void MeshRouteClass::InstallApplicationRandom()
 			if (m_Size <= m_ApplicationStep)
 			{
 				// 节点数量不足使用多应用
-				m_SourceNum = m_Size + 1;
-				m_DestinationNum = m_Size * (m_Size - 1) - 2;
-				InstallCoupleApplication(m_SourceNum, m_DestinationNum, 49000, 49001, 0, m_TotalTime);
+				InstallCoupleApplication(m_Size + 1, m_Size * (m_Size - 1) - 2, 49000, 49001, 0, m_TotalTime);
 			}
 			int start = ((m_Size - 1) % m_ApplicationStep) / 2;
 			bool end = false;
