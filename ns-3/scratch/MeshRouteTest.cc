@@ -52,7 +52,7 @@
 
 
 //测试所有协议
-//#define TEST_ALL
+#define TEST_ALL
 // 随机应用总数
 #define TEST_SET_COUNT 10
 // 随机应用运行间隔
@@ -64,13 +64,13 @@
 // 区域形状
 #define TEST_SET_AREA MeshRouteClass::SQUARE
 // 应用布置类型
-#define TEST_SET_APP MeshRouteClass::Random
+#define TEST_SET_APP MeshRouteClass::Multiple
 // 协议
 #define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
 // 区域大小
-#define TEST_SET_SIZE 8
+#define TEST_SET_SIZE 10
 // 区域间隔
-#define TEST_SET_APPSTEP 6
+#define TEST_SET_APPSTEP 8
 
 
 using namespace ns3;
@@ -186,11 +186,11 @@ MeshRouteClass::MeshRouteClass() :
 	m_RandomStart(0.1),
 	m_NumIface(1),
 	m_WifiPhyStandard(WIFI_PHY_STANDARD_80211g),
-	m_Step(75),
+	m_Step(100),
 	m_MaxBytes(0),
 	m_PacketSize(1024),
 	m_DataRate("150kbps"),
-	m_TotalTime(60),
+	m_TotalTime(120),
 	m_Root("00:00:00:00:00:01"),
 	m_Pcap(false),
 	m_PacketInterval(0.1)
@@ -744,15 +744,11 @@ int MeshRouteClass::Run()
 #ifndef NO_APPLICATION
 	InstallApplicationRandom();
 #else
-	if (m_SourceNum < 0 || m_SourceNum >= l_NodeNum) m_SourceNum = 0;
-	if (m_DestinationNum < 0 || m_DestinationNum >= l_NodeNum || m_DestinationNum == m_SourceNum) m_DestinationNum = l_NodeNum - 1;
-	m_SourceNum = m_Size + 1;
-	m_DestinationNum = m_Size * (m_Size - 1) - 2;
 	if (m_ProtocolType == MY11S_PMTMGMP)
 	{
-		/*DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(m_SourceNum)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Access_Point);*/
+		/*DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(m_Size + 1)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Access_Point);*/
 		DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(0)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Access_Point);
-		/*DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(m_DestinationNum)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Portal);*/
+		/*DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(m_Size * (m_Size - 1) - 2)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Portal);*/
 	}
 #endif
 	// 数据统计模块配置
@@ -848,7 +844,7 @@ int main(int argc, char *argv[])
 
 	//LogComponentEnableAll((LogLevel)(LOG_LEVEL_INFO | LOG_PREFIX_ALL));
 
-	LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpProtocolMac", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpPeerManagementProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpRtable", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
