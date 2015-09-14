@@ -804,7 +804,13 @@ void MeshRouteClass::Report()
 	{
 		std::ostringstream os;
 		//os << "mp-report1-" << n << ".xml";
-		os << typeName << "-mp-report-" << n << ".xml";
+		stringstream ss;
+		string s;
+		ss << n;
+		ss >> s;
+		s = typeName + "-mp-report-" + s + ".xml";
+		remove(s.c_str());
+		os << s;
 		std::ofstream of;
 		of.open(os.str().c_str(), ios::out | ios::app);
 		if (!of.is_open())
@@ -830,6 +836,14 @@ void MeshRouteClass::Report()
 
 int main(int argc, char *argv[])
 {
+	int n = 1;
+	string typeName = "pmtmgmp";
+	stringstream ss;
+	string s;
+	ss << n;
+	ss >> s;
+	s = typeName + "-mp-report-" + s + ".xml";
+
 	// √¸¡Ó––≈‰÷√
 	CommandLine cmd;
 	cmd.Parse(argc, argv);
