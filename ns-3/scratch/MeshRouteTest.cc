@@ -836,14 +836,6 @@ void MeshRouteClass::Report()
 
 int main(int argc, char *argv[])
 {
-	int n = 1;
-	string typeName = "pmtmgmp";
-	stringstream ss;
-	string s;
-	ss << n;
-	ss >> s;
-	s = typeName + "-mp-report-" + s + ".xml";
-
 	// √¸¡Ó––≈‰÷√
 	CommandLine cmd;
 	cmd.Parse(argc, argv);
