@@ -649,9 +649,9 @@ void MeshRouteClass::FlowMonitorReport()
 		{
 			//输出数据流量
 			k++;
-			NS_LOG_INFO("=============================");
+			NS_LOG_INFO("-----------------------------");
 			NS_LOG_INFO("Protocol: " << typeName << " (" << t.sourceAddress << " -> " << t.destinationAddress << ")\n");
-			NS_LOG_INFO("=============================");
+			NS_LOG_INFO("-----------------------------");
 			NS_LOG_INFO("PDF: " << pdf_value << " %\n");
 			NS_LOG_INFO("Tx Packets: " << i->second.txPackets << "\n");
 			NS_LOG_INFO("Rx Packets: " << i->second.rxPackets << "\n");
