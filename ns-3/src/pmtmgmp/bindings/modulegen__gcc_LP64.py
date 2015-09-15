@@ -12846,6 +12846,11 @@ def register_Ns3My11sPmtmgmpRoutePath_methods(root_module, cls):
                    'ns3::Time', 
                    [], 
                    is_const=True)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): bool ns3::my11s::PmtmgmpRoutePath::GetPmtmgmpPeerLinkStatus() const [member function]
+    cls.add_method('GetPmtmgmpPeerLinkStatus', 
+                   'bool', 
+                   [], 
+                   is_const=True)
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::my11s::PmtmgmpRoutePath::RouteInformationStatus ns3::my11s::PmtmgmpRoutePath::GetStatus() const [member function]
     cls.add_method('GetStatus', 
                    'ns3::my11s::PmtmgmpRoutePath::RouteInformationStatus', 
@@ -12929,6 +12934,10 @@ def register_Ns3My11sPmtmgmpRoutePath_methods(root_module, cls):
     cls.add_method('SetPathGenerationSequenceNumber', 
                    'void', 
                    [param('uint32_t', 'seq_number')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRoutePath::SetPmtmgmpPeerLinkStatus(bool status) [member function]
+    cls.add_method('SetPmtmgmpPeerLinkStatus', 
+                   'void', 
+                   [param('bool', 'status')])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRoutePath::SetStatus(ns3::my11s::PmtmgmpRoutePath::RouteInformationStatus status) [member function]
     cls.add_method('SetStatus', 
                    'void', 
@@ -13079,6 +13088,10 @@ def register_Ns3My11sPmtmgmpRouteTable_methods(root_module, cls):
     cls.add_method('SetPUPDsendRouteTreeIndex', 
                    'void', 
                    [param('uint8_t', 'index')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRouteTable::SetPathPeerLinkStatus(ns3::Mac48Address mterp, ns3::Mac48Address from, bool status) [member function]
+    cls.add_method('SetPathPeerLinkStatus', 
+                   'void', 
+                   [param('ns3::Mac48Address', 'mterp'), param('ns3::Mac48Address', 'from'), param('bool', 'status')])
     return
 
 def register_Ns3My11sPmtmgmpRouteTree_methods(root_module, cls):
@@ -13193,6 +13206,10 @@ def register_Ns3My11sPmtmgmpRouteTree_methods(root_module, cls):
     cls.add_method('SetMTERPaddress', 
                    'void', 
                    [param('ns3::Mac48Address', 'address')])
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRouteTree::SetPathPeerLinkStatus(ns3::Mac48Address from, bool status) [member function]
+    cls.add_method('SetPathPeerLinkStatus', 
+                   'void', 
+                   [param('ns3::Mac48Address', 'from'), param('bool', 'status')])
     return
 
 def register_Ns3My11sPmtmgmpRtable_methods(root_module, cls):
@@ -13318,6 +13335,10 @@ def register_Ns3My11sPmtmgmpTag_methods(root_module, cls):
     cls.add_method('GetMSECPindex', 
                    'uint8_t', 
                    [])
+    ## pmtmgmp-tag.h (module 'pmtmgmp'): uint32_t ns3::my11s::PmtmgmpTag::GetSeqno() [member function]
+    cls.add_method('GetSeqno', 
+                   'uint32_t', 
+                   [])
     ## pmtmgmp-tag.h (module 'pmtmgmp'): uint32_t ns3::my11s::PmtmgmpTag::GetSerializedSize() const [member function]
     cls.add_method('GetSerializedSize', 
                    'uint32_t', 
@@ -13358,6 +13379,10 @@ def register_Ns3My11sPmtmgmpTag_methods(root_module, cls):
     cls.add_method('SetMSECPindex', 
                    'void', 
                    [param('uint8_t', 'index')])
+    ## pmtmgmp-tag.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpTag::SetSeqno(uint32_t seqno) [member function]
+    cls.add_method('SetSeqno', 
+                   'void', 
+                   [param('uint32_t', 'seqno')])
     ## pmtmgmp-tag.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpTag::SetTtl(uint8_t ttl) [member function]
     cls.add_method('SetTtl', 
                    'void', 
