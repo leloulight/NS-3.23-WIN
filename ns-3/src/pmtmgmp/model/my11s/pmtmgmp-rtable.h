@@ -79,6 +79,7 @@ namespace ns3 {
 			void SetFromNode(Mac48Address address);
 			void SetStatus(RouteInformationStatus status);
 			void SetAcceptCandidateRouteInformaitonEvent(EventId id);
+			void SetPmtmgmpPeerLinkStatus(bool status);
 			void SetPGENsendTime();
 
 			Mac48Address GetMTERPaddress() const;
@@ -94,6 +95,7 @@ namespace ns3 {
 			Mac48Address GetFromNode() const;
 			RouteInformationStatus GetStatus() const;
 			EventId GetAcceptCandidateRouteInformaitonEvent() const;
+			bool GetPmtmgmpPeerLinkStatus() const;
 			Time GetPGENsendTime() const;
 			Time GetPathRecreateDelay() const;
 
@@ -153,6 +155,9 @@ namespace ns3 {
 
 			////路由路径补充生成延迟
 			Time m_PMTMGMPpathRecreateDelay;
+
+			////路径连通状态
+			bool m_PmtmgmpPeerLinkStatus;
 		};
 
 		/*************************
@@ -212,6 +217,8 @@ namespace ns3 {
 			std::vector<Ptr<PmtmgmpRoutePath> >::iterator GetBestRoutePathForData();
 			std::vector<Ptr<PmtmgmpRoutePath> >::iterator GetBestMSECPpath();
 
+			////设置路径链接状态
+			void SetPathPeerLinkStatus(Mac48Address from, bool status);
 
 		private:
 			////路由表树搜索器
@@ -335,6 +342,9 @@ namespace ns3 {
 
 			////发送列队的Packet
 			void SendQueuePackets(Mac48Address dst, PmtmgmpProtocol::Statistics *stats);
+
+			////设置路径链接状态
+			void SetPathPeerLinkStatus(Mac48Address mterp, Mac48Address from, bool status);
 
 		private:
 			////路由表路径搜索器

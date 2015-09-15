@@ -54,7 +54,8 @@ namespace ns3 {
 			m_InformationStatus(Confirmed),
 			m_MaxCandidateNum(8),
 			m_PMTGMGMProutePathInforLife(MicroSeconds(1024 * 80000)),
-			m_PMTMGMPpathRecreateDelay(MicroSeconds(1024 * 4000))
+			m_PMTMGMPpathRecreateDelay(MicroSeconds(1024 * 4000)),
+			m_PmtmgmpPeerLinkStatus(true)
 		{
 			RoutePathInforLifeUpdate();
 		}
@@ -183,6 +184,10 @@ namespace ns3 {
 		{
 			m_AcceptCandidateRouteInformaitonEvent = id;
 		}
+		void PmtmgmpRoutePath::SetPmtmgmpPeerLinkStatus(bool status)
+		{
+			m_PmtmgmpPeerLinkStatus = status;
+		}
 		void PmtmgmpRoutePath::SetPGENsendTime()
 		{
 			m_PMTGMGMPpgenSendTime = Simulator::Now();
@@ -238,6 +243,10 @@ namespace ns3 {
 		EventId PmtmgmpRoutePath::GetAcceptCandidateRouteInformaitonEvent() const
 		{
 			return m_AcceptCandidateRouteInformaitonEvent;
+		}
+		bool PmtmgmpRoutePath::GetPmtmgmpPeerLinkStatus() const
+		{
+			return m_PmtmgmpPeerLinkStatus;
 		}
 		Time PmtmgmpRoutePath::GetPGENsendTime() const
 		{
@@ -656,7 +665,7 @@ namespace ns3 {
 			if (m_tree.size() == 0) return 0;
 			////MSECPindex为不会分配0，说明当前没有历史路径（iter == m_tree.end()）
 			std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = std::find_if(m_tree.begin(), m_tree.end(), PmtmgmpRouteTree_IndexFinder(index));
-			if (iter == m_tree.end())
+			if (iter == m_tree.end() || (*iter)->GetPmtmgmpPeerLinkStatus() == false)
 			{
 				////没找到MSECPindex的路径直接返回最优路径
 				return *GetBestRoutePathForData();
@@ -681,12 +690,21 @@ namespace ns3 {
 			std::vector<Ptr<PmtmgmpRoutePath> >::iterator path = m_tree.begin();
 			for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin() + 1; iter != m_tree.end(); iter++)
 			{
-				if ((*path)->DataSendRoutePathMetricCompare(*iter))
+				if ((*path)->DataSendRoutePathMetricCompare(*iter) && (*path)->GetPmtmgmpPeerLinkStatus() == true)
 				{
 					path = iter;
 				}
 			}
-			return path;
+			if ((*path)->GetPmtmgmpPeerLinkStatus())
+			{
+				return path;
+			}
+			else
+			{
+				std::vector<Ptr<PmtmgmpRoutePath> > temp = std::vector<Ptr<PmtmgmpRoutePath> >();
+				temp.push_back(0);
+				return temp.begin();
+			}
 		}
 		std::vector<Ptr<PmtmgmpRoutePath> >::iterator PmtmgmpRouteTree::GetBestMSECPpath()
 		{
@@ -700,6 +718,17 @@ namespace ns3 {
 				}
 			}
 			return path;
+		}
+		////设置路径链接状态
+		void PmtmgmpRouteTree::SetPathPeerLinkStatus(Mac48Address from, bool status)
+		{
+			for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin(); iter != m_tree.end(); iter++)
+			{
+				if ((*iter)->GetFromNode() == from)
+				{
+					(*iter)->SetPmtmgmpPeerLinkStatus(status);
+				}
+			}
 		}
 		/*************************
 		* PmtmgmpRouteTable
@@ -1063,6 +1092,15 @@ namespace ns3 {
 				stats->txUnicast++;
 				stats->txBytes += select->pkt->GetSize();
 				select->reply(true, select->pkt, select->src, select->dst, select->protocol, next->GetInterface());
+			}
+		}
+		////设置路径链接状态
+		void PmtmgmpRouteTable::SetPathPeerLinkStatus(Mac48Address mterp, Mac48Address from, bool status)
+		{
+			Ptr<PmtmgmpRouteTree> pTree = GetTreeByMACaddress(mterp); 
+			if (pTree != 0)
+			{
+				return pTree->SetPathPeerLinkStatus(from, status);
 			}
 		}
 #endif

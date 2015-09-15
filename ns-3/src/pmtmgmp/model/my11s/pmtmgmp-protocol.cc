@@ -1004,12 +1004,20 @@ namespace ns3 {
 		void
 			PmtmgmpProtocol::PmtmgmpPeerLinkStatus(Mac48Address wmnPointAddress, Mac48Address peerAddress, uint32_t interface, bool status)
 		{
+#ifndef PMTMGMP_UNUSED_MY_CODE
+			m_RouteTable->SetPathPeerLinkStatus(wmnPointAddress, peerAddress, status);
+			if (status == true)
+			{
+				//m_RouteTable->SendQueuePackets()
+			}
+#else
 			if (status)
 			{
 				return;
 			}
 			std::vector<FailedDestination> destinations = m_rtable->GetUnreachableDestinations(peerAddress);
 			InitiatePathError(MakePathError(destinations));
+#endif
 		}
 		void
 			PmtmgmpProtocol::SetNeighboursCallback(Callback<std::vector<Mac48Address>, uint32_t> cb)
@@ -1922,6 +1930,7 @@ namespace ns3 {
 					return;
 				}
 			}
+			m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats);
 			if (pathCopy->GetTTL() > 0)
 			{
 				////转发PGEN
@@ -1992,10 +2001,12 @@ namespace ns3 {
 						find->SetMetric(select->GetMetric());
 						find->IncrementMetric(metric, GetValueMForAALM());
 						NS_LOG_DEBUG("PUPD  Infor: MTERP(" << mterp << "),MSECPindex(" << uint32_t(select->GetMSECPindex()) << "), Metric(From " << old << " to " << find->GetMetric() << " , Base:" << find->GetBaseMetric() << " Step:" << metric << ")");
+						m_RouteTable->SendQueuePackets(find->GetMTERPaddress(), &m_stats);
 					}
 					else
 					{
 						////路由表中存在指定路由路径且并非来自于PUPD的发送者，不做任何事情
+						m_RouteTable->SendQueuePackets(find->GetMTERPaddress(), &m_stats);
 						continue;
 					}
 				}
