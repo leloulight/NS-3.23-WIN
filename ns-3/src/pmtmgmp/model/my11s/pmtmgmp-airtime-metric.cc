@@ -41,7 +41,7 @@ PmtmgmpAirtimeLinkMetricCalculator::GetTypeId ()
                       &PmtmgmpAirtimeLinkMetricCalculator::SetTestLength),
                     MakeUintegerChecker<uint16_t> (1)
                     )
-    .AddAttribute ( "Dot11MetricTid",
+    .AddAttribute ( "My11MetricTid",
                     "TID used to calculate metric (data rate)",
                     UintegerValue (0),
                     MakeUintegerAccessor (

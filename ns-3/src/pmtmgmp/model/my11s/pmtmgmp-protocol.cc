@@ -567,7 +567,7 @@ namespace ns3 {
 					return false;
 				}
 
-				NS_LOG_DEBUG("No RouteTable here now. at " << m_address << " from " << source << " to " << destination);
+				NS_LOG_DEBUG("No Route Path here now. at " << m_address << " from " << source << " to " << destination);
 				if (m_RouteTable->AddPacketToQueue(packet, source, destination, protocolType, sourceIface, routeReply))
 				{
 					m_stats.totalQueued++;

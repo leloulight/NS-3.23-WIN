@@ -267,7 +267,6 @@ namespace ns3 {
 			m_stats.txData++;
 			m_stats.txDataBytes += packet->GetSize();
 			WmnHeader wmnHdr;
-			////PmtmgmpTagÈ¥³ýseqnoÊôÐÔ
 			wmnHdr.SetWmnSeqno(tag.GetSeqno());
 			wmnHdr.SetWmnTtl(tag.GetTtl());
 			packet->AddHeader(wmnHdr);
