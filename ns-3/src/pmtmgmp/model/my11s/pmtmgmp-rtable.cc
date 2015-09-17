@@ -321,8 +321,8 @@ namespace ns3 {
 			}
 			else
 			{
-				m_metric = (sqrt(m_hopCount) * k * metric + (m_hopCount - 1) * (double)m_BaseMetric) / sqrt(m_hopCount * (m_hopCount + 1));
-				//m_metric = (m_hopCount * k * metric + (m_hopCount - 1) * (double)m_BaseMetric) /(m_hopCount + 1);
+				//m_metric = (sqrt(m_hopCount) * k * metric + (m_hopCount - 1) * (double)m_BaseMetric) / sqrt(m_hopCount * (m_hopCount + 1));
+				m_metric = (m_hopCount * k * metric + (m_hopCount - 1) * (double)m_BaseMetric) /(m_hopCount + 1);
 			}
 		}
 		bool PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare(Ptr<PmtmgmpRoutePath> path)
