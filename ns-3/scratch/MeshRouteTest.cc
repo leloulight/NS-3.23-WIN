@@ -68,9 +68,9 @@
 // 协议
 #define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
 // 区域大小
-#define TEST_SET_SIZE 10
+#define TEST_SET_SIZE 5
 // 区域间隔
-#define TEST_SET_APPSTEP 8
+#define TEST_SET_APPSTEP 3
 
 
 using namespace ns3;

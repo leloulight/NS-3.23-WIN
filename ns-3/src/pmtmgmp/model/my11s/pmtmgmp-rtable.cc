@@ -321,8 +321,8 @@ namespace ns3 {
 			}
 			else
 			{
-				//m_metric = (sqrt(m_hopCount) * k * metric + (m_hopCount - 1) * (double)m_BaseMetric) / sqrt(m_hopCount * (m_hopCount + 1));
-				m_metric = (m_hopCount * k * metric + (m_hopCount - 1) * (double)m_BaseMetric) /(m_hopCount + 1);
+				m_metric = (sqrt(m_hopCount) * k * metric + (m_hopCount - 1) * (double)m_BaseMetric) / sqrt(m_hopCount * (m_hopCount + 1));
+				//m_metric = (m_hopCount * k * metric + (m_hopCount - 1) * (double)m_BaseMetric) /(m_hopCount + 1);
 			}
 		}
 		bool PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare(Ptr<PmtmgmpRoutePath> path)
@@ -668,20 +668,23 @@ namespace ns3 {
 			if (iter == m_tree.end() || (*iter)->GetPmtmgmpPeerLinkStatus() == false)
 			{
 				////没找到MSECPindex的路径直接返回最优路径
-				return *GetBestRoutePathForData();
+				iter = GetBestRoutePathForData();
 			}
 			else
 			{
 				////比较当前使用路由度量和最优路由路径度量，选取最优路径返回
-				if ((*iter)->GetMetric() < (*(m_tree.begin()))->GetMetric() * m_NotSelectBestRoutePathRate)
+				if ((*iter)->GetMetric() >= (*(m_tree.begin()))->GetMetric() * m_NotSelectBestRoutePathRate)
 				{
-					return *iter;
+					iter = GetBestRoutePathForData();
 				}
-				else
-				{
-					return *GetBestRoutePathForData();
-				}
+			}
+			if (iter != m_tree.end())
+			{
 				return *iter;
+			}
+			else
+			{
+				return 0;
 			}
 		}
 		std::vector<Ptr<PmtmgmpRoutePath> >::iterator PmtmgmpRouteTree::GetBestRoutePathForData()
@@ -701,9 +704,7 @@ namespace ns3 {
 			}
 			else
 			{
-				std::vector<Ptr<PmtmgmpRoutePath> > temp = std::vector<Ptr<PmtmgmpRoutePath> >();
-				temp.push_back(0);
-				return temp.begin();
+				return m_tree.end();
 			}
 		}
 		std::vector<Ptr<PmtmgmpRoutePath> >::iterator PmtmgmpRouteTree::GetBestMSECPpath()
