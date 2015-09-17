@@ -550,7 +550,7 @@ namespace ns3 {
 					tag.SetMSECPindex(next->GetMSECPindex());
 					packet->AddPacketTag(tag);
 
-					NS_LOG_DEBUG("Get next hop " << next->GetFromNode() << " at " << m_address << " from " << source << " to " << destination << " ,Path Status is " << next->GetPmtmgmpPeerLinkStatus());
+					NS_LOG_DEBUG("Get next hop " << next->GetFromNode() << " at " << m_address << " from " << source << " to " << destination << " ,Path Status is " << next->GetPmtmgmpPeerLinkStatus() << ", Path Change is " << (uint32_t) tag.GetChangePath());
 
 					// reply immediately :
 					routeReply(true, packet, source, destination, protocolType, next->GetInterface());
@@ -2015,7 +2015,7 @@ namespace ns3 {
 			{
 				SendPUPGQ(from, recreateList);
 			}
-			NS_LOG_DEBUG("Receive PUPD, it is PUPGQ  contain " << recreateList.size() << " Route Path.");
+			NS_LOG_DEBUG("Receive PUPD, it is PUPGQ  contain " << recreateList.size() << " Route Path at " << m_address);
 		}
 		////·¢ËÍPUPGQ
 		void PmtmgmpProtocol::SendPUPGQ(Mac48Address receiver, std::vector<PUPGQdata> list)
