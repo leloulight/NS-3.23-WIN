@@ -58,25 +58,25 @@
 #define TEST_SIDE_ALL
 
 // 随机应用总数
-#define TEST_SET_COUNT 10
+#define TEST_SET_COUNT 4
 // 随机应用运行间隔
 #define TEST_SET_INTERVAL 5
 // 随机应用持续时间
-#define TEST_SET_LIFE 18
+#define TEST_SET_LIFE 28
 // 随机应用随机区间
-#define TEST_SET_RANDOM 2
+#define TEST_SET_RANDOM 4
 // 区域形状
 #define TEST_SET_AREA MeshRouteClass::SQUARE
 // 应用布置类型
-#define TEST_SET_APP MeshRouteClass::Multiple
+#define TEST_SET_APP MeshRouteClass::Random
 // 协议
 #define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
-// 区域大小
-#define TEST_SET_SIZE 5
 // 区域最大大小
 #define TEST_SET_MAX_SIZE 7
 // 区域最小大小
-#define TEST_SET_MIN_SIZE 3
+#define TEST_SET_MIN_SIZE 4
+// 区域大小
+#define TEST_SET_SIZE 5
 // 区域间隔
 #define TEST_SET_APPSTEP 3
 
@@ -1019,7 +1019,7 @@ int main(int argc, char *argv[])
 		pmtmgmp.Run();
 		MeshRouteClass mesh;
 		mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
-		mesh.Run()
+		mesh.Run();
 #endif
 #else
 		MeshRouteClass test;
