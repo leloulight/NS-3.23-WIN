@@ -658,17 +658,17 @@ void MeshRouteClass::FlowMonitorReport()
 			//输出数据流量
 			k++;
 			NS_LOG_INFO("-----------------------------");
-			NS_LOG_INFO("Protocol: " << typeName << " (" << t.sourceAddress << " -> " << t.destinationAddress << ")\n");
+			NS_LOG_INFO("Protocol: " << typeName << " (" << t.sourceAddress << " -> " << t.destinationAddress << ")");
 			NS_LOG_INFO("-----------------------------");
-			NS_LOG_INFO("PDF: " << pdf_value << " %\n");
-			NS_LOG_INFO("Tx Packets: " << i->second.txPackets << "\n");
-			NS_LOG_INFO("Rx Packets: " << i->second.rxPackets << "\n");
-			NS_LOG_INFO("Lost Packets: " << i->second.lostPackets << "\n");
-			NS_LOG_INFO("Dropped Packets: " << i->second.packetsDropped.size() << "\n");
-			NS_LOG_INFO("PDF: " << pdf_value << " %\n");
-			NS_LOG_INFO("Average delay: " << delay_value << "s\n");
-			NS_LOG_INFO("Rx bitrate: " << rxbitrate_value << " kbps\n");
-			NS_LOG_INFO("Tx bitrate: " << txbitrate_value << " kbps\n");
+			NS_LOG_INFO("PDF: " << pdf_value << " %");
+			NS_LOG_INFO("Tx Packets: " << i->second.txPackets);
+			NS_LOG_INFO("Rx Packets: " << i->second.rxPackets);
+			NS_LOG_INFO("Lost Packets: " << i->second.lostPackets);
+			NS_LOG_INFO("Dropped Packets: " << i->second.packetsDropped.size());
+			NS_LOG_INFO("PDF: " << pdf_value << " %");
+			NS_LOG_INFO("Average delay: " << delay_value << "s");
+			NS_LOG_INFO("Rx bitrate: " << rxbitrate_value << " kbps");
+			NS_LOG_INFO("Tx bitrate: " << txbitrate_value << " kbps");
 			// 统计平均值
 			totaltxPackets += i->second.txPackets;
 			totaltxbytes += i->second.txBytes;
@@ -695,10 +695,10 @@ void MeshRouteClass::FlowMonitorReport()
 	}
 	// 输出全部结点数据
 	NS_LOG_INFO("=============================");
-	NS_LOG_INFO("Total PDF: " << pdf_total << " %\n");
-	NS_LOG_INFO("Total Rx bitrate: " << rxbitrate_total << " kbps\n");
-	NS_LOG_INFO("Total Delay: " << delay_total << " s\n");
-	NS_LOG_INFO("=============================\n\n\n");
+	NS_LOG_INFO("Total PDF: " << pdf_total << " %");
+	NS_LOG_INFO("Total Rx bitrate: " << rxbitrate_total << " kbps");
+	NS_LOG_INFO("Total Delay: " << delay_total << " s");
+	NS_LOG_INFO("=============================\n");
 
 	// 输出全部结点数据到文件
 	std::ostringstream os;
