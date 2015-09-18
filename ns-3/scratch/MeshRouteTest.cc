@@ -899,7 +899,6 @@ int main(int argc, char *argv[])
 	LogComponentEnable("MeshRouteTest", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 
 	PacketMetadata::Enable();
-	vector<NodeApplicationInfor> apps;
 	int totalTime = 0;
 	if (TEST_SET_APP == MeshRouteClass::Random)
 	{
@@ -923,6 +922,7 @@ int main(int argc, char *argv[])
 #ifdef TEST_SIDE_ALL
 		for (int i = TEST_SET_MIN_SIZE; i <= TEST_SET_MAX_SIZE; i++)
 		{
+			vector<NodeApplicationInfor> apps;
 			int nodeCount;
 			switch (TEST_SET_AREA)
 			{
@@ -966,6 +966,7 @@ int main(int argc, char *argv[])
 		NS_LOG_INFO("\n");
 		for (int i = TEST_SET_MIN_SIZE; i <= TEST_SET_MAX_SIZE; i++)
 		{
+			vector<NodeApplicationInfor> apps;
 			int nodeCount;
 			switch (TEST_SET_AREA)
 			{
@@ -1007,6 +1008,7 @@ int main(int argc, char *argv[])
 			mesh.Run();
 		}
 #else
+		vector<NodeApplicationInfor> apps;
 		int nodeCount;
 		switch (TEST_SET_AREA)
 		{
