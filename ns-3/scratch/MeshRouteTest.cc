@@ -53,6 +53,10 @@
 
 //测试所有协议
 #define TEST_ALL
+
+//测试不同边界
+#define TEST_SIDE_ALL
+
 // 随机应用总数
 #define TEST_SET_COUNT 10
 // 随机应用运行间隔
@@ -69,6 +73,10 @@
 #define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
 // 区域大小
 #define TEST_SET_SIZE 5
+// 区域最大大小
+#define TEST_SET_MAX_SIZE 8
+// 区域最小大小
+#define TEST_SET_MIN_SIZE 3
 // 区域间隔
 #define TEST_SET_APPSTEP 3
 
@@ -848,6 +856,7 @@ int main(int argc, char *argv[])
 #endif
 #endif
 
+#ifndef TEST_SIDE_ALL
 	//LogComponentEnableAll((LogLevel)(LOG_LEVEL_INFO | LOG_PREFIX_ALL));
 
 	LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
@@ -869,6 +878,7 @@ int main(int argc, char *argv[])
 	//LogComponentEnable("UdpClient", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("UdpTraceClient", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL)); 
 	//LogComponentEnable("UdpEchoClientApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL)); 
+#endif
 
 	LogComponentEnable("MeshRouteTest", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 
@@ -912,6 +922,20 @@ int main(int argc, char *argv[])
 
 		totalTime = (TEST_SET_COUNT - 1) * TEST_SET_INTERVAL + TEST_SET_LIFE + TEST_SET_RANDOM;
 #ifdef TEST_ALL
+#ifdef TEST_SIDE_ALL
+		for (int i = TEST_SET_MIN_SIZE; i <= TEST_SET_MAX_SIZE; i++)
+		{
+			MeshRouteClass pmtmgmp;
+			pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, apps, totalTime, TEST_SET_AREA, i, i - 2, TEST_SET_APP);
+			pmtmgmp.Run();
+		}
+		for (int i = TEST_SET_MIN_SIZE; i <= TEST_SET_MAX_SIZE; i++)
+		{
+			MeshRouteClass mesh;
+			mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, apps, totalTime, TEST_SET_AREA, i, i - 2, TEST_SET_APP);
+			mesh.Run();
+		}
+#else
 		//测试
 		MeshRouteClass pmtmgmp;
 		pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, apps, totalTime, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
@@ -919,6 +943,7 @@ int main(int argc, char *argv[])
 		MeshRouteClass mesh;
 		mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, apps, totalTime, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
 		mesh.Run();
+#endif
 #else
 		MeshRouteClass test;
 		test.SetMeshRouteClass(TEST_SET_PROTOCOL, apps, totalTime, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
@@ -928,13 +953,28 @@ int main(int argc, char *argv[])
 	else
 	{
 #ifdef TEST_ALL
+#ifdef TEST_SIDE_ALL
+		for (int i = TEST_SET_MIN_SIZE; i <= TEST_SET_MAX_SIZE; i++)
+		{
+			MeshRouteClass pmtmgmp;
+			pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, TEST_SET_AREA, i, i - 2, TEST_SET_APP);
+			pmtmgmp.Run();
+		};
+		for (int i = TEST_SET_MIN_SIZE; i <= TEST_SET_MAX_SIZE; i++)
+		{
+			MeshRouteClass mesh;
+			mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, TEST_SET_AREA, i, i - 2, TEST_SET_APP);
+			mesh.Run();
+		};
+#else
 		MeshRouteClass pmtmgmp;
 		pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
 		pmtmgmp.Run();
 		MeshRouteClass mesh;
 		mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
-		mesh.Run();
-	#else
+		mesh.Run()
+#endif
+#else
 		MeshRouteClass test;
 		test.SetMeshRouteClass(TEST_SET_PROTOCOL, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
 		test.Run();
