@@ -52,7 +52,7 @@ namespace ns3 {
 			m_BaseMetric(0),
 			m_CandidateRouteInformaiton(std::vector<Ptr<PmtmgmpRoutePath> >()),
 			m_InformationStatus(Confirmed),
-			m_MaxCandidateNum(8),
+			m_MaxCandidateNum(10),
 			m_PMTGMGMProutePathInforLife(MicroSeconds(1024 * 80000)),
 			m_PMTMGMPpathRecreateDelay(MicroSeconds(1024 * 4000)),
 			m_PmtmgmpPeerLinkStatus(true)
@@ -85,7 +85,7 @@ namespace ns3 {
 				.AddConstructor<PmtmgmpRoutePath>()
 				.AddAttribute("MaxCandidateNum",
 					"Max number of Candidate Information",
-					UintegerValue(8),
+					UintegerValue(10),
 					MakeUintegerAccessor(
 						&PmtmgmpRoutePath::m_MaxCandidateNum),
 					MakeUintegerChecker<uint8_t>(0)
@@ -384,7 +384,7 @@ namespace ns3 {
 			m_tree(std::vector<Ptr<PmtmgmpRoutePath> >()),
 			m_MSECPnumForMTERP(4),
 			m_AcceptInformaitonDelay(MicroSeconds(1024 * 1500)),
-			m_NotSelectBestRoutePathRate(5)
+			m_NotSelectBestRoutePathRate(1.5)
 		{
 		}
 
@@ -413,10 +413,10 @@ namespace ns3 {
 					)
 				.AddAttribute("NotSelectBestRoutePathRate",
 					"The rate for compare selected path and the best Metric path.",
-					UintegerValue(5),
+					DoubleValue(1.5),
 					MakeUintegerAccessor(
 						&PmtmgmpRouteTree::m_NotSelectBestRoutePathRate),
-					MakeUintegerChecker<uint8_t>(1)
+					MakeUintegerChecker<double>(0)
 					)
 				;
 			return tid;

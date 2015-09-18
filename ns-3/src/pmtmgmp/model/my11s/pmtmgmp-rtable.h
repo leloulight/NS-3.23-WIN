@@ -264,7 +264,7 @@ namespace ns3 {
 			Time m_AcceptInformaitonDelay;
 
 			////非当前使用路径最优路径比较倍率
-			uint8_t m_NotSelectBestRoutePathRate;
+			double m_NotSelectBestRoutePathRate;
 		};
 		/*************************
 		* PmtmgmpRouteTable
