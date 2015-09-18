@@ -701,6 +701,11 @@ void MeshRouteClass::FlowMonitorReport()
 	NS_LOG_INFO("=============================\n");
 
 	// 输出全部结点数据到文件
+#ifndef TEST_SIDE_ALL
+	remove("1_HWMP_PDF.txt");
+	remove("1_HWMP_Delay.txt");
+	remove("1_HWMP_Throu.txt");
+#endif
 	std::ostringstream os;
 	os << "1_HWMP_PDF.txt";
 	std::ofstream of(os.str().c_str(), ios::out | ios::app);
@@ -835,7 +840,7 @@ void MeshRouteClass::Report()
 		else if(TEST_SET_AREA == MeshRouteClass::SQUARE)
 			areatype = "MeshRouteClass::SQUARE";
 
-		of << "<!--TEST AREA:" << areatype  <<"(" << m_Size << ")-->";
+		of << "<!--TEST AREA:" << areatype  <<"(" << m_Size << ")-->\n";
 #endif
 		switch (m_ProtocolType)
 		{
@@ -945,6 +950,9 @@ int main(int argc, char *argv[])
 			s = "MY11S_PMTMGMP-mp-report-" + s + ".xml";
 			remove(s.c_str());
 		}
+		remove("1_HWMP_PDF.txt");
+		remove("1_HWMP_Delay.txt");
+		remove("1_HWMP_Throu.txt");
 #endif
 #ifdef TEST_ALL
 #ifdef TEST_SIDE_ALL
