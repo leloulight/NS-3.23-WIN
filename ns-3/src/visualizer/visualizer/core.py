@@ -680,6 +680,13 @@ class Visualizer(gobject.GObject):
         hbox.pack_start(zoom, False, False, 4)
         _zoom_changed(zoom_adj)
 
+        ##PMTMGMP_UNUSED_MY_CODE
+        self.checkbox = gtk.CheckButton("Show Origin Arrow")
+        self.checkbox.show()
+        self.checkbox.set_active(False)
+        hbox.pack_start(self.checkbox, False, False, 4)
+        ####
+
         # speed
         ##PMTMGMP_UNUSED_MY_CODE
         speed_adj = gtk.Adjustment(1.0, 0.01, 10.0, 0.02, 1.0, 0)
@@ -966,66 +973,126 @@ class Visualizer(gobject.GObject):
                 count += 1
                 transmissions_average[key] = rx_bytes, count
 
+        ##PMTMGMP_UNUSED_MY_CODE
+        # old_arrows = self._transmission_arrows
+        # for arrow, label in old_arrows:
+        #     arrow.set_property("visibility", goocanvas.ITEM_HIDDEN)
+        #     label.set_property("visibility", goocanvas.ITEM_HIDDEN)
+        # new_arrows = []
+        #
+        # k = self.node_size_adjustment.value/5
+        #
+        # for (transmitter_id, receiver_id), (rx_bytes, rx_count) in transmissions_average.iteritems():
+        #     transmitter = self.get_node(transmitter_id)
+        #     receiver = self.get_node(receiver_id)
+        #     try:
+        #         arrow, label = old_arrows.pop()
+        #     except IndexError:
+        #         arrow = goocanvas.Polyline(line_width=2.0, stroke_color_rgba=0x00C000C0, close_path=False, end_arrow=True)
+        #         arrow.set_property("parent", self.canvas.get_root_item())
+        #         arrow.props.pointer_events = 0
+        #         arrow.raise_(None)
+        #
+        #         label = goocanvas.Text(parent=self.canvas.get_root_item(), pointer_events=0)
+        #         label.raise_(None)
+        #
+        #     arrow.set_property("visibility", goocanvas.ITEM_VISIBLE)
+        #     line_width = max(0.1, math.log(float(rx_bytes)/rx_count/self.sample_period)*k)
+        #     arrow.set_property("line-width", line_width)
+        #
+        #     pos1_x, pos1_y = transmitter.get_position()
+        #     pos2_x, pos2_y = receiver.get_position()
+        #     points = goocanvas.Points([(pos1_x, pos1_y), (pos2_x, pos2_y)])
+        #     arrow.set_property("points", points)
+        #
+        #     kbps = float(rx_bytes*8)/1e3/rx_count/self.sample_period
+        #     label.set_properties(visibility=goocanvas.ITEM_VISIBLE_ABOVE_THRESHOLD,
+        #                          visibility_threshold=0.5,
+        #                          font=("Sans Serif %f" % int(1+BITRATE_FONT_SIZE*k)))
+        #     angle = math.atan2((pos2_y - pos1_y), (pos2_x - pos1_x))
+        #     if -PI_OVER_2 <= angle <= PI_OVER_2:
+        #         label.set_properties(text=("%.2f kbit/s →" % (kbps,)),
+        #                              alignment=pango.ALIGN_CENTER,
+        #                              anchor=gtk.ANCHOR_S,
+        #                              x=0, y=-line_width/2)
+        #         M = cairo.Matrix()
+        #         M.translate(*self._get_label_over_line_position(pos1_x, pos1_y, pos2_x, pos2_y))
+        #         M.rotate(angle)
+        #         label.set_transform(M)
+        #     else:
+        #         label.set_properties(text=("← %.2f kbit/s" % (kbps,)),
+        #                              alignment=pango.ALIGN_CENTER,
+        #                              anchor=gtk.ANCHOR_N,
+        #                              x=0, y=line_width/2)
+        #         M = cairo.Matrix()
+        #         M.translate(*self._get_label_over_line_position(pos1_x, pos1_y, pos2_x, pos2_y))
+        #         M.rotate(angle)
+        #         M.scale(-1, -1)
+        #         label.set_transform(M)
+        #
+        #     new_arrows.append((arrow, label))
+        #
+        # self._transmission_arrows = new_arrows + old_arrows
         old_arrows = self._transmission_arrows
         for arrow, label in old_arrows:
             arrow.set_property("visibility", goocanvas.ITEM_HIDDEN)
             label.set_property("visibility", goocanvas.ITEM_HIDDEN)
         new_arrows = []
+        if (self.checkbox.get_active()):
+            k = self.node_size_adjustment.value/5
 
-        k = self.node_size_adjustment.value/5
+            for (transmitter_id, receiver_id), (rx_bytes, rx_count) in transmissions_average.iteritems():
+                transmitter = self.get_node(transmitter_id)
+                receiver = self.get_node(receiver_id)
+                try:
+                    arrow, label = old_arrows.pop()
+                except IndexError:
+                    arrow = goocanvas.Polyline(line_width=2.0, stroke_color_rgba=0x00C000C0, close_path=False, end_arrow=True)
+                    arrow.set_property("parent", self.canvas.get_root_item())
+                    arrow.props.pointer_events = 0
+                    arrow.raise_(None)
 
-        for (transmitter_id, receiver_id), (rx_bytes, rx_count) in transmissions_average.iteritems():
-            transmitter = self.get_node(transmitter_id)
-            receiver = self.get_node(receiver_id)
-            try:
-                arrow, label = old_arrows.pop()
-            except IndexError:
-                arrow = goocanvas.Polyline(line_width=2.0, stroke_color_rgba=0x00C000C0, close_path=False, end_arrow=True)
-                arrow.set_property("parent", self.canvas.get_root_item())
-                arrow.props.pointer_events = 0
-                arrow.raise_(None)
-                
-                label = goocanvas.Text(parent=self.canvas.get_root_item(), pointer_events=0)
-                label.raise_(None)
+                    label = goocanvas.Text(parent=self.canvas.get_root_item(), pointer_events=0)
+                    label.raise_(None)
 
-            arrow.set_property("visibility", goocanvas.ITEM_VISIBLE)
-            line_width = max(0.1, math.log(float(rx_bytes)/rx_count/self.sample_period)*k)
-            arrow.set_property("line-width", line_width)
+                arrow.set_property("visibility", goocanvas.ITEM_VISIBLE)
+                line_width = max(0.1, math.log(float(rx_bytes)/rx_count/self.sample_period)*k)
+                arrow.set_property("line-width", line_width)
 
-            pos1_x, pos1_y = transmitter.get_position()
-            pos2_x, pos2_y = receiver.get_position()
-            points = goocanvas.Points([(pos1_x, pos1_y), (pos2_x, pos2_y)])
-            arrow.set_property("points", points)
+                pos1_x, pos1_y = transmitter.get_position()
+                pos2_x, pos2_y = receiver.get_position()
+                points = goocanvas.Points([(pos1_x, pos1_y), (pos2_x, pos2_y)])
+                arrow.set_property("points", points)
 
-            kbps = float(rx_bytes*8)/1e3/rx_count/self.sample_period
-            label.set_properties(visibility=goocanvas.ITEM_VISIBLE_ABOVE_THRESHOLD,
-                                 visibility_threshold=0.5,
-                                 font=("Sans Serif %f" % int(1+BITRATE_FONT_SIZE*k)))
-            angle = math.atan2((pos2_y - pos1_y), (pos2_x - pos1_x))
-            if -PI_OVER_2 <= angle <= PI_OVER_2:
-                label.set_properties(text=("%.2f kbit/s →" % (kbps,)),
-                                     alignment=pango.ALIGN_CENTER,
-                                     anchor=gtk.ANCHOR_S,
-                                     x=0, y=-line_width/2)
-                M = cairo.Matrix()
-                M.translate(*self._get_label_over_line_position(pos1_x, pos1_y, pos2_x, pos2_y))
-                M.rotate(angle)
-                label.set_transform(M)
-            else:
-                label.set_properties(text=("← %.2f kbit/s" % (kbps,)),
-                                     alignment=pango.ALIGN_CENTER,
-                                     anchor=gtk.ANCHOR_N,
-                                     x=0, y=line_width/2)
-                M = cairo.Matrix()
-                M.translate(*self._get_label_over_line_position(pos1_x, pos1_y, pos2_x, pos2_y))
-                M.rotate(angle)
-                M.scale(-1, -1)
-                label.set_transform(M)
+                kbps = float(rx_bytes*8)/1e3/rx_count/self.sample_period
+                label.set_properties(visibility=goocanvas.ITEM_VISIBLE_ABOVE_THRESHOLD,
+                                     visibility_threshold=0.5,
+                                     font=("Sans Serif %f" % int(1+BITRATE_FONT_SIZE*k)))
+                angle = math.atan2((pos2_y - pos1_y), (pos2_x - pos1_x))
+                if -PI_OVER_2 <= angle <= PI_OVER_2:
+                    label.set_properties(text=("%.2f kbit/s →" % (kbps,)),
+                                         alignment=pango.ALIGN_CENTER,
+                                         anchor=gtk.ANCHOR_S,
+                                         x=0, y=-line_width/2)
+                    M = cairo.Matrix()
+                    M.translate(*self._get_label_over_line_position(pos1_x, pos1_y, pos2_x, pos2_y))
+                    M.rotate(angle)
+                    label.set_transform(M)
+                else:
+                    label.set_properties(text=("← %.2f kbit/s" % (kbps,)),
+                                         alignment=pango.ALIGN_CENTER,
+                                         anchor=gtk.ANCHOR_N,
+                                         x=0, y=line_width/2)
+                    M = cairo.Matrix()
+                    M.translate(*self._get_label_over_line_position(pos1_x, pos1_y, pos2_x, pos2_y))
+                    M.rotate(angle)
+                    M.scale(-1, -1)
+                    label.set_transform(M)
 
-            new_arrows.append((arrow, label))
-            
-        self._transmission_arrows = new_arrows + old_arrows
+                new_arrows.append((arrow, label))
 
+            self._transmission_arrows = new_arrows + old_arrows
+        ####
 
     def _update_drops_view(self):
         drops_average = {}
