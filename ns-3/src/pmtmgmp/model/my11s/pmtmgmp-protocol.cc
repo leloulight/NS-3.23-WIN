@@ -206,7 +206,7 @@ namespace ns3 {
 					)
 				.AddAttribute("My11WmnPMTGMGMPpgerWaitTime",
 					"Delay time of waiting for receive PGER",
-					TimeValue(MicroSeconds(1024 * 2000)),
+					TimeValue(MicroSeconds(1024 * 6000)),
 					MakeTimeAccessor(
 						&PmtmgmpProtocol::m_My11WmnPMTMGMPpgerWaitTime),
 					MakeTimeChecker()
@@ -286,7 +286,7 @@ namespace ns3 {
 			m_My11WmnPMTMGMPsecInterval(MicroSeconds(1024 * 40000)),
 			m_My11WmnPMTMGMPsecSetTime(MicroSeconds(1024 * 2000)),
 			m_My11WmnPMTMGMPpgerWaitTime(MicroSeconds(1024 * 2000)),
-			m_My11WmnPMTMGMPpathMetricUpdatePeriod(MicroSeconds(1024 * 4000)),
+			m_My11WmnPMTMGMPpathMetricUpdatePeriod(MicroSeconds(1024 * 6000)),
 			m_PathGenerationSeqNumber(0),
 			m_PMTMGMPmterpAALMmagnification(3),
 			m_PMTMGMPmsecpAALMmagnification(2),
