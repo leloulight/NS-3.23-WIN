@@ -213,7 +213,7 @@ namespace ns3 {
 					)
 				.AddAttribute("My11WmnPMTMGMPpathMetricUpdatePeriod",
 					"Period for Update the Metric of Route Path, also the Period for PUDP",
-					TimeValue(MicroSeconds(1024 * 4000)),
+					TimeValue(MicroSeconds(1024 * 2000)),
 					MakeTimeAccessor(
 						&PmtmgmpProtocol::m_My11WmnPMTMGMPpathMetricUpdatePeriod),
 					MakeTimeChecker()
