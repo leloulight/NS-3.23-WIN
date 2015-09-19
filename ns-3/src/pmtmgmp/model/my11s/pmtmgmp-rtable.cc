@@ -1070,7 +1070,7 @@ namespace ns3 {
 			return true;
 		}
 		////发送列队的Packet
-		void PmtmgmpRouteTable::SendQueuePackets(Mac48Address dst, PmtmgmpProtocol::Statistics * stats)
+		void PmtmgmpRouteTable::SendQueuePackets(Mac48Address dst, PmtmgmpProtocol::Statistics * stats, std::map<Mac48Address, uint32_t> *packetSizePerPath)
 		{
 			std::map<Mac48Address, std::vector<PmtmgmpRouteQueuedPacket> >::iterator iter = m_packets.find(dst);
 			if (iter == m_packets.end())
@@ -1084,14 +1084,23 @@ namespace ns3 {
 				return;
 			}
 			std::vector<PmtmgmpRouteQueuedPacket> packetList = iter->second;
+			if (packetSizePerPath->find(next->GetMTERPaddress()) == packetSizePerPath->end())
+			{
+				(*packetSizePerPath)[next->GetMTERPaddress()] = 0;
+			}
 			for (std::vector<PmtmgmpRouteQueuedPacket>::iterator select = packetList.begin(); select != packetList.end(); select++)
 			{
 				PmtmgmpTag tag;
 				select->pkt->RemovePacketTag(tag);
 				tag.SetAddress(next->GetFromNode());
+				if (next->GetMSECPindex() != tag.GetMSECPindex())
+				{
+					tag.IncreaseChange();
+				}
 				select->pkt->AddPacketTag(tag);
 				stats->txUnicast++;
 				stats->txBytes += select->pkt->GetSize();
+				(*packetSizePerPath)[next->GetMTERPaddress()] += select->pkt->GetSize();
 				select->reply(true, select->pkt, select->src, select->dst, select->protocol, next->GetInterface());
 			}
 		}

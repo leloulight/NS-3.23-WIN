@@ -206,14 +206,14 @@ namespace ns3 {
 					)
 				.AddAttribute("My11WmnPMTGMGMPpgerWaitTime",
 					"Delay time of waiting for receive PGER",
-					TimeValue(MicroSeconds(1024 * 6000)),
+					TimeValue(MicroSeconds(1024 * 2000)),
 					MakeTimeAccessor(
 						&PmtmgmpProtocol::m_My11WmnPMTMGMPpgerWaitTime),
 					MakeTimeChecker()
 					)
 				.AddAttribute("My11WmnPMTMGMPpathMetricUpdatePeriod",
 					"Period for Update the Metric of Route Path, also the Period for PUDP",
-					TimeValue(MicroSeconds(1024 * 2000)),
+					TimeValue(MicroSeconds(1024 * 6000)),
 					MakeTimeAccessor(
 						&PmtmgmpProtocol::m_My11WmnPMTMGMPpathMetricUpdatePeriod),
 					MakeTimeChecker()
@@ -525,7 +525,9 @@ namespace ns3 {
 			else
 			{
 #ifdef PMTMGMP_TAG_INFOR_ATTACH
-				NS_LOG_DEBUG("Receive Packet at " << m_address << " from " << source << " to " << destination << " while tag index is " << tag.GetSendIndex());
+				NS_LOG_DEBUG("Receive Packet at " << m_address << " from " << source << " to " << destination << " while tag is (Address:" << tag.GetAddress() << ", SN:" << tag.GetSeqno() << ", MSECPindex:" << (uint32_t)tag.GetMSECPindex() << ", TTL:" << (uint32_t)tag.GetTtl() << ", Change:" << (uint32_t)tag.GetChangePath() << ", Index:" << (uint32_t)tag.GetSendIndex() << ")");
+#else
+				NS_LOG_DEBUG("Receive Packet at " << m_address << " from " << source << " to " << destination << " while tag is (Address:" << tag.GetAddress() << ", SN:" << tag.GetSeqno() << ", MSECPindex:" << (uint32_t)tag.GetMSECPindex() << ", TTL:" << (uint32_t)tag.GetTtl() << ", Change:" << (uint32_t)tag.GetChangePath() << ")");
 #endif
 				//return ForwardUnicast(sourceIface, source, destination, packet, protocolType, routeReply, tag.GetTtl());
 				Ptr<PmtmgmpRoutePath> next;
@@ -542,20 +544,31 @@ namespace ns3 {
 				else
 				{
 					next = m_RouteTable->GetBestRoutePathForData(destination, tag.GetMSECPindex());
-					tag.IncreaseChange();
 				}
 				if (next != 0)
 				{
+					if (next->GetMSECPindex() != tag.GetMSECPindex())
+					{
+						tag.IncreaseChange();
+					}
 					tag.SetAddress(next->GetFromNode());
 					tag.SetMSECPindex(next->GetMSECPindex());
 					packet->AddPacketTag(tag);
 
-					NS_LOG_DEBUG("Get next hop " << next->GetFromNode() << " at " << m_address << " from " << source << " to " << destination << " ,Path Status is " << next->GetPmtmgmpPeerLinkStatus() << ", Path Change is " << (uint32_t) tag.GetChangePath());
+					NS_LOG_DEBUG("Get next hop " << next->GetFromNode() << " at " << m_address << " from " << source << " to " << destination << " ,Path Status is " << next->GetPmtmgmpPeerLinkStatus() << ", Path Change is " << (uint32_t) tag.GetChangePath() << ", Hopcount is " << (uint32_t)(m_maxTtl - tag.GetTtl()) << ", Packet is " << packet);
 
 					// reply immediately :
 					routeReply(true, packet, source, destination, protocolType, next->GetInterface());
 					m_stats.txUnicast++;
 					m_stats.txBytes += packet->GetSize();
+					if (m_PacketSizePerPath.find(destination) == m_PacketSizePerPath.end())
+					{
+						m_PacketSizePerPath[destination] = packet->GetSize();
+					}
+					else
+					{
+						m_PacketSizePerPath[destination] += packet->GetSize();
+					}
 					return true;
 				}
 
@@ -1006,9 +1019,13 @@ namespace ns3 {
 		{
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			m_RouteTable->SetPathPeerLinkStatus(wmnPointAddress, peerAddress, status);
-			if (status == true)
+			if (status)
 			{
-				//m_RouteTable->SendQueuePackets()
+				NS_LOG_DEBUG("Status of PeerLink to " << peerAddress << " is True at " << m_address);
+			}
+			else
+			{
+				NS_LOG_DEBUG("Status of PeerLink to " << peerAddress << " is False at " << m_address);
 			}
 #else
 			if (status)
@@ -1623,6 +1640,11 @@ namespace ns3 {
 			}
 			return 1;
 		}
+		////获取每个发送数据帧的路径发送的数据量
+		std::map<Mac48Address, uint32_t> PmtmgmpProtocol::GetPacketSizePerPath()
+		{
+			return m_PacketSizePerPath;
+		}
 		////验证协议所属结点是否为终端节点MTERP
 		bool PmtmgmpProtocol::IsMTERP()
 		{
@@ -1800,7 +1822,7 @@ namespace ns3 {
 				routeTree->RepeatabilityIncrease(from);
 
 				////发送列队的数据
-				m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats);
+				m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats, &m_PacketSizePerPath);
 			}
 			else
 			{
@@ -1815,7 +1837,7 @@ namespace ns3 {
 					routeTree->RepeatabilityIncrease(from);
 
 					////发送列队的数据
-					m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats);
+					m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats, &m_PacketSizePerPath);
 				}
 				else if (GenSeqNum == routeTree->GetTreeMaxGenerationSeqNumber())
 				{
@@ -1835,7 +1857,7 @@ namespace ns3 {
 							routeTree->RepeatabilityIncrease(from);
 
 							////发送列队的数据
-							m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats);
+							m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats, &m_PacketSizePerPath);
 						}
 						else
 						{
@@ -1847,7 +1869,7 @@ namespace ns3 {
 								routeTree->AddNewPath(pathCopy);
 
 								////发送列队的数据
-								m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats);
+								m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats, &m_PacketSizePerPath);
 							}
 							else
 							{
@@ -1930,7 +1952,7 @@ namespace ns3 {
 					return;
 				}
 			}
-			m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats);
+			m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats, &m_PacketSizePerPath);
 			if (pathCopy->GetTTL() > 0)
 			{
 				////转发PGEN
@@ -2001,12 +2023,12 @@ namespace ns3 {
 						find->SetMetric(select->GetMetric());
 						find->IncrementMetric(metric, GetValueMForAALM());
 						NS_LOG_DEBUG("PUPD  Infor: MTERP(" << mterp << "),MSECPindex(" << uint32_t(select->GetMSECPindex()) << "), Metric(From " << old << " to " << find->GetMetric() << " , Base:" << find->GetBaseMetric() << " Step:" << metric << ")");
-						m_RouteTable->SendQueuePackets(find->GetMTERPaddress(), &m_stats);
+						m_RouteTable->SendQueuePackets(find->GetMTERPaddress(), &m_stats, &m_PacketSizePerPath);
 					}
 					else
 					{
 						////路由表中存在指定路由路径且并非来自于PUPD的发送者，不做任何事情
-						m_RouteTable->SendQueuePackets(find->GetMTERPaddress(), &m_stats);
+						m_RouteTable->SendQueuePackets(find->GetMTERPaddress(), &m_stats, &m_PacketSizePerPath);
 						continue;
 					}
 				}

@@ -630,6 +630,7 @@ def register_types_ns3_my11s(module):
     module.add_container('std::vector< ns3::my11s::PUPDaalmPathData >', 'ns3::my11s::PUPDaalmPathData', container_type=u'vector')
     module.add_container('std::vector< ns3::Ptr< ns3::my11s::PmtmgmpPeerLink > >', 'ns3::Ptr< ns3::my11s::PmtmgmpPeerLink >', container_type=u'vector')
     module.add_container('std::vector< ns3::Mac48Address >', 'ns3::Mac48Address', container_type=u'vector')
+    module.add_container('std::map< ns3::Mac48Address, unsigned int >', ('ns3::Mac48Address', 'unsigned int'), container_type=u'map')
     module.add_container('std::vector< ns3::Ptr< ns3::my11s::PmtmgmpRoutePath > >', 'ns3::Ptr< ns3::my11s::PmtmgmpRoutePath >', container_type=u'vector')
     module.add_container('std::vector< ns3::Ptr< ns3::my11s::PmtmgmpRouteTree > >', 'ns3::Ptr< ns3::my11s::PmtmgmpRouteTree >', container_type=u'vector')
     module.add_container('std::vector< std::pair< unsigned int, ns3::Mac48Address > >', 'std::pair< unsigned int, ns3::Mac48Address >', container_type=u'vector')
@@ -12616,6 +12617,10 @@ def register_Ns3My11sPmtmgmpProtocol_methods(root_module, cls):
     cls.add_method('GetNodeType', 
                    'ns3::my11s::PmtmgmpProtocol::NodeType', 
                    [])
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): std::map<ns3::Mac48Address, unsigned int, std::less<ns3::Mac48Address>, std::allocator<std::pair<ns3::Mac48Address const, unsigned int> > > ns3::my11s::PmtmgmpProtocol::GetPacketSizePerPath() [member function]
+    cls.add_method('GetPacketSizePerPath', 
+                   'std::map< ns3::Mac48Address, unsigned int >', 
+                   [])
     ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::Ptr<ns3::my11s::PmtmgmpRouteTable> ns3::my11s::PmtmgmpProtocol::GetPmtmgmpRouteTable() [member function]
     cls.add_method('GetPmtmgmpRouteTable', 
                    'ns3::Ptr< ns3::my11s::PmtmgmpRouteTable >', 
@@ -13072,10 +13077,10 @@ def register_Ns3My11sPmtmgmpRouteTable_methods(root_module, cls):
     cls.add_method('SelectMSECP', 
                    'void', 
                    [])
-    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRouteTable::SendQueuePackets(ns3::Mac48Address dst, ns3::my11s::PmtmgmpProtocol::Statistics * stats) [member function]
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRouteTable::SendQueuePackets(ns3::Mac48Address dst, ns3::my11s::PmtmgmpProtocol::Statistics * stats, std::map<ns3::Mac48Address, unsigned int, std::less<ns3::Mac48Address>, std::allocator<std::pair<ns3::Mac48Address const, unsigned int> > > * packetSizePerPath) [member function]
     cls.add_method('SendQueuePackets', 
                    'void', 
-                   [param('ns3::Mac48Address', 'dst'), param('ns3::my11s::PmtmgmpProtocol::Statistics *', 'stats')])
+                   [param('ns3::Mac48Address', 'dst'), param('ns3::my11s::PmtmgmpProtocol::Statistics *', 'stats'), param('std::map< ns3::Mac48Address, unsigned int > *', 'packetSizePerPath')])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): void ns3::my11s::PmtmgmpRouteTable::SetMTERPgenerationSeqNumber(uint32_t gsn) [member function]
     cls.add_method('SetMTERPgenerationSeqNumber', 
                    'void', 

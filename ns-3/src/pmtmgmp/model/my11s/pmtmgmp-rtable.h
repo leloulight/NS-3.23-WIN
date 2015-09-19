@@ -341,7 +341,7 @@ namespace ns3 {
 			bool AddPacketToQueue(Ptr<Packet> pkt, Mac48Address src, Mac48Address dst, uint16_t protocol, uint32_t inInterface, PmtmgmpProtocol::RouteReplyCallback reply);
 
 			////发送列队的Packet
-			void SendQueuePackets(Mac48Address dst, PmtmgmpProtocol::Statistics *stats);
+			void SendQueuePackets(Mac48Address dst, PmtmgmpProtocol::Statistics *stats, std::map<Mac48Address, uint32_t> *packetSizePerPath);
 
 			////设置路径链接状态
 			void SetPathPeerLinkStatus(Mac48Address mterp, Mac48Address from, bool status);

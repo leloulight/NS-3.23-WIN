@@ -153,6 +153,9 @@ namespace ns3 {
 			NodeType GetNodeType();
 			////获取AALM技术时采用的m的值
 			uint8_t GetValueMForAALM();
+
+			////获取每个发送数据帧的路径发送的数据量
+			std::map<Mac48Address, uint32_t> GetPacketSizePerPath();
 #endif
 
 		private:
@@ -422,6 +425,8 @@ namespace ns3 {
 #ifdef PMTMGMP_TAG_INFOR_ATTACH
 			uint32_t m_SendIndex;
 #endif
+			////每个发送数据帧的路径发送的数据量
+			std::map<Mac48Address, uint32_t> m_PacketSizePerPath;
 #endif
 		};
 	} // namespace my11s

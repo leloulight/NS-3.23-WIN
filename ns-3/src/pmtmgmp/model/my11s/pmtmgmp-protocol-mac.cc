@@ -97,7 +97,6 @@ namespace ns3 {
 				NS_FATAL_ERROR(
 					"6-address scheme is not yet supported and 4-address extension is not supposed to be used for data frames.");
 			}
-			////PmtmgmpTagÈ¥³ýseqnoÊôÐÔ
 			tag.SetSeqno(wmnHdr.GetWmnSeqno());
 			tag.SetTtl(wmnHdr.GetWmnTtl());
 			packet->AddPacketTag(tag);
