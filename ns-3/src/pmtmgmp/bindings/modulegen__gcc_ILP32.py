@@ -13017,6 +13017,10 @@ def register_Ns3My11sPmtmgmpRouteTable_methods(root_module, cls):
                    'ns3::Mac48Address', 
                    [], 
                    is_const=True)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> ns3::my11s::PmtmgmpRouteTable::GetNearestRoutePathForData(ns3::Mac48Address mterp) [member function]
+    cls.add_method('GetNearestRoutePathForData', 
+                   'ns3::Ptr< ns3::my11s::PmtmgmpRoutePath >', 
+                   [param('ns3::Mac48Address', 'mterp')])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): uint8_t ns3::my11s::PmtmgmpRouteTable::GetNextMSECPindex() [member function]
     cls.add_method('GetNextMSECPindex', 
                    'uint8_t', 
@@ -13142,6 +13146,10 @@ def register_Ns3My11sPmtmgmpRouteTree_methods(root_module, cls):
                    'ns3::Mac48Address', 
                    [], 
                    is_const=True)
+    ## pmtmgmp-rtable.h (module 'pmtmgmp'): ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> ns3::my11s::PmtmgmpRouteTree::GetNearestRoutePathForData() [member function]
+    cls.add_method('GetNearestRoutePathForData', 
+                   'ns3::Ptr< ns3::my11s::PmtmgmpRoutePath >', 
+                   [])
     ## pmtmgmp-rtable.h (module 'pmtmgmp'): std::vector<ns3::Ptr<ns3::my11s::PmtmgmpRoutePath>, std::allocator<ns3::Ptr<ns3::my11s::PmtmgmpRoutePath> > > ns3::my11s::PmtmgmpRouteTree::GetPartTree() [member function]
     cls.add_method('GetPartTree', 
                    'std::vector< ns3::Ptr< ns3::my11s::PmtmgmpRoutePath > >', 

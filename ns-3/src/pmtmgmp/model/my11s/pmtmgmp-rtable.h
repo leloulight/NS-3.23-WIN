@@ -213,9 +213,10 @@ namespace ns3 {
 			bool RouteTreeInforLifeCheck(Ptr<PmtmgmpRouteTable> table);
 
 			////数据传输最优路径获取
-			Ptr<PmtmgmpRoutePath> GetBestRoutePathForData(uint8_t index);
+			Ptr<PmtmgmpRoutePath> GetBestRoutePathForData(uint8_t index); 
 			std::vector<Ptr<PmtmgmpRoutePath> >::iterator GetBestRoutePathForData();
 			std::vector<Ptr<PmtmgmpRoutePath> >::iterator GetBestMSECPpath();
+			Ptr<PmtmgmpRoutePath> GetNearestRoutePathForData();
 
 			////设置路径链接状态
 			void SetPathPeerLinkStatus(Mac48Address from, bool status);
@@ -336,6 +337,7 @@ namespace ns3 {
 
 			////数据传输最优路径获取
 			Ptr<PmtmgmpRoutePath> GetBestRoutePathForData(Mac48Address mterp, uint8_t index);
+			Ptr<PmtmgmpRoutePath> GetNearestRoutePathForData(Mac48Address mterp);
 
 			////添加Packet数据
 			bool AddPacketToQueue(Ptr<Packet> pkt, Mac48Address src, Mac48Address dst, uint16_t protocol, uint32_t inInterface, PmtmgmpProtocol::RouteReplyCallback reply);

@@ -384,7 +384,7 @@ namespace ns3 {
 			m_tree(std::vector<Ptr<PmtmgmpRoutePath> >()),
 			m_MSECPnumForMTERP(4),
 			m_AcceptInformaitonDelay(MicroSeconds(1024 * 1500)),
-			m_NotSelectBestRoutePathRate(5)
+			m_NotSelectBestRoutePathRate(3)
 		{
 		}
 
@@ -413,7 +413,7 @@ namespace ns3 {
 					)
 				.AddAttribute("NotSelectBestRoutePathRate",
 					"The rate for compare selected path and the best Metric path.",
-					DoubleValue(5),
+					DoubleValue(3),
 					MakeUintegerAccessor(
 						&PmtmgmpRouteTree::m_NotSelectBestRoutePathRate),
 					MakeUintegerChecker<double>(0)
@@ -693,7 +693,7 @@ namespace ns3 {
 			std::vector<Ptr<PmtmgmpRoutePath> >::iterator path = m_tree.begin();
 			for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin() + 1; iter != m_tree.end(); iter++)
 			{
-				if ((*path)->DataSendRoutePathMetricCompare(*iter) && (*path)->GetPmtmgmpPeerLinkStatus() == true)
+				if ((*path)->DataSendRoutePathMetricCompare(*iter) && (*iter)->GetPmtmgmpPeerLinkStatus() == true)
 				{
 					path = iter;
 				}
@@ -719,6 +719,26 @@ namespace ns3 {
 				}
 			}
 			return path;
+		}
+		Ptr<PmtmgmpRoutePath> PmtmgmpRouteTree::GetNearestRoutePathForData()
+		{
+			if (m_tree.size() == 0) return 0;
+			std::vector<Ptr<PmtmgmpRoutePath> >::iterator path = m_tree.begin();
+			for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin() + 1; iter != m_tree.end(); iter++)
+			{
+				if ((*path)->GetHopCount() > (*iter)->GetHopCount() && (*iter)->GetPmtmgmpPeerLinkStatus() == true)
+				{
+					path = iter;
+				}
+			}
+			if ((*path)->GetPmtmgmpPeerLinkStatus())
+			{
+				return *path;
+			}
+			else
+			{
+				return 0;
+			}
 		}
 		////设置路径链接状态
 		void PmtmgmpRouteTree::SetPathPeerLinkStatus(Mac48Address from, bool status)
@@ -1039,6 +1059,19 @@ namespace ns3 {
 			else
 			{
 				return (*iter)->GetBestRoutePathForData(index);
+			}
+		}
+		Ptr<PmtmgmpRoutePath> PmtmgmpRouteTable::GetNearestRoutePathForData(Mac48Address mterp)
+		{
+			if (m_table.size() == 0) return 0;
+			std::vector<Ptr<PmtmgmpRouteTree> >::iterator iter = std::find_if(m_table.begin(), m_table.end(), PmtmgmpRouteTable_Finder(mterp));
+			if (iter == m_table.end())
+			{
+				return 0;
+			}
+			else
+			{
+				return (*iter)->GetNearestRoutePathForData();
 			}
 		}
 		////添加Packet数据

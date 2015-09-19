@@ -533,25 +533,20 @@ namespace ns3 {
 				Ptr<PmtmgmpRoutePath> next;
 				if (tag.GetChangePath() > m_MaxPathChange)
 				{
+					NS_LOG_DEBUG("Reach maximum change, and  can not find Next Hop Node by MSECPindex " << (uint32_t)tag.GetMSECPindex() << " at Node " << m_address);
 					////已到达最大路径转换次数
-					next = m_RouteTable->GetPathByMACindex(destination, tag.GetMSECPindex()); 
-					if (next == 0)
-					{
-						NS_LOG_DEBUG("Reach maximum change, and  can not find Next Hop Node by MSECPindex " << (uint32_t)tag.GetMSECPindex() << " at Node " << m_address);
-						next = m_RouteTable->GetBestRoutePathForData(destination, tag.GetMSECPindex());
-						tag.IncreaseChange();
-					}
+					next = m_RouteTable->GetNearestRoutePathForData(destination);
 				}
 				else
 				{
 					next = m_RouteTable->GetBestRoutePathForData(destination, tag.GetMSECPindex());
-					if (next != 0 && next->GetMSECPindex() != tag.GetMSECPindex())
-					{
-						tag.IncreaseChange();
-					}
 				}
 				if (next != 0)
 				{
+					if (next->GetMSECPindex() != tag.GetMSECPindex())
+					{
+						tag.IncreaseChange();
+					}
 					tag.SetAddress(next->GetFromNode());
 					tag.SetMSECPindex(next->GetMSECPindex());
 					packet->AddPacketTag(tag);

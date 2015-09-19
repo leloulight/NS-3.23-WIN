@@ -55,7 +55,7 @@
 #define TEST_ALL
 
 //测试不同边界
-//#define TEST_SIDE_ALL
+#define TEST_SIDE_ALL
 
 // 随机应用总数
 #define TEST_SET_COUNT 4
@@ -962,44 +962,7 @@ int main(int argc, char *argv[])
 			MeshRouteClass pmtmgmp;
 			pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, apps, totalTime, TEST_SET_AREA, i, i - 2, TEST_SET_APP);
 			pmtmgmp.Run();
-		}
-		NS_LOG_INFO("\n");
-		for (int i = TEST_SET_MIN_SIZE; i <= TEST_SET_MAX_SIZE; i++)
-		{
-			vector<NodeApplicationInfor> apps;
-			int nodeCount;
-			switch (TEST_SET_AREA)
-			{
-			case MeshRouteClass::SQUARE:
-				nodeCount = i * i;
-				break;
-			case MeshRouteClass::HEXAGON:
-				nodeCount = 3 * (i - 1) * i + 1;
-				break;
-			default:
-				break;
-			}
-
-			Ptr<UniformRandomVariable> randNodes = CreateObject<UniformRandomVariable>();
-			randNodes->SetAttribute("Min", DoubleValue(0));
-			randNodes->SetAttribute("Max", DoubleValue(nodeCount - 1));
-
-			Ptr<UniformRandomVariable> randTime = CreateObject<UniformRandomVariable>();
-
-			for (int j = 0; j < TEST_SET_COUNT; j++)
-			{
-				double startTime = TEST_SET_INTERVAL * j + randTime->GetValue(0, TEST_SET_RANDOM);
-				uint32_t src = randNodes->GetInteger();
-				uint32_t dst;
-				do
-				{
-					dst = randNodes->GetInteger();
-				} while (dst == src);
-				NodeApplicationInfor newApp = { src, dst, startTime, startTime + TEST_SET_LIFE };
-				apps.push_back(newApp);
-			}
-
-			totalTime = (TEST_SET_COUNT - 1) * TEST_SET_INTERVAL + TEST_SET_LIFE + TEST_SET_RANDOM;
+			NS_LOG_INFO("\n");
 			NS_LOG_INFO("=============================");
 			NS_LOG_INFO("PROTOCOL :DOT11S_HWMP   SIZE :" << i);
 			NS_LOG_INFO("=============================");
@@ -1068,17 +1031,15 @@ int main(int argc, char *argv[])
 			MeshRouteClass pmtmgmp;
 			pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, TEST_SET_AREA, i, i - 2, TEST_SET_APP);
 			pmtmgmp.Run();
-		};
-		for (int i = TEST_SET_MIN_SIZE; i <= TEST_SET_MAX_SIZE; i++)
-		{
+			NS_LOG_INFO("\n");
 			NS_LOG_INFO("=============================");
 			NS_LOG_INFO("PROTOCOL :DOT11S_HWMP   SIZE :" << i);
 			NS_LOG_INFO("=============================");
 			MeshRouteClass mesh;
 			mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, TEST_SET_AREA, i, i - 2, TEST_SET_APP);
 			mesh.Run();
+			NS_LOG_INFO("\n");
 		};
-		NS_LOG_INFO("\n");
 #else
 		MeshRouteClass pmtmgmp;
 		pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
