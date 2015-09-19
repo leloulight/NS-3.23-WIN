@@ -534,9 +534,10 @@ namespace ns3 {
 				if (tag.GetChangePath() > m_MaxPathChange)
 				{
 					////已到达最大路径转换次数
-					next = m_RouteTable->GetPathByMACindex(destination, tag.GetMSECPindex());
+					next = m_RouteTable->GetPathByMACindex(destination, tag.GetMSECPindex()); 
 					if (next == 0)
 					{
+						NS_LOG_DEBUG("Reach maximum change, and  can not find Next Hop Node by MSECPindex " << (uint32_t)tag.GetMSECPindex() << " at Node " << m_address);
 						next = m_RouteTable->GetBestRoutePathForData(destination, tag.GetMSECPindex());
 						tag.IncreaseChange();
 					}
@@ -544,18 +545,18 @@ namespace ns3 {
 				else
 				{
 					next = m_RouteTable->GetBestRoutePathForData(destination, tag.GetMSECPindex());
-				}
-				if (next != 0)
-				{
-					if (next->GetMSECPindex() != tag.GetMSECPindex())
+					if (next != 0 && next->GetMSECPindex() != tag.GetMSECPindex())
 					{
 						tag.IncreaseChange();
 					}
+				}
+				if (next != 0)
+				{
 					tag.SetAddress(next->GetFromNode());
 					tag.SetMSECPindex(next->GetMSECPindex());
 					packet->AddPacketTag(tag);
 
-					NS_LOG_DEBUG("Get next hop " << next->GetFromNode() << " at " << m_address << " from " << source << " to " << destination << " ,Path Status is " << next->GetPmtmgmpPeerLinkStatus() << ", Path Change is " << (uint32_t) tag.GetChangePath() << ", Hopcount is " << (uint32_t)(m_maxTtl - tag.GetTtl()) << ", Packet is " << packet);
+					NS_LOG_DEBUG("Get next hop " << next->GetFromNode() << " at " << m_address << " from " << source << " to " << destination << " as MSECPindex: " << (uint32_t)next->GetMSECPindex() << " ,Path Status is " << next->GetPmtmgmpPeerLinkStatus() << ", Path Change is " << (uint32_t) tag.GetChangePath() << ", Hopcount is " << (uint32_t)(m_maxTtl - tag.GetTtl()) << ", Packet is " << packet);
 
 					// reply immediately :
 					routeReply(true, packet, source, destination, protocolType, next->GetInterface());

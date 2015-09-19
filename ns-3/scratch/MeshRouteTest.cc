@@ -55,7 +55,7 @@
 #define TEST_ALL
 
 //测试不同边界
-#define TEST_SIDE_ALL
+//#define TEST_SIDE_ALL
 
 // 随机应用总数
 #define TEST_SET_COUNT 4
@@ -68,7 +68,7 @@
 // 区域形状
 #define TEST_SET_AREA MeshRouteClass::SQUARE
 // 应用布置类型
-#define TEST_SET_APP MeshRouteClass::Random
+#define TEST_SET_APP MeshRouteClass::Multiple
 // 协议
 #define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
 // 区域最大大小

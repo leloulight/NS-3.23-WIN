@@ -38,8 +38,16 @@ namespace ns3 {
 			return tid;
 		}
 		WmnHeader::WmnHeader() :
+#ifndef PMTMGMP_UNUSED_MY_CODE
+#ifndef PMTMGMP_TAG_INFOR_ATTACH
+			m_wmnFlags(0), m_wmnTtl(0), m_wmnSeqno(0), m_addr4(Mac48Address()), m_addr5(Mac48Address()), m_addr6(Mac48Address()), m_MSECPindex(0), m_ChangePath(0)
+#else
+			m_wmnFlags(0), m_wmnTtl(0), m_wmnSeqno(0), m_addr4(Mac48Address()), m_addr5(Mac48Address()), m_addr6(Mac48Address()), m_MSECPindex(0), m_ChangePath(0), m_SendIndex(0)
+#endif
+#else
 			m_wmnFlags(0), m_wmnTtl(0), m_wmnSeqno(0), m_addr4(Mac48Address()), m_addr5(Mac48Address()),
 			m_addr6(Mac48Address())
+#endif
 		{
 		}
 		WmnHeader::~WmnHeader()
@@ -145,6 +153,13 @@ namespace ns3 {
 			{
 				WriteTo(i, m_addr6);
 			}
+#ifndef PMTMGMP_UNUSED_MY_CODE
+			i.WriteU8(m_MSECPindex);
+			i.WriteU8(m_ChangePath);
+#ifdef PMTMGMP_TAG_INFOR_ATTACH
+			i.WriteHtolsbU32(m_SendIndex);
+#endif
+#endif
 		}
 		uint32_t
 			WmnHeader::Deserialize(Buffer::Iterator start)
@@ -167,6 +182,13 @@ namespace ns3 {
 			{
 				ReadFrom(i, m_addr6);
 			}
+#ifndef PMTMGMP_UNUSED_MY_CODE
+			m_MSECPindex = i.ReadU8();
+			m_ChangePath = i.ReadU8();
+#ifdef PMTMGMP_TAG_INFOR_ATTACH
+			m_SendIndex = i.ReadLsbtohU32();
+#endif
+#endif
 			return i.GetDistanceFrom(start);
 		}
 		void

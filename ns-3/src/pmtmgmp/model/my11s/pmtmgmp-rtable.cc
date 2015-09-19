@@ -384,7 +384,7 @@ namespace ns3 {
 			m_tree(std::vector<Ptr<PmtmgmpRoutePath> >()),
 			m_MSECPnumForMTERP(4),
 			m_AcceptInformaitonDelay(MicroSeconds(1024 * 1500)),
-			m_NotSelectBestRoutePathRate(1.5)
+			m_NotSelectBestRoutePathRate(5)
 		{
 		}
 
@@ -413,7 +413,7 @@ namespace ns3 {
 					)
 				.AddAttribute("NotSelectBestRoutePathRate",
 					"The rate for compare selected path and the best Metric path.",
-					DoubleValue(1.5),
+					DoubleValue(5),
 					MakeUintegerAccessor(
 						&PmtmgmpRouteTree::m_NotSelectBestRoutePathRate),
 					MakeUintegerChecker<double>(0)
@@ -741,6 +741,7 @@ namespace ns3 {
 			m_MTERPtree(0),
 			m_MTERPgenerationSeqNumber(0),
 			m_AsMSECPcount(0),
+			m_MSECPindex(0),
 			m_maxQueueSize(255),
 			m_currentQueueSize(0)
 		{
@@ -832,7 +833,6 @@ namespace ns3 {
 		void PmtmgmpRouteTable::ClearMTERProutePath()
 		{
 			m_MTERPgenerationSeqNumber++;
-			m_MSECPindex = 1;
 			////MTERP¬∑”… ˜Œ¥…Ë÷√
 			if (m_MTERPtree == 0) return;
 			std::vector<Ptr<PmtmgmpRouteTree> >::iterator iter = std::find_if(m_table.begin(), m_table.end(), PmtmgmpRouteTable_Finder(m_address));
