@@ -99,6 +99,13 @@ namespace ns3 {
 			}
 			tag.SetSeqno(wmnHdr.GetWmnSeqno());
 			tag.SetTtl(wmnHdr.GetWmnTtl());
+#ifndef PMTMGMP_UNUSED_MY_CODE
+			tag.SetMSECPindex(wmnHdr.GetMSECPindex());
+			tag.SetChangePath(wmnHdr.GetChangePath());
+#ifdef PMTMGMP_TAG_INFOR_ATTACH
+			tag.SetSendIndex(wmnHdr.GetSendIndex());
+#endif
+#endif
 			packet->AddPacketTag(tag);
 			if ((destination == Mac48Address::GetBroadcast()) && (m_protocol->DropDataFrame(wmnHdr.GetWmnSeqno(),
 				source)))
@@ -268,6 +275,13 @@ namespace ns3 {
 			WmnHeader wmnHdr;
 			wmnHdr.SetWmnSeqno(tag.GetSeqno());
 			wmnHdr.SetWmnTtl(tag.GetTtl());
+#ifndef PMTMGMP_UNUSED_MY_CODE
+			wmnHdr.SetMSECPindex(tag.GetMSECPindex());
+			wmnHdr.SetChangePath(tag.GetChangePath());
+#ifdef PMTMGMP_TAG_INFOR_ATTACH
+			wmnHdr.SetSendIndex(tag.GetSendIndex());
+#endif
+#endif
 			packet->AddHeader(wmnHdr);
 			header.SetAddr1(tag.GetAddress());
 			return true;

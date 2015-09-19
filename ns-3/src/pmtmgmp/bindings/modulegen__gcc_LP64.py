@@ -13425,11 +13425,19 @@ def register_Ns3My11sWmnHeader_methods(root_module, cls):
                    'uint8_t', 
                    [], 
                    is_const=True)
+    ## my11s-mac-header.h (module 'pmtmgmp'): uint8_t ns3::my11s::WmnHeader::GetChangePath() [member function]
+    cls.add_method('GetChangePath', 
+                   'uint8_t', 
+                   [])
     ## my11s-mac-header.h (module 'pmtmgmp'): ns3::TypeId ns3::my11s::WmnHeader::GetInstanceTypeId() const [member function]
     cls.add_method('GetInstanceTypeId', 
                    'ns3::TypeId', 
                    [], 
                    is_const=True, is_virtual=True)
+    ## my11s-mac-header.h (module 'pmtmgmp'): uint8_t ns3::my11s::WmnHeader::GetMSECPindex() [member function]
+    cls.add_method('GetMSECPindex', 
+                   'uint8_t', 
+                   [])
     ## my11s-mac-header.h (module 'pmtmgmp'): uint32_t ns3::my11s::WmnHeader::GetSerializedSize() const [member function]
     cls.add_method('GetSerializedSize', 
                    'uint32_t', 
@@ -13476,6 +13484,14 @@ def register_Ns3My11sWmnHeader_methods(root_module, cls):
     cls.add_method('SetAddressExt', 
                    'void', 
                    [param('uint8_t', 'num_of_addresses')])
+    ## my11s-mac-header.h (module 'pmtmgmp'): void ns3::my11s::WmnHeader::SetChangePath(uint8_t change) [member function]
+    cls.add_method('SetChangePath', 
+                   'void', 
+                   [param('uint8_t', 'change')])
+    ## my11s-mac-header.h (module 'pmtmgmp'): void ns3::my11s::WmnHeader::SetMSECPindex(uint8_t index) [member function]
+    cls.add_method('SetMSECPindex', 
+                   'void', 
+                   [param('uint8_t', 'index')])
     ## my11s-mac-header.h (module 'pmtmgmp'): void ns3::my11s::WmnHeader::SetWmnSeqno(uint32_t seqno) [member function]
     cls.add_method('SetWmnSeqno', 
                    'void', 
