@@ -557,13 +557,13 @@ namespace ns3 {
 					routeReply(true, packet, source, destination, protocolType, next->GetInterface());
 					m_stats.txUnicast++;
 					m_stats.txBytes += packet->GetSize();
-					if (m_PacketSizePerPath.find(destination) == m_PacketSizePerPath.end())
+					if (m_PacketSizePerPath.find(next->GetFromNode()) == m_PacketSizePerPath.end())
 					{
-						m_PacketSizePerPath[destination] = packet->GetSize();
+						m_PacketSizePerPath[next->GetFromNode()] = packet->GetSize();
 					}
 					else
 					{
-						m_PacketSizePerPath[destination] += packet->GetSize();
+						m_PacketSizePerPath[next->GetFromNode()] += packet->GetSize();
 					}
 					return true;
 				}

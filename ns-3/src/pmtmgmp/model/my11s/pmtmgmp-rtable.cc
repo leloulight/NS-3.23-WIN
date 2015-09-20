@@ -1133,7 +1133,7 @@ namespace ns3 {
 				select->pkt->AddPacketTag(tag);
 				stats->txUnicast++;
 				stats->txBytes += select->pkt->GetSize();
-				(*packetSizePerPath)[next->GetMTERPaddress()] += select->pkt->GetSize();
+				(*packetSizePerPath)[next->GetFromNode()] += select->pkt->GetSize();
 				select->reply(true, select->pkt, select->src, select->dst, select->protocol, next->GetInterface());
 			}
 		}
