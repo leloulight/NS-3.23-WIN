@@ -11,6 +11,7 @@ from visualizer.base import Link, transform_distance_canvas_to_simulation
 SHOW_LOG = True
 COLOR = [0xFF0000FF, 0x00FF00FF, 0x0000FFFF, 0x00FFFFFF, 0xFF00FFFF, 0xFFFF00FF, 0x8A2BE2FF, 0xB8860BFF, 0x006400FF, 0xFF1493FF]
 POINT_MODIFY = 10
+SPEED_UPDATE_TIME = 1000
 class Pmtmgmp_Path_Link(Link):
     def __init__(self, next_link, base_node, link_node, base_route_table, mterp, msecp, parent_canvas_item, color, path, viz, data_link):
         self.base_node = base_node
@@ -64,7 +65,10 @@ class Pmtmgmp_Path_Link(Link):
         if self.data_link:
             send_to = self.link_node.pmtmgmp.GetMacAddress()
             pmtmgmp = self.base_node.pmtmgmp
-            speed = (pmtmgmp.GetPacketSizePerPathSecondByMac(send_to) - self.base_node.packet_size_map[str(send_to)]) * 8 / (ns.core.Simulator.Now().GetMilliSeconds() - self.base_node.data_speed_time)
+            if (ns.core.Simulator.Now().GetMilliSeconds() - self.base_node.data_speed_time) == 0:
+                speed = 0
+            else:
+                speed = (float)(pmtmgmp.GetPacketSizePerPathSecondByMac(send_to) - self.base_node.packet_size_map[str(send_to)]) * 8 / 1e3 / SPEED_UPDATE_TIME / (ns.core.Simulator.Now().GetMilliSeconds() - self.base_node.data_speed_time)
             self.label.set_properties(font=("Sans Serif %i" % int(3 + self.viz.node_size_adjustment.value * 3)),
                                  text=("%.2f kbit/s" % (speed,)),
                                  alignment=pango.ALIGN_CENTER,
@@ -81,32 +85,32 @@ class Pmtmgmp_Path_Link(Link):
     def update_points(self):
         if self.data_link:
             if (self.base_node == None) or (self.link_node == None):
-                if SHOW_LOG:
-                    print "Delete(MAC) " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
+                # if SHOW_LOG:
+                #     print "Delete(MAC) " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
                 self.destroy()
                 return
             send_to = self.link_node.pmtmgmp.GetMacAddress()
             pmtmgmp = self.base_node.pmtmgmp
-            if pmtmgmp.GetPacketSizePerPathSecondByMac(send_to) == 0 or pmtmgmp.GetPacketSizePerPathSecondByMac(send_to) - self.base_node.packet_size_map[str(send_to)] == 0:
+            if ns.core.Simulator.Now().GetMilliSeconds() - self.base_node.data_speed_time > SPEED_UPDATE_TIME and (pmtmgmp.GetPacketSizePerPathSecondByMac(send_to) == 0 or pmtmgmp.GetPacketSizePerPathSecondByMac(send_to) - self.base_node.packet_size_map[str(send_to)] == 0):
                 self.destroy()
-                if SHOW_LOG:
-                    print "Delete(Speed) " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
+                # if SHOW_LOG:
+                #     print "Delete(Speed) " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
             else:
-                if SHOW_LOG:
-                    print "Move " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
+                # if SHOW_LOG:
+                #     print "Move " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
                 self.move_node_and_lable()
         else:
             if self.base_route_table.GetPathByMACaddress(self.mterp, self.msecp) == None:
-                if SHOW_LOG:
-                    print "Delete(Path) " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
+                # if SHOW_LOG:
+                #     print "Delete(Path) " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
                 self.destroy()
             elif (self.base_node == None) or (self.link_node == None):
-                if SHOW_LOG:
-                    print "Delete(MAC) " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
+                # if SHOW_LOG:
+                #     print "Delete(MAC) " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
                 self.destroy()
             else:
-                if SHOW_LOG:
-                    print "Move " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
+                # if SHOW_LOG:
+                #     print "Move " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
                 self.move_node_and_lable()
 
     def destroy(self):
@@ -149,6 +153,8 @@ class Pmtmgmp_Node(object):
             # if SHOW_LOG:
             #     print "update_points() "  + str(link.base_node.pmtmgmp.GetMacAddress()) + " to " + str(link.link_node.pmtmgmp.GetMacAddress())
             link.update_points()
+        if ns.core.Simulator.Now().GetMilliSeconds() - self.data_speed_time > SPEED_UPDATE_TIME:
+            self.data_speed_time = ns.core.Simulator.Now().GetMilliSeconds()
 
     def crearte_route_path(self, mac_node_list, mterp, msecp, parent_canvas_item):
         # if SHOW_LOG:
@@ -292,7 +298,7 @@ class Pmtmgmp_Route(object):
         self.show_data_send = None
         self.node_list = []
         self.mac_to_node = {} #(str(Mac48Address), Pmtmgmp_Route)
-        self.last_scan_time = ns.core.Simulator.Now().GetSeconds()
+        # self.last_scan_time = ns.core.Simulator.Now().GetSeconds()
 
     def route_path_clean(self):
         self.mac_to_node.clear()
@@ -366,7 +372,6 @@ class Pmtmgmp_Route(object):
 
     def scan_nodes(self, viz):
         self.viz = viz
-        self. route_path_clean()
         for node in self.viz.nodes.itervalues():
             ns3_node = ns.network.NodeList.GetNode(node.node_index)
             for devI in range(ns3_node.GetNDevices()):
@@ -384,12 +389,16 @@ class Pmtmgmp_Route(object):
         # if SHOW_LOG:
         #     print "scan_nodes " + str(len(self.node_list))
 
+    def scan_and_clean_nodes(self, viz):
+        self. route_path_clean()
+        self.scan_nodes(viz)
+
     def simulation_periodic_update(self, viz):
         # if SHOW_LOG:
         #     print "simulation_periodic_update"
-        if (ns.core.Simulator.Now().GetSeconds() - self.last_scan_time > 1):
-            self.scan_nodes(self.viz)
-            self.last_scan_time = ns.core.Simulator.Now().GetSeconds()
+        # if (ns.core.Simulator.Now().GetSeconds() - self.last_scan_time > 1):
+        #     self.scan_nodes(self.viz)
+        #     self.last_scan_time = ns.core.Simulator.Now().GetSeconds()
             # if SHOW_LOG:
             #     print "Time Scan" + str(self.last_scan_time)
         self.route_path_link()
@@ -456,7 +465,7 @@ class Pmtmgmp_Route(object):
                     route.show_msecp_mac = None
                     route.show_mterp_mac = route_table.GetTableItem(i).GetMTERPaddress()
                     route.show_data_send = None
-                    self.scan_nodes(viz)
+                    self.scan_and_clean_nodes(viz)
                     if SHOW_LOG:
                         print "Show part path as MTERP is " + str(self.show_mterp_mac)
 
@@ -490,7 +499,7 @@ class Pmtmgmp_Route(object):
                     route.show_mterp_mac = None
                     route.show_msecp_mac = route_tree.GetTreeItem(i).GetMSECPaddress()
                     route.show_data_send = None
-                    self.scan_nodes(viz)
+                    self.scan_and_clean_nodes(viz)
                     if SHOW_LOG:
                         print "Show full path as MSECP is " + str(self.show_msecp_mac)
 
@@ -504,7 +513,7 @@ class Pmtmgmp_Route(object):
                 route.show_mterp_mac = None
                 route.show_msecp_mac = None
                 route.show_data_send = route.pmtmgmp.GetMacAddress()
-                self.scan_nodes(viz)
+                self.scan_and_clean_nodes(viz)
                 if SHOW_LOG:
                     print "Show Data Send Path path as MTERP is " + str(self.pmtmgmp.GetMacAddress())
             menu_item = gtk.MenuItem("Show Data Send Path to " + str(self.pmtmgmp.GetMacAddress()))
@@ -524,4 +533,4 @@ def register(viz):
     viz.connect("populate-node-menu", pmtmgmp_route.populate_node_menu)
     viz.connect("simulation-periodic-update", pmtmgmp_route.simulation_periodic_update)
     viz.connect("update-view", pmtmgmp_route.simulation_periodic_update)
-    viz.connect("topology-scanned", pmtmgmp_route.scan_nodes)
+    viz.connect("topology-scanned", pmtmgmp_route.scan_and_clean_nodes)
