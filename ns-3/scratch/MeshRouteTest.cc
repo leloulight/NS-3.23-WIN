@@ -72,13 +72,15 @@
 // 协议
 #define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
 // 区域最大大小
-#define TEST_SET_MAX_SIZE 7
+#define TEST_SET_MAX_SIZE 11
 // 区域最小大小
-#define TEST_SET_MIN_SIZE 4
+#define TEST_SET_MIN_SIZE 6
 // 区域大小
 #define TEST_SET_SIZE 5
 // 区域间隔
 #define TEST_SET_APPSTEP 3
+// 区域间隔与大小的差值
+#define TEST_SET_SIZE_APPSTEP 4
 
 
 using namespace ns3;
@@ -958,16 +960,15 @@ int main(int argc, char *argv[])
 			totalTime = (TEST_SET_COUNT - 1) * TEST_SET_INTERVAL + TEST_SET_LIFE + TEST_SET_RANDOM;
 			NS_LOG_INFO("=============================");
 			NS_LOG_INFO("PROTOCOL :MY11S_PMTMGMP   SIZE :" << i);
-			NS_LOG_INFO("=============================");
+			NS_LOG_INFO("=============================\n");
 			MeshRouteClass pmtmgmp;
-			pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, apps, totalTime, TEST_SET_AREA, i, i - 2, TEST_SET_APP);
+			pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, apps, totalTime, TEST_SET_AREA, i, i - TEST_SET_SIZE_APPSTEP, TEST_SET_APP);
 			pmtmgmp.Run();
-			NS_LOG_INFO("\n");
 			NS_LOG_INFO("=============================");
 			NS_LOG_INFO("PROTOCOL :DOT11S_HWMP   SIZE :" << i);
-			NS_LOG_INFO("=============================");
+			NS_LOG_INFO("=============================\n");
 			MeshRouteClass mesh;
-			mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, apps, totalTime, TEST_SET_AREA, i, i - 2, TEST_SET_APP);
+			mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, apps, totalTime, TEST_SET_AREA, i, i - TEST_SET_SIZE_APPSTEP, TEST_SET_APP);
 			mesh.Run();
 		}
 #else
@@ -1027,16 +1028,15 @@ int main(int argc, char *argv[])
 		{
 			NS_LOG_INFO("=============================");
 			NS_LOG_INFO("PROTOCOL :MY11S_PMTMGMP   SIZE :" << i);
-			NS_LOG_INFO("=============================");
+			NS_LOG_INFO("=============================\n");
 			MeshRouteClass pmtmgmp;
-			pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, TEST_SET_AREA, i, i - 2, TEST_SET_APP);
+			pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, TEST_SET_AREA, i, i - TEST_SET_SIZE_APPSTEP, TEST_SET_APP);
 			pmtmgmp.Run();
-			NS_LOG_INFO("\n");
 			NS_LOG_INFO("=============================");
 			NS_LOG_INFO("PROTOCOL :DOT11S_HWMP   SIZE :" << i);
-			NS_LOG_INFO("=============================");
+			NS_LOG_INFO("=============================\n");
 			MeshRouteClass mesh;
-			mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, TEST_SET_AREA, i, i - 2, TEST_SET_APP);
+			mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, TEST_SET_AREA, i, i - TEST_SET_SIZE_APPSTEP, TEST_SET_APP);
 			mesh.Run();
 			NS_LOG_INFO("\n");
 		};

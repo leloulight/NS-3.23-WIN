@@ -12621,6 +12621,22 @@ def register_Ns3My11sPmtmgmpProtocol_methods(root_module, cls):
     cls.add_method('GetPacketSizePerPath', 
                    'std::map< ns3::Mac48Address, unsigned int >', 
                    [])
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): uint32_t ns3::my11s::PmtmgmpProtocol::GetPacketSizePerPathCount() [member function]
+    cls.add_method('GetPacketSizePerPathCount', 
+                   'uint32_t', 
+                   [])
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::Mac48Address ns3::my11s::PmtmgmpProtocol::GetPacketSizePerPathFirst(uint8_t index) [member function]
+    cls.add_method('GetPacketSizePerPathFirst', 
+                   'ns3::Mac48Address', 
+                   [param('uint8_t', 'index')])
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): uint32_t ns3::my11s::PmtmgmpProtocol::GetPacketSizePerPathSecond(uint8_t index) [member function]
+    cls.add_method('GetPacketSizePerPathSecond', 
+                   'uint32_t', 
+                   [param('uint8_t', 'index')])
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): uint32_t ns3::my11s::PmtmgmpProtocol::GetPacketSizePerPathSecond(ns3::Mac48Address first) [member function]
+    cls.add_method('GetPacketSizePerPathSecond', 
+                   'uint32_t', 
+                   [param('ns3::Mac48Address', 'first')])
     ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::Ptr<ns3::my11s::PmtmgmpRouteTable> ns3::my11s::PmtmgmpProtocol::GetPmtmgmpRouteTable() [member function]
     cls.add_method('GetPmtmgmpRouteTable', 
                    'ns3::Ptr< ns3::my11s::PmtmgmpRouteTable >', 

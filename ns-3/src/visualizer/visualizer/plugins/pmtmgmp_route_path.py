@@ -218,6 +218,41 @@ class Pmtmgmp_Node(object):
                 #     print "Pmtmgmp_Node::create_part_route_path_recursion() " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
             self.update_link_list()
 
+    def crearte_data_path(self, mac_node_list, mterp, msecp, parent_canvas_item):
+        # if SHOW_LOG:
+        #     print self
+
+        node_type = self.pmtmgmp.GetNodeType()
+        color = 0xFF0000FF
+        if (node_type == 2):
+            color = 0x00FF00FF
+        elif (node_type == 4):
+            color = 0x0000FFFF
+        elif (node_type == 8 and msecp == self.pmtmgmp.GetMacAddress()):
+            color = 0xFFFF00FF
+        if (self.pmtmgmp.GetPmtmgmpRouteTable().GetTableSize() == 0):
+            color = 0xFFFFFFFF
+        self.set_color(color)
+
+        data_infor = self.pmtmgmp.GetPacketSizePerPath()
+        #
+        # route_table = self.pmtmgmp.GetPmtmgmpRouteTable()
+        # route_path = route_table.GetPathByMACaddress(mterp,msecp)
+        # if route_path == None:
+        #      return
+        # if self.link_list.has_key(str(mterp) + "," + str(msecp)):
+        #     self.link_list[str(mterp) + "," + str(msecp)].update_points()
+        #     # if SHOW_LOG:
+        #     #     print "Pmtmgmp_Node::crearte_route_path() exist " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
+        # else:
+        #     if mac_node_list[str(route_path.GetFromNode())] is self:
+        #         return
+        #     route_link = Pmtmgmp_Path_Link(None, self, mac_node_list[str(route_path.GetFromNode())], route_table, mterp, msecp, parent_canvas_item, COLOR[1], route_path, self.viz)
+        #     self.link_list[str(mterp) + "," + str(msecp)] = route_link
+        #     # if SHOW_LOG:
+        #     #     print "Pmtmgmp_Node::crearte_route_path() " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
+        # self.update_link_list()
+
     def destory(self):
         self.node_index  = None
         self.viz_node  = None
@@ -232,6 +267,7 @@ class Pmtmgmp_Route(object):
         self.pmtmgmp = None
         self.show_msecp_mac = None
         self.show_mterp_mac = None
+        self.show_data_send = None
         self.node_list = []
         self.mac_to_node = {} #(str(Mac48Address), Pmtmgmp_Route)
         self.last_scan_time = ns.core.Simulator.Now().GetSeconds()
@@ -279,21 +315,30 @@ class Pmtmgmp_Route(object):
         #     print "Pmtmgmp_Route::route_path_link_part()"
         self.mac_to_node[str(self.pmtmgmp.GetMacAddress())].create_part_route_path_start(self.mac_to_node, mterp, self.viz.links_group)
 
+    def route_path_link_data(self, mac):
+        for node in self.node_list:
+            node.crearte_data_path(self.mac_to_node, self.pmtmgmp.GetMacAddress(), mac, self.viz.links_group)
+
     def route_path_link(self):
-        if (self.show_msecp_mac == None and self.show_mterp_mac == None):
+        if (self.show_msecp_mac == None and self.show_mterp_mac == None and self.show_data_send == None):
             # if SHOW_LOG:
             #     print "Pmtmgmp_Route::route_path_link().route_path_clean"
             self. route_path_clean()
-        elif self.show_msecp_mac == None:
+        elif self.show_mterp_mac != None:
             # if SHOW_LOG:
             #     print "Pmtmgmp_Route::route_path_link().route_path_link_part"
             self.route_path_link_part(self.show_mterp_mac)
-        elif self.show_mterp_mac == None:
+        elif self.show_msecp_mac != None:
             # if (self.mac_to_node[str(self.pmtmgmp.GetMacAddress())].pmtmgmp.GetPmtmgmpRouteTable().GetPathByMACaddress(self.pmtmgmp.GetMacAddress(), self.show_msecp_mac) == 0):
             #     self. route_path_clean()
             # if SHOW_LOG:
             #     print "Pmtmgmp_Route::route_path_link().route_path_link_full"
             self.route_path_link_full(self.show_msecp_mac)
+        elif self.show_data_send != None:
+            # if SHOW_LOG:
+            #     print "Pmtmgmp_Route::route_path_link().route_path_link_data"
+            self.route_path_link_data(self.pmtmgmp.GetMacAddress())
+
 
     def scan_nodes(self, viz):
         self.viz = viz
@@ -353,6 +398,7 @@ class Pmtmgmp_Route(object):
         def _clean_pmtmgmp_path(dummy_menu_item):
             route.show_msecp_mac = None
             route.show_mterp_mac = None
+            route.show_data_send = None
             self.scan_nodes(viz)
             # if SHOW_LOG:
             #     print "Clean Path"
@@ -385,6 +431,7 @@ class Pmtmgmp_Route(object):
                 def _show_pmtmgmp_part_path(dummy_menu_item, i):
                     route.show_msecp_mac = None
                     route.show_mterp_mac = route_table.GetTableItem(i).GetMTERPaddress()
+                    route.show_data_send = None
                     self.scan_nodes(viz)
                     if SHOW_LOG:
                         print "Show part path as MTERP is " + str(self.show_mterp_mac)
@@ -418,6 +465,7 @@ class Pmtmgmp_Route(object):
                 def _show_pmtmgmp_full_path(dummy_menu_item, i):
                     route.show_mterp_mac = None
                     route.show_msecp_mac = route_tree.GetTreeItem(i).GetMSECPaddress()
+                    route.show_data_send = None
                     self.scan_nodes(viz)
                     if SHOW_LOG:
                         print "Show full path as MSECP is " + str(self.show_msecp_mac)
@@ -427,6 +475,17 @@ class Pmtmgmp_Route(object):
                 menu_item_temp.show()
                 menu_menu.add(menu_item_temp)
                 menu_item_temp.connect("activate", _show_pmtmgmp_full_path, i)
+
+            def _show_data_send_path(dummy_menu_item, i):
+                route.show_mterp_mac = None
+                route.show_msecp_mac = None
+                route.show_data_send = route.pmtmgmp.GetMacAddress()
+                self.scan_nodes(viz)
+                if SHOW_LOG:
+                    print "Show Data Send Path path as MTERP is " + str(self.pmtmgmp.GetMacAddress())
+            menu_item = gtk.MenuItem("Show Data Send Path to " + str(self.pmtmgmp.GetMacAddress()))
+            menu_item.show()
+            menu_route.add(menu_item)
         # if SHOW_LOG:
         #     print add_menu
         if add_menu:

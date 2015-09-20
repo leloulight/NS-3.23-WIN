@@ -1641,6 +1641,40 @@ namespace ns3 {
 		{
 			return m_PacketSizePerPath;
 		}
+		////Python支持函数
+		uint32_t PmtmgmpProtocol::GetPacketSizePerPathCount()
+		{
+			return m_PacketSizePerPath.size();
+		}
+		Mac48Address PmtmgmpProtocol::GetPacketSizePerPathFirst(uint8_t index)
+		{
+			std::map<Mac48Address, uint32_t>::iterator iter = m_PacketSizePerPath.begin();
+			for (uint8_t i = 0; i < index; i++)
+			{
+				iter++;
+			}
+			return iter->first;
+		}
+		uint32_t PmtmgmpProtocol::GetPacketSizePerPathSecond(uint8_t index)
+		{
+			std::map<Mac48Address, uint32_t>::iterator iter = m_PacketSizePerPath.begin();
+			for (uint8_t i = 0; i < index; i++)
+			{
+				iter++;
+			}
+			return iter->second;
+		}
+		uint32_t PmtmgmpProtocol::GetPacketSizePerPathSecond(Mac48Address first)
+		{
+			if (m_PacketSizePerPath.find(first) != m_PacketSizePerPath.end())
+			{
+				return m_PacketSizePerPath.find(first)->second;
+			}
+			else
+			{
+				return 0;
+			}
+		}
 		////验证协议所属结点是否为终端节点MTERP
 		bool PmtmgmpProtocol::IsMTERP()
 		{

@@ -156,6 +156,11 @@ namespace ns3 {
 
 			////获取每个发送数据帧的路径发送的数据量
 			std::map<Mac48Address, uint32_t> GetPacketSizePerPath();
+			////Python支持函数
+			uint32_t GetPacketSizePerPathCount();
+			Mac48Address GetPacketSizePerPathFirst(uint8_t index);
+			uint32_t GetPacketSizePerPathSecond(uint8_t index);
+			uint32_t GetPacketSizePerPathSecond(Mac48Address first);
 #endif
 
 		private:
