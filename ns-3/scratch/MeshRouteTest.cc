@@ -52,10 +52,10 @@
 
 
 //测试所有协议
-#define TEST_ALL
+//#define TEST_ALL
 
 //测试不同边界
-#define TEST_SIDE_ALL
+//#define TEST_SIDE_ALL
 
 // 随机应用总数
 #define TEST_SET_COUNT 4
@@ -68,7 +68,7 @@
 // 区域形状
 #define TEST_SET_AREA MeshRouteClass::SQUARE
 // 应用布置类型
-#define TEST_SET_APP MeshRouteClass::Multiple
+#define TEST_SET_APP MeshRouteClass::Simple
 // 协议
 #define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
 // 区域最大大小
@@ -877,7 +877,7 @@ int main(int argc, char *argv[])
 #ifndef TEST_SIDE_ALL
 	//LogComponentEnableAll((LogLevel)(LOG_LEVEL_INFO | LOG_PREFIX_ALL));
 
-	LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpProtocolMac", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpPeerManagementProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpRtable", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
@@ -1015,6 +1015,40 @@ int main(int argc, char *argv[])
 		mesh.Run();
 #endif
 #else
+		vector<NodeApplicationInfor> apps;
+		int nodeCount;
+		switch (TEST_SET_AREA)
+		{
+		case MeshRouteClass::SQUARE:
+			nodeCount = TEST_SET_SIZE * TEST_SET_SIZE;
+			break;
+		case MeshRouteClass::HEXAGON:
+			nodeCount = 3 * (TEST_SET_SIZE - 1) * TEST_SET_SIZE + 1;
+			break;
+		default:
+			break;
+		}
+
+		Ptr<UniformRandomVariable> randNodes = CreateObject<UniformRandomVariable>();
+		randNodes->SetAttribute("Min", DoubleValue(0));
+		randNodes->SetAttribute("Max", DoubleValue(nodeCount - 1));
+
+		Ptr<UniformRandomVariable> randTime = CreateObject<UniformRandomVariable>();
+
+		for (int i = 0; i < TEST_SET_COUNT; i++)
+		{
+			double startTime = TEST_SET_INTERVAL * i + randTime->GetValue(0, TEST_SET_RANDOM);
+			uint32_t src = randNodes->GetInteger();
+			uint32_t dst;
+			do
+			{
+				dst = randNodes->GetInteger();
+			} while (dst == src);
+			NodeApplicationInfor newApp = { src, dst, startTime, startTime + TEST_SET_LIFE };
+			apps.push_back(newApp);
+		}
+
+		totalTime = (TEST_SET_COUNT - 1) * TEST_SET_INTERVAL + TEST_SET_LIFE + TEST_SET_RANDOM;
 		MeshRouteClass test;
 		test.SetMeshRouteClass(TEST_SET_PROTOCOL, apps, totalTime, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
 		test.Run();

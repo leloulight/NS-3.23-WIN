@@ -160,7 +160,7 @@ namespace ns3 {
 			uint32_t GetPacketSizePerPathCount();
 			Mac48Address GetPacketSizePerPathFirst(uint8_t index);
 			uint32_t GetPacketSizePerPathSecond(uint8_t index);
-			uint32_t GetPacketSizePerPathSecond(Mac48Address first);
+			uint32_t GetPacketSizePerPathSecondByMac(Mac48Address first);
 #endif
 
 		private:

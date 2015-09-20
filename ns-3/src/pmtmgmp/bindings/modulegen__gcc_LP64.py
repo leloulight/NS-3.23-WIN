@@ -12633,8 +12633,8 @@ def register_Ns3My11sPmtmgmpProtocol_methods(root_module, cls):
     cls.add_method('GetPacketSizePerPathSecond', 
                    'uint32_t', 
                    [param('uint8_t', 'index')])
-    ## pmtmgmp-protocol.h (module 'pmtmgmp'): uint32_t ns3::my11s::PmtmgmpProtocol::GetPacketSizePerPathSecond(ns3::Mac48Address first) [member function]
-    cls.add_method('GetPacketSizePerPathSecond', 
+    ## pmtmgmp-protocol.h (module 'pmtmgmp'): uint32_t ns3::my11s::PmtmgmpProtocol::GetPacketSizePerPathSecondByMac(ns3::Mac48Address first) [member function]
+    cls.add_method('GetPacketSizePerPathSecondByMac', 
                    'uint32_t', 
                    [param('ns3::Mac48Address', 'first')])
     ## pmtmgmp-protocol.h (module 'pmtmgmp'): ns3::Ptr<ns3::my11s::PmtmgmpRouteTable> ns3::my11s::PmtmgmpProtocol::GetPmtmgmpRouteTable() [member function]

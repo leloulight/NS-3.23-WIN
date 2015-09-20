@@ -1664,7 +1664,7 @@ namespace ns3 {
 			}
 			return iter->second;
 		}
-		uint32_t PmtmgmpProtocol::GetPacketSizePerPathSecond(Mac48Address first)
+		uint32_t PmtmgmpProtocol::GetPacketSizePerPathSecondByMac(Mac48Address first)
 		{
 			if (m_PacketSizePerPath.find(first) != m_PacketSizePerPath.end())
 			{

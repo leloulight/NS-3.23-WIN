@@ -12,15 +12,19 @@ SHOW_LOG = True
 COLOR = [0xFF0000FF, 0x00FF00FF, 0x0000FFFF, 0x00FFFFFF, 0xFF00FFFF, 0xFFFF00FF, 0x8A2BE2FF, 0xB8860BFF, 0x006400FF, 0xFF1493FF]
 POINT_MODIFY = 10
 class Pmtmgmp_Path_Link(Link):
-    def __init__(self, next_link, base_node, link_node, base_route_table, mterp, msecp, parent_canvas_item, color, path, viz):
+    def __init__(self, next_link, base_node, link_node, base_route_table, mterp, msecp, parent_canvas_item, color, path, viz, data_link):
         self.base_node = base_node
         self.link_node = link_node
         self.base_route_table = base_route_table
         self.mterp = mterp
         self.msecp = msecp
         self.canvas_item = goocanvas.Group(parent=parent_canvas_item)
-        # self.line = goocanvas.Polyline(parent=self.canvas_item, line_width=1.0, stroke_color_rgba=0xC00000FF, start_arrow=True, arrow_length=10,arrow_width=8)
-        self.line = goocanvas.Polyline(parent=self.canvas_item, line_width=2.0, stroke_color_rgba=color, start_arrow=True, close_path=False, end_arrow=False, arrow_length=15, arrow_width=15)
+        if data_link:
+            # self.line = goocanvas.Polyline(parent=self.canvas_item, line_width=1.0, stroke_color_rgba=0xC00000FF, start_arrow=True, arrow_length=10,arrow_width=8)
+            self.line = goocanvas.Polyline(parent=self.canvas_item, line_width=3.0, stroke_color_rgba=0xC00000FF, start_arrow=True, close_path=False, end_arrow=False, arrow_length=20, arrow_width=20)
+        else:
+            # self.line = goocanvas.Polyline(parent=self.canvas_item, line_width=1.0, stroke_color_rgba=0xC00000FF, start_arrow=True, arrow_length=10,arrow_width=8)
+            self.line = goocanvas.Polyline(parent=self.canvas_item, line_width=2.0, stroke_color_rgba=color, start_arrow=True, close_path=False, end_arrow=False, arrow_length=15, arrow_width=15)
         self.line.raise_(None)
         self.label = goocanvas.Text()#, fill_color_rgba=0x00C000C0)
         self.label.props.pointer_events = 0
@@ -32,6 +36,7 @@ class Pmtmgmp_Path_Link(Link):
         self.next_link = next_link
         self.path = path
         self.viz = viz
+        self.data_link = data_link
 
     def set_way_index(self, index):
         self.way_index = index
@@ -56,27 +61,51 @@ class Pmtmgmp_Path_Link(Link):
             pos1_y = pos1_y + y * next_index
             pos2_x = pos2_x + x * self.way_index
             pos2_y = pos2_y + y * self.way_index
-
-        self.label.set_properties(font=("Sans Serif %i" % int(1 + self.viz.node_size_adjustment.value * 3)),
-                             text=("%d" % (self.path.GetMetric(),)),
-                             alignment=pango.ALIGN_CENTER,
-                             x=(pos1_x + pos2_x)/2,
-                             y=(pos1_y + pos2_y)/2)
+        if self.data_link:
+            send_to = self.link_node.pmtmgmp.GetMacAddress()
+            pmtmgmp = self.base_node.pmtmgmp
+            speed = (pmtmgmp.GetPacketSizePerPathSecond(send_to) - pmtmgmp.packet_size_map[send_to]) * 8 / (ns.core.Simulator.Now().GetMilliSeconds() - self.base_node.data_speed_time)
+            self.label.set_properties(font=("Sans Serif %i" % int(3 + self.viz.node_size_adjustment.value * 3)),
+                                 text=("%.2f kbit/s" % (speed,)),
+                                 alignment=pango.ALIGN_CENTER,
+                                 x=(pos1_x + pos2_x)/2,
+                                 y=(pos1_y + pos2_y)/2)
+        else:
+            self.label.set_properties(font=("Sans Serif %i" % int(1 + self.viz.node_size_adjustment.value * 3)),
+                                 text=("%d" % (self.path.GetMetric(),)),
+                                 alignment=pango.ALIGN_CENTER,
+                                 x=(pos1_x + pos2_x)/2,
+                                 y=(pos1_y + pos2_y)/2)
         self.line.set_property("points", goocanvas.Points([(pos1_x, pos1_y), (pos2_x, pos2_y)]))
 
     def update_points(self):
-        if self.base_route_table.GetPathByMACaddress(self.mterp, self.msecp) == None:
-            # if SHOW_LOG:
-            #     print "Delete(Path) " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
-            self.destroy()
-        elif (self.base_node == None) or (self.link_node == None):
-            # if SHOW_LOG:
-            #     print "Delete(MAC) " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
-            self.destroy()
+        if self.data_link:
+            if (self.base_node == None) or (self.link_node == None):
+                # if SHOW_LOG:
+                #     print "Delete(MAC) " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
+                self.destroy()
+                return
+            send_to = self.link_node.pmtmgmp.GetMacAddress()
+            pmtmgmp = self.base_node.pmtmgmp
+            if pmtmgmp.GetPacketSizePerPathSecond(send_to) == 0 or pmtmgmp.GetPacketSizePerPathSecond(send_to) - pmtmgmp.packet_size_map[send_to] == 0:
+                self.destroy()
+            else:
+                # if SHOW_LOG:
+                #     print "Move " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
+                self.move_node_and_lable()
         else:
-            # if SHOW_LOG:
-            #     print "Move " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
-            self.move_node_and_lable()
+            if self.base_route_table.GetPathByMACaddress(self.mterp, self.msecp) == None:
+                # if SHOW_LOG:
+                #     print "Delete(Path) " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
+                self.destroy()
+            elif (self.base_node == None) or (self.link_node == None):
+                # if SHOW_LOG:
+                #     print "Delete(MAC) " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
+                self.destroy()
+            else:
+                # if SHOW_LOG:
+                #     print "Move " + str(self.base_node.pmtmgmp.GetMacAddress()) + " to " + str(self.link_node.pmtmgmp.GetMacAddress())
+                self.move_node_and_lable()
 
     def destroy(self):
         self.line.remove()
@@ -95,6 +124,8 @@ class Pmtmgmp_Node(object):
         self.pmtmgmp = pmtmgmp
         self.link_list = {}
         self.viz = viz
+        self.packet_size_map = {}
+        self.data_speed_time = ns.core.Simulator.Now().GetMilliSeconds()
 
     def set_color(self, color):
         self.viz_node.canvas_item.set_properties(fill_color_rgba=color)
@@ -144,7 +175,7 @@ class Pmtmgmp_Node(object):
         else:
             if mac_node_list[str(route_path.GetFromNode())] is self:
                 return
-            route_link = Pmtmgmp_Path_Link(None, self, mac_node_list[str(route_path.GetFromNode())], route_table, mterp, msecp, parent_canvas_item, COLOR[1], route_path, self.viz)
+            route_link = Pmtmgmp_Path_Link(None, self, mac_node_list[str(route_path.GetFromNode())], route_table, mterp, msecp, parent_canvas_item, COLOR[1], route_path, self.viz, False)
             self.link_list[str(mterp) + "," + str(msecp)] = route_link
             # if SHOW_LOG:
             #     print "Pmtmgmp_Node::crearte_route_path() " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
@@ -177,7 +208,7 @@ class Pmtmgmp_Node(object):
             # if SHOW_LOG:
             #     print "Pmtmgmp_Node::create_part_route_path_recursion() exist " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
         else:
-            self.link_list[key] = Pmtmgmp_Path_Link(next_link, self, mac_node_list[str(route_path.GetFromNode())], route_table, mterp, msecp, parent_canvas_item, color, route_path, self.viz)
+            self.link_list[key] = Pmtmgmp_Path_Link(next_link, self, mac_node_list[str(route_path.GetFromNode())], route_table, mterp, msecp, parent_canvas_item, color, route_path, self.viz, False)
             # if SHOW_LOG:
             #     print "Pmtmgmp_Node::create_part_route_path_recursion() " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
         self.update_link_list()
@@ -213,7 +244,7 @@ class Pmtmgmp_Node(object):
                 # if SHOW_LOG:
                 #     print "Pmtmgmp_Node::create_part_route_path_recursion() exist " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
             else:
-                self.link_list[key] = Pmtmgmp_Path_Link(next_link, self, mac_node_list[str(route_path.GetFromNode())], route_table, mterp, msecp, parent_canvas_item, COLOR[i%10], route_path, self.viz)
+                self.link_list[key] = Pmtmgmp_Path_Link(next_link, self, mac_node_list[str(route_path.GetFromNode())], route_table, mterp, msecp, parent_canvas_item, COLOR[i%10], route_path, self.viz, False)
                 # if SHOW_LOG:
                 #     print "Pmtmgmp_Node::create_part_route_path_recursion() " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
             self.update_link_list()
@@ -234,24 +265,14 @@ class Pmtmgmp_Node(object):
             color = 0xFFFFFFFF
         self.set_color(color)
 
-        data_infor = self.pmtmgmp.GetPacketSizePerPath()
-        #
-        # route_table = self.pmtmgmp.GetPmtmgmpRouteTable()
-        # route_path = route_table.GetPathByMACaddress(mterp,msecp)
-        # if route_path == None:
-        #      return
-        # if self.link_list.has_key(str(mterp) + "," + str(msecp)):
-        #     self.link_list[str(mterp) + "," + str(msecp)].update_points()
-        #     # if SHOW_LOG:
-        #     #     print "Pmtmgmp_Node::crearte_route_path() exist " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
-        # else:
-        #     if mac_node_list[str(route_path.GetFromNode())] is self:
-        #         return
-        #     route_link = Pmtmgmp_Path_Link(None, self, mac_node_list[str(route_path.GetFromNode())], route_table, mterp, msecp, parent_canvas_item, COLOR[1], route_path, self.viz)
-        #     self.link_list[str(mterp) + "," + str(msecp)] = route_link
-        #     # if SHOW_LOG:
-        #     #     print "Pmtmgmp_Node::crearte_route_path() " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
-        # self.update_link_list()
+        for i in range(0, self.pmtmgmp.GetPacketSizePerPathCount()):
+            send_to = self.pmtmgmp.GetPacketSizePerPathFirst(i)
+            self.packet_size_map[str(send_to)] = self.pmtmgmp.GetPacketSizePerPathSecond(i)
+            route_link = Pmtmgmp_Path_Link(None, self, mac_node_list[str(self.pmtmgmp.GetPacketSizePerPathFirst(i))], None, None, None, parent_canvas_item, None, None, self.viz, True)
+            self.link_list[str(send_to)]
+            # if SHOW_LOG:
+            #     print "Pmtmgmp_Node::crearte_data_path() " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(send_to)
+        self.update_link_list()
 
     def destory(self):
         self.node_index  = None
@@ -476,7 +497,7 @@ class Pmtmgmp_Route(object):
                 menu_menu.add(menu_item_temp)
                 menu_item_temp.connect("activate", _show_pmtmgmp_full_path, i)
 
-            def _show_data_send_path(dummy_menu_item, i):
+            def _show_data_send_path(dummy_menu_item):
                 route.show_mterp_mac = None
                 route.show_msecp_mac = None
                 route.show_data_send = route.pmtmgmp.GetMacAddress()
@@ -486,6 +507,7 @@ class Pmtmgmp_Route(object):
             menu_item = gtk.MenuItem("Show Data Send Path to " + str(self.pmtmgmp.GetMacAddress()))
             menu_item.show()
             menu_route.add(menu_item)
+            menu_item.connect("activate", _show_data_send_path)
         # if SHOW_LOG:
         #     print add_menu
         if add_menu:
