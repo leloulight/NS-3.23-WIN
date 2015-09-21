@@ -55,9 +55,9 @@ class Pmtmgmp_Path_Link(Link):
         pos1_x, pos1_y = self.link_node.viz_node.get_position()
         pos2_x, pos2_y = self.base_node.viz_node.get_position()
         angle = math.atan2(pos2_y - pos1_y, pos2_x - pos1_x) + math.pi / 2
+        x = POINT_MODIFY * math.cos(angle)
+        y = POINT_MODIFY * math.sin(angle)
         if (self.way_index != 0):
-            x = POINT_MODIFY * math.cos(angle)
-            y = POINT_MODIFY * math.sin(angle)
             next_index = 0
             if self.next_link != None:
                 next_index = self.next_link.way_index
@@ -65,32 +65,48 @@ class Pmtmgmp_Path_Link(Link):
             pos1_y = pos1_y + y * next_index
             pos2_x = pos2_x + x * self.way_index
             pos2_y = pos2_y + y * self.way_index
-        if self.data_link:
-            send_to = self.link_node.pmtmgmp.GetMacAddress()
-            pmtmgmp = self.base_node.pmtmgmp
-            if (ns.core.Simulator.Now().GetMilliSeconds() - self.base_node.data_speed_time) == 0:
-                speed = 0
-            else:
-                speed = (float)(pmtmgmp.GetPacketSizePerPathSecondByMac(send_to) - self.base_node.packet_size_map[str(send_to)]) * 8 * 1000 / SPEED_UPDATE_TIME / (ns.core.Simulator.Now().GetMilliSeconds() - self.base_node.data_speed_time)
-            self.label.set_properties(font=("Sans Serif %i" % int(3 + self.viz.node_size_adjustment.value * 3)),
-                                 text=("%.2f kbit/s" % (speed,)),
-                                 alignment=pango.ALIGN_CENTER,
-                                 x=(pos1_x + pos2_x)/2,
-                                 y=(pos1_y + pos2_y)/2)
-        else:
-            self.label.set_properties(font=("Sans Serif %i" % int(1 + self.viz.node_size_adjustment.value * 3)),
-                                 text=("%d" % (self.path.GetMetric(),)),
-                                 alignment=pango.ALIGN_CENTER,
-                                 x=(pos1_x + pos2_x)/2,
-                                 y=(pos1_y + pos2_y)/2)
         self.line.set_property("points", goocanvas.Points([(pos1_x, pos1_y), (pos2_x, pos2_y)]))
+        p1_x, p1_y = self.link_node.viz_node.get_position()
+        p2_x, p2_y = self.base_node.viz_node.get_position()
         if -PI_OVER_2 <= angle <= PI_OVER_2:
+            if self.data_link:
+                send_to = self.link_node.pmtmgmp.GetMacAddress()
+                pmtmgmp = self.base_node.pmtmgmp
+                if (ns.core.Simulator.Now().GetMilliSeconds() - self.base_node.data_speed_time) == 0:
+                    speed = 0
+                else:
+                    speed = (float)(pmtmgmp.GetPacketSizePerPathSecondByMac(send_to) - self.base_node.packet_size_map[str(send_to)]) * 8 * 1000 / SPEED_UPDATE_TIME / (ns.core.Simulator.Now().GetMilliSeconds() - self.base_node.data_speed_time)
+                self.label.set_properties(font=("Sans Serif %i" % int(3 + self.viz.node_size_adjustment.value * 3)),
+                                     text=("%.2f kbit/s" % (speed,)),
+                                     alignment=pango.ALIGN_CENTER,
+                                     x=x, y=-0.5 + y)
+            else:
+                self.label.set_properties(font=("Sans Serif %i" % int(1 + self.viz.node_size_adjustment.value * 3)),
+                                     text=("%d" % (self.path.GetMetric(),)),
+                                     alignment=pango.ALIGN_CENTER,
+                                     x=x, y=-0.5 - y)
             M = cairo.Matrix()
-            # M.translate(*self._get_label_over_line_position(pos1_x, pos1_y, pos2_x, pos2_y))
+            M.translate(*self.viz._get_label_over_line_position(p1_x, p1_y, p2_x, p2_y))
             M.rotate(angle)
         else:
+            if self.data_link:
+                send_to = self.link_node.pmtmgmp.GetMacAddress()
+                pmtmgmp = self.base_node.pmtmgmp
+                if (ns.core.Simulator.Now().GetMilliSeconds() - self.base_node.data_speed_time) == 0:
+                    speed = 0
+                else:
+                    speed = (float)(pmtmgmp.GetPacketSizePerPathSecondByMac(send_to) - self.base_node.packet_size_map[str(send_to)]) * 8 * 1000 / SPEED_UPDATE_TIME / (ns.core.Simulator.Now().GetMilliSeconds() - self.base_node.data_speed_time)
+                self.label.set_properties(font=("Sans Serif %i" % int(3 + self.viz.node_size_adjustment.value * 3)),
+                                     text=("%.2f kbit/s" % (speed,)),
+                                     alignment=pango.ALIGN_CENTER,
+                                     x=0, y=0.5)
+            else:
+                self.label.set_properties(font=("Sans Serif %i" % int(1 + self.viz.node_size_adjustment.value * 3)),
+                                     text=("%d" % (self.path.GetMetric(),)),
+                                     alignment=pango.ALIGN_CENTER,
+                                     x=0, y=0.5)
             M = cairo.Matrix()
-            # M.translate(*self._get_label_over_line_position(pos1_x, pos1_y, pos2_x, pos2_y))
+            M.translate(*self.viz._get_label_over_line_position(p1_x, p1_y, p2_x, p2_y))
             M.rotate(angle)
             M.scale(-1, -1)
         self.label.set_transform(M)
