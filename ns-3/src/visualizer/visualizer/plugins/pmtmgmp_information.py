@@ -121,11 +121,11 @@ class ShowPmtmgmpInforamtion(InformationWindow):
                 self.page_treeview.append_column(page_treeviewcolum)
                 page_treeviewcolum = gtk.TreeViewColumn(' Status ', gtk.CellRendererText(), text = 9)
                 self.page_treeview.append_column(page_treeviewcolum)
-                for i in range(0, self.page_column_num, 2):
-                    page_treeviewcolum = gtk.TreeViewColumn(' Candidate' +  bytes(self.page_column_num) + '_From ', gtk.CellRendererText(), text= i + 10)
-                    self.page_treeview.append_column(page_treeviewcolum)
-                    page_treeviewcolum = gtk.TreeViewColumn(' Candidate_ ' +  bytes(self.page_column_num) + '_Metric ', gtk.CellRendererText(), text= i + 111)
-                    self.page_treeview.append_column(page_treeviewcolum)
+                # for i in range(0, self.page_column_num, 2):
+                #     page_treeviewcolum = gtk.TreeViewColumn(' Candidate' +  bytes(self.page_column_num) + '_From ', gtk.CellRendererText(), text= i + 10)
+                #     self.page_treeview.append_column(page_treeviewcolum)
+                #     page_treeviewcolum = gtk.TreeViewColumn(' Candidate_ ' +  bytes(self.page_column_num) + '_Metric ', gtk.CellRendererText(), text= i + 111)
+                #     self.page_treeview.append_column(page_treeviewcolum)
 
         #Information label of Node
         self.label = gtk.Label("Information For Node[" + bytes(self.node_index) + "]:" + self.get_node_type(self.pmtmgmp.GetNodeType()))
@@ -149,13 +149,13 @@ class ShowPmtmgmpInforamtion(InformationWindow):
                 for j in range(0, route_tree.GetTreeSize()):
                     route_path = route_tree.GetTreeItem(j)
                     page_treeview_iter = page.page_treeview_model.append()
-                    data = []
-                    for k in range(0, route_path.GetCandidateRouteInformaitonSize()):
-                        candidate_infor = route_path.GetCandidateRouteInformaitonItem(k)
-                        data.append(k + 10)
-                        data.append(str(candidate_infor.GetFromNode()))
-                        data.append(k + 11)
-                        data.append(candidate_infor.GetMetric())
+                    # data = []
+                    # for k in range(0, route_path.GetCandidateRouteInformaitonSize()):
+                    #     candidate_infor = route_path.GetCandidateRouteInformaitonItem(k)
+                    #     data.append(k + 10)
+                    #     data.append(str(candidate_infor.GetFromNode()))
+                    #     data.append(k + 11)
+                    #     data.append(candidate_infor.GetMetric())
 
                     page.page_treeview_model.set(
                         page_treeview_iter,
@@ -169,7 +169,8 @@ class ShowPmtmgmpInforamtion(InformationWindow):
                         7, route_path.GetMetric(),
                         8, str(route_path.GetFromNode()),
                         9, self.get_infor_status(route_path.GetStatus()),
-                        *data)
+                        # *data
+                    )
 
                     index = index + 1
 
