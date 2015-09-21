@@ -53,7 +53,7 @@ namespace ns3 {
 			m_CandidateRouteInformaiton(std::vector<Ptr<PmtmgmpRoutePath> >()),
 			m_InformationStatus(Confirmed),
 			m_MaxCandidateNum(10),
-			m_PMTGMGMProutePathInforLife(MicroSeconds(1024 * 80000)),
+			m_PMTGMGMProutePathInforLife(MicroSeconds(1024 * 200000)),
 			m_PMTMGMPpathRecreateDelay(MicroSeconds(1024 * 4000)),
 			m_PmtmgmpPeerLinkStatus(true)
 		{
@@ -92,7 +92,7 @@ namespace ns3 {
 					)
 				.AddAttribute("PMTGMGMProutePathInforLife",
 					"Life of route path information.",
-					TimeValue(MicroSeconds(1024 * 80000)),
+					TimeValue(MicroSeconds(1024 * 200000)),
 					MakeTimeAccessor(
 						&PmtmgmpRoutePath::m_PMTGMGMProutePathInforLife),
 					MakeTimeChecker()

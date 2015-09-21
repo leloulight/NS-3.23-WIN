@@ -192,7 +192,7 @@ namespace ns3 {
 					)
 				.AddAttribute("My11WmnPMTMGMPsecInterval",
 					"Interval MSECP search, it also the interval of path Generation",
-					TimeValue(MicroSeconds(1024 * 40000)),
+					TimeValue(MicroSeconds(1024 * 100000)),
 					MakeTimeAccessor(
 						&PmtmgmpProtocol::m_My11WmnPMTMGMPsecInterval),
 					MakeTimeChecker()
@@ -283,7 +283,7 @@ namespace ns3 {
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			m_NodeType(Mesh_STA),
 			m_My11WmnPMTMGMPsecStartDelayTime(MicroSeconds(1024 * 5000)),
-			m_My11WmnPMTMGMPsecInterval(MicroSeconds(1024 * 40000)),
+			m_My11WmnPMTMGMPsecInterval(MicroSeconds(1024 * 100000)),
 			m_My11WmnPMTMGMPsecSetTime(MicroSeconds(1024 * 2000)),
 			m_My11WmnPMTMGMPpgerWaitTime(MicroSeconds(1024 * 2000)),
 			m_My11WmnPMTMGMPpathMetricUpdatePeriod(MicroSeconds(1024 * 6000)),

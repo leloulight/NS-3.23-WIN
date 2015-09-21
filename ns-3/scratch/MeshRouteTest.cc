@@ -52,10 +52,10 @@
 
 
 //测试所有协议
-//#define TEST_ALL
+#define TEST_ALL
 
 //测试不同边界
-//#define TEST_SIDE_ALL
+#define TEST_SIDE_ALL
 
 // 随机应用总数
 #define TEST_SET_COUNT 4
@@ -68,19 +68,19 @@
 // 区域形状
 #define TEST_SET_AREA MeshRouteClass::SQUARE
 // 应用布置类型
-#define TEST_SET_APP MeshRouteClass::Simple
+#define TEST_SET_APP MeshRouteClass::Random
 // 协议
 #define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
 // 区域最大大小
-#define TEST_SET_MAX_SIZE 11
+#define TEST_SET_MAX_SIZE 10
 // 区域最小大小
-#define TEST_SET_MIN_SIZE 6
+#define TEST_SET_MIN_SIZE 4
 // 区域大小
 #define TEST_SET_SIZE 5
 // 区域间隔
 #define TEST_SET_APPSTEP 3
 // 区域间隔与大小的差值
-#define TEST_SET_SIZE_APPSTEP 4
+#define TEST_SET_SIZE_APPSTEP 2
 
 
 using namespace ns3;
