@@ -689,8 +689,8 @@ class Visualizer(gobject.GObject):
 
         # speed
         ##PMTMGMP_UNUSED_MY_CODE
-        speed_adj = gtk.Adjustment(1.0, 0.01, 10.0, 0.02, 1.0, 0)
-        #speed_adj = gtk.Adjustment(10, 0.01, 10.0, 0.02, 1.0, 0)
+        # speed_adj = gtk.Adjustment(1.0, 0.01, 10.0, 0.02, 1.0, 0)
+        speed_adj = gtk.Adjustment(10, 0.01, 10.0, 0.02, 1.0, 0)
         ####
         def _speed_changed(adj):
             self.speed = adj.value
