@@ -46,7 +46,7 @@
 #define DEGREES_TO_RADIANS(__ANGLE__) ((__ANGLE__) * 0.01745329252f) // PI / 180
 
 // 仿真前路由生成时间
-#define MIN_APPLICATION_TIME 20
+#define MIN_APPLICATION_TIME 10
 // 仿真后等待时间
 #define END_APPLICATION_TIME 20
 
@@ -72,7 +72,7 @@
 // 协议
 #define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
 // 区域最大大小
-#define TEST_SET_MAX_SIZE 10
+#define TEST_SET_MAX_SIZE 11
 // 区域最小大小
 #define TEST_SET_MIN_SIZE 4
 // 区域大小
@@ -877,7 +877,7 @@ int main(int argc, char *argv[])
 #ifndef TEST_SIDE_ALL
 	//LogComponentEnableAll((LogLevel)(LOG_LEVEL_INFO | LOG_PREFIX_ALL));
 
-	//LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpProtocolMac", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpPeerManagementProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpRtable", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));

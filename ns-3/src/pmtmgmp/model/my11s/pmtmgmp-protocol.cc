@@ -185,7 +185,7 @@ namespace ns3 {
 #ifndef PMTMGMP_UNUSED_MY_CODE
 				.AddAttribute("My11WmnPMTMGMPsecStartDelayTime",
 					"Delay time of start MSECP search",
-					TimeValue(MicroSeconds(1024 * 5000)),
+					TimeValue(MicroSeconds(1024 * 4000)),
 					MakeTimeAccessor(
 						&PmtmgmpProtocol::m_My11WmnPMTMGMPsecStartDelayTime),
 					MakeTimeChecker()
