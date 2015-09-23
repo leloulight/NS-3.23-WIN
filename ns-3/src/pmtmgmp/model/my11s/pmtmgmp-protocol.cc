@@ -185,7 +185,7 @@ namespace ns3 {
 #ifndef PMTMGMP_UNUSED_MY_CODE
 				.AddAttribute("My11WmnPMTMGMPsecStartDelayTime",
 					"Delay time of start MSECP search",
-					TimeValue(MicroSeconds(1024 * 4000)),
+					TimeValue(MicroSeconds(1024 * 1000)),
 					MakeTimeAccessor(
 						&PmtmgmpProtocol::m_My11WmnPMTMGMPsecStartDelayTime),
 					MakeTimeChecker()
@@ -220,21 +220,21 @@ namespace ns3 {
 					)
 				.AddAttribute("PMTMGMPmterpAALMmagnification",
 					"The magnification of the value as M in MTERP node when Compute AALM.",
-					DoubleValue(3),
+					DoubleValue(4),
 					MakeDoubleAccessor(
 						&PmtmgmpProtocol::m_PMTMGMPmterpAALMmagnification),
 					MakeDoubleChecker<double>(1)
 					)
 				.AddAttribute("PMTMGMPmsecpAALMmagnification",
 					"The magnification of the value as M in MSECP node when Compute AALM.",
-					DoubleValue(2),
+					DoubleValue(3),
 					MakeDoubleAccessor(
 						&PmtmgmpProtocol::m_PMTMGMPmsecpAALMmagnification),
 					MakeDoubleChecker<double>(1)
 					)
 				.AddAttribute("MaxRoutePathPerPUPD",
 					"Max Route Path in each PUPD, same times it may be more then this value.",
-					UintegerValue(12),
+					UintegerValue(15),
 					MakeUintegerAccessor(
 						&PmtmgmpProtocol::m_MaxRoutePathPerPUPD),
 					MakeUintegerChecker<uint8_t>(1)
@@ -282,16 +282,16 @@ namespace ns3 {
 			m_rfFlag(false),
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			m_NodeType(Mesh_STA),
-			m_My11WmnPMTMGMPsecStartDelayTime(MicroSeconds(1024 * 5000)),
+			m_My11WmnPMTMGMPsecStartDelayTime(MicroSeconds(1024 * 1000)),
 			m_My11WmnPMTMGMPsecInterval(MicroSeconds(1024 * 100000)),
 			m_My11WmnPMTMGMPsecSetTime(MicroSeconds(1024 * 2000)),
 			m_My11WmnPMTMGMPpgerWaitTime(MicroSeconds(1024 * 2000)),
 			m_My11WmnPMTMGMPpathMetricUpdatePeriod(MicroSeconds(1024 * 6000)),
 			m_PathGenerationSeqNumber(0),
-			m_PMTMGMPmterpAALMmagnification(3),
-			m_PMTMGMPmsecpAALMmagnification(2),
+			m_PMTMGMPmterpAALMmagnification(4),
+			m_PMTMGMPmsecpAALMmagnification(3),
 			m_RouteTable(CreateObject<PmtmgmpRouteTable>()),
-			m_MaxRoutePathPerPUPD(12),
+			m_MaxRoutePathPerPUPD(15),
 			m_MaxRoutePathPerPUPGQ(6),
 #ifdef PMTMGMP_TAG_INFOR_ATTACH
 			m_MaxPathChange(10),
@@ -1735,7 +1735,7 @@ namespace ns3 {
 			{
 				if (path->GetPathGenerationSequenceNumber() > secack.GetPathGenerationSequenceNumber())
 				{
-					NS_LOG_DEBUG("Receive SECACK have expired from " << from << " at interface " << interface << " while metric is " << metric << " at " << m_address << " is ");
+					NS_LOG_DEBUG("Receive SECACK have expired from " << from << " at interface " << interface << " while metric is " << metric << " at " << m_address);
 					return;
 				}
 			}
