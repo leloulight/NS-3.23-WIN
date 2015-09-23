@@ -58,11 +58,11 @@
 #define TEST_SIDE_ALL
 
 // 随机应用总数
-#define TEST_SET_COUNT 4
+#define TEST_SET_COUNT 5
 // 随机应用运行间隔
-#define TEST_SET_INTERVAL 5
+#define TEST_SET_INTERVAL 6
 // 随机应用持续时间
-#define TEST_SET_LIFE 28
+#define TEST_SET_LIFE 26
 // 随机应用随机区间
 #define TEST_SET_RANDOM 4
 // 区域形状
@@ -72,7 +72,7 @@
 // 协议
 #define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
 // 区域最大大小
-#define TEST_SET_MAX_SIZE 11
+#define TEST_SET_MAX_SIZE 10
 // 区域最小大小
 #define TEST_SET_MIN_SIZE 4
 // 区域大小
@@ -193,7 +193,7 @@ private:
 
 // 初始化测试
 MeshRouteClass::MeshRouteClass() :
-	m_RandomStart(0.1),
+	m_RandomStart(1),
 	m_NumIface(1),
 	m_WifiPhyStandard(WIFI_PHY_STANDARD_80211g),
 	m_Step(100),
@@ -920,8 +920,10 @@ int main(int argc, char *argv[])
 		remove("1_HWMP_Delay.txt");
 		remove("1_HWMP_Throu.txt");
 #endif
-#ifdef TEST_ALL
-#ifdef TEST_SIDE_ALL
+//测试连续边长
+#ifdef TEST_SIDE_ALL 
+//测试全部协议
+#ifdef TEST_ALL 
 		for (int i = TEST_SET_MIN_SIZE; i <= TEST_SET_MAX_SIZE; i++)
 		{
 			vector<NodeApplicationInfor> apps;
@@ -971,7 +973,67 @@ int main(int argc, char *argv[])
 			mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, apps, totalTime, TEST_SET_AREA, i, i - TEST_SET_SIZE_APPSTEP, TEST_SET_APP);
 			mesh.Run();
 		}
+#else//测试指定协议
+		string typeName;
+		switch (TEST_SET_PROTOCOL)
+		{
+		case MeshRouteClass::DOT11S_HWMP:
+			typeName = "PROTOCOL :DOT11S_HWMP   SIZE :";
+			break;
+		case MeshRouteClass::MY11S_PMTMGMP:
+			typeName = "PROTOCOL :MY11S_PMTMGMP   SIZE :";
+			break;
+		default:
+			break;
+		}
+		for (int i = TEST_SET_MIN_SIZE; i <= TEST_SET_MAX_SIZE; i++)
+		{
+			vector<NodeApplicationInfor> apps;
+			int nodeCount;
+			switch (TEST_SET_AREA)
+			{
+			case MeshRouteClass::SQUARE:
+				nodeCount = i * i;
+				break;
+			case MeshRouteClass::HEXAGON:
+				nodeCount = 3 * (i - 1) * i + 1;
+				break;
+			default:
+				break;
+			}
+
+			Ptr<UniformRandomVariable> randNodes = CreateObject<UniformRandomVariable>();
+			randNodes->SetAttribute("Min", DoubleValue(0));
+			randNodes->SetAttribute("Max", DoubleValue(nodeCount - 1));
+
+			Ptr<UniformRandomVariable> randTime = CreateObject<UniformRandomVariable>();
+
+			for (int j = 0; j < TEST_SET_COUNT; j++)
+			{
+				double startTime = TEST_SET_INTERVAL * j + randTime->GetValue(0, TEST_SET_RANDOM);
+				uint32_t src = randNodes->GetInteger();
+				uint32_t dst;
+				do
+				{
+					dst = randNodes->GetInteger();
+				} while (dst == src);
+				NodeApplicationInfor newApp = { src, dst, startTime, startTime + TEST_SET_LIFE };
+				apps.push_back(newApp);
+			}
+
+			totalTime = (TEST_SET_COUNT - 1) * TEST_SET_INTERVAL + TEST_SET_LIFE + TEST_SET_RANDOM;
+			NS_LOG_INFO("=============================");
+			NS_LOG_INFO(typeName << i);
+			NS_LOG_INFO("=============================\n");
+			MeshRouteClass test;
+			test.SetMeshRouteClass(TEST_SET_PROTOCOL, apps, totalTime, TEST_SET_AREA, i, i - TEST_SET_SIZE_APPSTEP, TEST_SET_APP);
+			test.Run();
+		}
+#endif
+//测试指定边长
 #else
+//测试全部协议
+#ifdef TEST_SIDE_ALL
 		vector<NodeApplicationInfor> apps;
 		int nodeCount;
 		switch (TEST_SET_AREA)
@@ -1007,14 +1069,32 @@ int main(int argc, char *argv[])
 
 		totalTime = (TEST_SET_COUNT - 1) * TEST_SET_INTERVAL + TEST_SET_LIFE + TEST_SET_RANDOM;
 		//测试
+		NS_LOG_INFO("=============================");
+		NS_LOG_INFO("PROTOCOL :MY11S_PMTMGMP   SIZE :" << TEST_SET_SIZE);
+		NS_LOG_INFO("=============================\n");
 		MeshRouteClass pmtmgmp;
 		pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, apps, totalTime, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
 		pmtmgmp.Run();
+		NS_LOG_INFO("=============================");
+		NS_LOG_INFO("PROTOCOL :DOT11S_HWMP   SIZE :" << TEST_SET_SIZE);
+		NS_LOG_INFO("=============================\n");
 		MeshRouteClass mesh;
 		mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, apps, totalTime, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
 		mesh.Run();
-#endif
-#else
+#else//测试指定协议
+		string typeName;
+
+		switch (TEST_SET_PROTOCOL)
+		{
+		case MeshRouteClass::DOT11S_HWMP:
+			typeName = "PROTOCOL :DOT11S_HWMP   SIZE :";
+			break;
+		case MeshRouteClass::MY11S_PMTMGMP:
+			typeName = "PROTOCOL :MY11S_PMTMGMP   SIZE :";
+			break;
+		default:
+			break;
+		}
 		vector<NodeApplicationInfor> apps;
 		int nodeCount;
 		switch (TEST_SET_AREA)
@@ -1049,9 +1129,15 @@ int main(int argc, char *argv[])
 		}
 
 		totalTime = (TEST_SET_COUNT - 1) * TEST_SET_INTERVAL + TEST_SET_LIFE + TEST_SET_RANDOM;
+
+		NS_LOG_INFO("=============================");
+		NS_LOG_INFO(typeName << i);
+		NS_LOG_INFO("=============================\n");
+
 		MeshRouteClass test;
 		test.SetMeshRouteClass(TEST_SET_PROTOCOL, apps, totalTime, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
 		test.Run();
+#endif
 #endif
 	}
 	else
@@ -1075,19 +1161,41 @@ int main(int argc, char *argv[])
 			NS_LOG_INFO("\n");
 		};
 #else
+		NS_LOG_INFO("=============================");
+		NS_LOG_INFO("PROTOCOL :MY11S_PMTMGMP   SIZE :" << TEST_SET_SIZE);
+		NS_LOG_INFO("=============================\n");
 		MeshRouteClass pmtmgmp;
 		pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
 		pmtmgmp.Run();
+		NS_LOG_INFO("=============================");
+		NS_LOG_INFO("PROTOCOL :DOT11S_HWMP   SIZE :" << TEST_SET_SIZE);
+		NS_LOG_INFO("=============================\n");
+		MeshRouteClass mesh;
 		MeshRouteClass mesh;
 		mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
 		mesh.Run();
 #endif
 #else
+		string typeName;
+		switch (TEST_SET_PROTOCOL)
+		{
+		case MeshRouteClass::DOT11S_HWMP:
+			typeName = "PROTOCOL :DOT11S_HWMP   SIZE :";
+			break;
+		case MeshRouteClass::MY11S_PMTMGMP:
+			typeName = "PROTOCOL :MY11S_PMTMGMP   SIZE :";
+			break;
+		default:
+			break;
+		}
+		NS_LOG_INFO("=============================");
+		NS_LOG_INFO(typeName << TEST_SET_SIZE);
+		NS_LOG_INFO("=============================\n");
+
 		MeshRouteClass test;
 		test.SetMeshRouteClass(TEST_SET_PROTOCOL, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
 		test.Run();
 #endif
 	}
-
 	return 0;
 }

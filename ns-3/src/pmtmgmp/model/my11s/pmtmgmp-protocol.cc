@@ -248,7 +248,7 @@ namespace ns3 {
 					)
 				.AddAttribute("MaxPathChange",
 					"Max Route Path count can change when a packet in its way.",
-					UintegerValue(10),
+					UintegerValue(16),
 					MakeUintegerAccessor(
 						&PmtmgmpProtocol::m_MaxPathChange),
 					MakeUintegerChecker<uint8_t>(1)
@@ -297,7 +297,7 @@ namespace ns3 {
 			m_MaxPathChange(10),
 			m_SendIndex(0)
 #else
-			m_MaxPathChange(10)
+			m_MaxPathChange(16)
 #endif
 #endif
 		{
