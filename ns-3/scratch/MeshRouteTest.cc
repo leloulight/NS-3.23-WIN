@@ -18,6 +18,51 @@
 * Author: Whimsy Duke <whimsyduke@163.com>
 */
 
+//输出到文件
+//#define OUT_TO_FILE
+//无应用层模式
+//#define NO_APPLICATION
+//测试模式
+//#define TEST_LOCATION
+//测试所有协议
+//#define TEST_ALL
+//测试不同边界
+//#define TEST_SIDE_ALL
+
+//角度转换
+#define DEGREES_TO_RADIANS(__ANGLE__) ((__ANGLE__) * 0.01745329252f) // PI / 180
+
+// 仿真前路由生成时间
+#define MIN_APPLICATION_TIME 10
+// 仿真后等待时间
+#define END_APPLICATION_TIME 20
+
+// 随机应用总数
+#define TEST_SET_COUNT 5
+// 随机应用运行间隔
+#define TEST_SET_INTERVAL 6
+// 随机应用持续时间
+#define TEST_SET_LIFE 26
+// 随机应用随机区间
+#define TEST_SET_RANDOM 4
+// 区域形状
+#define TEST_SET_AREA MeshRouteClass::SQUARE
+// 应用布置类型
+#define TEST_SET_APP MeshRouteClass::Simple
+// 协议
+#define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
+// 区域最大大小
+#define TEST_SET_MAX_SIZE 10
+// 区域最小大小
+#define TEST_SET_MIN_SIZE 4
+// 区域大小
+#define TEST_SET_SIZE 5
+// 区域间隔
+#define TEST_SET_APPSTEP 3
+// 区域间隔与大小的差值
+#define TEST_SET_SIZE_APPSTEP 2
+
+
 #include "ns3/core-module.h"
 #include "ns3/internet-module.h"
 #include "ns3/network-module.h"
@@ -33,55 +78,6 @@
 #include <sstream>
 #include <fstream>
 #include <ctime>
-
-//输出到文件
-#define OUT_TO_FILE
-//无应用层模式
-//#define NO_APPLICATION
-//测试模式
-//#define TEST_LOCATION
-
-
-//角度转换
-#define DEGREES_TO_RADIANS(__ANGLE__) ((__ANGLE__) * 0.01745329252f) // PI / 180
-
-// 仿真前路由生成时间
-#define MIN_APPLICATION_TIME 10
-// 仿真后等待时间
-#define END_APPLICATION_TIME 20
-
-
-//测试所有协议
-#define TEST_ALL
-
-//测试不同边界
-#define TEST_SIDE_ALL
-
-// 随机应用总数
-#define TEST_SET_COUNT 5
-// 随机应用运行间隔
-#define TEST_SET_INTERVAL 6
-// 随机应用持续时间
-#define TEST_SET_LIFE 26
-// 随机应用随机区间
-#define TEST_SET_RANDOM 4
-// 区域形状
-#define TEST_SET_AREA MeshRouteClass::SQUARE
-// 应用布置类型
-#define TEST_SET_APP MeshRouteClass::Random
-// 协议
-#define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
-// 区域最大大小
-#define TEST_SET_MAX_SIZE 10
-// 区域最小大小
-#define TEST_SET_MIN_SIZE 4
-// 区域大小
-#define TEST_SET_SIZE 5
-// 区域间隔
-#define TEST_SET_APPSTEP 3
-// 区域间隔与大小的差值
-#define TEST_SET_SIZE_APPSTEP 2
-
 
 using namespace ns3;
 using namespace std;
@@ -427,6 +423,7 @@ void MeshRouteClass::InstallInternetStack()
 	Ipv4AddressHelper address;
 	address.SetBase("192.168.1.0", "255.255.255.0");
 	l_Interfaces = address.Assign(l_NetDevices);
+	Ipv4InterfaceContainer interfaces = address.Assign(l_NetDevices);
 }
 
 // 安装一对应用
@@ -588,8 +585,8 @@ void MeshRouteClass::InstallApplicationRandom()
 void MeshRouteClass::StatsDataSet()
 {
 	//输出配置
-	Config::Connect("/NodeList/*/DeviceList/*/RoutingProtocol/RouteDiscoveryTime", MakeCallback(&MeshRouteClass::CallBack_RouteDiscoveryTime, this));
-	Config::Connect("/NodeList/*/ApplicationList/*/$ns3::BulkSendApplication/Tx", MakeCallback(&MeshRouteClass::CallBack_ApplicationTX, this));
+	//Config::Connect("/NodeList/*/DeviceList/*/RoutingProtocol/RouteDiscoveryTime", MakeCallback(&MeshRouteClass::CallBack_RouteDiscoveryTime, this));
+	//Config::Connect("/NodeList/*/ApplicationList/*/$ns3::BulkSendApplication/Tx", MakeCallback(&MeshRouteClass::CallBack_ApplicationTX, this));
 
 	//Gnuplot图表输出
 	string probeType = "ns3::Ipv4PacketProbe";
@@ -767,7 +764,7 @@ int MeshRouteClass::Run()
 	}
 #endif
 	// 数据统计模块配置
-	StatsDataSet();
+	//StatsDataSet();
 
 	//Ptr<WmnPointDevice> wpd = DynamicCast<WmnPointDevice>(l_Nodes.Get(0)->GetDevice(0));
 	//Ptr<my11s::PmtmgmpProtocol> pp = DynamicCast<my11s::PmtmgmpProtocol>(wpd->GetRoutingProtocol());
