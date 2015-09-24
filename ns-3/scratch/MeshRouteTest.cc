@@ -148,6 +148,7 @@ private:
 	// 回调函数
 	void CallBack_RouteDiscoveryTime(string context, Time time);
 	void CallBack_ApplicationTX(string context, Ptr<const Packet> packet);
+	void CallBack_ApplicationRX(string context, Ptr<const Packet> packet);
 	// 输出报告
 	void Report();
 
@@ -429,14 +430,14 @@ void MeshRouteClass::InstallInternetStack()
 // 安装一对应用
 void MeshRouteClass::InstallCoupleApplication(int srcIndex, int dstIndex, int srcPort, int dstPort, double start, double end)
 {
-	OnOffHelper onOffAPP("ns3::UdpSocketFactory", Address(InetSocketAddress(l_Interfaces.GetAddress(dstIndex), srcPort)));
+	OnOffHelper onOffAPP("ns3::TcpSocketFactory", Address(InetSocketAddress(l_Interfaces.GetAddress(dstIndex), srcPort)));
 	onOffAPP.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]"));
 	onOffAPP.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=0]"));
 	ApplicationContainer sourceApps = onOffAPP.Install(l_Nodes.Get(srcIndex));
 	sourceApps.Start(Seconds(MIN_APPLICATION_TIME + start));
 	sourceApps.Stop(Seconds(MIN_APPLICATION_TIME + end));
 
-	PacketSinkHelper sink("ns3::UdpSocketFactory", InetSocketAddress(l_Interfaces.GetAddress(dstIndex), dstPort));
+	PacketSinkHelper sink("ns3::TcpSocketFactory", InetSocketAddress(l_Interfaces.GetAddress(dstIndex), dstPort));
 	ApplicationContainer sinkApps = sink.Install(l_Nodes.Get(srcIndex));
 	sinkApps.Start(Seconds(MIN_APPLICATION_TIME + start));
 	sinkApps.Stop(Seconds(MIN_APPLICATION_TIME + end + END_APPLICATION_TIME));
@@ -586,20 +587,21 @@ void MeshRouteClass::StatsDataSet()
 {
 	//输出配置
 	//Config::Connect("/NodeList/*/DeviceList/*/RoutingProtocol/RouteDiscoveryTime", MakeCallback(&MeshRouteClass::CallBack_RouteDiscoveryTime, this));
-	//Config::Connect("/NodeList/*/ApplicationList/*/$ns3::BulkSendApplication/Tx", MakeCallback(&MeshRouteClass::CallBack_ApplicationTX, this));
+	Config::Connect("/NodeList/*/ApplicationList/*/$ns3::OnOffApplication/Tx", MakeCallback(&MeshRouteClass::CallBack_ApplicationTX, this));
+	Config::Connect("/NodeList/*/ApplicationList/*/$ns3::PacketSink/Rx", MakeCallback(&MeshRouteClass::CallBack_ApplicationRX, this));
 
-	//Gnuplot图表输出
-	string probeType = "ns3::Ipv4PacketProbe";
-	string tracePath = "/NodeList/*/$ns3::Ipv4L3Protocol/Tx";
+	////Gnuplot图表输出
+	//string probeType = "ns3::Ipv4PacketProbe";
+	//string tracePath = "/NodeList/*/$ns3::Ipv4L3Protocol/Tx";
 
-	GnuplotHelper plotHelper;
-	plotHelper.ConfigurePlot("Mesh-Route-Test-Packet-Byte-Count", "Packet Byte Count vs. Time", "Time (Seconds)", "Packet Byte Count");
-	plotHelper.PlotProbe(probeType, tracePath, "OutputBytes", "Packet Byte Count", GnuplotAggregator::KEY_BELOW);
+	//GnuplotHelper plotHelper;
+	//plotHelper.ConfigurePlot("Mesh-Route-Test-Packet-Byte-Count", "Packet Byte Count vs. Time", "Time (Seconds)", "Packet Byte Count");
+	//plotHelper.PlotProbe(probeType, tracePath, "OutputBytes", "Packet Byte Count", GnuplotAggregator::KEY_BELOW);
 
-	FileHelper fileHelper;
-	fileHelper.ConfigureFile("Mesh-Route-Test", FileAggregator::FORMATTED);
-	fileHelper.Set2dFormat("Time (Seconds) = %.3e\tPacket Byte Count = %.0f");
-	fileHelper.WriteProbe(probeType, tracePath, "OutputBytes");
+	//FileHelper fileHelper;
+	//fileHelper.ConfigureFile("Mesh-Route-Test", FileAggregator::FORMATTED);
+	//fileHelper.Set2dFormat("Time (Seconds) = %.3e\tPacket Byte Count = %.0f");
+	//fileHelper.WriteProbe(probeType, tracePath, "OutputBytes");
 }
 
 // 输出流量数据
@@ -764,7 +766,7 @@ int MeshRouteClass::Run()
 	}
 #endif
 	// 数据统计模块配置
-	//StatsDataSet();
+	StatsDataSet();
 
 	//Ptr<WmnPointDevice> wpd = DynamicCast<WmnPointDevice>(l_Nodes.Get(0)->GetDevice(0));
 	//Ptr<my11s::PmtmgmpProtocol> pp = DynamicCast<my11s::PmtmgmpProtocol>(wpd->GetRoutingProtocol());
@@ -789,7 +791,11 @@ void MeshRouteClass::CallBack_RouteDiscoveryTime(string context, Time time)
 }
 void MeshRouteClass::CallBack_ApplicationTX(string context, Ptr<const Packet> packet)
 {
-	NS_LOG_INFO("Packet Size:" << packet->GetSize() << std::endl);
+	NS_LOG_INFO("Send Packet, Size:" << packet->GetSize() << std::endl);
+}
+void MeshRouteClass::CallBack_ApplicationRX(string context, Ptr<const Packet> packet)
+{
+	NS_LOG_INFO("Receive Packet, Size:" << packet->GetSize() << std::endl);
 }
 
 //输出报告
@@ -874,7 +880,7 @@ int main(int argc, char *argv[])
 #ifndef TEST_SIDE_ALL
 	//LogComponentEnableAll((LogLevel)(LOG_LEVEL_INFO | LOG_PREFIX_ALL));
 
-	LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("PmtmgmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpProtocolMac", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpPeerManagementProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("PmtmgmpRtable", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
