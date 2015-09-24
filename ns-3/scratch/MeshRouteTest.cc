@@ -592,8 +592,8 @@ void MeshRouteClass::StatsDataSet()
 	Config::Connect("/NodeList/*/ApplicationList/*/$ns3::BulkSendApplication/Tx", MakeCallback(&MeshRouteClass::CallBack_ApplicationTX, this));
 
 	//Gnuplot图表输出
-	string probeType = "ns3::PacketProbe";
-	string tracePath = "/NodeList/*/ApplicationList/*/$ns3::BulkSendApplication/Tx";
+	string probeType = "ns3::Ipv4PacketProbe";
+	string tracePath = "/NodeList/*/$ns3::Ipv4L3Protocol/Tx";
 
 	GnuplotHelper plotHelper;
 	plotHelper.ConfigurePlot("Mesh-Route-Test-Packet-Byte-Count", "Packet Byte Count vs. Time", "Time (Seconds)", "Packet Byte Count");
@@ -767,7 +767,7 @@ int MeshRouteClass::Run()
 	}
 #endif
 	// 数据统计模块配置
-	void StatsDataSet();
+	StatsDataSet();
 
 	//Ptr<WmnPointDevice> wpd = DynamicCast<WmnPointDevice>(l_Nodes.Get(0)->GetDevice(0));
 	//Ptr<my11s::PmtmgmpProtocol> pp = DynamicCast<my11s::PmtmgmpProtocol>(wpd->GetRoutingProtocol());
@@ -1131,7 +1131,7 @@ int main(int argc, char *argv[])
 		totalTime = (TEST_SET_COUNT - 1) * TEST_SET_INTERVAL + TEST_SET_LIFE + TEST_SET_RANDOM;
 
 		NS_LOG_INFO("=============================");
-		NS_LOG_INFO(typeName << i);
+		NS_LOG_INFO(typeName << TEST_SET_SIZE);
 		NS_LOG_INFO("=============================\n");
 
 		MeshRouteClass test;
