@@ -32,12 +32,12 @@ class Pmtmgmp_Path_Link(Link):
             # self.line = goocanvas.Polyline(parent=self.canvas_item, line_width=1.0, stroke_color_rgba=0xC00000FF, start_arrow=True, arrow_length=10,arrow_width=8)
             self.line = goocanvas.Polyline(parent=self.canvas_item, line_width=3.0, stroke_color_rgba=0xC00000FF,
                                            start_arrow=True, close_path=False, end_arrow=False, arrow_length=20,
-                                           arrow_width=20)
+                                           arrow_width=25)
         else:
             # self.line = goocanvas.Polyline(parent=self.canvas_item, line_width=1.0, stroke_color_rgba=0xC00000FF, start_arrow=True, arrow_length=10,arrow_width=8)
             self.line = goocanvas.Polyline(parent=self.canvas_item, line_width=2.0, stroke_color_rgba=color,
-                                           start_arrow=True, close_path=False, end_arrow=False, arrow_length=15,
-                                           arrow_width=15)
+                                           start_arrow=True, close_path=False, end_arrow=False, arrow_length=25,
+                                           arrow_width=20)
         self.line.raise_(None)
         self.label = goocanvas.Text()  # , fill_color_rgba=0x00C000C0)
         self.label.props.pointer_events = 0
@@ -93,12 +93,12 @@ class Pmtmgmp_Path_Link(Link):
                     if speed == 0:
                         self.destroy()
                         return
-                self.label.set_properties(font=("Sans Serif %i" % int(3 + self.viz.node_size_adjustment.value * 3)),
+                self.label.set_properties(font=("Sans Serif %i" % int(3 + self.viz.node_size_adjustment.value * 4)),
                                           text=("%.2f kbit/s" % (speed,)),
                                           alignment=pango.ALIGN_CENTER,
                                           x=x, y=-0.5 + y)
             else:
-                self.label.set_properties(font=("Sans Serif %i" % int(1 + self.viz.node_size_adjustment.value * 3)),
+                self.label.set_properties(font=("Sans Serif %i" % int(1 + self.viz.node_size_adjustment.value * 4)),
                                           text=("%d" % (self.path.GetMetric(),)),
                                           alignment=pango.ALIGN_CENTER,
                                           x=x, y=-0.5 - y)
@@ -238,7 +238,7 @@ class Pmtmgmp_Node(object):
         elif (node_type == 4):
             color = 0x0000FFFF
         elif (node_type == 8 and msecp == self.pmtmgmp.GetMacAddress()):
-            color = 0xFFFF00FF
+            color = 0x9900FFFF
         if (self.pmtmgmp.GetPmtmgmpRouteTable().GetTableSize() == 0):
             color = 0xFFFFFFFF
         self.set_color(color)
@@ -256,7 +256,7 @@ class Pmtmgmp_Node(object):
             if mac_node_list[str(route_path.GetFromNode())] is self:
                 return
             route_link = Pmtmgmp_Path_Link(None, self, mac_node_list[str(route_path.GetFromNode())], route_table, mterp,
-                                           msecp, parent_canvas_item, COLOR[1], route_path, self.viz, False,
+                                           msecp, parent_canvas_item, COLOR[2], route_path, self.viz, False,
                                            self.link_dict, key)
             self.link_dict[key] = route_link
             # if SHOW_LOG:
@@ -271,7 +271,7 @@ class Pmtmgmp_Node(object):
         elif (node_type == 4):
             node_color = 0x0000FFFF
         elif (node_type == 8):
-            node_color = 0xFFFF00FF
+            node_color = 0x9900FFFF
         if (self.pmtmgmp.GetPmtmgmpRouteTable().GetTableSize() == 0):
             node_color = 0xFFFFFFFF
         self.set_color(node_color)
@@ -306,7 +306,7 @@ class Pmtmgmp_Node(object):
         elif (node_type == 4):
             node_color = 0x0000FFFF
         elif (node_type == 8):
-            node_color = 0xFFFF00FF
+            node_color = 0x9900FFFF
         if (self.pmtmgmp.GetPmtmgmpRouteTable().GetTableSize() == 0):
             node_color = 0xFFFFFFFF
         self.set_color(node_color)
@@ -344,7 +344,7 @@ class Pmtmgmp_Node(object):
         elif (node_type == 4):
             color = 0x0000FFFF
         elif (node_type == 8):
-            color = 0xFFFF00FF
+            color = 0x9900FFFF
         if (self.pmtmgmp.GetPmtmgmpRouteTable().GetTableSize() == 0):
             color = 0xFFFFFFFF
         self.set_color(color)
@@ -412,7 +412,7 @@ class Pmtmgmp_Route(object):
             elif (node_type == 4):
                 node_color = 0x0000FFFF
             elif (node_type == 8):
-                node_color = 0xFFFF00FF
+                node_color = 0x9900FFFF
             if (pmtmgmp.GetPmtmgmpRouteTable().GetTableSize() == 0):
                 node_color = 0xFFFFFFFF
             node.canvas_item.set_properties(fill_color_rgba=node_color)
