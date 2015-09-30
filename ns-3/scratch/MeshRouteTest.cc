@@ -28,6 +28,8 @@
 //#define TEST_ALL
 //测试不同边界
 //#define TEST_SIDE_ALL
+//使用Stats
+//#define TEST_STATS
 
 //角度转换
 #define DEGREES_TO_RADIANS(__ANGLE__) ((__ANGLE__) * 0.01745329252f) // PI / 180
@@ -51,6 +53,7 @@
 #define TEST_SET_APP MeshRouteClass::Simple
 // 协议
 #define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
+
 // 区域最大大小
 #define TEST_SET_MAX_SIZE 10
 // 区域最小大小
@@ -144,11 +147,13 @@ private:
 	// 输出流量数据
 	void FlowMonitorReport();
 
+#ifdef TEST_STATS
 private:
 	// 回调函数
 	void CallBack_RouteDiscoveryTime(string context, Time time);
 	void CallBack_ApplicationTX(string context, Ptr<const Packet> packet);
 	void CallBack_ApplicationRX(string context, Ptr<const Packet> packet);
+#endif
 	// 输出报告
 	void Report();
 
@@ -430,14 +435,21 @@ void MeshRouteClass::InstallInternetStack()
 // 安装一对应用
 void MeshRouteClass::InstallCoupleApplication(int srcIndex, int dstIndex, int srcPort, int dstPort, double start, double end)
 {
-	OnOffHelper onOffAPP("ns3::TcpSocketFactory", Address(InetSocketAddress(l_Interfaces.GetAddress(dstIndex), srcPort)));
+	string str;
+	char ch[6] ;
+	OnOffHelper onOffAPP("ns3::UdpSocketFactory", Address(InetSocketAddress(l_Interfaces.GetAddress(dstIndex), srcPort)));
 	onOffAPP.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]"));
 	onOffAPP.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=0]"));
 	ApplicationContainer sourceApps = onOffAPP.Install(l_Nodes.Get(srcIndex));
 	sourceApps.Start(Seconds(MIN_APPLICATION_TIME + start));
 	sourceApps.Stop(Seconds(MIN_APPLICATION_TIME + end));
+#ifdef TEST_STATS
+	sprintf(ch, "%d", srcIndex);
+	str = ch;
+	Config::Connect("/NodeList/" + str + "/ApplicationList/*/$ns3::OnOffApplication/Tx", MakeCallback(&MeshRouteClass::CallBack_ApplicationTX, this));
+#endif
 
-	PacketSinkHelper sink("ns3::TcpSocketFactory", InetSocketAddress(l_Interfaces.GetAddress(dstIndex), dstPort));
+	PacketSinkHelper sink("ns3::UdpSocketFactory", InetSocketAddress(l_Interfaces.GetAddress(dstIndex), dstPort));
 	ApplicationContainer sinkApps = sink.Install(l_Nodes.Get(srcIndex));
 	sinkApps.Start(Seconds(MIN_APPLICATION_TIME + start));
 	sinkApps.Stop(Seconds(MIN_APPLICATION_TIME + end + END_APPLICATION_TIME));
@@ -446,7 +458,12 @@ void MeshRouteClass::InstallCoupleApplication(int srcIndex, int dstIndex, int sr
 	{
 		DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(srcIndex)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Access_Point);
 		DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(dstIndex)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Portal);
-	}
+	}	
+#ifdef TEST_STATS
+	sprintf(ch, "%d", dstIndex);
+	str = ch;
+	Config::Connect("/NodeList/" + str + "/ApplicationList/*/$ns3::PacketSink/Rx", MakeCallback(&MeshRouteClass::CallBack_ApplicationRX, this));
+#endif
 }
 
 // 安装应用层
@@ -585,10 +602,9 @@ void MeshRouteClass::InstallApplicationRandom()
 // 数据统计模块配置
 void MeshRouteClass::StatsDataSet()
 {
+#ifdef TEST_STATS
 	//输出配置
 	//Config::Connect("/NodeList/*/DeviceList/*/RoutingProtocol/RouteDiscoveryTime", MakeCallback(&MeshRouteClass::CallBack_RouteDiscoveryTime, this));
-	Config::Connect("/NodeList/*/ApplicationList/*/$ns3::OnOffApplication/Tx", MakeCallback(&MeshRouteClass::CallBack_ApplicationTX, this));
-	Config::Connect("/NodeList/*/ApplicationList/*/$ns3::PacketSink/Rx", MakeCallback(&MeshRouteClass::CallBack_ApplicationRX, this));
 
 	////Gnuplot图表输出
 	//string probeType = "ns3::Ipv4PacketProbe";
@@ -602,6 +618,7 @@ void MeshRouteClass::StatsDataSet()
 	//fileHelper.ConfigureFile("Mesh-Route-Test", FileAggregator::FORMATTED);
 	//fileHelper.Set2dFormat("Time (Seconds) = %.3e\tPacket Byte Count = %.0f");
 	//fileHelper.WriteProbe(probeType, tracePath, "OutputBytes");
+#endif
 }
 
 // 输出流量数据
@@ -783,7 +800,7 @@ int MeshRouteClass::Run()
 	FlowMonitorReport();
 	return 0;
 }
-
+#ifdef TEST_STATS
 // 回调函数
 void MeshRouteClass::CallBack_RouteDiscoveryTime(string context, Time time)
 {
@@ -797,6 +814,7 @@ void MeshRouteClass::CallBack_ApplicationRX(string context, Ptr<const Packet> pa
 {
 	NS_LOG_INFO("Receive Packet, Size:" << packet->GetSize() << std::endl);
 }
+#endif
 
 //输出报告
 void MeshRouteClass::Report()
