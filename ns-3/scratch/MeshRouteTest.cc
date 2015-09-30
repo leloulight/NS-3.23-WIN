@@ -55,7 +55,7 @@
 #define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
 
 // 区域最大大小
-#define TEST_SET_MAX_SIZE 10
+#define TEST_SET_MAX_SIZE 7
 // 区域最小大小
 #define TEST_SET_MIN_SIZE 4
 // 区域大小

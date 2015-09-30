@@ -185,7 +185,7 @@ namespace ns3 {
 #ifndef PMTMGMP_UNUSED_MY_CODE
 				.AddAttribute("My11WmnPMTMGMPsecStartDelayTime",
 					"Delay time of start MSECP search",
-					TimeValue(MicroSeconds(1024 * 1000)),
+					TimeValue(MicroSeconds(1024 * 958)),
 					MakeTimeAccessor(
 						&PmtmgmpProtocol::m_My11WmnPMTMGMPsecStartDelayTime),
 					MakeTimeChecker()
@@ -282,7 +282,7 @@ namespace ns3 {
 			m_rfFlag(false),
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			m_NodeType(Mesh_STA),
-			m_My11WmnPMTMGMPsecStartDelayTime(MicroSeconds(1024 * 1000)),
+			m_My11WmnPMTMGMPsecStartDelayTime(MicroSeconds(1024 * 958)),
 			m_My11WmnPMTMGMPsecInterval(MicroSeconds(1024 * 100000)),
 			m_My11WmnPMTMGMPsecSetTime(MicroSeconds(1024 * 2000)),
 			m_My11WmnPMTMGMPpgerWaitTime(MicroSeconds(1024 * 2000)),
