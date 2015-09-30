@@ -200,7 +200,8 @@ class Pmtmgmp_Node(object):
     def clean_link_dict(self):
         for (key, link) in self.link_dict.items():
             link.destroy()
-            del (self.link_dict[key])
+            if self.link_dict.has_key(key):
+                del (self.link_dict[key])
         self.link_dict.clear()
         self.link_dict = {}
 

@@ -1841,6 +1841,7 @@ namespace ns3 {
 			pathCopy->SetFromNode(from);
 			pathCopy->SetPGENsendTime();
 
+#ifndef PMTMGMP_UNUSED_REPEAT_PATH //使用路径重复效验
 			////路由表是否存在PGEN来源对应路径
 			Ptr<PmtmgmpRouteTree> routeTree = m_RouteTable->GetTreeByMACaddress(pathCopy->GetMTERPaddress());
 			if (routeTree == 0)
@@ -1850,9 +1851,6 @@ namespace ns3 {
 				m_RouteTable->AddNewPath(pathCopy);
 				routeTree = m_RouteTable->GetTreeByMACaddress(pathCopy->GetMTERPaddress());
 				routeTree->RepeatabilityIncrease(from);
-
-				////发送列队的数据
-				m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats, &m_PacketSizePerPath);
 			}
 			else
 			{
@@ -1865,9 +1863,6 @@ namespace ns3 {
 					pathCopy->SetStatus(PmtmgmpRoutePath::Confirmed);
 					routeTree->AddNewPath(pathCopy);
 					routeTree->RepeatabilityIncrease(from);
-
-					////发送列队的数据
-					m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats, &m_PacketSizePerPath);
 				}
 				else if (GenSeqNum == routeTree->GetTreeMaxGenerationSeqNumber())
 				{
@@ -1886,8 +1881,6 @@ namespace ns3 {
 							routeTree->AddNewPath(pathCopy);
 							routeTree->RepeatabilityIncrease(from);
 
-							////发送列队的数据
-							m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats, &m_PacketSizePerPath);
 						}
 						else
 						{
@@ -1897,9 +1890,6 @@ namespace ns3 {
 								pathCopy->SetStatus(PmtmgmpRoutePath::Confirmed);
 								routeTree->RepeatabilityIncrease(from);
 								routeTree->AddNewPath(pathCopy);
-
-								////发送列队的数据
-								m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats, &m_PacketSizePerPath);
 							}
 							else
 							{
@@ -1982,6 +1972,23 @@ namespace ns3 {
 					return;
 				}
 			}
+#else
+			Ptr<PmtmgmpRouteTree> routeTree = m_RouteTable->GetTreeByMACaddress(pathCopy->GetMTERPaddress());
+			if (routeTree != 0)
+			{
+				Ptr<PmtmgmpRoutePath> existPath = routeTree->GetPathByMACaddress(pathCopy->GetMSECPaddress());
+				if (existPath != 0)
+				{
+					if (existPath->GetStatus() == PmtmgmpRoutePath::Confirmed && pathCopy->GetPathGenerationSequenceNumber() == existPath->GetPathGenerationSequenceNumber())
+					{
+						//路径信息存在且当前生成已完成，放弃PGEN
+						return;
+					}
+				}
+			}
+			pathCopy->SetStatus(PmtmgmpRoutePath::Confirmed);
+			m_RouteTable->AddNewPath(pathCopy);
+#endif
 			m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats, &m_PacketSizePerPath);
 			if (pathCopy->GetTTL() > 0)
 			{
