@@ -25,11 +25,11 @@
 //测试模式
 //#define TEST_LOCATION
 //测试所有协议
-#define TEST_ALL
+//#define TEST_ALL
 //测试不同边界
-#define TEST_SIDE_ALL
+//#define TEST_SIDE_ALL
 //使用Stats
-//#define TEST_STATS
+#define TEST_STATS
 
 //角度转换
 #define DEGREES_TO_RADIANS(__ANGLE__) ((__ANGLE__) * 0.01745329252f) // PI / 180
@@ -50,7 +50,7 @@
 // 区域形状
 #define TEST_SET_AREA MeshRouteClass::SQUARE
 // 应用布置类型
-#define TEST_SET_APP MeshRouteClass::Random
+#define TEST_SET_APP MeshRouteClass::Multiple
 // 协议
 #define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
 
@@ -139,7 +139,7 @@ private:
 	// 安装网络协议栈
 	void InstallInternetStack();
 	// 安装一对应用
-	void InstallCoupleApplication(int srcIndex, int dstIndex, int srcPort, int dstPort, double start, double end);
+	void InstallCoupleApplication(int srcIndex, int dstIndex, int port, double start, double end);
 	// 安装应用层
 	void InstallApplicationRandom();
 	// 数据统计模块配置
@@ -152,7 +152,7 @@ private:
 	// 回调函数
 	void CallBack_RouteDiscoveryTime(string context, Time time);
 	void CallBack_ApplicationTX(string context, Ptr<const Packet> packet);
-	void CallBack_ApplicationRX(string context, Ptr<const Packet> packet);
+	void CallBack_ApplicationRX(std::string path, Ptr<const Packet> packet, const Address &from);
 #endif
 	// 输出报告
 	void Report();
@@ -433,13 +433,13 @@ void MeshRouteClass::InstallInternetStack()
 }
 
 // 安装一对应用
-void MeshRouteClass::InstallCoupleApplication(int srcIndex, int dstIndex, int srcPort, int dstPort, double start, double end)
+void MeshRouteClass::InstallCoupleApplication(int srcIndex, int dstIndex, int port, double start, double end)
 {
 #ifdef TEST_STATS
 	string str;
 	char ch[6] ;
 #endif
-	OnOffHelper onOffAPP("ns3::UdpSocketFactory", Address(InetSocketAddress(l_Interfaces.GetAddress(dstIndex), srcPort)));
+	OnOffHelper onOffAPP("ns3::UdpSocketFactory", Address(InetSocketAddress(l_Interfaces.GetAddress(dstIndex), port)));
 	onOffAPP.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]"));
 	onOffAPP.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=0]"));
 	ApplicationContainer sourceApps = onOffAPP.Install(l_Nodes.Get(srcIndex));
@@ -451,8 +451,8 @@ void MeshRouteClass::InstallCoupleApplication(int srcIndex, int dstIndex, int sr
 	Config::Connect("/NodeList/" + str + "/ApplicationList/*/$ns3::OnOffApplication/Tx", MakeCallback(&MeshRouteClass::CallBack_ApplicationTX, this));
 #endif
 
-	PacketSinkHelper sink("ns3::UdpSocketFactory", InetSocketAddress(l_Interfaces.GetAddress(dstIndex), dstPort));
-	ApplicationContainer sinkApps = sink.Install(l_Nodes.Get(srcIndex));
+	PacketSinkHelper sink("ns3::UdpSocketFactory", InetSocketAddress(l_Interfaces.GetAddress(dstIndex), port));
+	ApplicationContainer sinkApps = sink.Install(l_Nodes.Get(dstIndex));
 	sinkApps.Start(Seconds(MIN_APPLICATION_TIME + start));
 	sinkApps.Stop(Seconds(MIN_APPLICATION_TIME + end + END_APPLICATION_TIME));
 
@@ -479,18 +479,18 @@ void MeshRouteClass::InstallApplicationRandom()
 		{
 		case MeshRouteClass::SQUARE:
 		{
-			InstallCoupleApplication(m_Size + 1, m_Size * (m_Size - 1) - 2, 49000, 49001, 0, m_TotalTime);
+			InstallCoupleApplication(m_Size + 1, m_Size * (m_Size - 1) - 2, 49001, 0, m_TotalTime);
 		}
 		break;
 		case MeshRouteClass::HEXAGON:
 		{
 			if (m_Size == 2)
 			{
-				InstallCoupleApplication(1, 4, 49000, 49001, 0, m_TotalTime);
+				InstallCoupleApplication(1, 4, 49001, 0, m_TotalTime);
 			}
 			else
 			{
-				InstallCoupleApplication(l_NodeNum + 18 - 12 * m_Size, l_NodeNum + 12 - 9 * m_Size, 49000, 49001, 0, m_TotalTime);
+				InstallCoupleApplication(l_NodeNum + 18 - 12 * m_Size, l_NodeNum + 12 - 9 * m_Size, 49001, 0, m_TotalTime);
 			}
 		}
 		break;
@@ -510,7 +510,7 @@ void MeshRouteClass::InstallApplicationRandom()
 			if (m_Size <= m_ApplicationStep)
 			{
 				// 节点数量不足使用多应用
-				InstallCoupleApplication(m_Size + 1, m_Size * (m_Size - 1) - 2, 49000, 49001, 0, m_TotalTime);
+				InstallCoupleApplication(m_Size + 1, m_Size * (m_Size - 1) - 2, 49001, 0, m_TotalTime);
 			}
 			int start = ((m_Size - 1) % m_ApplicationStep) / 2;
 			bool end = false;
@@ -527,11 +527,11 @@ void MeshRouteClass::InstallApplicationRandom()
 					}
 					if (count % 2 == 0)
 					{
-						InstallCoupleApplication(y * m_Size + x, l_NodeNum - y * m_Size - x - 1, 49000, 49001 + i, i, m_TotalTime);
+						InstallCoupleApplication(y * m_Size + x, l_NodeNum - y * m_Size - x - 1, 49001 + i, i, m_TotalTime);
 					}
 					else
 					{
-						InstallCoupleApplication(l_NodeNum - y * m_Size - x - 1, y * m_Size + x, 49000, 49001 + i, i, m_TotalTime);
+						InstallCoupleApplication(l_NodeNum - y * m_Size - x - 1, y * m_Size + x, 49001 + i, i, m_TotalTime);
 					}
 					count++;
 				}
@@ -553,11 +553,11 @@ void MeshRouteClass::InstallApplicationRandom()
 				// 节点数量不足使用多应用
 				if (m_Size == 2)
 				{
-					InstallCoupleApplication(1, 4, 49000, 49001, 0, m_TotalTime);
+					InstallCoupleApplication(1, 4, 49001, 0, m_TotalTime);
 				}
 				else
 				{
-					InstallCoupleApplication(l_NodeNum + 18 - 12 * m_Size, l_NodeNum + 12 - 9 * m_Size, 49000, 49001, 0, m_TotalTime);
+					InstallCoupleApplication(l_NodeNum + 18 - 12 * m_Size, l_NodeNum + 12 - 9 * m_Size, 49001, 0, m_TotalTime);
 				}
 			}
 			else
@@ -570,11 +570,11 @@ void MeshRouteClass::InstallApplicationRandom()
 					{
 						if (n % 2 == 0)
 						{
-							InstallCoupleApplication(s + i, s + r * 3 + i, 49000, 49000 + n, n, m_TotalTime);
+							InstallCoupleApplication(s + i, s + r * 3 + i, 49000 + n, n, m_TotalTime);
 						}
 						else
 						{
-							InstallCoupleApplication(s + r * 3 + i, s + i, 49000, 49000 + n, n, m_TotalTime);
+							InstallCoupleApplication(s + r * 3 + i, s + i, 49000 + n, n, m_TotalTime);
 						}
 						n++;
 					}
@@ -592,7 +592,7 @@ void MeshRouteClass::InstallApplicationRandom()
 		for (vector<NodeApplicationInfor>::iterator iter = m_Applications.begin(); iter != m_Applications.end(); iter++)
 		{
 			port++;
-			InstallCoupleApplication(iter->srcIndex, iter->dstIndex, 49000, 49000 + port, iter->start, iter->end);
+			InstallCoupleApplication(iter->srcIndex, iter->dstIndex, 49000 + port, iter->start, iter->end);
 		}
 	}
 	break;
@@ -812,7 +812,7 @@ void MeshRouteClass::CallBack_ApplicationTX(string context, Ptr<const Packet> pa
 {
 	NS_LOG_INFO("Send Packet, Size:" << packet->GetSize() << std::endl);
 }
-void MeshRouteClass::CallBack_ApplicationRX(string context, Ptr<const Packet> packet)
+void MeshRouteClass::CallBack_ApplicationRX(std::string path, Ptr<const Packet> packet, const Address &from)
 {
 	NS_LOG_INFO("Receive Packet, Size:" << packet->GetSize() << std::endl);
 }
@@ -913,6 +913,7 @@ int main(int argc, char *argv[])
 	//LogComponentEnable("HwmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("MeshPointDevice", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 
+	//LogComponentEnable("PacketSink", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("OnOffApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("BulkSendApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("UdpServer", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
@@ -1193,7 +1194,6 @@ int main(int argc, char *argv[])
 		NS_LOG_INFO("=============================");
 		NS_LOG_INFO("PROTOCOL :DOT11S_HWMP   SIZE :" << TEST_SET_SIZE);
 		NS_LOG_INFO("=============================\n");
-		MeshRouteClass mesh;
 		MeshRouteClass mesh;
 		mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
 		mesh.Run();

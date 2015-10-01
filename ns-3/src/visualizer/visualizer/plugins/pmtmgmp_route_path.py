@@ -389,6 +389,7 @@ class Pmtmgmp_Route(object):
         self.node_list = []
         self.mac_to_node = {}  # (str(Mac48Address), Pmtmgmp_Route)
         # self.last_scan_time = ns.core.Simulator.Now().GetSeconds()
+        self.have_pmtmgmp = False
 
     def route_path_clean(self):
         self.mac_to_node.clear()
@@ -482,8 +483,9 @@ class Pmtmgmp_Route(object):
         #     print "scan_nodes " + str(len(self.node_list))
 
     def scan_and_clean_nodes(self, viz):
-        self.route_path_clean()
-        self.scan_nodes(viz)
+        if self.have_pmtmgmp:
+            self.route_path_clean()
+            self.scan_nodes(viz)
 
     def simulation_periodic_update(self, viz):
         # if SHOW_LOG:
@@ -493,7 +495,8 @@ class Pmtmgmp_Route(object):
         #     self.last_scan_time = ns.core.Simulator.Now().GetSeconds()
         # if SHOW_LOG:
         #     print "Time Scan" + str(self.last_scan_time)
-        self.route_path_link()
+        if self.have_pmtmgmp:
+            self.route_path_link()
 
     def populate_node_menu(self, viz, node, menu):
         ns3_node = ns.network.NodeList.GetNode(node.node_index)
@@ -504,7 +507,9 @@ class Pmtmgmp_Route(object):
                 wmn_device = dev
         if wmn_device == None:
             print "No PMTMGMP"
+            self.have_pmtmgmp = False
             return
+        self.have_pmtmgmp = True
         self.pmtmgmp = wmn_device.GetRoutingProtocol()
 
         # if SHOW_LOG:
