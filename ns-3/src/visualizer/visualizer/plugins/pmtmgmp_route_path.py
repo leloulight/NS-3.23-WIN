@@ -239,7 +239,7 @@ class Pmtmgmp_Node(object):
         elif (node_type == 4):
             color = 0x0000FFFF
         elif (node_type == 8 and msecp == self.pmtmgmp.GetMacAddress()):
-            color = 0x9900FFFF
+            color = 0xFFFF00FF
         if (self.pmtmgmp.GetPmtmgmpRouteTable().GetTableSize() == 0):
             color = 0xFFFFFFFF
         self.set_color(color)
@@ -272,7 +272,7 @@ class Pmtmgmp_Node(object):
         elif (node_type == 4):
             node_color = 0x0000FFFF
         elif (node_type == 8):
-            node_color = 0x9900FFFF
+            node_color = 0xFFFF00FF
         if (self.pmtmgmp.GetPmtmgmpRouteTable().GetTableSize() == 0):
             node_color = 0xFFFFFFFF
         self.set_color(node_color)
@@ -307,7 +307,7 @@ class Pmtmgmp_Node(object):
         elif (node_type == 4):
             node_color = 0x0000FFFF
         elif (node_type == 8):
-            node_color = 0x9900FFFF
+            node_color = 0xFFFF00FF
         if (self.pmtmgmp.GetPmtmgmpRouteTable().GetTableSize() == 0):
             node_color = 0xFFFFFFFF
         self.set_color(node_color)
@@ -345,7 +345,7 @@ class Pmtmgmp_Node(object):
         elif (node_type == 4):
             color = 0x0000FFFF
         elif (node_type == 8):
-            color = 0x9900FFFF
+            color = 0xFFFF00FF
         if (self.pmtmgmp.GetPmtmgmpRouteTable().GetTableSize() == 0):
             color = 0xFFFFFFFF
         self.set_color(color)
@@ -413,7 +413,7 @@ class Pmtmgmp_Route(object):
             elif (node_type == 4):
                 node_color = 0x0000FFFF
             elif (node_type == 8):
-                node_color = 0x9900FFFF
+                node_color = 0xFFFF00FF
             if (pmtmgmp.GetPmtmgmpRouteTable().GetTableSize() == 0):
                 node_color = 0xFFFFFFFF
             node.canvas_item.set_properties(fill_color_rgba=node_color)

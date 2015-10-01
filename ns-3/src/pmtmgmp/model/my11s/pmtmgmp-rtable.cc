@@ -382,7 +382,7 @@ namespace ns3 {
 		************************/
 		PmtmgmpRouteTree::PmtmgmpRouteTree() :
 			m_tree(std::vector<Ptr<PmtmgmpRoutePath> >()),
-			m_MSECPnumForMTERP(4),
+			m_MSECPnumForMTERP(5),
 			m_AcceptInformaitonDelay(MicroSeconds(1024 * 1500)),
 			m_NotSelectBestRoutePathRate(3)
 		{
@@ -399,7 +399,7 @@ namespace ns3 {
 				.AddConstructor<PmtmgmpRouteTree>()
 				.AddAttribute("MSECPnumForMTERP",
 					"The number of MESCP that each MTERP can have.",
-					UintegerValue(4),
+					UintegerValue(5),
 					MakeUintegerAccessor(
 						&PmtmgmpRouteTree::m_MSECPnumForMTERP),
 					MakeUintegerChecker<uint8_t>(1)
