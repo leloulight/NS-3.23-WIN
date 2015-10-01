@@ -25,9 +25,9 @@
 //测试模式
 //#define TEST_LOCATION
 //测试所有协议
-//#define TEST_ALL
+#define TEST_ALL
 //测试不同边界
-//#define TEST_SIDE_ALL
+#define TEST_SIDE_ALL
 //使用Stats
 #define TEST_STATS
 
