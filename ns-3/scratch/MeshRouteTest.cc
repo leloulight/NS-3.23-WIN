@@ -25,9 +25,9 @@
 //测试模式
 //#define TEST_LOCATION
 //测试所有协议
-#define TEST_ALL
+//#define TEST_ALL
 //测试不同边界
-#define TEST_SIDE_ALL
+//#define TEST_SIDE_ALL
 //使用Stats
 #define TEST_STATS
 
@@ -150,9 +150,8 @@ private:
 #ifdef TEST_STATS
 private:
 	// 回调函数
-	void CallBack_RouteDiscoveryTime(string context, Time time);
 	void CallBack_ApplicationTX(string context, Ptr<const Packet> packet);
-	void CallBack_ApplicationRX(std::string path, Ptr<const Packet> packet, const Address &from);
+	void CallBack_ApplicationRX(std::string path, Ptr<const Packet> packet, const Address &from, uint32_t index);
 #endif
 	// 输出报告
 	void Report();
@@ -176,6 +175,8 @@ private:
 	bool m_Pcap;
 	double m_PacketInterval;
 	vector<NodeApplicationInfor> m_Applications;
+	uint32_t m_totalTx;
+	uint32_t m_totalRx;
 
 private:
 	// 节点总数
@@ -205,7 +206,9 @@ MeshRouteClass::MeshRouteClass() :
 	m_TotalTime(120),
 	m_Root("00:00:00:00:00:01"),
 	m_Pcap(false),
-	m_PacketInterval(0.1)
+	m_PacketInterval(0.1),
+	m_totalTx(0),
+	m_totalRx(0)
 {
 	// 链路层及网络层协议设置
 	l_Mesh = MeshHelper::Default();
@@ -804,17 +807,15 @@ int MeshRouteClass::Run()
 }
 #ifdef TEST_STATS
 // 回调函数
-void MeshRouteClass::CallBack_RouteDiscoveryTime(string context, Time time)
-{
-	NS_LOG_INFO("RouteDiscoveryTime:" << time.GetSeconds() << std::endl);
-}
 void MeshRouteClass::CallBack_ApplicationTX(string context, Ptr<const Packet> packet)
 {
-	NS_LOG_INFO("Send Packet, Size:" << packet->GetSize() << std::endl);
+	//NS_LOG_INFO("Send Packet, Size:" << packet->GetSize());
+	m_totalTx += packet->GetSize();
 }
-void MeshRouteClass::CallBack_ApplicationRX(std::string path, Ptr<const Packet> packet, const Address &from)
+void MeshRouteClass::CallBack_ApplicationRX(std::string path, Ptr<const Packet> packet, const Address &from, uint32_t index)
 {
-	NS_LOG_INFO("Receive Packet, Size:" << packet->GetSize() << std::endl);
+	//NS_LOG_INFO("Receive Packet, Size:" << packet->GetSize() << ", Index:" << index);
+	m_totalRx += packet->GetSize();
 }
 #endif
 
