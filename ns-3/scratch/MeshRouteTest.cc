@@ -30,6 +30,10 @@
 //#define TEST_SIDE_ALL
 //使用Stats
 #define TEST_STATS
+#ifdef TEST_STATS
+//显示回调日志
+#define TEST_STATS_SHOW_LOG
+#endif
 
 //角度转换
 #define DEGREES_TO_RADIANS(__ANGLE__) ((__ANGLE__) * 0.01745329252f) // PI / 180
@@ -89,12 +93,33 @@ NS_LOG_COMPONENT_DEFINE("MeshRouteTest");
 
 struct NodeApplicationInfor
 {
-	uint32_t srcIndex;
-	uint32_t dstIndex;
-	double start;
-	double end;
+	uint32_t SrcIndex;
+	uint32_t DstIndex;
+	double Start;
+	double End;
 };
-class MeshRouteClass
+#ifdef TEST_STATS
+struct StatsData
+{
+	Time CurrentTime;
+	uint32_t CurrentTX;
+	uint32_t CurrentRX;
+	StatsData *Next;
+	
+	StatsData();
+	StatsData(Time currentTime,	uint32_t currentTX,	uint32_t currentRX);
+};
+StatsData::StatsData() : CurrentTime(Seconds(0)), CurrentTX(0), CurrentRX(0), Next(NULL)
+{
+}
+StatsData::StatsData(Time currentTime, uint32_t currentTX, uint32_t currentRX)
+{
+	CurrentTime = currentTime;
+	CurrentTX = currentTX;
+	CurrentRX = currentRX;
+}
+#endif
+class MeshRouteClass : public Object
 {
 public:
 	//子类型定义
@@ -119,6 +144,7 @@ public:
 	};
 
 public:
+	static TypeId GetTypeId(void);
 	// 初始化测试
 	MeshRouteClass();
 	// 设置参数
@@ -129,7 +155,10 @@ public:
 	// 开始测试
 	int Run();
 
+	static string GetProtocolNameString(MeshProtocolType type);
+
 private:
+	void DoInitialize(void);
 	// 仿真配置
 	void SimulatorSetting();
 	// 创建节点及相关协议设置
@@ -142,8 +171,6 @@ private:
 	void InstallCoupleApplication(int srcIndex, int dstIndex, int port, double start, double end);
 	// 安装应用层
 	void InstallApplicationRandom();
-	// 数据统计模块配置
-	void StatsDataSet();
 	// 输出流量数据
 	void FlowMonitorReport();
 
@@ -151,7 +178,10 @@ private:
 private:
 	// 回调函数
 	void CallBack_ApplicationTX(string context, Ptr<const Packet> packet);
-	void CallBack_ApplicationRX(std::string path, Ptr<const Packet> packet, const Address &from, uint32_t index);
+	void CallBack_ApplicationRX(std::string path, Ptr<const Packet> packet, const Address &from);
+#ifdef TEST_STATS_SHOW_LOG
+	void CallBack_PDF(std::string context, double oldValue, double newValue);
+#endif
 #endif
 	// 输出报告
 	void Report();
@@ -177,6 +207,7 @@ private:
 	vector<NodeApplicationInfor> m_Applications;
 	uint32_t m_totalTx;
 	uint32_t m_totalRx;
+	TracedValue<double> m_PDF;
 
 private:
 	// 节点总数
@@ -192,7 +223,26 @@ private:
 	// 流量统计
 	FlowMonitorHelper l_Flowmon;
 	Ptr<FlowMonitor> l_Monitor;
+
+#ifdef TEST_STATS
+	// 数据链表首尾
+	StatsData *l_StatsFirst;
+	StatsData *l_StatsEnd;
+#endif
 };
+
+TypeId MeshRouteClass::GetTypeId(void)
+{
+	static TypeId tid = TypeId("ns3::MeshRoute")
+		.AddConstructor<MeshRouteClass>()
+		.SetParent<Object>()
+		.AddTraceSource("PDF",
+			"Packet Delvery Fraction",
+			MakeTraceSourceAccessor(&MeshRouteClass::m_PDF),
+			"ns3::TracedValue::DoubleCallback")
+		;
+	return tid;
+}
 
 // 初始化测试
 MeshRouteClass::MeshRouteClass() :
@@ -203,7 +253,7 @@ MeshRouteClass::MeshRouteClass() :
 	m_MaxBytes(0),
 	m_PacketSize(1024),
 	m_DataRate("150kbps"),
-	m_TotalTime(120),
+	m_TotalTime(20),
 	m_Root("00:00:00:00:00:01"),
 	m_Pcap(false),
 	m_PacketInterval(0.1),
@@ -211,8 +261,14 @@ MeshRouteClass::MeshRouteClass() :
 	m_totalRx(0)
 {
 	// 链路层及网络层协议设置
+	m_PDF = 0;
 	l_Mesh = MeshHelper::Default();
 	l_Pmtmgmp = WmnHelper::Default();
+#ifdef TEST_STATS
+	StatsData temp = StatsData();
+	l_StatsFirst = &temp;
+	l_StatsEnd = l_StatsFirst;
+#endif
 }
 
 // 设置参数
@@ -234,6 +290,11 @@ void MeshRouteClass::SetMeshRouteClass(MeshProtocolType protocolType, NodeAreaTy
 	m_Size = size;
 	m_ApplicationStep = appStep;
 	m_ApplicationAddType = appType;
+}
+
+void MeshRouteClass::DoInitialize(void)
+{
+	NS_LOG_FUNCTION(this);
 }
 
 // 通过配置计算基本参数
@@ -438,21 +499,12 @@ void MeshRouteClass::InstallInternetStack()
 // 安装一对应用
 void MeshRouteClass::InstallCoupleApplication(int srcIndex, int dstIndex, int port, double start, double end)
 {
-#ifdef TEST_STATS
-	string str;
-	char ch[6] ;
-#endif
 	OnOffHelper onOffAPP("ns3::UdpSocketFactory", Address(InetSocketAddress(l_Interfaces.GetAddress(dstIndex), port)));
 	onOffAPP.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]"));
 	onOffAPP.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=0]"));
 	ApplicationContainer sourceApps = onOffAPP.Install(l_Nodes.Get(srcIndex));
 	sourceApps.Start(Seconds(MIN_APPLICATION_TIME + start));
 	sourceApps.Stop(Seconds(MIN_APPLICATION_TIME + end));
-#ifdef TEST_STATS
-	sprintf(ch, "%d", srcIndex);
-	str = ch;
-	Config::Connect("/NodeList/" + str + "/ApplicationList/*/$ns3::OnOffApplication/Tx", MakeCallback(&MeshRouteClass::CallBack_ApplicationTX, this));
-#endif
 
 	PacketSinkHelper sink("ns3::UdpSocketFactory", InetSocketAddress(l_Interfaces.GetAddress(dstIndex), port));
 	ApplicationContainer sinkApps = sink.Install(l_Nodes.Get(dstIndex));
@@ -463,11 +515,18 @@ void MeshRouteClass::InstallCoupleApplication(int srcIndex, int dstIndex, int po
 	{
 		DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(srcIndex)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Access_Point);
 		DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(dstIndex)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Portal);
-	}	
+	}
 #ifdef TEST_STATS
-	sprintf(ch, "%d", dstIndex);
-	str = ch;
+	string str;
+	char chsrc[3];
+	char chdst[3];
+	sprintf(chsrc, "%d", srcIndex);
+	str = chsrc;
+	Config::Connect("/NodeList/" + str + "/ApplicationList/*/$ns3::OnOffApplication/Tx", MakeCallback(&MeshRouteClass::CallBack_ApplicationTX, this));
+	sprintf(chdst, "%d", dstIndex);
+	str = chdst;
 	Config::Connect("/NodeList/" + str + "/ApplicationList/*/$ns3::PacketSink/Rx", MakeCallback(&MeshRouteClass::CallBack_ApplicationRX, this));
+	
 #endif
 }
 
@@ -595,35 +654,13 @@ void MeshRouteClass::InstallApplicationRandom()
 		for (vector<NodeApplicationInfor>::iterator iter = m_Applications.begin(); iter != m_Applications.end(); iter++)
 		{
 			port++;
-			InstallCoupleApplication(iter->srcIndex, iter->dstIndex, 49000 + port, iter->start, iter->end);
+			InstallCoupleApplication(iter->SrcIndex, iter->DstIndex, 49000 + port, iter->Start, iter->End);
 		}
 	}
 	break;
 	default:
 		break;
 	}
-}
-
-// 数据统计模块配置
-void MeshRouteClass::StatsDataSet()
-{
-#ifdef TEST_STATS
-	//输出配置
-	//Config::Connect("/NodeList/*/DeviceList/*/RoutingProtocol/RouteDiscoveryTime", MakeCallback(&MeshRouteClass::CallBack_RouteDiscoveryTime, this));
-
-	////Gnuplot图表输出
-	//string probeType = "ns3::Ipv4PacketProbe";
-	//string tracePath = "/NodeList/*/$ns3::Ipv4L3Protocol/Tx";
-
-	//GnuplotHelper plotHelper;
-	//plotHelper.ConfigurePlot("Mesh-Route-Test-Packet-Byte-Count", "Packet Byte Count vs. Time", "Time (Seconds)", "Packet Byte Count");
-	//plotHelper.PlotProbe(probeType, tracePath, "OutputBytes", "Packet Byte Count", GnuplotAggregator::KEY_BELOW);
-
-	//FileHelper fileHelper;
-	//fileHelper.ConfigureFile("Mesh-Route-Test", FileAggregator::FORMATTED);
-	//fileHelper.Set2dFormat("Time (Seconds) = %.3e\tPacket Byte Count = %.0f");
-	//fileHelper.WriteProbe(probeType, tracePath, "OutputBytes");
-#endif
 }
 
 // 输出流量数据
@@ -722,34 +759,51 @@ void MeshRouteClass::FlowMonitorReport()
 	NS_LOG_INFO("Total Rx bitrate: " << rxbitrate_total << " kbps");
 	NS_LOG_INFO("Total Delay: " << delay_total << " s");
 	NS_LOG_INFO("=============================\n");
+	
+#ifdef TEST_STATS
+	//	输出统计数据
+	string fileName;
+	char ch[3];
+	sprintf(ch, "%d", m_Size);
+	fileName = GetProtocolNameString(m_ProtocolType) + "_" + ch + "_PDF.dat";
+	char *chName;
+	chName = new char[fileName.length() + 1];
+	strcpy(chName, fileName.c_str());
+	remove(chName);
 
-	// 输出全部结点数据到文件
-#ifndef TEST_SIDE_ALL
-	remove("1_HWMP_PDF.txt");
-	remove("1_HWMP_Delay.txt");
-	remove("1_HWMP_Throu.txt");
-#endif
-	std::ostringstream os;
-	os << "1_HWMP_PDF.txt";
-	std::ofstream of(os.str().c_str(), ios::out | ios::app);
-	of << pdf_total << "\n";
-	of.close();
-	std::ostringstream os2;
-	os2 << "1_HWMP_Delay.txt";
-	std::ofstream of2(os2.str().c_str(), ios::out | ios::app);
-	of2 << delay_total << "\n";
-	of2.close();
-	std::ostringstream os3;
-	os3 << "1_HWMP_Throu.txt";
-	std::ofstream of3(os3.str().c_str(), ios::out | ios::app);
-	of3 << rxbitrate_total << "\n";
-	of3.close();
+	std::ostringstream osStats;
+	osStats << fileName;
+	std::ofstream ofStats(osStats.str().c_str(), ios::out | ios::app);
+
+	StatsData *select = l_StatsFirst;
+	double pdf;
+	do
+	{
+		if (select->CurrentTX == 0)
+		{
+			pdf = 0;
+		}
+		else
+		{
+			pdf = select->CurrentRX * 100 / select->CurrentTX;
+		}
+		select = select->Next;
+		ofStats << select->CurrentTime.GetSeconds() << " " << pdf << "\n";
+	} while (select != l_StatsEnd);
+
+	ofStats.close();
 	Simulator::Destroy();
+#endif
 }
 
 // 开始测试
 int MeshRouteClass::Run()
 {
+#ifdef TEST_STATS_SHOW_LOG
+	// 测试临时
+	Config::Connect("/Names/MeshRoute/PDF", MakeCallback(&MeshRouteClass::CallBack_PDF, this));
+#endif
+
 	// 通过配置计算基本参数
 	SimulatorSetting();
 	// 创建节点及相关协议设置
@@ -787,9 +841,6 @@ int MeshRouteClass::Run()
 		/*DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(m_Size * (m_Size - 1) - 2)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Portal);*/
 	}
 #endif
-	// 数据统计模块配置
-	StatsDataSet();
-
 	//Ptr<WmnPointDevice> wpd = DynamicCast<WmnPointDevice>(l_Nodes.Get(0)->GetDevice(0));
 	//Ptr<my11s::PmtmgmpProtocol> pp = DynamicCast<my11s::PmtmgmpProtocol>(wpd->GetRoutingProtocol());
 
@@ -799,45 +850,58 @@ int MeshRouteClass::Run()
 	Simulator::Schedule(Seconds(m_TotalTime), &MeshRouteClass::Report, this);
 	Simulator::Stop(Seconds(m_TotalTime));
 	Simulator::Run();
-	Simulator::Destroy();
 
 	// 输出流量数据
 	FlowMonitorReport();
 	return 0;
 }
+string MeshRouteClass::GetProtocolNameString(MeshProtocolType type)
+{
+	switch (type)
+	{
+	case MeshRouteClass::DOT11S_HWMP:
+		return "DOT11S_HWMP";
+	case MeshRouteClass::DOT11S_FLAME:
+		return "DOT11S_FLAME";
+	case MeshRouteClass::MY11S_PMTMGMP:
+		return "MY11S_PMTMGMP";
+	default:
+		return "";
+	}
+}
 #ifdef TEST_STATS
 // 回调函数
 void MeshRouteClass::CallBack_ApplicationTX(string context, Ptr<const Packet> packet)
 {
-	//NS_LOG_INFO("Send Packet, Size:" << packet->GetSize());
 	m_totalTx += packet->GetSize();
+#ifdef TEST_STATS_SHOW_LOG
+	NS_LOG_INFO("Send Packet, Size:" << packet->GetSize());
+#endif
 }
-void MeshRouteClass::CallBack_ApplicationRX(std::string path, Ptr<const Packet> packet, const Address &from, uint32_t index)
+void MeshRouteClass::CallBack_ApplicationRX(std::string path, Ptr<const Packet> packet, const Address &from)
 {
-	//NS_LOG_INFO("Receive Packet, Size:" << packet->GetSize() << ", Index:" << index);
 	m_totalRx += packet->GetSize();
+	m_PDF = (double)m_totalRx / (double)m_totalTx * 100;
+	StatsData stats = StatsData(Simulator::Now(), m_totalTx, m_totalRx);
+	l_StatsEnd->Next = &stats;
+	l_StatsEnd = &stats;
+#ifdef TEST_STATS_SHOW_LOG
+	NS_LOG_INFO("Receive Packet, Size:" << packet->GetSize() << ", PDF:" << m_PDF);
+#endif
 }
+#ifdef TEST_STATS_SHOW_LOG
+void MeshRouteClass::CallBack_PDF(std::string context, double oldValue, double newValue)
+{
+	NS_LOG_INFO("PDF Change:" << oldValue << " to " << newValue << " with context is :" << context);
+}
+#endif
 #endif
 
 //输出报告
 void MeshRouteClass::Report()
 {
 	unsigned n(0);
-	string typeName;
-	switch (m_ProtocolType)
-	{
-	case MeshRouteClass::DOT11S_HWMP:
-		typeName = "DOT11S_HWMP";
-		break;
-	case MeshRouteClass::DOT11S_FLAME:
-		typeName = "DOT11S_FLAME";
-		break;
-	case MeshRouteClass::MY11S_PMTMGMP:
-		typeName = "MY11S_PMTMGMP";
-		break;
-	default:
-		break;
-	}
+	
 	for (NetDeviceContainer::Iterator i = l_NetDevices.Begin();
 	i != l_NetDevices.End(); ++i, ++n)
 	{
@@ -847,7 +911,7 @@ void MeshRouteClass::Report()
 		string s;
 		ss << n;
 		ss >> s;
-		s = typeName + "-mp-report-" + s + ".xml";
+		s = GetProtocolNameString(m_ProtocolType) + "-mp-report-" + s + ".xml";
 #ifndef TEST_SIDE_ALL
 		remove(s.c_str());
 #endif
@@ -883,6 +947,26 @@ void MeshRouteClass::Report()
 	}
 	n = 0;
 }
+#ifdef TEST_STATS
+void SetStats(string protocolName, uint8_t size, Ptr<MeshRouteClass> mesh)
+{
+	//string str;
+	//char ch[6];
+	//sprintf(ch, "%d", size);
+	//str = protocolName + "_" + ch;                                                                                                                                                                                                                                                                                                                             
+	//Names::Add("/Names/MeshRoute", mesh);
+	//GnuplotHelper plotHelper; 
+	
+	//plotHelper.ConfigurePlot(str, "Packet Delvery Fraction vs. Time", "Time (Seconds)", "Packet Delvery Fraction (%)", "png");
+	//plotHelper.PlotProbe("ns3::DoubleProbe", "/Names/MeshRoute/PDF", "Output", "Packet Delvery Fraction", GnuplotAggregator::KEY_INSIDE);
+
+	//FileHelper fileHelper;
+	//fileHelper.ConfigureFile(str, FileAggregator::FORMATTED);
+	//fileHelper.Set2dFormat("Time (Seconds) = %.3e\tPacket Byte Count = %.0f");
+	//fileHelper.WriteProbe("ns3::DoubleProbe", "/Names/MeshRoute/PDF", "Output");
+}
+#endif
+
 
 int main(int argc, char *argv[])
 {
@@ -897,7 +981,6 @@ int main(int argc, char *argv[])
 #else
 #endif
 #endif
-
 #ifndef TEST_SIDE_ALL
 	//LogComponentEnableAll((LogLevel)(LOG_LEVEL_INFO | LOG_PREFIX_ALL));
 
@@ -988,29 +1071,24 @@ int main(int argc, char *argv[])
 			NS_LOG_INFO("=============================");
 			NS_LOG_INFO("PROTOCOL :MY11S_PMTMGMP   SIZE :" << i);
 			NS_LOG_INFO("=============================\n");
-			MeshRouteClass pmtmgmp;
-			pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, apps, totalTime, TEST_SET_AREA, i, i - TEST_SET_SIZE_APPSTEP, TEST_SET_APP);
-			pmtmgmp.Run();
+			Ptr<MeshRouteClass> pmtmgmp = CreateObject<MeshRouteClass>();
+#ifdef TEST_STATS
+			SetStats("MY11S_PMTMGMP", i, pmtmgmp);
+#endif
+			pmtmgmp->SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, apps, totalTime, TEST_SET_AREA, i, i - TEST_SET_SIZE_APPSTEP, TEST_SET_APP);
+			pmtmgmp->Run();
 			NS_LOG_INFO("=============================");
 			NS_LOG_INFO("PROTOCOL :DOT11S_HWMP   SIZE :" << i);
-			NS_LOG_INFO("=============================\n");
-			MeshRouteClass mesh;
-			mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, apps, totalTime, TEST_SET_AREA, i, i - TEST_SET_SIZE_APPSTEP, TEST_SET_APP);
-			mesh.Run();
+			NS_LOG_INFO("=============================\n"); 
+			Ptr<MeshRouteClass> mesh = CreateObject<MeshRouteClass>();
+#ifdef TEST_STATS
+			SetStats("DOT11S_HWMP", i, mesh);
+#endif
+			mesh->SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, apps, totalTime, TEST_SET_AREA, i, i - TEST_SET_SIZE_APPSTEP, TEST_SET_APP);
+			mesh->Run();
 		}
 #else//测试指定协议
-		string typeName;
-		switch (TEST_SET_PROTOCOL)
-		{
-		case MeshRouteClass::DOT11S_HWMP:
-			typeName = "PROTOCOL :DOT11S_HWMP   SIZE :";
-			break;
-		case MeshRouteClass::MY11S_PMTMGMP:
-			typeName = "PROTOCOL :MY11S_PMTMGMP   SIZE :";
-			break;
-		default:
-			break;
-		}
+		string typeName = MeshRouteClass::GetProtocolNameString(TEST_SET_PROTOCOL);
 		for (int i = TEST_SET_MIN_SIZE; i <= TEST_SET_MAX_SIZE; i++)
 		{
 			vector<NodeApplicationInfor> apps;
@@ -1048,11 +1126,14 @@ int main(int argc, char *argv[])
 
 			totalTime = (TEST_SET_COUNT - 1) * TEST_SET_INTERVAL + TEST_SET_LIFE + TEST_SET_RANDOM;
 			NS_LOG_INFO("=============================");
-			NS_LOG_INFO(typeName << i);
-			NS_LOG_INFO("=============================\n");
-			MeshRouteClass test;
-			test.SetMeshRouteClass(TEST_SET_PROTOCOL, apps, totalTime, TEST_SET_AREA, i, i - TEST_SET_SIZE_APPSTEP, TEST_SET_APP);
-			test.Run();
+			NS_LOG_INFO("PROTOCOL :" << typeName << "   SIZE :" << i);
+			NS_LOG_INFO("=============================\n"); 
+			Ptr<MeshRouteClass> test = CreateObject<MeshRouteClass>();
+#ifdef TEST_STATS
+			SetStats(typeName, i, test);
+#endif
+			test->SetMeshRouteClass(TEST_SET_PROTOCOL, apps, totalTime, TEST_SET_AREA, i, i - TEST_SET_SIZE_APPSTEP, TEST_SET_APP);
+			test->Run();
 		}
 #endif
 //测试指定边长
@@ -1097,29 +1178,24 @@ int main(int argc, char *argv[])
 		NS_LOG_INFO("=============================");
 		NS_LOG_INFO("PROTOCOL :MY11S_PMTMGMP   SIZE :" << TEST_SET_SIZE);
 		NS_LOG_INFO("=============================\n");
-		MeshRouteClass pmtmgmp;
-		pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, apps, totalTime, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
-		pmtmgmp.Run();
+		Ptr<MeshRouteClass> pmtmgmp = CreateObject<MeshRouteClass>();
+#ifdef TEST_STATS
+		SetStats("MY11S_PMTMGMP", TEST_SET_SIZE, pmtmgmp);
+#endif
+		pmtmgmp->SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, apps, totalTime, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
+		pmtmgmp->Run();
 		NS_LOG_INFO("=============================");
 		NS_LOG_INFO("PROTOCOL :DOT11S_HWMP   SIZE :" << TEST_SET_SIZE);
 		NS_LOG_INFO("=============================\n");
-		MeshRouteClass mesh;
-		mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, apps, totalTime, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
-		mesh.Run();
+		Ptr<MeshRouteClass> mesh = CreateObject<MeshRouteClass>();
+#ifdef TEST_STATS
+		SetStats("DOT11S_HWMP", TEST_SET_SIZE, mesh);
+#endif
+		mesh->SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, apps, totalTime, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
+		mesh->Run();
 #else//测试指定协议
-		string typeName;
 
-		switch (TEST_SET_PROTOCOL)
-		{
-		case MeshRouteClass::DOT11S_HWMP:
-			typeName = "PROTOCOL :DOT11S_HWMP   SIZE :";
-			break;
-		case MeshRouteClass::MY11S_PMTMGMP:
-			typeName = "PROTOCOL :MY11S_PMTMGMP   SIZE :";
-			break;
-		default:
-			break;
-		}
+		string typeName = MeshRouteClass::GetProtocolNameString(TEST_SET_PROTOCOL);
 		vector<NodeApplicationInfor> apps;
 		int nodeCount;
 		switch (TEST_SET_AREA)
@@ -1156,12 +1232,14 @@ int main(int argc, char *argv[])
 		totalTime = (TEST_SET_COUNT - 1) * TEST_SET_INTERVAL + TEST_SET_LIFE + TEST_SET_RANDOM;
 
 		NS_LOG_INFO("=============================");
-		NS_LOG_INFO(typeName << TEST_SET_SIZE);
+		NS_LOG_INFO("PROTOCOL :" << typeName << "   SIZE :" << TEST_SET_SIZE);
 		NS_LOG_INFO("=============================\n");
-
-		MeshRouteClass test;
-		test.SetMeshRouteClass(TEST_SET_PROTOCOL, apps, totalTime, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
-		test.Run();
+		Ptr<MeshRouteClass> test = CreateObject<MeshRouteClass>();
+#ifdef TEST_STATS
+		SetStats(typeName, TEST_SET_SIZE, test);
+#endif
+		test->SetMeshRouteClass(TEST_SET_PROTOCOL, apps, totalTime, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
+		test->Run();;
 #endif
 #endif
 	}
@@ -1174,51 +1252,54 @@ int main(int argc, char *argv[])
 			NS_LOG_INFO("=============================");
 			NS_LOG_INFO("PROTOCOL :MY11S_PMTMGMP   SIZE :" << i);
 			NS_LOG_INFO("=============================\n");
-			MeshRouteClass pmtmgmp;
-			pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, TEST_SET_AREA, i, i - TEST_SET_SIZE_APPSTEP, TEST_SET_APP);
-			pmtmgmp.Run();
+			Ptr<MeshRouteClass> pmtmgmp = CreateObject<MeshRouteClass>();
+#ifdef TEST_STATS
+			SetStats("MY11S_PMTMGMP", i, pmtmgmp);
+#endif
+			pmtmgmp->SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, TEST_SET_AREA, i, i - TEST_SET_SIZE_APPSTEP, TEST_SET_APP);
+			pmtmgmp->Run();
 			NS_LOG_INFO("=============================");
 			NS_LOG_INFO("PROTOCOL :DOT11S_HWMP   SIZE :" << i);
 			NS_LOG_INFO("=============================\n");
-			MeshRouteClass mesh;
-			mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, TEST_SET_AREA, i, i - TEST_SET_SIZE_APPSTEP, TEST_SET_APP);
-			mesh.Run();
+			Ptr<MeshRouteClass> mesh = CreateObject<MeshRouteClass>();
+#ifdef TEST_STATS
+			SetStats("DOT11S_HWMP", i, mesh);
+#endif
+			mesh->SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, TEST_SET_AREA, i, i - TEST_SET_SIZE_APPSTEP, TEST_SET_APP);
+			mesh->Run();
 			NS_LOG_INFO("\n");
 		};
 #else
 		NS_LOG_INFO("=============================");
 		NS_LOG_INFO("PROTOCOL :MY11S_PMTMGMP   SIZE :" << TEST_SET_SIZE);
 		NS_LOG_INFO("=============================\n");
-		MeshRouteClass pmtmgmp;
-		pmtmgmp.SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
-		pmtmgmp.Run();
+		Ptr<MeshRouteClass> pmtmgmp = CreateObject<MeshRouteClass>();
+#ifdef TEST_STATS
+		SetStats("MY11S_PMTMGMP", TEST_SET_SIZE, pmtmgmp);
+#endif
+		pmtmgmp->SetMeshRouteClass(MeshRouteClass::MY11S_PMTMGMP, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
+		pmtmgmp->Run();
 		NS_LOG_INFO("=============================");
 		NS_LOG_INFO("PROTOCOL :DOT11S_HWMP   SIZE :" << TEST_SET_SIZE);
 		NS_LOG_INFO("=============================\n");
-		MeshRouteClass mesh;
-		mesh.SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
-		mesh.Run();
+		Ptr<MeshRouteClass> mesh = CreateObject<MeshRouteClass>();
+#ifdef TEST_STATS
+		SetStats("DOT11S_HWMP", TEST_SET_SIZE, mesh);
+#endif
+		mesh->SetMeshRouteClass(MeshRouteClass::DOT11S_HWMP, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
+		mesh->Run();
 #endif
 #else
-		string typeName;
-		switch (TEST_SET_PROTOCOL)
-		{
-		case MeshRouteClass::DOT11S_HWMP:
-			typeName = "PROTOCOL :DOT11S_HWMP   SIZE :";
-			break;
-		case MeshRouteClass::MY11S_PMTMGMP:
-			typeName = "PROTOCOL :MY11S_PMTMGMP   SIZE :";
-			break;
-		default:
-			break;
-		}
+		string typeName = MeshRouteClass::GetProtocolNameString(TEST_SET_PROTOCOL);
 		NS_LOG_INFO("=============================");
-		NS_LOG_INFO(typeName << TEST_SET_SIZE);
+		NS_LOG_INFO("PROTOCOL :" << typeName << "   SIZE :" << TEST_SET_SIZE);
 		NS_LOG_INFO("=============================\n");
-
-		MeshRouteClass test;
-		test.SetMeshRouteClass(TEST_SET_PROTOCOL, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
-		test.Run();
+		Ptr<MeshRouteClass> test = CreateObject<MeshRouteClass>();
+#ifdef TEST_STATS
+		SetStats(typeName, TEST_SET_SIZE, test);
+#endif
+		test->SetMeshRouteClass(TEST_SET_PROTOCOL, TEST_SET_AREA, TEST_SET_SIZE, TEST_SET_APPSTEP, TEST_SET_APP);
+		test->Run();
 #endif
 	}
 	return 0;
