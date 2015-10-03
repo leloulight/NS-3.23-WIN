@@ -25,14 +25,14 @@
 //测试模式
 //#define TEST_LOCATION
 //测试所有协议
-//#define TEST_ALL
+#define TEST_ALL
 //测试不同边界
-//#define TEST_SIDE_ALL
+#define TEST_SIDE_ALL
 //使用Stats
 #define TEST_STATS
 #ifdef TEST_STATS
 //显示回调日志
-#define TEST_STATS_SHOW_LOG
+//#define TEST_STATS_SHOW_LOG
 #endif
 
 //角度转换
@@ -54,12 +54,12 @@
 // 区域形状
 #define TEST_SET_AREA MeshRouteClass::SQUARE
 // 应用布置类型
-#define TEST_SET_APP MeshRouteClass::Multiple
+#define TEST_SET_APP MeshRouteClass::Random
 // 协议
 #define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
 
 // 区域最大大小
-#define TEST_SET_MAX_SIZE 10
+#define TEST_SET_MAX_SIZE 7
 // 区域最小大小
 #define TEST_SET_MIN_SIZE 4
 // 区域大小
@@ -225,9 +225,8 @@ private:
 	Ptr<FlowMonitor> l_Monitor;
 
 #ifdef TEST_STATS
-	// 数据链表首尾
-	StatsData *l_StatsFirst;
-	StatsData *l_StatsEnd;
+	// 运行产生数据
+	vector<StatsData> l_statistics;
 #endif
 };
 
@@ -265,9 +264,7 @@ MeshRouteClass::MeshRouteClass() :
 	l_Mesh = MeshHelper::Default();
 	l_Pmtmgmp = WmnHelper::Default();
 #ifdef TEST_STATS
-	StatsData temp = StatsData();
-	l_StatsFirst = &temp;
-	l_StatsEnd = l_StatsFirst;
+	l_statistics = vector<StatsData>();
 #endif
 }
 
@@ -775,21 +772,19 @@ void MeshRouteClass::FlowMonitorReport()
 	osStats << fileName;
 	std::ofstream ofStats(osStats.str().c_str(), ios::out | ios::app);
 
-	StatsData *select = l_StatsFirst;
 	double pdf;
-	do
+	for (vector<StatsData>::iterator iter = l_statistics.begin(); iter != l_statistics.end(); iter++)
 	{
-		if (select->CurrentTX == 0)
+		if (iter->CurrentTX == 0)
 		{
 			pdf = 0;
 		}
 		else
 		{
-			pdf = select->CurrentRX * 100 / select->CurrentTX;
+			pdf = iter->CurrentRX * 100 / iter->CurrentTX;
 		}
-		select = select->Next;
-		ofStats << select->CurrentTime.GetSeconds() << " " << pdf << "\n";
-	} while (select != l_StatsEnd);
+		ofStats << iter->CurrentTime.GetSeconds() << " " << pdf << "\n";
+	}
 
 	ofStats.close();
 	Simulator::Destroy();
@@ -883,8 +878,7 @@ void MeshRouteClass::CallBack_ApplicationRX(std::string path, Ptr<const Packet> 
 	m_totalRx += packet->GetSize();
 	m_PDF = (double)m_totalRx / (double)m_totalTx * 100;
 	StatsData stats = StatsData(Simulator::Now(), m_totalTx, m_totalRx);
-	l_StatsEnd->Next = &stats;
-	l_StatsEnd = &stats;
+	l_statistics.push_back(stats);
 #ifdef TEST_STATS_SHOW_LOG
 	NS_LOG_INFO("Receive Packet, Size:" << packet->GetSize() << ", PDF:" << m_PDF);
 #endif
