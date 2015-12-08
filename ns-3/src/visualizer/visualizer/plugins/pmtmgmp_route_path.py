@@ -176,7 +176,6 @@ class Pmtmgmp_Path_Link(Link):
         self.pmtmgmp_node = None
         del (self)
 
-
 class Pmtmgmp_Node(object):
     def __init__(self, node_index, viz_node, pmtmgmp, viz):
         self.node_index = node_index
@@ -196,14 +195,6 @@ class Pmtmgmp_Node(object):
         self.viz_node.canvas_item.set_properties(fill_color_rgba=color)
         # if SHOW_LOG:
         #     print str(self.pmtmgmp.GetMacAddress()) + " set color " + str(color)
-
-    def clean_link_dict(self):
-        for (key, link) in self.link_dict.items():
-            link.destroy()
-            if self.link_dict.has_key(key):
-                del (self.link_dict[key])
-        self.link_dict.clear()
-        self.link_dict = {}
 
     def update_link_dict(self, type):
         if type and self.packet_size_map_first:
@@ -227,6 +218,30 @@ class Pmtmgmp_Node(object):
             # if SHOW_LOG:
             #     print "update_points() "  + str(link.base_node.pmtmgmp.GetMacAddress()) + " to " + str(link.link_node.pmtmgmp.GetMacAddress())
             link.update_points()
+
+    def clean_link_dict(self):
+        node_type = self.pmtmgmp.GetNodeType()
+        node_color = 0xFF0000FF
+        if (node_type == 2):
+            node_color = 0x00FF00FF
+        elif (node_type == 4):
+            node_color = 0x0000FFFF
+        elif (node_type == 8):
+            node_color = 0xFFFF00FF
+        if (self.pmtmgmp.GetPmtmgmpRouteTable().GetTableSize() == 0):
+            node_color = 0xFFFFFFFF
+        self.set_color(node_color)
+        for (key, link) in self.link_dict.items():
+            link.destroy()
+            if self.link_dict.has_key(key):
+                del (self.link_dict[key])
+        self.link_dict.clear()
+        self.link_dict = {}
+        self.packet_size_map = {}
+        self.packet_size_map_temp = {}
+        self.data_speed_time = 0
+        self.data_speed_time_temp = 0
+        self.packet_size_map_first = True
 
     def crearte_route_path(self, mac_node_list, mterp, msecp, parent_canvas_item):
         # if SHOW_LOG:
@@ -396,37 +411,8 @@ class Pmtmgmp_Route(object):
         self.init_pmtmgmp = True
 
     def route_path_clean(self):
-        self.mac_to_node.clear()
-        self.mac_to_node = {}
         for node in self.node_list:
-            node.destory()
-        del self.node_list[:]
-
-        for node in self.viz.nodes.itervalues():
-            ns3_node = ns.network.NodeList.GetNode(node.node_index)
-            for devI in range(ns3_node.GetNDevices()):
-                dev = ns3_node.GetDevice(devI)
-                if isinstance(dev, ns.pmtmgmp.WmnPointDevice):
-                    wmn_device = dev
-                else:
-                    continue
-            pmtmgmp = wmn_device.GetRoutingProtocol()
-            node_type = pmtmgmp.GetNodeType()
-            node_color = 0xFF0000FF
-            if (node_type == 2):
-                node_color = 0x00FF00FF
-            elif (node_type == 4):
-                node_color = 0x0000FFFF
-            elif (node_type == 8):
-                node_color = 0xFFFF00FF
-            if (pmtmgmp.GetPmtmgmpRouteTable().GetTableSize() == 0):
-                node_color = 0xFFFFFFFF
-            node.canvas_item.set_properties(fill_color_rgba=node_color)
-            # if SHOW_LOG:
-            #     print "Clean node list " + str(len(self.node_list))
-        self.viz._update_node_positions()
-        self.viz._update_transmissions_view()
-        self.viz._update_drops_view()
+            node.clean_link_dict()
 
     def route_path_link_full(self, msecp):
         # if SHOW_LOG:
@@ -481,21 +467,16 @@ class Pmtmgmp_Route(object):
                 dev = ns3_node.GetDevice(devI)
                 if isinstance(dev, ns.pmtmgmp.WmnPointDevice):
                     wmn_device = dev
-                else:
-                    continue
-                new_node = Pmtmgmp_Node(node.node_index, node, wmn_device.GetRoutingProtocol(), viz)
-                # if SHOW_LOG:
-                #     print new_node
-                self.node_list.append(new_node)
-                self.mac_to_node[str(new_node.base_mac)] = new_node
-        self.route_path_link()
-        # if SHOW_LOG:
-        #     print "scan_nodes " + str(len(self.node_list))
+                    pmtmgmp = wmn_device.GetRoutingProtocol()
+                    if (not self.mac_to_node.has_key(str(pmtmgmp.GetMacAddress()))):
+                        new_node = Pmtmgmp_Node(node.node_index, node, pmtmgmp, viz)
+                        self.node_list.append(new_node)
+                        self.mac_to_node[str(new_node.base_mac)] = new_node
+                        self.have_pmtmgmp = True
 
-    def scan_and_clean_nodes(self, viz):
-        if self.have_pmtmgmp:
-            self.route_path_clean()
-            self.scan_nodes(viz)
+    def update_nodes_view(self, viz):
+        for node in self.node_list:
+            node.update_link_dict(self.show_data_send != None)
 
     def simulation_periodic_update(self, viz):
         # if SHOW_LOG:
@@ -503,6 +484,8 @@ class Pmtmgmp_Route(object):
         # if (ns.core.Simulator.Now().GetSeconds() - self.last_scan_time > 1):
         #     self.scan_nodes(self.viz)
         #     self.last_scan_time = ns.core.Simulator.Now().GetSeconds()
+
+        self. scan_nodes(viz)
         if self.have_pmtmgmp:
             self.route_path_link()
             if self.init_pmtmgmp:
@@ -511,34 +494,6 @@ class Pmtmgmp_Route(object):
                 self.viz._on_play_button_toggled(self.viz.play_button)
                 if SHOW_LOG:
                     print "Init Pmtmgmp"
-        else:
-            for node in self.viz.nodes.itervalues():
-                ns3_node = ns.network.NodeList.GetNode(node.node_index)
-                for devI in range(ns3_node.GetNDevices()):
-                    dev = ns3_node.GetDevice(devI)
-                    if isinstance(dev, ns.pmtmgmp.WmnPointDevice):
-                        wmn_device = dev
-                if wmn_device != None:
-                    pmtmgmp = wmn_device.GetRoutingProtocol()
-                    node_type = pmtmgmp.GetNodeType()
-                    node_color = 0xFF0000FF
-                    if (node_type == 2):
-                        node_color = 0x00FF00FF
-                    elif (node_type == 4):
-                        node_color = 0x0000FFFF
-                    elif (node_type == 8):
-                        node_color = 0xFFFF00FF
-                    if (pmtmgmp.GetPmtmgmpRouteTable().GetTableSize() == 0):
-                        node_color = 0xFFFFFFFF
-                    node.canvas_item.set_properties(fill_color_rgba=node_color)
-                    if (node_type !=0):
-                        self.have_pmtmgmp = True
-                        # if SHOW_LOG:
-                        #     print "Have Pmtmgmp" + str(pmtmgmp.GetNodeType())
-            if self.have_pmtmgmp:
-                self.viz._update_node_positions()
-                self.viz._update_transmissions_view()
-                self.viz._update_drops_view()
 
     def populate_node_menu(self, viz, node, menu):
         ns3_node = ns.network.NodeList.GetNode(node.node_index)
@@ -564,13 +519,11 @@ class Pmtmgmp_Route(object):
         menu_route = gtk.Menu()
         menu_route.show()
         menu_item_main.set_submenu(menu_route)
-        add_menu = False
 
         def _clean_pmtmgmp_path(dummy_menu_item):
             route.show_msecp_mac = None
             route.show_mterp_mac = None
             route.show_data_send = None
-            self.scan_nodes(viz)
             # if SHOW_LOG:
             #     print "Clean Path"
 
@@ -606,7 +559,6 @@ class Pmtmgmp_Route(object):
             if SHOW_LOG:
                 print "There is no part path start at this node"
         else:
-            add_menu = True
             # if SHOW_LOG:
             #     print "Find " + str(route_table_size) + " MTERP"
 
@@ -624,7 +576,8 @@ class Pmtmgmp_Route(object):
                     route.show_msecp_mac = None
                     route.show_mterp_mac = route_table.GetTableItem(i).GetMTERPaddress()
                     route.show_data_send = None
-                    self.scan_and_clean_nodes(viz)
+                    route.route_path_clean()
+                    route.simulation_periodic_update(viz)
                     if SHOW_LOG:
                         print "Show part path as MTERP is " + str(self.show_mterp_mac)
 
@@ -632,8 +585,6 @@ class Pmtmgmp_Route(object):
                 menu_item_temp.show()
                 menu_menu.add(menu_item_temp)
                 menu_item_temp.connect("activate", _show_pmtmgmp_part_path, i)
-        # if SHOW_LOG:
-        #     print add_menu
 
         # As a MTERP
         route_tree = route_table.GetTreeByMACaddress(self.pmtmgmp.GetMacAddress())
@@ -644,7 +595,6 @@ class Pmtmgmp_Route(object):
             if SHOW_LOG:
                 print "This node is not MTERP"
         else:
-            add_menu = True
             menu_item = gtk.MenuItem("Show Pmtmgmp Tree As Root")
             menu_item.show()
             menu_menu = gtk.Menu()
@@ -658,7 +608,9 @@ class Pmtmgmp_Route(object):
                     route.show_mterp_mac = None
                     route.show_msecp_mac = route_tree.GetTreeItem(i).GetMSECPaddress()
                     route.show_data_send = None
-                    self.scan_and_clean_nodes(viz)
+                    route.route_path_clean()
+                    route.simulation_periodic_update(viz)
+                    route.stop_by_step = True
                     if SHOW_LOG:
                         print "Show full path as MSECP is " + str(self.show_msecp_mac)
 
@@ -672,7 +624,8 @@ class Pmtmgmp_Route(object):
             route.show_mterp_mac = None
             route.show_msecp_mac = None
             route.show_data_send = route.pmtmgmp.GetMacAddress()
-            self.scan_and_clean_nodes(viz)
+            route.route_path_clean()
+            route.simulation_periodic_update(viz)
             if SHOW_LOG:
                 print "Show Data Send Path path"
 
@@ -682,18 +635,15 @@ class Pmtmgmp_Route(object):
         menu_item.connect("activate", _show_data_send_path)
         # if SHOW_LOG:
         #     print add_menu
-        if add_menu:
-            menu.add(menu_item_main)
-
+        menu.add(menu_item_main)
 
 pmtmgmp_route = None
-
 
 def register(viz):
     global pmtmgmp_route
     if pmtmgmp_route == None:
         pmtmgmp_route = Pmtmgmp_Route(viz)
     viz.connect("populate-node-menu", pmtmgmp_route.populate_node_menu)
-    viz.connect("simulation-periodic-update", pmtmgmp_route.simulation_periodic_update)
+    viz.connect("simulation-periodic-update", pmtmgmp_route.scan_nodes)
     viz.connect("update-view", pmtmgmp_route.simulation_periodic_update)
-    viz.connect("topology-scanned", pmtmgmp_route.scan_and_clean_nodes)
+    viz.connect("topology-scanned", pmtmgmp_route.update_nodes_view)

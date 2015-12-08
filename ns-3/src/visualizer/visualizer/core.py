@@ -892,7 +892,7 @@ class Visualizer(gobject.GObject):
 
         ##PMTMGMP_UNUSED_MY_CODE
         if (self.stop_time_adj.get_value() != 0):
-            if (self.stop_time_adj.get_value() < ns.core.Simulator.Now().GetSeconds()):
+            if (self.stop_time_adj.get_value() <= ns.core.Simulator.Now().GetSeconds()):
                 self.play_button.set_active(False)
                 self._on_play_button_toggled(self.play_button)
         ####
