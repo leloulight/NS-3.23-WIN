@@ -25,9 +25,9 @@
 //测试模式
 //#define TEST_LOCATION
 //测试所有协议
-#define TEST_ALL
+//#define TEST_ALL
 //测试不同边界
-#define TEST_SIDE_ALL
+//#define TEST_SIDE_ALL
 //使用Stats
 //#define TEST_STATS
 
@@ -50,12 +50,12 @@
 // 区域形状
 #define TEST_SET_AREA MeshRouteClass::SQUARE
 // 应用布置类型
-#define TEST_SET_APP MeshRouteClass::Random
+#define TEST_SET_APP MeshRouteClass::Multiple
 // 协议
 #define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
 
 // 区域最大大小
-#define TEST_SET_MAX_SIZE 10
+#define TEST_SET_MAX_SIZE 7
 // 区域最小大小
 #define TEST_SET_MIN_SIZE 4
 // 区域大小
@@ -76,6 +76,7 @@
 #include "ns3/applications-module.h"
 #include "ns3/flow-monitor-module.h"
 #include "ns3/stats-module.h"
+#include "ns3/netanim-module.h"
 
 #include <iostream>
 #include <sstream>
@@ -85,6 +86,7 @@
 using namespace ns3;
 using namespace std;
 
+NS_LOG_COMPONENT_DEFINE("MeshRouteTest");
 
 struct NodeApplicationInfor
 {
@@ -246,7 +248,7 @@ void MeshRouteClass::SimulatorSetting()
 		string l_AttributePath_RouteProtocol;// Route Protocol
 		string l_AttributePath_RouteProtocolPart;// 部分名称差异
 
-		//路由协议类型
+												 //路由协议类型
 		switch (m_ProtocolType)
 		{
 		case MeshRouteClass::DOT11S_HWMP:
@@ -280,10 +282,8 @@ void MeshRouteClass::SimulatorSetting()
 		// 设置应用层参数
 		Config::SetDefault("ns3::OnOffApplication::PacketSize", UintegerValue(m_PacketSize));
 		Config::SetDefault("ns3::OnOffApplication::DataRate", StringValue(m_DataRate));
-		NS_LOG_DEBUG("123");
 	}
 }
-NS_LOG_COMPONENT_DEFINE("MeshRouteTest");
 
 // 创建节点及相关协议设置
 void MeshRouteClass::CreateNodes()
@@ -438,7 +438,7 @@ void MeshRouteClass::InstallCoupleApplication(int srcIndex, int dstIndex, int sr
 {
 #ifdef TEST_STATS
 	string str;
-	char ch[6] ;
+	char ch[6];
 #endif
 	OnOffHelper onOffAPP("ns3::UdpSocketFactory", Address(InetSocketAddress(l_Interfaces.GetAddress(dstIndex), srcPort)));
 	onOffAPP.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]"));
@@ -461,7 +461,7 @@ void MeshRouteClass::InstallCoupleApplication(int srcIndex, int dstIndex, int sr
 	{
 		DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(srcIndex)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Access_Point);
 		DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(dstIndex)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Portal);
-	}	
+	}
 #ifdef TEST_STATS
 	sprintf(ch, "%d", dstIndex);
 	str = ch;
@@ -521,7 +521,7 @@ void MeshRouteClass::InstallApplicationRandom()
 				for (int x = start; x < m_Size; x += m_ApplicationStep)
 				{
 					int i = y * m_Size + x;
-					if (i > (l_NodeNum - 1) / 2)
+					if (i >(l_NodeNum - 1) / 2)
 					{
 						end = true;
 						break;
@@ -794,6 +794,10 @@ int MeshRouteClass::Run()
 	//流量监测
 	l_Monitor = l_Flowmon.InstallAll();
 
+	//NetAnim
+	std::string animFile = "MeshRouteTest.xml";
+	AnimationInterface anim(animFile);
+
 	Simulator::Schedule(Seconds(m_TotalTime), &MeshRouteClass::Report, this);
 	Simulator::Stop(Seconds(m_TotalTime));
 	Simulator::Run();
@@ -863,10 +867,10 @@ void MeshRouteClass::Report()
 		string areatype;
 		if (TEST_SET_AREA == MeshRouteClass::HEXAGON)
 			areatype = "MeshRouteClass::HEXAGON";
-		else if(TEST_SET_AREA == MeshRouteClass::SQUARE)
+		else if (TEST_SET_AREA == MeshRouteClass::SQUARE)
 			areatype = "MeshRouteClass::SQUARE";
 
-		of << "<!--TEST AREA:" << areatype  <<"(" << m_Size << ")-->\n";
+		of << "<!--TEST AREA:" << areatype << "(" << m_Size << ")-->\n";
 #endif
 		switch (m_ProtocolType)
 		{
@@ -908,7 +912,7 @@ int main(int argc, char *argv[])
 	//LogComponentEnable("WmnPointDevice", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("WmnWifiInterfaceMac", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 
-	//LogComponentEnable("FlameProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL)); 
+	//LogComponentEnable("FlameProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("FlameProtocolMac", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 
 	//LogComponentEnable("HwmpProtocol", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
@@ -918,8 +922,8 @@ int main(int argc, char *argv[])
 	//LogComponentEnable("BulkSendApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("UdpServer", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 	//LogComponentEnable("UdpClient", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
-	//LogComponentEnable("UdpTraceClient", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL)); 
-	//LogComponentEnable("UdpEchoClientApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL)); 
+	//LogComponentEnable("UdpTraceClient", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
+	//LogComponentEnable("UdpEchoClientApplication", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
 #endif
 
 	LogComponentEnable("MeshRouteTest", (LogLevel)(LOG_LEVEL_ALL | LOG_PREFIX_ALL));
@@ -944,10 +948,10 @@ int main(int argc, char *argv[])
 		remove("1_HWMP_Delay.txt");
 		remove("1_HWMP_Throu.txt");
 #endif
-//测试连续边长
-#ifdef TEST_SIDE_ALL 
-//测试全部协议
-#ifdef TEST_ALL 
+		//测试连续边长
+#ifdef TEST_SIDE_ALL
+		//测试全部协议
+#ifdef TEST_ALL
 		for (int i = TEST_SET_MIN_SIZE; i <= TEST_SET_MAX_SIZE; i++)
 		{
 			vector<NodeApplicationInfor> apps;
@@ -1054,9 +1058,9 @@ int main(int argc, char *argv[])
 			test.Run();
 		}
 #endif
-//测试指定边长
+		//测试指定边长
 #else
-//测试全部协议
+		//测试全部协议
 #ifdef TEST_SIDE_ALL
 		vector<NodeApplicationInfor> apps;
 		int nodeCount;
