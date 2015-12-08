@@ -85,7 +85,6 @@
 using namespace ns3;
 using namespace std;
 
-NS_LOG_COMPONENT_DEFINE("MeshRouteTest");
 
 struct NodeApplicationInfor
 {
@@ -281,8 +280,10 @@ void MeshRouteClass::SimulatorSetting()
 		// 设置应用层参数
 		Config::SetDefault("ns3::OnOffApplication::PacketSize", UintegerValue(m_PacketSize));
 		Config::SetDefault("ns3::OnOffApplication::DataRate", StringValue(m_DataRate));
+		NS_LOG_DEBUG("123");
 	}
 }
+NS_LOG_COMPONENT_DEFINE("MeshRouteTest");
 
 // 创建节点及相关协议设置
 void MeshRouteClass::CreateNodes()
