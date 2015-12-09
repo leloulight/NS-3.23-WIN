@@ -31,13 +31,13 @@ class Pmtmgmp_Path_Link(Link):
         if data_link:
             # self.line = goocanvas.Polyline(parent=self.canvas_item, line_width=1.0, stroke_color_rgba=0xC00000FF, start_arrow=True, arrow_length=10,arrow_width=8)
             self.line = goocanvas.Polyline(parent=self.canvas_item, line_width=3.0, stroke_color_rgba=0xC00000FF,
-                                           start_arrow=True, close_path=False, end_arrow=False, arrow_length=20,
+                                           start_arrow=True, close_path=False, end_arrow=False, arrow_length=25,
                                            arrow_width=25)
         else:
             # self.line = goocanvas.Polyline(parent=self.canvas_item, line_width=1.0, stroke_color_rgba=0xC00000FF, start_arrow=True, arrow_length=10,arrow_width=8)
-            self.line = goocanvas.Polyline(parent=self.canvas_item, line_width=2.0, stroke_color_rgba=color,
+            self.line = goocanvas.Polyline(parent=self.canvas_item, line_width=3.0, stroke_color_rgba=color,
                                            start_arrow=True, close_path=False, end_arrow=False, arrow_length=25,
-                                           arrow_width=20)
+                                           arrow_width=25)
         self.line.raise_(None)
         self.label = goocanvas.Text()  # , fill_color_rgba=0x00C000C0)
         self.label.props.pointer_events = 0
@@ -93,15 +93,15 @@ class Pmtmgmp_Path_Link(Link):
                     if speed == 0:
                         self.destroy()
                         return
-                self.label.set_properties(font=("Sans Serif %i" % int(3 + self.viz.node_size_adjustment.value * 4)),
+                self.label.set_properties(font=("Sans Serif %i" % int(3 + self.viz.node_size_adjustment.value * 5)),
                                           text=("%.2f kbit/s" % (speed,)),
                                           alignment=pango.ALIGN_CENTER,
-                                          x=x, y=-0.5 + y)
+                                          x=x + 0.5, y=-0.5 + y)
             else:
-                self.label.set_properties(font=("Sans Serif %i" % int(1 + self.viz.node_size_adjustment.value * 4)),
+                self.label.set_properties(font=("Sans Serif %i" % int(1 + self.viz.node_size_adjustment.value * 5)),
                                           text=("%d" % (self.path.GetMetric(),)),
                                           alignment=pango.ALIGN_CENTER,
-                                          x=x, y=-0.5 - y)
+                                          x=x + 0.5, y=-0.5 - y)
             M = cairo.Matrix()
             M.translate(*self.viz._get_label_over_line_position(p1_x, p1_y, p2_x, p2_y))
             M.rotate(angle)
@@ -115,15 +115,15 @@ class Pmtmgmp_Path_Link(Link):
                     speed = (float)(pmtmgmp.GetPacketSizePerPathSecondByMac(send_to) - self.base_node.packet_size_map[
                         self.link_key]) * 8 * 1000 / SPEED_UPDATE_TIME / (
                             ns.core.Simulator.Now().GetMilliSeconds() - self.base_node.data_speed_time)
-                self.label.set_properties(font=("Sans Serif %i" % int(3 + self.viz.node_size_adjustment.value * 3)),
+                self.label.set_properties(font=("Sans Serif %i" % int(3 + self.viz.node_size_adjustment.value * 5)),
                                           text=("%.2f kbit/s" % (speed,)),
                                           alignment=pango.ALIGN_CENTER,
-                                          x=0, y=0.5)
+                                          x=0.5, y=0.5)
             else:
-                self.label.set_properties(font=("Sans Serif %i" % int(1 + self.viz.node_size_adjustment.value * 3)),
+                self.label.set_properties(font=("Sans Serif %i" % int(1 + self.viz.node_size_adjustment.value * 5)),
                                           text=("%d" % (self.path.GetMetric(),)),
                                           alignment=pango.ALIGN_CENTER,
-                                          x=0, y=0.5)
+                                          x=0.5, y=0.5)
             M = cairo.Matrix()
             M.translate(*self.viz._get_label_over_line_position(p1_x, p1_y, p2_x, p2_y))
             M.rotate(angle)
@@ -190,13 +190,31 @@ class Pmtmgmp_Node(object):
         self.data_speed_time = 0
         self.data_speed_time_temp = 0
         self.packet_size_map_first = True
+        self.canvas_item = goocanvas.Group(parent=self.viz.links_group)
+        self.label = goocanvas.Text()  # , fill_color_rgba=0x00C000C0)
+        self.label.props.pointer_events = 0
+        self.label.set_property("parent", self.canvas_item)
+        self.label.raise_(None)
+        self.canvas_item.set_data("pyviz-object", self)
+        self.canvas_item.lower(None)
 
     def set_color(self, color):
         self.viz_node.canvas_item.set_properties(fill_color_rgba=color)
         # if SHOW_LOG:
         #     print str(self.pmtmgmp.GetMacAddress()) + " set color " + str(color)
 
-    def update_link_dict(self, type):
+    def update_link_dict_and_node_lable(self, type):
+        pos_x, pos_y = self.viz_node.get_position()
+        if SHOW_LOG:
+            print str(pos_x) + "," + str(pos_y)
+        self.label.set_properties(font=("Sans Serif %i" % int(3 + self.viz.node_size_adjustment.value * 5)),
+                                          text=(str(self.node_index)),
+                                          alignment=pango.ALIGN_CENTER,
+                                          x=int(-3 + self.viz.node_size_adjustment.value * 6),
+                                          y=int(-3 + self.viz.node_size_adjustment.value * 6))
+        M = cairo.Matrix()
+        M.translate(pos_x, pos_y)
+        self.label.set_transform(M)
         if type and self.packet_size_map_first:
             self.packet_size_map_first = False
             self.data_speed_time_temp = ns.core.Simulator.Now().GetMilliSeconds()
@@ -278,7 +296,7 @@ class Pmtmgmp_Node(object):
             route_changed = True
             # if SHOW_LOG:
             #     print "Pmtmgmp_Node::crearte_route_path() " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
-        self.update_link_dict(False)
+        self.update_link_dict_and_node_lable(False)
         return route_changed
 
     def create_part_route_path_recursion(self, mac_node_list, mterp, msecp, parent_canvas_item, color):
@@ -313,7 +331,7 @@ class Pmtmgmp_Node(object):
                                                     self.viz, False, self.link_dict, key)
             # if SHOW_LOG:
             #     print "Pmtmgmp_Node::create_part_route_path_recursion() " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
-        self.update_link_dict(False)
+        self.update_link_dict_and_node_lable(False)
         return self.link_dict[key]
 
     def create_part_route_path_start(self, mac_node_list, mterp, parent_canvas_item):
@@ -352,7 +370,7 @@ class Pmtmgmp_Node(object):
                                                         route_path, self.viz, False, self.link_dict, key)
                 # if SHOW_LOG:
                 #     print "Pmtmgmp_Node::create_part_route_path_recursion() " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(route_path.GetFromNode())
-            self.update_link_dict(False)
+            self.update_link_dict_and_node_lable(False)
 
     def crearte_data_path(self, mac_node_list, mterp, msecp, parent_canvas_item):
         node_type = self.pmtmgmp.GetNodeType()
@@ -384,7 +402,7 @@ class Pmtmgmp_Node(object):
                 self.link_dict[str(send_to)] = route_link
                 # if SHOW_LOG:
                 #     print "Pmtmgmp_Node::crearte_data_path() " + str(self.pmtmgmp.GetMacAddress()) + " link to " + str(send_to)
-        self.update_link_dict(True)
+        self.update_link_dict_and_node_lable(True)
 
     def destory(self):
         self.node_index = None
@@ -476,7 +494,7 @@ class Pmtmgmp_Route(object):
 
     def update_nodes_view(self, viz):
         for node in self.node_list:
-            node.update_link_dict(self.show_data_send != None)
+            node.update_link_dict_and_node_lable(self.show_data_send != None)
 
     def simulation_periodic_update(self, viz):
         # if SHOW_LOG:
@@ -488,6 +506,7 @@ class Pmtmgmp_Route(object):
         self. scan_nodes(viz)
         if self.have_pmtmgmp:
             self.route_path_link()
+            self.update_nodes_view(viz)
             if self.init_pmtmgmp:
                 self.init_pmtmgmp = False
                 self.viz.play_button.set_active(False)
@@ -571,20 +590,21 @@ class Pmtmgmp_Route(object):
 
             for i in range(0, route_table.GetTableSize()):
                 route_tree = route_table.GetTableItem(i)
+                if str(route_tree.GetMTERPaddress()) != str(self.pmtmgmp.GetMacAddress()):
 
-                def _show_pmtmgmp_part_path(dummy_menu_item, i):
-                    route.show_msecp_mac = None
-                    route.show_mterp_mac = route_table.GetTableItem(i).GetMTERPaddress()
-                    route.show_data_send = None
-                    route.route_path_clean()
-                    route.simulation_periodic_update(viz)
-                    if SHOW_LOG:
-                        print "Show part path as MTERP is " + str(self.show_mterp_mac)
+                    def _show_pmtmgmp_part_path(dummy_menu_item, i):
+                        route.show_msecp_mac = None
+                        route.show_mterp_mac = route_table.GetTableItem(i).GetMTERPaddress()
+                        route.show_data_send = None
+                        route.route_path_clean()
+                        route.simulation_periodic_update(viz)
+                        if SHOW_LOG:
+                            print "Show part path as MTERP is " + str(self.show_mterp_mac)
 
-                menu_item_temp = gtk.MenuItem(str(route_tree.GetMTERPaddress()))
-                menu_item_temp.show()
-                menu_menu.add(menu_item_temp)
-                menu_item_temp.connect("activate", _show_pmtmgmp_part_path, i)
+                    menu_item_temp = gtk.MenuItem(str(route_tree.GetMTERPaddress()))
+                    menu_item_temp.show()
+                    menu_menu.add(menu_item_temp)
+                    menu_item_temp.connect("activate", _show_pmtmgmp_part_path, i)
 
         # As a MTERP
         route_tree = route_table.GetTreeByMACaddress(self.pmtmgmp.GetMacAddress())
