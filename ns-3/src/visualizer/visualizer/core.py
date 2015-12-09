@@ -755,6 +755,17 @@ class Visualizer(gobject.GObject):
             load_button_icon(shell_button, "gnome-terminal")
             shell_button.connect("clicked", self._start_shell)
 
+        ##PMTMGMP_UNUSED_MY_CODE
+        #AutoView
+        auto_view_button = gobject.new(gtk.Button,
+                                           label="AutoView",
+                                           relief=gtk.RELIEF_NONE, focus_on_click=False,
+                                           visible=True)
+        hbox.pack_start(auto_view_button, False, False, 4)
+        load_button_icon(auto_view_button, "gnome-terminal")
+        auto_view_button.connect("clicked", self._auto_view)
+        ####
+
         # Play button
         self.play_button = gobject.new(gtk.ToggleButton,
                                        image=gobject.new(gtk.Image, stock=gtk.STOCK_MEDIA_PLAY, visible=True),
@@ -773,6 +784,31 @@ class Visualizer(gobject.GObject):
         vbox.pack_start(self._create_advanced_controls(), False, False, 4)
         
         self.window.show()
+
+    ##PMTMGMP_UNUSED_MY_CODE
+    def _auto_view(self, dummy_button):
+        self._update_node_positions()
+        positions = [node.get_position() for node in self.nodes.itervalues()]
+        min_x, min_y = min(x for (x,y) in positions), min(y for (x,y) in positions)
+        max_x, max_y = max(x for (x,y) in positions), max(y for (x,y) in positions)
+        dx = max_x - min_x
+        dy = max_y - min_y
+        # print "dx:" +  str(dx) + ",dy:" + str(dy)
+        hadj = self._scrolled_window.get_hadjustment()
+        vadj = self._scrolled_window.get_vadjustment()
+        # print "hadj:" +  str(hadj.page_size) + ",vadj:" + str(vadj.page_size)
+        adj = min(hadj.page_size, vadj.page_size)
+        self.zoom.value = min(adj / dx / 1.2, adj / dy / 1.2)
+        # print "self.zoom.value:" +  str(self.zoom.value)
+        x1, y1 = self.canvas.convert_from_pixels(hadj.value, vadj.value)
+        x2, y2 = self.canvas.convert_from_pixels(hadj.value+hadj.page_size, vadj.value+vadj.page_size)
+        width = x2 - x1
+        height = y2 - y1
+        center_x = (min_x + max_x) / 2
+        center_y = (min_y + max_y) / 2
+        # print "center_x:" +  str(center_x) + ",center_y:" + str(center_y)
+        self.canvas.scroll_to(center_x - width/2, center_y - height/2)
+    ####
 
     def scan_topology(self):
         print "scanning topology: %i nodes..." % (ns.network.NodeList.GetNNodes(),)

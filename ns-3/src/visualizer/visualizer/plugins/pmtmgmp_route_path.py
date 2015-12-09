@@ -205,8 +205,8 @@ class Pmtmgmp_Node(object):
 
     def update_link_dict_and_node_lable(self, type):
         pos_x, pos_y = self.viz_node.get_position()
-        if SHOW_LOG:
-            print str(pos_x) + "," + str(pos_y)
+        # if SHOW_LOG:
+        #     print str(pos_x) + "," + str(pos_y)
         self.label.set_properties(font=("Sans Serif %i" % int(3 + self.viz.node_size_adjustment.value * 5)),
                                           text=("N" + str(self.node_index)),
                                           alignment=pango.ALIGN_CENTER,
