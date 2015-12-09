@@ -208,7 +208,7 @@ class Pmtmgmp_Node(object):
         if SHOW_LOG:
             print str(pos_x) + "," + str(pos_y)
         self.label.set_properties(font=("Sans Serif %i" % int(3 + self.viz.node_size_adjustment.value * 5)),
-                                          text=(str(self.node_index)),
+                                          text=("N" + str(self.node_index)),
                                           alignment=pango.ALIGN_CENTER,
                                           x=int(-3 + self.viz.node_size_adjustment.value * 6),
                                           y=int(-3 + self.viz.node_size_adjustment.value * 6))
