@@ -96,12 +96,12 @@ class Pmtmgmp_Path_Link(Link):
                 self.label.set_properties(font=("Sans Serif %i" % int(3 + self.viz.node_size_adjustment.value * 5)),
                                           text=("%.2f kbit/s" % (speed,)),
                                           alignment=pango.ALIGN_CENTER,
-                                          x=x + 0.5, y=-0.5 + y)
+                                          x=x+15, y=-15+y)
             else:
                 self.label.set_properties(font=("Sans Serif %i" % int(1 + self.viz.node_size_adjustment.value * 5)),
                                           text=("%d" % (self.path.GetMetric(),)),
                                           alignment=pango.ALIGN_CENTER,
-                                          x=x + 0.5, y=-0.5 - y)
+                                          x=x+15, y=-15-y)
             M = cairo.Matrix()
             M.translate(*self.viz._get_label_over_line_position(p1_x, p1_y, p2_x, p2_y))
             M.rotate(angle)
@@ -118,12 +118,12 @@ class Pmtmgmp_Path_Link(Link):
                 self.label.set_properties(font=("Sans Serif %i" % int(3 + self.viz.node_size_adjustment.value * 5)),
                                           text=("%.2f kbit/s" % (speed,)),
                                           alignment=pango.ALIGN_CENTER,
-                                          x=0.5, y=0.5)
+                                          x=15, y=15)
             else:
                 self.label.set_properties(font=("Sans Serif %i" % int(1 + self.viz.node_size_adjustment.value * 5)),
                                           text=("%d" % (self.path.GetMetric(),)),
                                           alignment=pango.ALIGN_CENTER,
-                                          x=0.5, y=0.5)
+                                          x=15, y=15)
             M = cairo.Matrix()
             M.translate(*self.viz._get_label_over_line_position(p1_x, p1_y, p2_x, p2_y))
             M.rotate(angle)
@@ -210,8 +210,8 @@ class Pmtmgmp_Node(object):
         self.label.set_properties(font=("Sans Serif %i" % int(3 + self.viz.node_size_adjustment.value * 5)),
                                           text=("N" + str(self.node_index)),
                                           alignment=pango.ALIGN_CENTER,
-                                          x=int(-3 + self.viz.node_size_adjustment.value * 6),
-                                          y=int(-3 + self.viz.node_size_adjustment.value * 6))
+                                          x=-3 + self.viz.node_size_adjustment.value * 6,
+                                          y=-3 + self.viz.node_size_adjustment.value * 6)
         M = cairo.Matrix()
         M.translate(pos_x, pos_y)
         self.label.set_transform(M)
