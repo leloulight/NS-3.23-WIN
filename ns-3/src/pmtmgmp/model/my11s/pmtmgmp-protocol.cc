@@ -37,6 +37,8 @@
 #include "ie-my11s-perr.h"
 
 #ifndef PMTMGMP_UNUSED_MY_CODE
+///Comment Below Code To Use Path Check
+#define PMTMGMP_UNUSED_REPEAT_PATH
 ////find_if
 #include <algorithm>
 

@@ -795,7 +795,7 @@ int MeshRouteClass::Run()
 	l_Monitor = l_Flowmon.InstallAll();
 
 	//NetAnim
-	std::string animFile = "MeshRouteTest.xml";
+	std::string animFile = "grid-animation.xml";
 	AnimationInterface anim(animFile);
 
 	Simulator::Schedule(Seconds(m_TotalTime), &MeshRouteClass::Report, this);
