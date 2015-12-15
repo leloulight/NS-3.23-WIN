@@ -38,7 +38,7 @@
 
 #ifndef PMTMGMP_UNUSED_MY_CODE
 ///Comment Below Code To Use Path Check
-#define PMTMGMP_UNUSED_REPEAT_PATH
+//#define PMTMGMP_UNUSED_REPEAT_PATH
 ////find_if
 #include <algorithm>
 
