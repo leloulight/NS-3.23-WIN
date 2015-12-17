@@ -23,7 +23,7 @@
 //2：多路径测试PMTRP
 //3：多路径测试
 //4：多路径测试路径截图
-#define MESH_TEST_ROUTE_MODE 4
+#define MESH_TEST_ROUTE_MODE 1
 
 //1：多网关测试
 #if MESH_TEST_ROUTE_MODE == 1
@@ -708,7 +708,7 @@ void MeshRouteClass::InstallOnOffHelperApplication(int srcIndex, double start, d
 	{
 		DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(srcIndex)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Access_Point);
 	}
-	Simulator::Schedule(Seconds(MIN_APPLICATION_TIME + start - 0.001), &MeshRouteClass::SetOnOffHelperApplicationRemote, this, DynamicCast<OnOffApplication>(sourceApps.Get(0)), srcIndex);
+	Simulator::Schedule(Seconds(MIN_APPLICATION_TIME + start), &MeshRouteClass::SetOnOffHelperApplicationRemote, this, DynamicCast<OnOffApplication>(sourceApps.Get(0)), srcIndex);
 }
 // 安装PacketSinkHelper应用
 void MeshRouteClass::InstallPacketSinkHelperApplication(int dstIndex, int dstPort, double start, double end)
