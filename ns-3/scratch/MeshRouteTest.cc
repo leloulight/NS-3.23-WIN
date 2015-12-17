@@ -18,6 +18,15 @@
 * Author: Whimsy Duke <whimsyduke@163.com>
 */
 
+//测试脚本模式
+//1：多网关测试
+//2：多路径测试PMTRP
+//3：多路径测试
+//4：多路径测试路径截图
+#define MESH_TEST_ROUTE_MODE 4
+
+//1：多网关测试
+#if MESH_TEST_ROUTE_MODE == 1
 //输出到文件
 //#define OUT_TO_FILE
 //无应用层模式
@@ -34,11 +43,7 @@
 #define TEST_MULTIGATE
 #ifdef TEST_MULTIGATE
 //使用Stats
-//#define TEST_STATS
 #endif
-
-//角度转换
-#define DEGREES_TO_RADIANS(__ANGLE__) ((__ANGLE__) * 0.01745329252f) // PI / 180
 
 // 仿真前路由生成时间
 #define MIN_APPLICATION_TIME 10
@@ -70,7 +75,165 @@
 #define TEST_SET_APPSTEP 4
 // 区域间隔与大小的差值
 #define TEST_SET_SIZE_APPSTEP 2
+#endif
+//2：多网关测试PMTRP
+#if MESH_TEST_ROUTE_MODE == 2
+//输出到文件
+//#define OUT_TO_FILE
+//无应用层模式
+//#define NO_APPLICATION
+//测试模式
+//#define TEST_LOCATION
+//测试所有协议
+//#define TEST_ALL
+//测试不同边界
+//#define TEST_SIDE_ALL
+//使用NetAnim
+//#define TEST_USE_NetAnim
+//进行多网关测试
+#define TEST_MULTIGATE
+#ifdef TEST_MULTIGATE
+//使用Stats
+#endif
 
+// 仿真前路由生成时间
+#define MIN_APPLICATION_TIME 10
+// 仿真后等待时间
+#define END_APPLICATION_TIME 20
+
+// 随机应用总数
+#define TEST_SET_COUNT 5
+// 随机应用运行间隔
+#define TEST_SET_INTERVAL 6
+// 随机应用持续时间
+#define TEST_SET_LIFE 26
+// 随机应用随机区间
+#define TEST_SET_RANDOM 4
+// 区域形状
+#define TEST_SET_AREA MeshRouteClass::HEXAGON
+// 应用布置类型
+#define TEST_SET_APP MeshRouteClass::Multiple
+// 协议
+#define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
+
+// 区域最大大小
+#define TEST_SET_MAX_SIZE 7
+// 区域最小大小
+#define TEST_SET_MIN_SIZE 4
+// 区域大小
+#define TEST_SET_SIZE 4
+// 区域间隔
+#define TEST_SET_APPSTEP 4
+// 区域间隔与大小的差值
+#define TEST_SET_SIZE_APPSTEP 2
+#endif
+//3：多路径测试
+#if MESH_TEST_ROUTE_MODE == 3
+//输出到文件
+//#define OUT_TO_FILE
+//无应用层模式
+//#define NO_APPLICATION
+//测试模式
+//#define TEST_LOCATION
+//测试所有协议
+#define TEST_ALL
+//测试不同边界
+#define TEST_SIDE_ALL
+//使用NetAnim
+//#define TEST_USE_NetAnim
+//进行多网关测试
+//#define TEST_MULTIGATE
+#ifdef TEST_MULTIGATE
+//使用Stats
+//#define TEST_STATS
+#endif
+
+// 仿真前路由生成时间
+#define MIN_APPLICATION_TIME 10
+// 仿真后等待时间
+#define END_APPLICATION_TIME 20
+
+// 随机应用总数
+#define TEST_SET_COUNT 5
+// 随机应用运行间隔
+#define TEST_SET_INTERVAL 6
+// 随机应用持续时间
+#define TEST_SET_LIFE 26
+// 随机应用随机区间
+#define TEST_SET_RANDOM 4
+// 区域形状
+#define TEST_SET_AREA MeshRouteClass::SQUARE
+// 应用布置类型
+#define TEST_SET_APP MeshRouteClass::Random
+// 协议
+#define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
+
+// 区域最大大小
+#define TEST_SET_MAX_SIZE 7
+// 区域最小大小
+#define TEST_SET_MIN_SIZE 4
+// 区域大小
+#define TEST_SET_SIZE 5
+// 区域间隔
+#define TEST_SET_APPSTEP 3
+// 区域间隔与大小的差值
+#define TEST_SET_SIZE_APPSTEP 2
+#endif
+//4：多路径测试路径截图
+#if MESH_TEST_ROUTE_MODE == 4
+//输出到文件
+//#define OUT_TO_FILE
+//无应用层模式
+//#define NO_APPLICATION
+//测试模式
+//#define TEST_LOCATION
+//测试所有协议
+//#define TEST_ALL
+//测试不同边界
+//#define TEST_SIDE_ALL
+//使用NetAnim
+//#define TEST_USE_NetAnim
+//进行多网关测试
+//#define TEST_MULTIGATE
+#ifdef TEST_MULTIGATE
+//使用Stats
+//#define TEST_STATS
+#endif
+
+// 仿真前路由生成时间
+#define MIN_APPLICATION_TIME 10
+// 仿真后等待时间
+#define END_APPLICATION_TIME 20
+
+// 随机应用总数
+#define TEST_SET_COUNT 5
+// 随机应用运行间隔
+#define TEST_SET_INTERVAL 6
+// 随机应用持续时间
+#define TEST_SET_LIFE 26
+// 随机应用随机区间
+#define TEST_SET_RANDOM 4
+// 区域形状
+#define TEST_SET_AREA MeshRouteClass::SQUARE
+// 应用布置类型
+#define TEST_SET_APP MeshRouteClass::Multiple
+// 协议
+#define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
+
+// 区域最大大小
+#define TEST_SET_MAX_SIZE 7
+// 区域最小大小
+#define TEST_SET_MIN_SIZE 4
+// 区域大小
+#define TEST_SET_SIZE 5
+// 区域间隔
+#define TEST_SET_APPSTEP 3
+// 区域间隔与大小的差值
+#define TEST_SET_SIZE_APPSTEP 2
+#endif
+
+//角度转换
+#define DEGREES_TO_RADIANS(__ANGLE__) ((__ANGLE__) * 0.01745329252f) // PI / 180
 
 #include "ns3/core-module.h"
 #include "ns3/internet-module.h"
@@ -147,12 +310,14 @@ private:
 	void InstallInternetStack();
 	// 安装应用
 	void InstallCoupleApplication(int srcIndex, int dstIndex, int srcPort, int dstPort, double start, double end);
+#ifdef TEST_MULTIGATE
 	// 设置BulkSendHelper应用选择目标节点
 	void SetOnOffHelperApplicationRemote(Ptr<OnOffApplication> app, int nodeIndex);
 	// 安装BulkSendHelper应用
 	void InstallOnOffHelperApplication(int srcIndex, double start, double end);
 	// 安装PacketSinkHelper应用
 	void InstallPacketSinkHelperApplication(int dstIndex, int dstPort, double start, double end);
+#endif
 	// 安装应用层
 	void InstallApplicationRandom();
 	// 数据统计模块配置
@@ -479,6 +644,7 @@ void MeshRouteClass::InstallCoupleApplication(int srcIndex, int dstIndex, int sr
 	}
 }
 
+#ifdef TEST_MULTIGATE
 // 设置BulkSendHelper应用选择目标节点
 void MeshRouteClass::SetOnOffHelperApplicationRemote(Ptr<OnOffApplication> app, int nodeIndex)
 {
@@ -532,6 +698,7 @@ void MeshRouteClass::InstallOnOffHelperApplication(int srcIndex, double start, d
 	sourceApps.Start(Seconds(MIN_APPLICATION_TIME + start));
 	sourceApps.Stop(Seconds(MIN_APPLICATION_TIME + end));
 	l_MAP.push_back(srcIndex);
+
 #ifdef TEST_STATS
 	sprintf(ch, "%d", srcIndex);
 	str = ch;
@@ -561,6 +728,7 @@ void MeshRouteClass::InstallPacketSinkHelperApplication(int dstIndex, int dstPor
 	Config::Connect("/NodeList/" + str + "/ApplicationList/*/$ns3::PacketSink/Rx", MakeCallback(&MeshRouteClass::CallBack_ApplicationRX, this));
 #endif
 }
+#endif // TEST_MULTIGATE
 
 // 安装应用层
 void MeshRouteClass::InstallApplicationRandom()
