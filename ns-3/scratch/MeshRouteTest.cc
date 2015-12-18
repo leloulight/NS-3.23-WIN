@@ -43,6 +43,7 @@
 #define TEST_MULTIGATE
 #ifdef TEST_MULTIGATE
 //使用Stats
+//#define TEST_STATS
 #endif
 
 // 仿真前路由生成时间
@@ -94,6 +95,7 @@
 #define TEST_MULTIGATE
 #ifdef TEST_MULTIGATE
 //使用Stats
+//#define TEST_STATS
 #endif
 
 // 仿真前路由生成时间
@@ -328,9 +330,8 @@ private:
 #ifdef TEST_STATS
 private:
 	// 回调函数
-	void CallBack_RouteDiscoveryTime(string context, Time time);
 	void CallBack_ApplicationTX(string context, Ptr<const Packet> packet);
-	void CallBack_ApplicationRX(string context, Ptr<const Packet> packet);
+	void CallBack_ApplicationRX(string path, Ptr<const Packet> packet, const Address &address);
 #endif
 	// 输出报告
 	void Report();
@@ -381,7 +382,7 @@ MeshRouteClass::MeshRouteClass() :
 	m_NumIface(1),
 	m_WifiPhyStandard(WIFI_PHY_STANDARD_80211g),
 	m_Step(100),
-	m_MaxBytes(5242880),
+	m_MaxBytes(2097152),
 	m_PacketSize(1024),
 	m_DataRate("150kbps"),
 	m_TotalTime(120),
@@ -621,10 +622,6 @@ void MeshRouteClass::InstallInternetStack()
 // 安装一对OnOffHelper应用
 void MeshRouteClass::InstallCoupleApplication(int srcIndex, int dstIndex, int srcPort, int dstPort, double start, double end)
 {
-#ifdef TEST_STATS
-	string str;
-	char ch[6];
-#endif
 	OnOffHelper onOffAPP("ns3::UdpSocketFactory", Address(InetSocketAddress(l_Interfaces.GetAddress(dstIndex), srcPort)));
 	onOffAPP.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]"));
 	onOffAPP.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=0]"));
@@ -700,9 +697,10 @@ void MeshRouteClass::InstallOnOffHelperApplication(int srcIndex, double start, d
 	l_MAP.push_back(srcIndex);
 
 #ifdef TEST_STATS
-	sprintf(ch, "%d", srcIndex);
-	str = ch;
-	Config::Connect("/NodeList/" + str + "/ApplicationList/*/$ns3::BulkSendApplication/Tx", MakeCallback(&MeshRouteClass::CallBack_ApplicationTX, this));
+	char ch[3];
+	std::sprintf(ch, "%d", srcIndex);
+	string str = ch;
+	Config::Connect("/NodeList/" + str + "/ApplicationList/*/$ns3::OnOffApplication/Tx", MakeCallback(&MeshRouteClass::CallBack_ApplicationTX, this));
 #endif
 	if (m_ProtocolType == MY11S_PMTMGMP)
 	{
@@ -723,8 +721,9 @@ void MeshRouteClass::InstallPacketSinkHelperApplication(int dstIndex, int dstPor
 		DynamicCast<my11s::PmtmgmpProtocol>(DynamicCast<WmnPointDevice>(l_Nodes.Get(dstIndex)->GetDevice(0))->GetRoutingProtocol())->SetNodeType(my11s::PmtmgmpProtocol::Mesh_Portal);
 	}
 #ifdef TEST_STATS
-	sprintf(ch, "%d", dstIndex);
-	str = ch;
+	char ch[3];
+	std::sprintf(ch, "%d", dstIndex);
+	string str = ch;
 	Config::Connect("/NodeList/" + str + "/ApplicationList/*/$ns3::PacketSink/Rx", MakeCallback(&MeshRouteClass::CallBack_ApplicationRX, this));
 #endif
 }
@@ -938,21 +937,6 @@ void MeshRouteClass::InstallApplicationRandom()
 void MeshRouteClass::StatsDataSet()
 {
 #ifdef TEST_STATS
-	//输出配置
-	//Config::Connect("/NodeList/*/DeviceList/*/RoutingProtocol/RouteDiscoveryTime", MakeCallback(&MeshRouteClass::CallBack_RouteDiscoveryTime, this));
-
-	////Gnuplot图表输出
-	//string probeType = "ns3::Ipv4PacketProbe";
-	//string tracePath = "/NodeList/*/$ns3::Ipv4L3Protocol/Tx";
-
-	//GnuplotHelper plotHelper;
-	//plotHelper.ConfigurePlot("Mesh-Route-Test-Packet-Byte-Count", "Packet Byte Count vs. Time", "Time (Seconds)", "Packet Byte Count");
-	//plotHelper.PlotProbe(probeType, tracePath, "OutputBytes", "Packet Byte Count", GnuplotAggregator::KEY_BELOW);
-
-	//FileHelper fileHelper;
-	//fileHelper.ConfigureFile("Mesh-Route-Test", FileAggregator::FORMATTED);
-	//fileHelper.Set2dFormat("Time (Seconds) = %.3e\tPacket Byte Count = %.0f");
-	//fileHelper.WriteProbe(probeType, tracePath, "OutputBytes");
 #endif
 }
 
@@ -1022,6 +1006,13 @@ void MeshRouteClass::FlowMonitorReport()
 			NS_LOG_INFO("Average delay: " << delay_value << "s");
 			NS_LOG_INFO("Rx bitrate: " << rxbitrate_value << " kbps");
 			NS_LOG_INFO("Tx bitrate: " << txbitrate_value << " kbps");
+			NS_LOG_INFO("LastTxPacket: " << i->second.timeLastTxPacket.GetSeconds() << " s");
+			NS_LOG_INFO("FirstTxPacket: " << i->second.timeFirstTxPacket.GetSeconds() << " s");
+			NS_LOG_INFO("TxPackets: " << i->second.txPackets);
+			NS_LOG_INFO("LastRxPacket: " << i->second.timeLastRxPacket.GetSeconds() << " s");
+			NS_LOG_INFO("FirstRxPacket: " << i->second.timeFirstRxPacket.GetSeconds() << " s");
+			NS_LOG_INFO("RxPackets: " << i->second.rxPackets);
+
 			// 统计平均值
 			totaltxPackets += i->second.txPackets;
 			totaltxbytes += i->second.txBytes;
@@ -1143,17 +1134,13 @@ int MeshRouteClass::Run()
 }
 #ifdef TEST_STATS
 // 回调函数
-void MeshRouteClass::CallBack_RouteDiscoveryTime(string context, Time time)
-{
-	NS_LOG_INFO("RouteDiscoveryTime:" << time.GetSeconds() << std::endl);
-}
 void MeshRouteClass::CallBack_ApplicationTX(string context, Ptr<const Packet> packet)
 {
 	NS_LOG_INFO("Send Packet, Size:" << packet->GetSize() << std::endl);
 }
-void MeshRouteClass::CallBack_ApplicationRX(string context, Ptr<const Packet> packet)
+void MeshRouteClass::CallBack_ApplicationRX(string path, Ptr<const Packet> packet, const Address &address)
 {
-	NS_LOG_INFO("Receive Packet, Size:" << packet->GetSize() << std::endl);
+	NS_LOG_INFO("Receive Packet at " <<  address << ", Size:" << packet->GetSize() << std::endl);
 }
 #endif
 
