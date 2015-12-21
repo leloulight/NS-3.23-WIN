@@ -23,7 +23,7 @@
 //2：多路径测试PMTRP
 //3：多路径测试
 //4：多路径测试路径截图
-#define MESH_TEST_ROUTE_MODE 1
+#define MESH_TEST_ROUTE_MODE 2
 
 //1：多网关测试
 #if MESH_TEST_ROUTE_MODE == 1
@@ -77,7 +77,7 @@
 // 区域间隔与大小的差值
 #define TEST_SET_SIZE_APPSTEP 2
 #endif
-//2：多网关测试PMTRP
+//2：多路径测试PMTRP
 #if MESH_TEST_ROUTE_MODE == 2
 //输出到文件
 //#define OUT_TO_FILE
@@ -92,7 +92,7 @@
 //使用NetAnim
 //#define TEST_USE_NetAnim
 //进行多网关测试
-#define TEST_MULTIGATE
+//#define TEST_MULTIGATE
 #ifdef TEST_MULTIGATE
 //使用Stats
 //#define TEST_STATS
@@ -112,9 +112,9 @@
 // 随机应用随机区间
 #define TEST_SET_RANDOM 4
 // 区域形状
-#define TEST_SET_AREA MeshRouteClass::HEXAGON
+#define TEST_SET_AREA MeshRouteClass::SQUARE
 // 应用布置类型
-#define TEST_SET_APP MeshRouteClass::Multiple
+#define TEST_SET_APP MeshRouteClass::Simple
 // 协议
 #define TEST_SET_PROTOCOL MeshRouteClass::MY11S_PMTMGMP
 
@@ -123,7 +123,7 @@
 // 区域最小大小
 #define TEST_SET_MIN_SIZE 4
 // 区域大小
-#define TEST_SET_SIZE 4
+#define TEST_SET_SIZE 6
 // 区域间隔
 #define TEST_SET_APPSTEP 4
 // 区域间隔与大小的差值
