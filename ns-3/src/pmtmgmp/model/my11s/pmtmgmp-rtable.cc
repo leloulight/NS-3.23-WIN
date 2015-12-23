@@ -26,6 +26,9 @@
 
 #include "pmtmgmp-rtable.h"
 
+//Set Not Use AALM
+//#define PMTMGMP_UNUSED_AALM 
+
 namespace ns3 {
 
 	NS_LOG_COMPONENT_DEFINE("PmtmgmpRtable");
@@ -310,6 +313,7 @@ namespace ns3 {
 		////度量值更新
 		void PmtmgmpRoutePath::IncrementMetric(uint32_t metric, double k)
 		{
+#ifndef PMTMGMP_UNUSED_AALM
 			////按公式积累计算度量，见AALM计算公式
 			if (metric == 0xffffffff)
 			{
@@ -322,8 +326,11 @@ namespace ns3 {
 			else
 			{
 				//m_metric = (sqrt(m_hopCount) * k * metric + (m_hopCount - 1) * (double)m_BaseMetric) / sqrt(m_hopCount * (m_hopCount + 1));
-				m_metric = (m_hopCount * k * metric + (m_hopCount - 1) * (double)m_BaseMetric) /(m_hopCount + 1);
+				m_metric = (m_hopCount * k * metric + (m_hopCount - 1) * (double)m_BaseMetric) / (m_hopCount + 1);
 			}
+#else
+			m_metric += metric;
+#endif 
 		}
 		bool PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare(Ptr<PmtmgmpRoutePath> path)
 		{

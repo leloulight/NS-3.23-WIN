@@ -103,11 +103,11 @@ class ShowPmtmgmpInforamtion(InformationWindow):
                 self.page_vbox.add(self.page_treeview)
                 page_treeviewcolum = gtk.TreeViewColumn(' Index ', gtk.CellRendererText(), text = 0)
                 self.page_treeview.append_column(page_treeviewcolum)
-                page_treeviewcolum = gtk.TreeViewColumn(' MTERP ', gtk.CellRendererText(), text = 1)
+                page_treeviewcolum = gtk.TreeViewColumn(' MTP ', gtk.CellRendererText(), text = 1)
                 self.page_treeview.append_column(page_treeviewcolum)
-                page_treeviewcolum = gtk.TreeViewColumn(' MSECP ', gtk.CellRendererText(), text = 2)
+                page_treeviewcolum = gtk.TreeViewColumn(' MSP ', gtk.CellRendererText(), text = 2)
                 self.page_treeview.append_column(page_treeviewcolum)
-                page_treeviewcolum = gtk.TreeViewColumn(' MSECP Index ', gtk.CellRendererText(), text = 3)
+                page_treeviewcolum = gtk.TreeViewColumn(' MSP Index ', gtk.CellRendererText(), text = 3)
                 self.page_treeview.append_column(page_treeviewcolum)
                 page_treeviewcolum = gtk.TreeViewColumn(' GSN ', gtk.CellRendererText(), text = 4)
                 self.page_treeview.append_column(page_treeviewcolum)
@@ -174,7 +174,7 @@ class ShowPmtmgmpInforamtion(InformationWindow):
 
                     index = index + 1
 
-                self.notebook.append_page(page.page_vbox, gtk.Label("Node " + bytes(i)))
+                self.notebook.append_page(page.page_vbox, gtk.Label(route_tree.GetMTERPaddress()))
 
 def populate_node_menu(viz, node, menu):
     ns3_node = ns.network.NodeList.GetNode(node.node_index)
