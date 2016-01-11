@@ -208,11 +208,13 @@ void
 MgmpProtocol::DoInitialize ()
 {
   m_coefficient->SetAttribute ("Max", DoubleValue (m_randomStart.GetSeconds ()));
+#ifdef HUMGMP_UNUSED_MY_CODE
   if (m_isRoot)
     {
       Time randomStart = Seconds (m_coefficient->GetValue ());
       m_proactivePreqTimer = Simulator::Schedule (randomStart, &MgmpProtocol::SendProactivePreq, this);
     }
+#endif
 }
 
 void

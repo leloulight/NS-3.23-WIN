@@ -154,6 +154,14 @@ MgmpProtocolMac::ReceiveAction (Ptr<Packet> packet, const WifiMacHeader & header
               failedDestinations.push_back (*i);
             }
         }
+#ifndef HUMGMP_UNUSED_MY_CODE
+	  if ((*i)->ElementId() == IE11S_RANN)
+	  {
+		  Ptr<IeRann> rann = DynamicCast<IeRann>(*i);
+		  NS_ASSERT(rann != 0);
+		  m_stats.rxRann++;
+	  }
+#endif
     }
   if (failedDestinations.size () > 0)
     {

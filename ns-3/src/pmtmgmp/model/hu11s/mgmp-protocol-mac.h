@@ -117,6 +117,10 @@ private:
     uint16_t rxPrep;
     uint16_t txPerr;
     uint16_t rxPerr;
+#ifndef HUMGMP_UNUSED_MY_CODE
+	uint16_t txRann;
+	uint16_t rxRann;
+#endif
     uint16_t txMgt;
     uint32_t txMgtBytes;
     uint16_t rxMgt;
