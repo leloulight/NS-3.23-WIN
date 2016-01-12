@@ -1105,6 +1105,9 @@ MgmpProtocol::GetUnicastPerrThreshold ()
 {
   return m_unicastPerrThreshold;
 }
+void MgmpProtocol::ReceiveRann(IePreq preq, Mac48Address from, uint32_t, Mac48Address fromMp, uint32_t metric)
+{
+}
 Mac48Address
 MgmpProtocol::GetAddress ()
 {

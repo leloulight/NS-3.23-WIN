@@ -160,6 +160,8 @@ MgmpProtocolMac::ReceiveAction (Ptr<Packet> packet, const WifiMacHeader & header
 		  Ptr<IeRann> rann = DynamicCast<IeRann>(*i);
 		  NS_ASSERT(rann != 0);
 		  m_stats.rxRann++;
+		  m_protocol->ReceiveRann(*rann, header.GetAddr2(), m_ifIndex, header.GetAddr3(),
+			  m_parent->GetLinkMetric(header.GetAddr2()));
 	  }
 #endif
     }

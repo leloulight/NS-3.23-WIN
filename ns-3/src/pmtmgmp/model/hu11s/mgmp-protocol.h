@@ -212,6 +212,9 @@ private:
   uint32_t GetActivePathLifetime ();
   uint8_t GetUnicastPerrThreshold ();
   ///\}
+#ifndef HUMGMP_UNUSED_MY_CODE
+  void ReceiveRann(IePreq preq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric);
+#endif
 private:
   ///\name Statistics:
   ///\{
