@@ -23,14 +23,11 @@
 #include "ns3/simulator.h"
 #include "ns3/test.h"
 #include "ns3/log.h"
-#ifndef PMTMGMP_UNUSED_MY_CODE
- ////find_if
-#include <algorithm>
-#include "ns3/random-variable-stream.h"
-#include "ns3/pmtmgmp-tag.h"
-#endif
 
 #include "pmtmgmp-rtable.h"
+
+//Set Not Use AALM
+//#define PMTMGMP_UNUSED_AALM 
 
 namespace ns3 {
 
@@ -58,9 +55,10 @@ namespace ns3 {
 			m_BaseMetric(0),
 			m_CandidateRouteInformaiton(std::vector<Ptr<PmtmgmpRoutePath> >()),
 			m_InformationStatus(Confirmed),
-			m_MaxCandidateNum(4),
-			m_PMTGMGMProutePathInforLife(MicroSeconds(1024 * 120000)),
-			m_PMTMGMPpathRecreateDelay(MicroSeconds(1024 * 5000))
+			m_MaxCandidateNum(10),
+			m_PMTGMGMProutePathInforLife(MicroSeconds(1024 * 200000)),
+			m_PMTMGMPpathRecreateDelay(MicroSeconds(1024 * 4000)),
+			m_PmtmgmpPeerLinkStatus(true)
 		{
 			RoutePathInforLifeUpdate();
 		}
@@ -90,21 +88,21 @@ namespace ns3 {
 				.AddConstructor<PmtmgmpRoutePath>()
 				.AddAttribute("MaxCandidateNum",
 					"Max number of Candidate Information",
-					UintegerValue(4),
+					UintegerValue(10),
 					MakeUintegerAccessor(
 						&PmtmgmpRoutePath::m_MaxCandidateNum),
 					MakeUintegerChecker<uint8_t>(0)
 					)
 				.AddAttribute("PMTGMGMProutePathInforLife",
 					"Life of route path information.",
-					TimeValue(MicroSeconds(1024 * 120000)),
+					TimeValue(MicroSeconds(1024 * 200000)),
 					MakeTimeAccessor(
 						&PmtmgmpRoutePath::m_PMTGMGMProutePathInforLife),
 					MakeTimeChecker()
 					)
 				.AddAttribute("My11WmnPMTMGMPpathRecreateDelay",
 					"Delay for Recreate the Route Path, in Delay Time PUPGQ would not be sended",
-					TimeValue(MicroSeconds(1024 * 5000)),
+					TimeValue(MicroSeconds(1024 * 4000)),
 					MakeTimeAccessor(
 						&PmtmgmpRoutePath::m_PMTMGMPpathRecreateDelay),
 					MakeTimeChecker()
@@ -166,7 +164,15 @@ namespace ns3 {
 		void PmtmgmpRoutePath::SetMetric(uint32_t metric)
 		{
 			m_BaseMetric = metric;
+<<<<<<< HEAD
+=======
 			m_metric = metric;
+		}
+		void PmtmgmpRoutePath::SetAllMetric(uint32_t metric, uint32_t base)
+		{
+>>>>>>> refs/remotes/Whimsyduke/humgmp
+			m_metric = metric;
+			m_BaseMetric = base;
 		}
 		void PmtmgmpRoutePath::SetAllMetric(uint32_t metric, uint32_t base)
 		{
@@ -188,6 +194,10 @@ namespace ns3 {
 		void PmtmgmpRoutePath::SetAcceptCandidateRouteInformaitonEvent(EventId id)
 		{
 			m_AcceptCandidateRouteInformaitonEvent = id;
+		}
+		void PmtmgmpRoutePath::SetPmtmgmpPeerLinkStatus(bool status)
+		{
+			m_PmtmgmpPeerLinkStatus = status;
 		}
 		void PmtmgmpRoutePath::SetPGENsendTime()
 		{
@@ -244,6 +254,10 @@ namespace ns3 {
 		EventId PmtmgmpRoutePath::GetAcceptCandidateRouteInformaitonEvent() const
 		{
 			return m_AcceptCandidateRouteInformaitonEvent;
+		}
+		bool PmtmgmpRoutePath::GetPmtmgmpPeerLinkStatus() const
+		{
+			return m_PmtmgmpPeerLinkStatus;
 		}
 		Time PmtmgmpRoutePath::GetPGENsendTime() const
 		{
@@ -307,17 +321,89 @@ namespace ns3 {
 		////度量值更新
 		void PmtmgmpRoutePath::IncrementMetric(uint32_t metric, double k)
 		{
+#ifndef PMTMGMP_UNUSED_AALM
 			////按公式积累计算度量，见AALM计算公式
+<<<<<<< HEAD
 			m_metric = (sqrt(m_hopCount) * k * metric + (m_hopCount - 1) * (double) m_BaseMetric) / sqrt(m_hopCount * (m_hopCount + 1));
+=======
+			if (metric == 0xffffffff)
+			{
+				m_metric = 0xffffffff;
+			}
+			else if (m_BaseMetric == 0xffffffff)
+			{
+				m_metric = 0xffffffff;
+			}
+			else
+			{
+				//m_metric = (sqrt(m_hopCount) * k * metric + (m_hopCount - 1) * (double)m_BaseMetric) / sqrt(m_hopCount * (m_hopCount + 1));
+				m_metric = (m_hopCount * k * metric + (m_hopCount - 1) * (double)m_BaseMetric) / (m_hopCount + 1);
+			}
+#else
+			m_metric += metric;
+#endif 
+		}
+		bool PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare(Ptr<PmtmgmpRoutePath> path)
+		{
+			if (m_metric == path->GetMetric())
+			{
+				Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
+				rand->SetAttribute("Min", DoubleValue(-0.5));
+				rand->SetAttribute("Max", DoubleValue(1.5));
+				if (rand->GetInteger(0, 1) == 1)
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return m_metric > path->GetMetric();
+			}
+			return false;
+		}
+		bool PmtmgmpRoutePath::DataSendRoutePathMetricCompare(Ptr<PmtmgmpRoutePath> path)
+		{
+			if (path == this) return false;
+			if (m_PathGenerationSeqNumber == path->GetPathGenerationSequenceNumber() && (m_metric * uint8_t(m_InformationStatus) == path->GetMetric() * uint8_t(path->GetStatus())))
+			{
+				Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
+				rand->SetAttribute("Min", DoubleValue(-0.5));
+				rand->SetAttribute("Max", DoubleValue(1.5));
+				if (rand->GetInteger(0, 1) == 1)
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				if (m_metric * uint8_t(m_InformationStatus) == path->GetMetric() * uint8_t(path->GetStatus()))
+				{
+					return m_PathGenerationSeqNumber < path->GetPathGenerationSequenceNumber();
+				}
+				else
+				{
+					return m_metric * uint8_t(m_InformationStatus) > path->GetMetric() * uint8_t(path->GetStatus());
+				}
+			}
+			return false;
+>>>>>>> refs/remotes/Whimsyduke/humgmp
 		}
 		/*************************
 		* PmtmgmpRouteTree
 		************************/
 		PmtmgmpRouteTree::PmtmgmpRouteTree() :
 			m_tree(std::vector<Ptr<PmtmgmpRoutePath> >()),
-			m_MSECPnumForMTERP(2),
-			m_AcceptInformaitonDelay(MicroSeconds(1024 * 1000)),
-			m_NotSelectBestRoutePathRate(5)
+			m_MSECPnumForMTERP(5),
+			m_AcceptInformaitonDelay(MicroSeconds(1024 * 1500)),
+			m_NotSelectBestRoutePathRate(3)
 		{
 		}
 
@@ -332,24 +418,24 @@ namespace ns3 {
 				.AddConstructor<PmtmgmpRouteTree>()
 				.AddAttribute("MSECPnumForMTERP",
 					"The number of MESCP that each MTERP can have.",
-					UintegerValue(2),
+					UintegerValue(5),
 					MakeUintegerAccessor(
 						&PmtmgmpRouteTree::m_MSECPnumForMTERP),
 					MakeUintegerChecker<uint8_t>(1)
 					)
 				.AddAttribute("AcceptInformaitonDelay",
 					"Delay for accept information.",
-					TimeValue(MicroSeconds(1024 * 1000)),
+					TimeValue(MicroSeconds(1024 * 1500)),
 					MakeTimeAccessor(
 						&PmtmgmpRouteTree::m_AcceptInformaitonDelay),
 					MakeTimeChecker()
 					)
 				.AddAttribute("NotSelectBestRoutePathRate",
 					"The rate for compare selected path and the best Metric path.",
-					UintegerValue(5),
+					DoubleValue(3),
 					MakeUintegerAccessor(
 						&PmtmgmpRouteTree::m_NotSelectBestRoutePathRate),
-					MakeUintegerChecker<uint8_t>(1)
+					MakeUintegerChecker<double>(0)
 					)
 				;
 			return tid;
@@ -412,12 +498,26 @@ namespace ns3 {
 		////选择MSECP
 		void PmtmgmpRouteTree::SelectMSECP()
 		{
-			std::sort(m_tree.begin(), m_tree.end(), PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare());
-			if (m_tree.size() > m_MSECPnumForMTERP)
+			std::vector<Ptr<PmtmgmpRoutePath> > tree = std::vector<Ptr<PmtmgmpRoutePath> >();
+			uint8_t size = m_tree.size();
+			if (size > m_MSECPnumForMTERP)
 			{
-				std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin() + m_MSECPnumForMTERP;
-				m_tree.erase(iter, m_tree.end());
+				size = m_MSECPnumForMTERP;
 			}
+			for (int i = 0; i < size; i++)
+			{
+				std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = GetBestMSECPpath();
+				Ptr<PmtmgmpRoutePath> path = *iter;
+				tree.push_back(path);
+				m_tree.erase(iter);
+			}
+			m_tree = tree;
+			//std::sort(m_tree.begin(), m_tree.end(), &MSECPselectRoutePathMetricCompare);
+			//if (m_tree.size() > m_MSECPnumForMTERP)
+			//{
+			//	std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin() + m_MSECPnumForMTERP;
+			//	m_tree.erase(iter, m_tree.end());
+			//}
 		}
 		void PmtmgmpRouteTree::AddMSECPpath(Ptr<PmtmgmpRoutePath> path)
 		{
@@ -582,26 +682,92 @@ namespace ns3 {
 		Ptr<PmtmgmpRoutePath> PmtmgmpRouteTree::GetBestRoutePathForData(uint8_t index)
 		{
 			if (m_tree.size() == 0) return 0;
-			std::sort(m_tree.begin(), m_tree.end(), PmtmgmpRoutePath::MSECPselectRoutePathMetricCompare());
 			////MSECPindex为不会分配0，说明当前没有历史路径（iter == m_tree.end()）
 			std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = std::find_if(m_tree.begin(), m_tree.end(), PmtmgmpRouteTree_IndexFinder(index));
-			if (iter == m_tree.end())
+			if (iter == m_tree.end() || (*iter)->GetPmtmgmpPeerLinkStatus() == false)
 			{
 				////没找到MSECPindex的路径直接返回最优路径
-				return *(m_tree.begin());
+				iter = GetBestRoutePathForData();
 			}
 			else
 			{
 				////比较当前使用路由度量和最优路由路径度量，选取最优路径返回
-				if ((*iter)->GetMetric() < (*(m_tree.begin()))->GetMetric() * m_NotSelectBestRoutePathRate)
+				if ((*iter)->GetMetric() >= (*(m_tree.begin()))->GetMetric() * m_NotSelectBestRoutePathRate)
 				{
-					return *iter;
+					iter = GetBestRoutePathForData();
 				}
-				else
-				{
-					return *(m_tree.begin());
-				}
+			}
+			if (iter != m_tree.end())
+			{
 				return *iter;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+		std::vector<Ptr<PmtmgmpRoutePath> >::iterator PmtmgmpRouteTree::GetBestRoutePathForData()
+		{
+			if (m_tree.size() == 0) return m_tree.end();
+			std::vector<Ptr<PmtmgmpRoutePath> >::iterator path = m_tree.begin();
+			for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin() + 1; iter != m_tree.end(); iter++)
+			{
+				if ((*path)->DataSendRoutePathMetricCompare(*iter) && (*iter)->GetPmtmgmpPeerLinkStatus() == true)
+				{
+					path = iter;
+				}
+			}
+			if ((*path)->GetPmtmgmpPeerLinkStatus())
+			{
+				return path;
+			}
+			else
+			{
+				return m_tree.end();
+			}
+		}
+		std::vector<Ptr<PmtmgmpRoutePath> >::iterator PmtmgmpRouteTree::GetBestMSECPpath()
+		{
+			if (m_tree.size() == 0) return m_tree.end();
+			std::vector<Ptr<PmtmgmpRoutePath> >::iterator path = m_tree.begin();
+			for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin() + 1; iter != m_tree.end(); iter++)
+			{
+				if ((*path)->MSECPselectRoutePathMetricCompare(*iter))
+				{
+					path = iter;
+				}
+			}
+			return path;
+		}
+		Ptr<PmtmgmpRoutePath> PmtmgmpRouteTree::GetNearestRoutePathForData()
+		{
+			if (m_tree.size() == 0) return 0;
+			std::vector<Ptr<PmtmgmpRoutePath> >::iterator path = m_tree.begin();
+			for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin() + 1; iter != m_tree.end(); iter++)
+			{
+				if ((*path)->GetHopCount() > (*iter)->GetHopCount() && (*iter)->GetPmtmgmpPeerLinkStatus() == true)
+				{
+					path = iter;
+				}
+			}
+			if ((*path)->GetPmtmgmpPeerLinkStatus())
+			{
+				return *path;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+		////设置路径链接状态
+		void PmtmgmpRouteTree::SetPathPeerLinkStatus(Mac48Address from, bool status)
+		{
+			for (std::vector<Ptr<PmtmgmpRoutePath> >::iterator iter = m_tree.begin(); iter != m_tree.end(); iter++)
+			{
+				if ((*iter)->GetFromNode() == from)
+				{
+					(*iter)->SetPmtmgmpPeerLinkStatus(status);
+				}
 			}
 		}
 		/*************************
@@ -614,6 +780,7 @@ namespace ns3 {
 			m_MTERPtree(0),
 			m_MTERPgenerationSeqNumber(0),
 			m_AsMSECPcount(0),
+			m_MSECPindex(0),
 			m_maxQueueSize(255),
 			m_currentQueueSize(0)
 		{
@@ -705,7 +872,6 @@ namespace ns3 {
 		void PmtmgmpRouteTable::ClearMTERProutePath()
 		{
 			m_MTERPgenerationSeqNumber++;
-			m_MSECPindex = 1;
 			////MTERP路由树未设置
 			if (m_MTERPtree == 0) return;
 			std::vector<Ptr<PmtmgmpRouteTree> >::iterator iter = std::find_if(m_table.begin(), m_table.end(), PmtmgmpRouteTable_Finder(m_address));
@@ -916,6 +1082,19 @@ namespace ns3 {
 				return (*iter)->GetBestRoutePathForData(index);
 			}
 		}
+		Ptr<PmtmgmpRoutePath> PmtmgmpRouteTable::GetNearestRoutePathForData(Mac48Address mterp)
+		{
+			if (m_table.size() == 0) return 0;
+			std::vector<Ptr<PmtmgmpRouteTree> >::iterator iter = std::find_if(m_table.begin(), m_table.end(), PmtmgmpRouteTable_Finder(mterp));
+			if (iter == m_table.end())
+			{
+				return 0;
+			}
+			else
+			{
+				return (*iter)->GetNearestRoutePathForData();
+			}
+		}
 		////添加Packet数据
 		bool PmtmgmpRouteTable::AddPacketToQueue(Ptr<Packet> pkt, Mac48Address src, Mac48Address dst, uint16_t protocol, uint32_t inInterface, PmtmgmpProtocol::RouteReplyCallback reply)
 		{
@@ -945,7 +1124,7 @@ namespace ns3 {
 			return true;
 		}
 		////发送列队的Packet
-		void PmtmgmpRouteTable::SendQueuePackets(Mac48Address dst, PmtmgmpProtocol::Statistics * stats)
+		void PmtmgmpRouteTable::SendQueuePackets(Mac48Address dst, PmtmgmpProtocol::Statistics * stats, std::map<Mac48Address, uint32_t> *packetSizePerPath)
 		{
 			std::map<Mac48Address, std::vector<PmtmgmpRouteQueuedPacket> >::iterator iter = m_packets.find(dst);
 			if (iter == m_packets.end())
@@ -959,15 +1138,33 @@ namespace ns3 {
 				return;
 			}
 			std::vector<PmtmgmpRouteQueuedPacket> packetList = iter->second;
+			if (packetSizePerPath->find(next->GetMTERPaddress()) == packetSizePerPath->end())
+			{
+				(*packetSizePerPath)[next->GetMTERPaddress()] = 0;
+			}
 			for (std::vector<PmtmgmpRouteQueuedPacket>::iterator select = packetList.begin(); select != packetList.end(); select++)
 			{
 				PmtmgmpTag tag;
 				select->pkt->RemovePacketTag(tag);
 				tag.SetAddress(next->GetFromNode());
+				if (next->GetMSECPindex() != tag.GetMSECPindex())
+				{
+					tag.IncreaseChange();
+				}
 				select->pkt->AddPacketTag(tag);
 				stats->txUnicast++;
 				stats->txBytes += select->pkt->GetSize();
+				(*packetSizePerPath)[next->GetFromNode()] += select->pkt->GetSize();
 				select->reply(true, select->pkt, select->src, select->dst, select->protocol, next->GetInterface());
+			}
+		}
+		////设置路径链接状态
+		void PmtmgmpRouteTable::SetPathPeerLinkStatus(Mac48Address mterp, Mac48Address from, bool status)
+		{
+			Ptr<PmtmgmpRouteTree> pTree = GetTreeByMACaddress(mterp); 
+			if (pTree != 0)
+			{
+				return pTree->SetPathPeerLinkStatus(from, status);
 			}
 		}
 #endif

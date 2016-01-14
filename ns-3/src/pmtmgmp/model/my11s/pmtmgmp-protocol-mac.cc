@@ -97,12 +97,17 @@ namespace ns3 {
 				NS_FATAL_ERROR(
 					"6-address scheme is not yet supported and 4-address extension is not supposed to be used for data frames.");
 			}
-#ifdef PMTMGMP_UNUSED_MY_CODE
-			////PmtmgmpTag去除seqno属性
 			tag.SetSeqno(wmnHdr.GetWmnSeqno());
-#endif
 			tag.SetTtl(wmnHdr.GetWmnTtl());
+#ifndef PMTMGMP_UNUSED_MY_CODE
+			tag.SetMSECPindex(wmnHdr.GetMSECPindex());
+			tag.SetChangePath(wmnHdr.GetChangePath());
+#ifdef PMTMGMP_TAG_INFOR_ATTACH
+			tag.SetSendIndex(wmnHdr.GetSendIndex());
+#endif
+#endif
 			packet->AddPacketTag(tag);
+<<<<<<< HEAD
 
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			////随时同步Metric
@@ -119,6 +124,8 @@ namespace ns3 {
 				return false;
 			}
 #else
+=======
+>>>>>>> refs/remotes/Whimsyduke/humgmp
 			if ((destination == Mac48Address::GetBroadcast()) && (m_protocol->DropDataFrame(wmnHdr.GetWmnSeqno(),
 				source)))
 			{
@@ -286,11 +293,15 @@ namespace ns3 {
 			m_stats.txData++;
 			m_stats.txDataBytes += packet->GetSize();
 			WmnHeader wmnHdr;
-#ifdef PMTMGMP_UNUSED_MY_CODE
-			////PmtmgmpTag去除seqno属性
 			wmnHdr.SetWmnSeqno(tag.GetSeqno());
-#endif
 			wmnHdr.SetWmnTtl(tag.GetTtl());
+#ifndef PMTMGMP_UNUSED_MY_CODE
+			wmnHdr.SetMSECPindex(tag.GetMSECPindex());
+			wmnHdr.SetChangePath(tag.GetChangePath());
+#ifdef PMTMGMP_TAG_INFOR_ATTACH
+			wmnHdr.SetSendIndex(tag.GetSendIndex());
+#endif
+#endif
 			packet->AddHeader(wmnHdr);
 			header.SetAddr1(tag.GetAddress());
 			return true;

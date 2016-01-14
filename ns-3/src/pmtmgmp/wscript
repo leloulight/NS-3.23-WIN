@@ -40,6 +40,29 @@ def build(bld):
         'model/my11s/pmtmgmp-airtime-metric.cc',
         'helper/wmn-helper.cc',
         'helper/my11s/my11s-installer.cc',
+		## HUYUN_MGMP_CODE
+        'model/hu11s/ie-hu11s-beacon-timing.cc',
+        'model/hu11s/ie-hu11s-configuration.cc',
+        'model/hu11s/ie-hu11s-id.cc',
+        'model/hu11s/ie-hu11s-peer-management.cc',
+        'model/hu11s/ie-hu11s-preq.cc',
+        'model/hu11s/ie-hu11s-prep.cc',
+        'model/hu11s/ie-hu11s-perr.cc',
+        'model/hu11s/ie-hu11s-rann.cc',
+        'model/hu11s/ie-hu11s-hupering-protocol.cc',
+        'model/hu11s/ie-hu11s-metric-report.cc',
+        'model/hu11s/hu11s-mac-header.cc',
+        'model/hu11s/mgmp-huper-link-frame.cc',
+        'model/hu11s/mgmp-huper-link.cc',
+        'model/hu11s/mgmp-huper-management-protocol-mac.cc',
+        'model/hu11s/mgmp-huper-management-protocol.cc',
+        'model/hu11s/mgmp-tag.cc',
+        'model/hu11s/mgmp-rtable.cc',
+        'model/hu11s/mgmp-protocol-mac.cc',
+        'model/hu11s/mgmp-protocol.cc',
+        'model/hu11s/hu11s-airtime-metric.cc',
+        'helper/hu11s/hu11s-installer.cc',
+		## HUYUN_MGMP_CODE
         ]
 
     obj_test = bld.create_ns3_module_test_library('wmn')
@@ -93,6 +116,25 @@ def build(bld):
         'helper/wmn-helper.h',
         'helper/wmn-stack-installer.h',
         'helper/my11s/my11s-installer.h',
+		## HUYUN_MGMP_CODE
+        'model/hu11s/mgmp-protocol.h',
+        'model/hu11s/mgmp-huper-management-protocol.h',
+        'model/hu11s/ie-hu11s-beacon-timing.h',
+        'model/hu11s/ie-hu11s-configuration.h',
+        'model/hu11s/ie-hu11s-huper-management.h',
+        'model/hu11s/ie-hu11s-id.h',
+        'model/hu11s/mgmp-huper-link.h',
+        'model/hu11s/hu11s-mac-header.h',
+        'model/hu11s/mgmp-huper-link-frame.h',
+        'model/hu11s/mgmp-rtable.h',
+        'model/hu11s/ie-hu11s-hupering-protocol.h',
+        'model/hu11s/ie-hu11s-metric-report.h',
+        'model/hu11s/ie-hu11s-perr.h',
+        'model/hu11s/ie-hu11s-prep.h',
+        'model/hu11s/ie-hu11s-preq.h',
+        'model/hu11s/ie-hu11s-rann.h',
+        'helper/hu11s/hu11s-installer.h',
+		## HUYUN_MGMP_CODE
         ]
 
     if bld.env['ENABLE_EXAMPLES']:

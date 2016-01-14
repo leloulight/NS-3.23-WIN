@@ -1,22 +1,22 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2008,2009 IITP RAS
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation;
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * Authors: Kirill Andreev <andreev@iitp.ru>
- */
+* Copyright (c) 2008,2009 IITP RAS
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License version 2 as
+* published by the Free Software Foundation;
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*
+* Authors: Kirill Andreev <andreev@iitp.ru>
+*/
 
 #include "pmtmgmp-protocol.h"
 #include "pmtmgmp-protocol-mac.h"
@@ -37,7 +37,9 @@
 #include "ie-my11s-perr.h"
 
 #ifndef PMTMGMP_UNUSED_MY_CODE
- ////find_if
+///Comment Below Code To Use Path Check
+//#define PMTMGMP_UNUSED_REPEAT_PATH
+////find_if
 #include <algorithm>
 
 #include "ns3/ie-my11s-secreq.h"
@@ -185,14 +187,14 @@ namespace ns3 {
 #ifndef PMTMGMP_UNUSED_MY_CODE
 				.AddAttribute("My11WmnPMTMGMPsecStartDelayTime",
 					"Delay time of start MSECP search",
-					TimeValue(MicroSeconds(1024 * 1000)),
+					TimeValue(MicroSeconds(1024 * 958)),
 					MakeTimeAccessor(
 						&PmtmgmpProtocol::m_My11WmnPMTMGMPsecStartDelayTime),
 					MakeTimeChecker()
 					)
 				.AddAttribute("My11WmnPMTMGMPsecInterval",
 					"Interval MSECP search, it also the interval of path Generation",
-					TimeValue(MicroSeconds(1024 * 65000)),
+					TimeValue(MicroSeconds(1024 * 100000)),
 					MakeTimeAccessor(
 						&PmtmgmpProtocol::m_My11WmnPMTMGMPsecInterval),
 					MakeTimeChecker()
@@ -213,28 +215,28 @@ namespace ns3 {
 					)
 				.AddAttribute("My11WmnPMTMGMPpathMetricUpdatePeriod",
 					"Period for Update the Metric of Route Path, also the Period for PUDP",
-					TimeValue(MicroSeconds(1024 * 2000)),
+					TimeValue(MicroSeconds(1024 * 6000)),
 					MakeTimeAccessor(
 						&PmtmgmpProtocol::m_My11WmnPMTMGMPpathMetricUpdatePeriod),
 					MakeTimeChecker()
 					)
 				.AddAttribute("PMTMGMPmterpAALMmagnification",
 					"The magnification of the value as M in MTERP node when Compute AALM.",
-					DoubleValue(3),
+					DoubleValue(4),
 					MakeDoubleAccessor(
 						&PmtmgmpProtocol::m_PMTMGMPmterpAALMmagnification),
 					MakeDoubleChecker<double>(1)
 					)
 				.AddAttribute("PMTMGMPmsecpAALMmagnification",
 					"The magnification of the value as M in MSECP node when Compute AALM.",
-					DoubleValue(2),
+					DoubleValue(3),
 					MakeDoubleAccessor(
 						&PmtmgmpProtocol::m_PMTMGMPmsecpAALMmagnification),
 					MakeDoubleChecker<double>(1)
 					)
 				.AddAttribute("MaxRoutePathPerPUPD",
 					"Max Route Path in each PUPD, same times it may be more then this value.",
-					UintegerValue(10),
+					UintegerValue(15),
 					MakeUintegerAccessor(
 						&PmtmgmpProtocol::m_MaxRoutePathPerPUPD),
 					MakeUintegerChecker<uint8_t>(1)
@@ -244,6 +246,13 @@ namespace ns3 {
 					UintegerValue(6),
 					MakeUintegerAccessor(
 						&PmtmgmpProtocol::m_MaxRoutePathPerPUPGQ),
+					MakeUintegerChecker<uint8_t>(1)
+					)
+				.AddAttribute("MaxPathChange",
+					"Max Route Path count can change when a packet in its way.",
+					UintegerValue(16),
+					MakeUintegerAccessor(
+						&PmtmgmpProtocol::m_MaxPathChange),
 					MakeUintegerChecker<uint8_t>(1)
 					)
 #endif
@@ -275,17 +284,23 @@ namespace ns3 {
 			m_rfFlag(false),
 #ifndef PMTMGMP_UNUSED_MY_CODE
 			m_NodeType(Mesh_STA),
-			m_My11WmnPMTMGMPsecStartDelayTime(MicroSeconds(1024 * 1000)),
-			m_My11WmnPMTMGMPsecInterval(MicroSeconds(1024 * 65000)),
+			m_My11WmnPMTMGMPsecStartDelayTime(MicroSeconds(1024 * 958)),
+			m_My11WmnPMTMGMPsecInterval(MicroSeconds(1024 * 100000)),
 			m_My11WmnPMTMGMPsecSetTime(MicroSeconds(1024 * 2000)),
 			m_My11WmnPMTMGMPpgerWaitTime(MicroSeconds(1024 * 2000)),
-			m_My11WmnPMTMGMPpathMetricUpdatePeriod(MicroSeconds(1024 * 2000)),
+			m_My11WmnPMTMGMPpathMetricUpdatePeriod(MicroSeconds(1024 * 6000)),
 			m_PathGenerationSeqNumber(0),
-			m_PMTMGMPmterpAALMmagnification(3),
-			m_PMTMGMPmsecpAALMmagnification(2),
+			m_PMTMGMPmterpAALMmagnification(4),
+			m_PMTMGMPmsecpAALMmagnification(3),
 			m_RouteTable(CreateObject<PmtmgmpRouteTable>()),
-			m_MaxRoutePathPerPUPD(10),
-			m_MaxRoutePathPerPUPGQ(6)
+			m_MaxRoutePathPerPUPD(15),
+			m_MaxRoutePathPerPUPGQ(6),
+#ifdef PMTMGMP_TAG_INFOR_ATTACH
+			m_MaxPathChange(10),
+			m_SendIndex(0)
+#else
+			m_MaxPathChange(16)
+#endif
 #endif
 		{
 			NS_LOG_FUNCTION_NOARGS();
@@ -443,6 +458,20 @@ namespace ns3 {
 					NS_FATAL_ERROR("PMTMGMP tag has come with a packet from upper layer. This must not occur...");
 				}
 				tag.SetTtl(m_maxTtl);
+				//Filling TAG:
+				if (destination == Mac48Address::GetBroadcast())
+				{
+					tag.SetSeqno(m_dataSeqno++);
+					NS_LOG_DEBUG("Start ARP Packet at " << m_address << " from " << source << " to " << destination);
+				}
+#ifdef PMTMGMP_TAG_INFOR_ATTACH
+				else
+				{
+					NS_LOG_DEBUG("Start Packet at " << m_address << " from " << source << " to " << destination << " while tag index is " << tag.GetSendIndex());
+					tag.SetSendIndex(m_SendIndex);
+					m_SendIndex++;
+				}
+#endif
 			}
 			else
 			{
@@ -453,12 +482,14 @@ namespace ns3 {
 				tag.DecrementTtl();
 				if (tag.GetTtl() == 0)
 				{
+					NS_LOG_DEBUG("TTL is 0 " << " at " << m_address << " from " << source << " to " << destination);
 					m_stats.droppedTtl++;
 					return false;
 				}
 			}
 			if (destination == Mac48Address::GetBroadcast())
 			{
+				NS_LOG_DEBUG("Receive ARP Packet at " << m_address << " from " << source << " to " << destination);
 				m_stats.txBroadcast++;
 				m_stats.txBytes += packet->GetSize();
 				//channel IDs where we have already sent broadcast:
@@ -495,32 +526,63 @@ namespace ns3 {
 			}
 			else
 			{
+#ifdef PMTMGMP_TAG_INFOR_ATTACH
+				NS_LOG_DEBUG("Receive Packet at " << m_address << " from " << source << " to " << destination << " while tag is (Address:" << tag.GetAddress() << ", SN:" << tag.GetSeqno() << ", MSECPindex:" << (uint32_t)tag.GetMSECPindex() << ", TTL:" << (uint32_t)tag.GetTtl() << ", Change:" << (uint32_t)tag.GetChangePath() << ", Index:" << (uint32_t)tag.GetSendIndex() << ")");
+#else
+				NS_LOG_DEBUG("Receive Packet at " << m_address << " from " << source << " to " << destination << " while tag is (Address:" << tag.GetAddress() << ", SN:" << tag.GetSeqno() << ", MSECPindex:" << (uint32_t)tag.GetMSECPindex() << ", TTL:" << (uint32_t)tag.GetTtl() << ", Change:" << (uint32_t)tag.GetChangePath() << ")");
+#endif
 				//return ForwardUnicast(sourceIface, source, destination, packet, protocolType, routeReply, tag.GetTtl());
-				Ptr<PmtmgmpRoutePath> next = m_RouteTable->GetBestRoutePathForData(destination, tag.GetMSECPindex());
+				Ptr<PmtmgmpRoutePath> next;
+				if (tag.GetChangePath() > m_MaxPathChange)
+				{
+					NS_LOG_DEBUG("Reach maximum change, and  can not find Next Hop Node by MSECPindex " << (uint32_t)tag.GetMSECPindex() << " at Node " << m_address);
+					////已到达最大路径转换次数
+					next = m_RouteTable->GetNearestRoutePathForData(destination);
+				}
+				else
+				{
+					next = m_RouteTable->GetBestRoutePathForData(destination, tag.GetMSECPindex());
+				}
 				if (next != 0)
 				{
+					if (next->GetMSECPindex() != tag.GetMSECPindex())
+					{
+						tag.IncreaseChange();
+					}
 					tag.SetAddress(next->GetFromNode());
 					tag.SetMSECPindex(next->GetMSECPindex());
 					packet->AddPacketTag(tag);
 
+<<<<<<< HEAD
 					NS_LOG_DEBUG("Get next hop " << next->GetFromNode() << " at " << m_address << " to " << destination << " from " << source);
+=======
+					NS_LOG_DEBUG("Get next hop " << next->GetFromNode() << " at " << m_address << " from " << source << " to " << destination << " as MSECPindex: " << (uint32_t)next->GetMSECPindex() << " ,Path Status is " << next->GetPmtmgmpPeerLinkStatus() << ", Path Change is " << (uint32_t) tag.GetChangePath() << ", Hopcount is " << (uint32_t)(m_maxTtl - tag.GetTtl()) << ", Packet is " << packet);
+>>>>>>> refs/remotes/Whimsyduke/humgmp
 
 					// reply immediately :
 					routeReply(true, packet, source, destination, protocolType, next->GetInterface());
 					m_stats.txUnicast++;
 					m_stats.txBytes += packet->GetSize();
+					if (m_PacketSizePerPath.find(next->GetFromNode()) == m_PacketSizePerPath.end())
+					{
+						m_PacketSizePerPath[next->GetFromNode()] = packet->GetSize();
+					}
+					else
+					{
+						m_PacketSizePerPath[next->GetFromNode()] += packet->GetSize();
+					}
 					return true;
 				}
 
 				if (sourceIface != GetWmnPoint()->GetIfIndex())
 				{
 					//Start path error procedure:
-					NS_LOG_DEBUG("Must Send PERR");
+					NS_LOG_DEBUG("Must Send PERR at " << m_address << " from " << source << " to " << destination);
 					m_stats.totalDropped++;
 					return false;
 				}
 
-				NS_LOG_DEBUG("No RouteTable here now. at " << m_address);
+				NS_LOG_DEBUG("No Route Path here now. at " << m_address << " from " << source << " to " << destination);
 				if (m_RouteTable->AddPacketToQueue(packet, source, destination, protocolType, sourceIface, routeReply))
 				{
 					m_stats.totalQueued++;
@@ -949,7 +1011,7 @@ namespace ns3 {
 			mp->AggregateObject(this);
 			m_address = Mac48Address::ConvertFrom(mp->GetAddress()); // address;
 #ifndef PMTMGMP_UNUSED_MY_CODE
-			////同步路由表中地址
+																	 ////同步路由表中地址
 			m_RouteTable->InitRouteTable(m_address, m_NodeType, MakeCallback(&PmtmgmpProtocol::SetNodeType, this));
 #endif
 			return true;
@@ -957,12 +1019,24 @@ namespace ns3 {
 		void
 			PmtmgmpProtocol::PmtmgmpPeerLinkStatus(Mac48Address wmnPointAddress, Mac48Address peerAddress, uint32_t interface, bool status)
 		{
+#ifndef PMTMGMP_UNUSED_MY_CODE
+			m_RouteTable->SetPathPeerLinkStatus(wmnPointAddress, peerAddress, status);
+			if (status)
+			{
+				NS_LOG_DEBUG("Status of PeerLink to " << peerAddress << " is True at " << m_address);
+			}
+			else
+			{
+				NS_LOG_DEBUG("Status of PeerLink to " << peerAddress << " is False at " << m_address);
+			}
+#else
 			if (status)
 			{
 				return;
 			}
 			std::vector<FailedDestination> destinations = m_rtable->GetUnreachableDestinations(peerAddress);
 			InitiatePathError(MakePathError(destinations));
+#endif
 		}
 		void
 			PmtmgmpProtocol::SetNeighboursCallback(Callback<std::vector<Mac48Address>, uint32_t> cb)
@@ -1402,7 +1476,7 @@ namespace ns3 {
 			default:
 				break;
 			}
-			std::string name[] = {"Mesh_STA", "Mesh_Access_Point", "Mesh_Portal", "Mesh_Secondary_Point"};
+			std::string name[] = { "Mesh_STA", "Mesh_Access_Point", "Mesh_Portal", "Mesh_Secondary_Point" };
 			os << "<Pmtmgmp "
 				"address=\"" << m_address << "\"" << std::endl <<
 				"NodeType=\"" << typeName << "\"" << std::endl <<
@@ -1568,6 +1642,45 @@ namespace ns3 {
 			}
 			return 1;
 		}
+		////获取每个发送数据帧的路径发送的数据量
+		std::map<Mac48Address, uint32_t> PmtmgmpProtocol::GetPacketSizePerPath()
+		{
+			return m_PacketSizePerPath;
+		}
+		////Python支持函数
+		uint32_t PmtmgmpProtocol::GetPacketSizePerPathCount()
+		{
+			return m_PacketSizePerPath.size();
+		}
+		Mac48Address PmtmgmpProtocol::GetPacketSizePerPathFirst(uint8_t index)
+		{
+			std::map<Mac48Address, uint32_t>::iterator iter = m_PacketSizePerPath.begin();
+			for (uint8_t i = 0; i < index; i++)
+			{
+				iter++;
+			}
+			return iter->first;
+		}
+		uint32_t PmtmgmpProtocol::GetPacketSizePerPathSecond(uint8_t index)
+		{
+			std::map<Mac48Address, uint32_t>::iterator iter = m_PacketSizePerPath.begin();
+			for (uint8_t i = 0; i < index; i++)
+			{
+				iter++;
+			}
+			return iter->second;
+		}
+		uint32_t PmtmgmpProtocol::GetPacketSizePerPathSecondByMac(Mac48Address first)
+		{
+			if (m_PacketSizePerPath.find(first) != m_PacketSizePerPath.end())
+			{
+				return m_PacketSizePerPath.find(first)->second;
+			}
+			else
+			{
+				return 0;
+			}
+		}
 		////验证协议所属结点是否为终端节点MTERP
 		bool PmtmgmpProtocol::IsMTERP()
 		{
@@ -1581,11 +1694,11 @@ namespace ns3 {
 				////新的路径生成开始，放弃此过程
 				return;
 			}
-			
+
 			////效验是否收到SECREP，若未收到，重发SECREQ
 			if (m_RouteTable->GetMTERPtree() == 0)
 			{
-				NS_LOG_DEBUG("Select MSECP: receive SECREP " << m_RouteTable->GetMTERPtree()->GetPartTree().size() << " at " << m_address << ", Research.");
+				NS_LOG_DEBUG("Select MSECP: receive SECREP " << " at " << m_address << ", Research.");
 				MSECPSearch();
 			}
 			else
@@ -1634,7 +1747,7 @@ namespace ns3 {
 			{
 				if (path->GetPathGenerationSequenceNumber() > secack.GetPathGenerationSequenceNumber())
 				{
-					NS_LOG_DEBUG("Receive SECACK have expired from " << from << " at interface " << interface << " while metric is " << metric << " at " << m_address << " is ");
+					NS_LOG_DEBUG("Receive SECACK have expired from " << from << " at interface " << interface << " while metric is " << metric << " at " << m_address);
 					return;
 				}
 			}
@@ -1740,6 +1853,7 @@ namespace ns3 {
 			pathCopy->SetFromNode(from);
 			pathCopy->SetPGENsendTime();
 
+#ifndef PMTMGMP_UNUSED_REPEAT_PATH //使用路径重复效验
 			////路由表是否存在PGEN来源对应路径
 			Ptr<PmtmgmpRouteTree> routeTree = m_RouteTable->GetTreeByMACaddress(pathCopy->GetMTERPaddress());
 			if (routeTree == 0)
@@ -1749,9 +1863,6 @@ namespace ns3 {
 				m_RouteTable->AddNewPath(pathCopy);
 				routeTree = m_RouteTable->GetTreeByMACaddress(pathCopy->GetMTERPaddress());
 				routeTree->RepeatabilityIncrease(from);
-
-				////发送列队的数据
-				m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats);
 			}
 			else
 			{
@@ -1764,9 +1875,6 @@ namespace ns3 {
 					pathCopy->SetStatus(PmtmgmpRoutePath::Confirmed);
 					routeTree->AddNewPath(pathCopy);
 					routeTree->RepeatabilityIncrease(from);
-
-					////发送列队的数据
-					m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats);
 				}
 				else if (GenSeqNum == routeTree->GetTreeMaxGenerationSeqNumber())
 				{
@@ -1785,8 +1893,6 @@ namespace ns3 {
 							routeTree->AddNewPath(pathCopy);
 							routeTree->RepeatabilityIncrease(from);
 
-							////发送列队的数据
-							m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats);
 						}
 						else
 						{
@@ -1796,9 +1902,6 @@ namespace ns3 {
 								pathCopy->SetStatus(PmtmgmpRoutePath::Confirmed);
 								routeTree->RepeatabilityIncrease(from);
 								routeTree->AddNewPath(pathCopy);
-
-								////发送列队的数据
-								m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats);
 							}
 							else
 							{
@@ -1881,6 +1984,24 @@ namespace ns3 {
 					return;
 				}
 			}
+#else
+			Ptr<PmtmgmpRouteTree> routeTree = m_RouteTable->GetTreeByMACaddress(pathCopy->GetMTERPaddress());
+			if (routeTree != 0)
+			{
+				Ptr<PmtmgmpRoutePath> existPath = routeTree->GetPathByMACaddress(pathCopy->GetMSECPaddress());
+				if (existPath != 0)
+				{
+					if (existPath->GetStatus() == PmtmgmpRoutePath::Confirmed && pathCopy->GetPathGenerationSequenceNumber() == existPath->GetPathGenerationSequenceNumber())
+					{
+						//路径信息存在且当前生成已完成，放弃PGEN
+						return;
+					}
+				}
+			}
+			pathCopy->SetStatus(PmtmgmpRoutePath::Confirmed);
+			m_RouteTable->AddNewPath(pathCopy);
+#endif
+			m_RouteTable->SendQueuePackets(pathCopy->GetMTERPaddress(), &m_stats, &m_PacketSizePerPath);
 			if (pathCopy->GetTTL() > 0)
 			{
 				////转发PGEN
@@ -1950,11 +2071,17 @@ namespace ns3 {
 						uint32_t old = find->GetMetric();
 						find->SetMetric(select->GetMetric());
 						find->IncrementMetric(metric, GetValueMForAALM());
+<<<<<<< HEAD
 						NS_LOG_DEBUG("PUPD  Infor: MTERP(" << mterp << "),MSECPindex(" << uint32_t(select->GetMSECPindex()) << "), Metric(From " << old << " to " << find->GetMetric() << " , Base:" << find-> GetBaseMetric()<< " Step:" << metric << ")");
+=======
+						NS_LOG_DEBUG("PUPD  Infor: MTERP(" << mterp << "),MSECPindex(" << uint32_t(select->GetMSECPindex()) << "), Metric(From " << old << " to " << find->GetMetric() << " , Base:" << find->GetBaseMetric() << " Step:" << metric << ")");
+						m_RouteTable->SendQueuePackets(find->GetMTERPaddress(), &m_stats, &m_PacketSizePerPath);
+>>>>>>> refs/remotes/Whimsyduke/humgmp
 					}
 					else
 					{
 						////路由表中存在指定路由路径且并非来自于PUPD的发送者，不做任何事情
+						m_RouteTable->SendQueuePackets(find->GetMTERPaddress(), &m_stats, &m_PacketSizePerPath);
 						continue;
 					}
 				}
@@ -1963,7 +2090,7 @@ namespace ns3 {
 			{
 				SendPUPGQ(from, recreateList);
 			}
-			NS_LOG_DEBUG("Receive PUPD, it is PUPGQ  contain " << recreateList.size() << " Route Path.");
+			NS_LOG_DEBUG("Receive PUPD, it is PUPGQ  contain " << recreateList.size() << " Route Path at " << m_address);
 		}
 		////发送PUPGQ
 		void PmtmgmpProtocol::SendPUPGQ(Mac48Address receiver, std::vector<PUPGQdata> list)
@@ -1976,7 +2103,7 @@ namespace ns3 {
 				i->second->SendPUPGQ(pupgq, receiver);
 			}
 		}
-		////接收PUPD
+		////接收PUPGQ
 		void PmtmgmpProtocol::ReceivePUPGQ(IePupgq pupgq, Mac48Address from, uint32_t interface, Mac48Address fromMp, uint32_t metric)
 		{
 			int sendTimes = 0;

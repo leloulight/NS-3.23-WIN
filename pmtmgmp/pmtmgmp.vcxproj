@@ -11,9 +11,31 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\ns-3\src\pmtmgmp\helper\hu11s\hu11s-installer.h" />
     <ClInclude Include="..\ns-3\src\pmtmgmp\helper\my11s\my11s-installer.h" />
     <ClInclude Include="..\ns-3\src\pmtmgmp\helper\wmn-helper.h" />
     <ClInclude Include="..\ns-3\src\pmtmgmp\helper\wmn-stack-installer.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\hu11s\hu11s-airtime-metric.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\hu11s\hu11s-mac-header.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\hu11s\hu11s.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\hu11s\huper-link-frame.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\hu11s\huper-link.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\hu11s\huper-management-protocol-mac.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\hu11s\huper-management-protocol.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\hu11s\ie-hu11s-beacon-timing.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\hu11s\ie-hu11s-configuration.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\hu11s\ie-hu11s-huper-management.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\hu11s\ie-hu11s-hupering-protocol.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\hu11s\ie-hu11s-id.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\hu11s\ie-hu11s-metric-report.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\hu11s\ie-hu11s-perr.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\hu11s\ie-hu11s-prep.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\hu11s\ie-hu11s-preq.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\hu11s\ie-hu11s-rann.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\hu11s\mgmp-protocol-mac.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\hu11s\mgmp-protocol.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\hu11s\mgmp-rtable.h" />
+    <ClInclude Include="..\ns-3\src\pmtmgmp\model\hu11s\mgmp-tag.h" />
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-beacon-timing.h" />
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-configuration.h" />
     <ClInclude Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-id.h" />
@@ -52,8 +74,29 @@
     <ClInclude Include="..\others\ns3\pmtmgmp-module.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\ns-3\src\pmtmgmp\helper\hu11s\hu11s-installer.cc" />
     <ClCompile Include="..\ns-3\src\pmtmgmp\helper\my11s\my11s-installer.cc" />
     <ClCompile Include="..\ns-3\src\pmtmgmp\helper\wmn-helper.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\hu11s\hu11s-airtime-metric.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\hu11s\hu11s-mac-header.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\hu11s\huper-link-frame.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\hu11s\huper-link.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\hu11s\huper-management-protocol-mac.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\hu11s\huper-management-protocol.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\hu11s\ie-hu11s-beacon-timing.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\hu11s\ie-hu11s-configuration.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\hu11s\ie-hu11s-huper-management.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\hu11s\ie-hu11s-hupering-protocol.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\hu11s\ie-hu11s-id.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\hu11s\ie-hu11s-metric-report.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\hu11s\ie-hu11s-perr.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\hu11s\ie-hu11s-prep.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\hu11s\ie-hu11s-preq.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\hu11s\ie-hu11s-rann.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\hu11s\mgmp-protocol-mac.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\hu11s\mgmp-protocol.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\hu11s\mgmp-rtable.cc" />
+    <ClCompile Include="..\ns-3\src\pmtmgmp\model\hu11s\mgmp-tag.cc" />
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-beacon-timing.cc" />
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-configuration.cc" />
     <ClCompile Include="..\ns-3\src\pmtmgmp\model\my11s\ie-my11s-id.cc" />
@@ -134,6 +177,8 @@ copy "$(SolutionDir)ns-3\src\pmtmgmp\helper\*.h"  "$(SolutionDir)headers\ns3"
 
 copy "$(SolutionDir)ns-3\src\pmtmgmp\model\my11s\*.h"  "$(SolutionDir)headers\ns3"
 copy "$(SolutionDir)ns-3\src\pmtmgmp\helper\my11s\*.h"  "$(SolutionDir)headers\ns3"
+copy "$(SolutionDir)ns-3\src\pmtmgmp\model\hu11s\*.h"  "$(SolutionDir)headers\ns3"
+copy "$(SolutionDir)ns-3\src\pmtmgmp\helper\hu11s\*.h"  "$(SolutionDir)headers\ns3"
 </Command>
     </PostBuildEvent>
     <Bscmake>

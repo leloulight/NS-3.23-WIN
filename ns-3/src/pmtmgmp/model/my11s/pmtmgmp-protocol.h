@@ -27,6 +27,9 @@
 #include "ns3/traced-value.h"
 #include <vector>
 #include <map>
+#ifndef PMTMGMP_UNUSED_MY_CODE
+#include "ns3/pmtmgmp-tag.h"
+#endif
 
 namespace ns3 {
 	class WmnPointDevice;
@@ -150,6 +153,14 @@ namespace ns3 {
 			NodeType GetNodeType();
 			////获取AALM技术时采用的m的值
 			uint8_t GetValueMForAALM();
+
+			////获取每个发送数据帧的路径发送的数据量
+			std::map<Mac48Address, uint32_t> GetPacketSizePerPath();
+			////Python支持函数
+			uint32_t GetPacketSizePerPathCount();
+			Mac48Address GetPacketSizePerPathFirst(uint8_t index);
+			uint32_t GetPacketSizePerPathSecond(uint8_t index);
+			uint32_t GetPacketSizePerPathSecondByMac(Mac48Address first);
 #endif
 
 		private:
@@ -414,6 +425,13 @@ namespace ns3 {
 			uint8_t m_MaxRoutePathPerPUPD;
 			////每个PUPGQ可以发送的路由路径最大数量
 			uint8_t m_MaxRoutePathPerPUPGQ;
+			////最大路径转换次数
+			uint8_t m_MaxPathChange;
+#ifdef PMTMGMP_TAG_INFOR_ATTACH
+			uint32_t m_SendIndex;
+#endif
+			////每个发送数据帧的路径发送的数据量
+			std::map<Mac48Address, uint32_t> m_PacketSizePerPath;
 #endif
 		};
 	} // namespace my11s
